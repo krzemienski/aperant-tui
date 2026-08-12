@@ -50,6 +50,10 @@ export interface ParallelExecutorConfig {
   onSubtaskFailed?: (subtask: SubtaskInfo, error: Error) => void;
   /** Called when a rate limit is detected */
   onRateLimited?: (delayMs: number) => void;
+  // [APERANT-PATCH observability-tap] (spec §7.2): fired when a subtask is
+  // placed in a batch but not yet started — makes the execution queue visible
+  // to observers. Additive and optional; execution behavior is unchanged.
+  onSubtaskQueued?: (subtask: SubtaskInfo, batchIndex: number, position: number) => void;
 }
 
 /** Function that runs a single subtask session */
@@ -113,6 +117,16 @@ export async function executeParallel(
   const batches = createBatches(subtasks, maxConcurrency);
   const allResults: ParallelSubtaskResult[] = [];
   let rateLimitBackoff = 0;
+
+  // [APERANT-PATCH observability-tap]: announce every queued subtask before
+  // the first batch starts (position = index within its batch).
+  if (config.onSubtaskQueued) {
+    batches.forEach((batch, batchIndex) => {
+      batch.forEach((subtask, position) => {
+        if (batchIndex > 0) config.onSubtaskQueued!(subtask, batchIndex, position);
+      });
+    });
+  }
 
   for (const batch of batches) {
     if (config.abortSignal?.aborted) {

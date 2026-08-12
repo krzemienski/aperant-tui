@@ -187,6 +187,10 @@ export class WorkerBridge extends EventEmitter {
         if (message.data.type === 'text-delta') {
           this.emitTyped('log', message.taskId, message.data.text, message.projectId);
         }
+        // [APERANT-PATCH observability-tap]: re-emit the raw StreamEvent so
+        // observability subscribers (TUI swarm/trace/tokens views) see
+        // tool-call/tool-result/step-finish/usage-update traffic. Additive.
+        this.emitTyped('stream-event', message.taskId, message.data, message.projectId);
         break;
 
       case 'task-event':
