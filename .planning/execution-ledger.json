@@ -134,6 +134,55 @@
       },
       "status": "done",
       "artifact": "proofpunk commit b6a91002, /mnt/agents/output/proofpunk-site/"
+    },
+    {
+      "id": "T11",
+      "scope": "doc-vs-evidence consistency audit + remediation",
+      "depends_on": [
+        "T7",
+        "T9"
+      ],
+      "proof_obligation": {
+        "end_user_test": "recompute every cited number from committed artifacts",
+        "assertion": "drift found (1807\u2192275) and corrected; all other claims verify"
+      },
+      "status": "done",
+      "artifact": "phase-3.5-VALIDATION.md corrections; audit output"
+    },
+    {
+      "id": "T12",
+      "scope": "prompt-source + phase-ordering measurement",
+      "depends_on": [
+        "T7"
+      ],
+      "proof_obligation": {
+        "end_user_test": "probe prompt dir resolution (main+worker) and extract phase sequence from committed logs",
+        "assertion": "real prompts resolved both paths; zero regressions in 1,886 events"
+      },
+      "status": "done",
+      "artifact": "phase-2.5-VALIDATION.md measurement section"
+    },
+    {
+      "id": "T13",
+      "scope": "real npm build for the TUI",
+      "depends_on": [],
+      "proof_obligation": {
+        "end_user_test": "npm run build && node dist/cli.mjs in a real PTY",
+        "assertion": "TASKS + task titles matched; boot screenshot"
+      },
+      "status": "done",
+      "artifact": "tools/build-cli.mjs + evidence/dist-cli-boot.png"
+    },
+    {
+      "id": "T14",
+      "scope": "proofpunk skill round-2 improvements (6) + tui-testing replication",
+      "depends_on": [],
+      "proof_obligation": {
+        "end_user_test": "frontmatter parses for 19 skills; manifests 1.9.0; site regenerated",
+        "assertion": "grep-verified; Pages live"
+      },
+      "status": "done",
+      "artifact": "proofpunk commits daaed5df + 7f65a3fb; proofpunk-skills-improvement-report-round2.md"
     }
   ],
   "defects_caught_by_gates": [

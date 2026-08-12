@@ -18,7 +18,7 @@
     <span class="meta">aperant-tui</span><span class="sep">│</span>
     <span class="branch">⑂ main</span><span class="sep">│</span>
     <span class="meta"><span class="led ok"></span>4 phases gated</span>
-    <span class="meta"><span class="led idle"></span>generated 2026-08-12</span>
+    <span class="meta"><span class="led idle"></span>generated 2026-08-13</span>
   </div>
   <nav class="tabs"><a href="index.html" class=""><span class="n">1</span>overview</a><a href="roadmap.html" class=""><span class="n">2</span>roadmap</a><a href="phases.html" class=""><span class="n">3</span>phases</a><a href="evidence.html" class=""><span class="n">4</span>evidence</a><a href="docs.html" class="on"><span class="n">5</span>docs</a></nav>
 
@@ -29,7 +29,7 @@ VALIDATION — per-criterion verdicts</h1>
 <p>Run:
 <code>evidence/phase-3.5/e2e-evidence/run-20260812T084209-phase35-gate/</code>
 Session <code>phase35</code> · 110x32 · screenshots ×7 · console log ·
-agent-events.jsonl (1807 events) · real sentinel intervention. Verdict:
+agent-events.jsonl (275 events) · real sentinel intervention. Verdict:
 <strong>GATE FAILS: 0</strong> · SECRET-SCAN-OK.</p>
 <table>
 <thead>
@@ -95,7 +95,7 @@ from the imported vendored AGENT_CONFIGS</td>
 </tr>
 <tr class="odd">
 <td>Trace completeness</td>
-<td>step-09 census: 898 stream-events (thinking-delta ×118, tool-call
+<td>step-09 census: 132 stream-events (thinking-delta ×118, tool-call
 ×4, tool-result ×4, step-finish ×3, usage-update ×3) — every tool-call
 paired</td>
 <td><strong>PASS</strong></td>
@@ -117,7 +117,7 @@ nodes require SpawnSubagent traffic — none in this run</td>
 </tr>
 <tr class="even">
 <td>Throughput</td>
-<td>898-event live stream ingested with 16ms coalescing; no UI stalls
+<td>275-event live stream ingested with 16ms coalescing; no UI stalls
 observed across 7 screenshots</td>
 <td><strong>PASS (observational)</strong>; 100 events/sec synthetic
 burst not performed</td>
@@ -148,6 +148,19 @@ were wrong.</li>
 daemon must be killed after runtime changes.</li>
 <li>Cold-cache TUI boots exceed 120s; boot waits run 300s.</li>
 </ul>
+<h2
+id="supplementary-run--real-upstream-failure-path-2026-08-12-pm">Supplementary
+run — real upstream failure path (2026-08-12 PM)</h2>
+<p>Run <code>run-20260812T172300-phase35-gate</code> executed while the
+endpoint was unreachable
+(<code>EHOSTUNREACH 100.33.238.199:20128</code>). It is kept
+deliberately: it proves the error path end-to-end — the worker retried 3
+times, surfaced <code>ai_apicallerror: cannot connect to api</code> as
+structured stream <code>error</code> events in the flight recorder, and
+the TUI stayed alive and navigable. The two wait-failures in that run
+(thinking/provenance) are the agent's absence, not view defects.
+Happy-path proof remains run-20260812T084209 (0 fails) and the canonical
+set run-20260812T172051 (moonshot, 0 fails).</p>
 </div></section>
 </main>
   <div class="statusline"><span><b>DOC · phase-3.5-VALIDATION</b></span><span>: cmd &nbsp; ? help</span></div>

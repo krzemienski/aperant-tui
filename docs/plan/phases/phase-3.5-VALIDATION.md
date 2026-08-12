@@ -37,3 +37,14 @@ Verdict: **GATE FAILS: 0** · SECRET-SCAN-OK.
 - agent-tty daemon inherits the PATH of its first invocation — a stale
   daemon must be killed after runtime changes.
 - Cold-cache TUI boots exceed 120s; boot waits run 300s.
+
+## Supplementary run — real upstream failure path (2026-08-12 PM)
+
+Run `run-20260812T172300-phase35-gate` executed while the endpoint was
+unreachable (`EHOSTUNREACH 100.33.238.199:20128`). It is kept deliberately:
+it proves the error path end-to-end — the worker retried 3 times, surfaced
+`ai_apicallerror: cannot connect to api` as structured stream `error`
+events in the flight recorder, and the TUI stayed alive and navigable.
+The two wait-failures in that run (thinking/provenance) are the agent's
+absence, not view defects. Happy-path proof remains run-20260812T084209
+(0 fails) and the canonical set run-20260812T172051 (moonshot, 0 fails).

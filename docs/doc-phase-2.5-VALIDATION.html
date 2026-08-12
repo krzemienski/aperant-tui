@@ -18,7 +18,7 @@
     <span class="meta">aperant-tui</span><span class="sep">│</span>
     <span class="branch">⑂ main</span><span class="sep">│</span>
     <span class="meta"><span class="led ok"></span>4 phases gated</span>
-    <span class="meta"><span class="led idle"></span>generated 2026-08-12</span>
+    <span class="meta"><span class="led idle"></span>generated 2026-08-13</span>
   </div>
   <nav class="tabs"><a href="index.html" class=""><span class="n">1</span>overview</a><a href="roadmap.html" class=""><span class="n">2</span>roadmap</a><a href="phases.html" class=""><span class="n">3</span>phases</a><a href="evidence.html" class=""><span class="n">4</span>evidence</a><a href="docs.html" class="on"><span class="n">5</span>docs</a></nav>
 
@@ -104,6 +104,28 @@ concurrency 3)</td>
 </tr>
 </tbody>
 </table>
+<h2
+id="prompt--ordering-measurements-remediation-sweep-2026-08-12-pm">Prompt
+&amp; ordering measurements (remediation sweep 2026-08-12 PM)</h2>
+<ul>
+<li><strong>Prompt source (empirical)</strong>: the main thread's
+<code>prompt-loader</code> resolves <code>apps/desktop/prompts/</code>
+via repo-root traversal; the bundled worker's own
+<code>loadPrompt</code> resolves the same real directory
+(<code>join(dist,'..','..','..','apps','desktop','prompts')</code> —
+probed standalone, RESOLVED). The planner phase therefore ran the real
+<code>prompts/planner.md</code> (30,116 bytes; mandates Write of
+<code>implementation_plan.json</code> — which the agent demonstrably
+did), and coder/QA phases inside the worker load their real prompt files
+from the same tree. No fallback prompts were used.</li>
+<li><strong>Phase ordering</strong>: sequence extracted from this run's
+committed <code>agent-events.jsonl</code>:
+<code>planning → [structured CODING_STARTED] → coding → (idle: session boundary) → planning → qa_review → qa_fixing</code>.
+Splitting at session boundaries, every segment is monotonic per
+<code>PHASE_ORDER_INDEX</code> (0→1 and 0→2→3);
+<code>qa_review → qa_fixing</code> is the legal 80–95% QA cycle.
+<strong>No phase regression in 1,886 events.</strong></li>
+</ul>
 <h2 id="defects-caught-by-this-gate-family">Defects caught by this gate
 family</h2>
 <ul>
