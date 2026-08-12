@@ -61,31 +61,34 @@ wait_assert "$S1" "AGENT SWARM" 20000 "$RUN/step-03a-swarm.json"
 wait_assert "$S1" "planner" 30000 "$RUN/step-03b-swarm-type.json"
 shot "$S1" step-03c-swarm-shot.json
 
-step 4 "GRAPH view — phase pipeline + regression guard"
-$ATTY send-keys "$S1" 2 --json > /dev/null 2>&1; sleep 2
-wait_assert "$S1" "PHASE PIPELINE" 20000 "$RUN/step-04a-graph.json"
-wait_assert "$S1" "regression guard" 10000 "$RUN/step-04b-guard.json"
-shot "$S1" step-04c-graph-shot.json
-
-step 5 "INSPECT view — identity + tool grants byte-match AGENT_CONFIGS"
+step 4 "INSPECT view — identity + tool grants byte-match AGENT_CONFIGS (early: planner still active)"
 $ATTY send-keys "$S1" 3 --json > /dev/null 2>&1; sleep 2
-wait_assert "$S1" "TOOL GRANTS" 20000 "$RUN/step-05a-inspect.json"
-wait_assert "$S1" "thinking:high" 10000 "$RUN/step-05b-thinking.json"
-wait_assert "$S1" "structured" 10000 "$RUN/step-05c-provenance.json"
-shot "$S1" step-05d-inspect-shot.json
-python3 - > "$RUN/step-05e-grants-bytematch.txt" <<'EOF'
-import subprocess, json, os
+wait_assert "$S1" "TOOL GRANTS" 20000 "$RUN/step-04a-inspect.json"
+wait_assert "$S1" "thinking:high" 10000 "$RUN/step-04b-thinking.json"
+wait_assert "$S1" "structured" 10000 "$RUN/step-04c-provenance.json"
+shot "$S1" step-04d-inspect-shot.json
+python3 - > "$RUN/step-04e-grants-bytematch.txt" <<EOF
+import subprocess, json
 r = subprocess.run(
-  ["bash", "-c", "cd /tmp/build/aperant-tui && $HOME/node24/bin/node --import tsx -e \"import('@main/ai/config/agent-configs').then(m=>console.log(JSON.stringify(m.AGENT_CONFIGS.planner)))\""],
+  ["bash", "-c", "cd $REPO && \$HOME/node24/bin/node --import tsx tools/dump-agent-configs.mts planner coder qa_reviewer"],
   capture_output=True, text=True, timeout=120)
-cfg = json.loads(r.stdout.strip().splitlines()[-1])
+line = r.stdout.strip().splitlines()[-1]
+cfg = json.loads(line)
+planner = cfg["planner"]
 print("planner grants from vendored AGENT_CONFIGS:")
-print(json.dumps(cfg, indent=2))
-assert "Read" in cfg["tools"] and "Bash" in cfg["tools"]
-assert cfg["thinkingDefault"] == "high"
+print(json.dumps(planner, indent=2))
+assert "Read" in planner["tools"] and "Bash" in planner["tools"]
+assert planner["thinkingDefault"] == "high"
+assert cfg["coder"]["thinkingDefault"] == "low"   # the cost-model asymmetry (spec §1.2)
 print("GRANTS-BYTEMATCH-OK")
 EOF
-grep -q "GRANTS-BYTEMATCH-OK" "$RUN/step-05e-grants-bytematch.txt" && echo "  GRANTS-PASS" || { echo "  GRANTS-FAIL"; FAILS=$((FAILS+1)); }
+grep -q "GRANTS-BYTEMATCH-OK" "$RUN/step-04e-grants-bytematch.txt" && echo "  GRANTS-PASS" || { echo "  GRANTS-FAIL"; FAILS=$((FAILS+1)); }
+
+step 5 "GRAPH view — phase pipeline + regression guard"
+$ATTY send-keys "$S1" 2 --json > /dev/null 2>&1; sleep 2
+wait_assert "$S1" "PHASE PIPELINE" 20000 "$RUN/step-05a-graph.json"
+wait_assert "$S1" "regression guard" 10000 "$RUN/step-05b-guard.json"
+shot "$S1" step-05c-graph-shot.json
 
 step 6 "TRACE view — real event stream"
 $ATTY send-keys "$S1" 4 --json > /dev/null 2>&1; sleep 2

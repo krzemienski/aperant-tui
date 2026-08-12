@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "command": "wait",
+  "timestamp": "2026-08-12T05:43:24.068Z",
+  "result": {
+    "matched": true,
+    "timedOut": false,
+    "matchedText": "ACCOUNTS",
+    "cursorRow": 27,
+    "cursorCol": 0,
+    "capturedAtSeq": 11,
+    "screenHash": "ae447b92abfe0f2895e2c5c3eb02d69659bb83b919460e41ce7970c7b01f5c0f"
+  }
+}

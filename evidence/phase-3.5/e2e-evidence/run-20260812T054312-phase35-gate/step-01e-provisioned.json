@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "command": "wait",
+  "timestamp": "2026-08-12T05:43:28.152Z",
+  "result": {
+    "matched": true,
+    "timedOut": false,
+    "matchedText": "moonshot account",
+    "cursorRow": 28,
+    "cursorCol": 0,
+    "capturedAtSeq": 14,
+    "screenHash": "7bf140615d740b5f04df1a2dcacde919973ee93abbb6514173c34bbcbd761a0a"
+  }
+}

@@ -134,6 +134,10 @@ class Ring<T> {
 interface AgentStateMut {
   snap: AgentSnapshot;
   openToolCalls: Map<string, { toolName: string; argsSummary: string; since: number }>;
+  /** Last phase set by a structured (authoritative) event. When the
+   *  tracker-derived phase agrees, provenance stays 'structured' — the
+   *  authoritative source confirmed it (spec §2.3 trust levels). */
+  lastStructuredPhase?: string;
 }
 
 interface ObservabilityDeps {
@@ -264,7 +268,7 @@ export class ObservabilityService extends EventEmitter {
     const a = this.ensureAgent(taskId);
     if (progress.phase) {
       a.snap.phase = progress.phase;
-      a.snap.phaseSource = 'inferred'; // tracker-derived (tool/text patterns)
+      a.snap.phaseSource = a.lastStructuredPhase === progress.phase ? 'structured' : 'inferred';
       const agentType = PHASE_AGENT_MAP[progress.phase];
       if (agentType) this.applyAgentType(a, agentType);
       if (progress.phase === 'complete') a.snap.state = 'done';
@@ -304,6 +308,7 @@ export class ObservabilityService extends EventEmitter {
     if (phase) {
       a.snap.phase = phase;
       a.snap.phaseSource = 'structured';
+      a.lastStructuredPhase = phase;
       const agentType = PHASE_AGENT_MAP[phase];
       if (agentType) this.applyAgentType(a, agentType);
       if (phase === 'complete') a.snap.state = 'done';
