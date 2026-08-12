@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>vendored — APERANT TUI</title>
+<meta name="description" content="Aperant TUI — the full Aperant agent runtime in your terminal. Real gates, real evidence.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<div class="chrome">
+  <div class="chrome-bar">
+    <span class="brand">APERANT</span><span class="sep">│</span>
+    <span class="meta">aperant-tui</span><span class="sep">│</span>
+    <span class="branch">⑂ main</span><span class="sep">│</span>
+    <span class="meta"><span class="led ok"></span>2 phases gated</span>
+    <span class="meta"><span class="led warn"></span>1 unverified</span>
+    <span class="meta"><span class="led idle"></span>6 pending</span>
+  </div>
+  <nav class="tabs"><a href="index.html" class=""><span class="n">1</span>overview</a><a href="roadmap.html" class=""><span class="n">2</span>roadmap</a><a href="phases.html" class=""><span class="n">3</span>phases</a><a href="evidence.html" class=""><span class="n">4</span>evidence</a><a href="docs.html" class="on"><span class="n">5</span>docs</a></nav>
+  
+<main>
+<section><div class="marker">DOC / VENDORED</div><div class="doc"><h1 id="vendored-upstream-appsdesktop">Vendored upstream:
+apps/desktop</h1>
+<p><code>apps/desktop/</code> is a <strong>byte-for-byte
+unmodified</strong> snapshot of <a
+href="https://github.com/AndyMik90/Aperant">AndyMik90/Aperant</a>,
+branch <code>develop</code>.</p>
+<ul>
+<li>Upstream HEAD at vendor time:
+<code>20250db069a849ab001ac6ab9e3e9779886ab9e2</code>
+(<code>2026-06-14 docs: communicate Aperant 3.0 rebuild and pause contributions</code>)</li>
+<li>TypeScript migration commit referenced by the spec:
+<code>75869f7e</code>
+(<code>2026-03-11 feat: migrate from Python Claude Agent SDK to Vercel AI SDK v6 (TypeScript) (#1891)</code>)</li>
+<li>Checksums: <code>apps/DESKTOP-SHA256SUMS.txt</code> (1288
+files)</li>
+</ul>
+<h2 id="the-rule">The rule</h2>
+<p>The TUI <strong>imports</strong>
+<code>apps/desktop/src/main/**</code> and
+<code>apps/desktop/src/shared/**</code>. It never modifies them. If a
+change seems needed in vendored code, the TUI wraps or adapts in its own
+tree instead.</p>
+<h2 id="verify-unmodified">Verify unmodified</h2>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> apps/desktop</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sha256sum</span> <span class="at">-c</span> ../DESKTOP-SHA256SUMS.txt   <span class="co"># all files: OK</span></span></code></pre></div>
+<h2 id="re-sync-from-upstream">Re-sync from upstream</h2>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-sL</span> https://codeload.github.com/AndyMik90/Aperant/tar.gz/refs/heads/develop <span class="kw">|</span> <span class="fu">tar</span> xz</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">rsync</span> <span class="at">-a</span> <span class="at">--delete</span> Aperant-develop/apps/desktop/ apps/desktop/</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> apps/desktop <span class="kw">&amp;&amp;</span> <span class="fu">find</span> . <span class="at">-type</span> f <span class="kw">|</span> <span class="fu">sort</span> <span class="kw">|</span> <span class="fu">xargs</span> sha256sum <span class="op">&gt;</span> ../DESKTOP-SHA256SUMS.txt</span></code></pre></div>
+</div></section>
+</main>
+  <div class="statusline"><span><b>DOC · VENDORED</b></span><span>: cmd &nbsp; ? help</span></div>
+</div>
+<footer>
+  <div class="wrap" style="padding:0">
+    <span>APERANT TUI — vendored runtime, zero mocks, gate-proven.</span>
+    &nbsp;<a href="https://github.com/krzemienski/aperant-tui">github.com/krzemienski/aperant-tui</a>
+    &nbsp;· upstream <a href="https://github.com/AndyMik90/Aperant">AndyMik90/Aperant</a> @ 20250db0
+  </div>
+</footer>
+</div>
+</body>
+</html>

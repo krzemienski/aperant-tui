@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>phase-2-plan — APERANT TUI</title>
+<meta name="description" content="Aperant TUI — the full Aperant agent runtime in your terminal. Real gates, real evidence.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<div class="chrome">
+  <div class="chrome-bar">
+    <span class="brand">APERANT</span><span class="sep">│</span>
+    <span class="meta">aperant-tui</span><span class="sep">│</span>
+    <span class="branch">⑂ main</span><span class="sep">│</span>
+    <span class="meta"><span class="led ok"></span>2 phases gated</span>
+    <span class="meta"><span class="led warn"></span>1 unverified</span>
+    <span class="meta"><span class="led idle"></span>6 pending</span>
+  </div>
+  <nav class="tabs"><a href="index.html" class=""><span class="n">1</span>overview</a><a href="roadmap.html" class=""><span class="n">2</span>roadmap</a><a href="phases.html" class=""><span class="n">3</span>phases</a><a href="evidence.html" class=""><span class="n">4</span>evidence</a><a href="docs.html" class="on"><span class="n">5</span>docs</a></nav>
+  
+<main>
+<section><div class="marker">DOC / phase-2-PLAN</div><div class="doc"><h1 id="phase-2-plan--board--task-lifecycle">Phase 2 PLAN — Board &amp;
+Task Lifecycle</h1>
+<h2 id="proof-obligation">Proof obligation</h2>
+<p>Board lists real tasks from a live project. <code>s</code> starts the
+real vendored agent pipeline (real outcome surfaced). Task status
+changes persist to disk and survive restart. Phase 1 gates re-run
+green.</p>
+<h2 id="work-items">Work items</h2>
+<ol type="1">
+<li><code>services/task-lifecycle-service.ts</code> — H/L column moves
+via vendored <code>persistPlanStatusSync</code> (atomic disk write +
+cache invalidation).</li>
+<li><code>services/agent-start-service.ts</code> — lazy import of
+vendored <code>agent/agent-manager</code>; resolves with the pipeline's
+REAL first outcome event (<code>task-started</code> / <code>error</code>
+/ rejection / honest 30s timeout).</li>
+<li>BoardView wiring: H/L/s/x/l keys; AGENT STREAM renders real
+lifecycle events (moves, start outcomes) in place of the empty
+state.</li>
+<li>Dependency alignment: mirror the upstream provider SDK set
+(<code>@ai-sdk/*</code>, <code>@anthropic-ai/sdk</code>,
+<code>ai</code>, <code>@libsql/client</code>,
+<code>@modelcontextprotocol/sdk</code>, <code>@tavily/core</code>,
+<code>@openrouter/ai-sdk-provider</code>) so the vendored closure really
+imports; zod ^4 and typescript ^5.9 / @types/node ^25 / DOM lib aligned
+to upstream's toolchain.</li>
+<li>Gate run: move → disk proof → restart survival → real start outcome
+→ Phase 1 regression.</li>
+</ol>
+<h2 id="credential-constraint">Credential constraint</h2>
+<p>No AI provider credentials exist in this environment. The gate
+criterion "agent stream shows real spec/plan/code phase output and
+progress advances" is therefore <strong>UNVERIFIED — no
+credentials</strong>; what IS proven is that <code>s</code> executes the
+real vendored pipeline and surfaces its real outcome (the pre-flight
+auth error), never a simulation.</p>
+</div></section>
+</main>
+  <div class="statusline"><span><b>DOC · phase-2-PLAN</b></span><span>: cmd &nbsp; ? help</span></div>
+</div>
+<footer>
+  <div class="wrap" style="padding:0">
+    <span>APERANT TUI — vendored runtime, zero mocks, gate-proven.</span>
+    &nbsp;<a href="https://github.com/krzemienski/aperant-tui">github.com/krzemienski/aperant-tui</a>
+    &nbsp;· upstream <a href="https://github.com/AndyMik90/Aperant">AndyMik90/Aperant</a> @ 20250db0
+  </div>
+</footer>
+</div>
+</body>
+</html>

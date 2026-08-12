@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>phase-2-validation — APERANT TUI</title>
+<meta name="description" content="Aperant TUI — the full Aperant agent runtime in your terminal. Real gates, real evidence.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<div class="chrome">
+  <div class="chrome-bar">
+    <span class="brand">APERANT</span><span class="sep">│</span>
+    <span class="meta">aperant-tui</span><span class="sep">│</span>
+    <span class="branch">⑂ main</span><span class="sep">│</span>
+    <span class="meta"><span class="led ok"></span>2 phases gated</span>
+    <span class="meta"><span class="led warn"></span>1 unverified</span>
+    <span class="meta"><span class="led idle"></span>6 pending</span>
+  </div>
+  <nav class="tabs"><a href="index.html" class=""><span class="n">1</span>overview</a><a href="roadmap.html" class=""><span class="n">2</span>roadmap</a><a href="phases.html" class=""><span class="n">3</span>phases</a><a href="evidence.html" class=""><span class="n">4</span>evidence</a><a href="docs.html" class="on"><span class="n">5</span>docs</a></nav>
+  
+<main>
+<section><div class="marker">DOC / phase-2-VALIDATION</div><div class="doc"><h1 id="phase-2-validation--per-criterion-verdicts">Phase 2 VALIDATION —
+per-criterion verdicts</h1>
+<p>Run:
+<code>evidence/phase-2/e2e-evidence/run-20260812T011904-phase2-gate/</code>
+Sessions A 01K…(phase2-gate-a) / B (phase2-gate-b) · 110x32 · asciicast
+step-04-record.cast + step-08-record.cast · screenshots step-02/03/07
+PNG</p>
+<p>Gate criteria (spec Part 6, Phase 2):</p>
+<table>
+<thead>
+<tr class="header">
+<th>#</th>
+<th>Criterion</th>
+<th>Evidence</th>
+<th>VERDICT</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>Board lists real tasks from a live project</td>
+<td>step-01-snap-board: 4 real tasks in 4 columns, real
+titles/priority/subtasks</td>
+<td><strong>PASS</strong></td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>Status change persists to disk</td>
+<td>step-02-disk-status.txt: <code>queued</code> →
+<code>in_progress</code> after <code>L</code>; step-06:
+<code>in_progress</code> → <code>queue</code> after <code>H</code>
+(direct reads of implementation_plan.json)</td>
+<td><strong>PASS</strong></td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>Change survives restart</td>
+<td>session A quit (step-04); session B launch: step-05-wait-building
+matched <code>BUILDING (2)</code> — state re-read from disk</td>
+<td><strong>PASS</strong></td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>Move acts on the selected task</td>
+<td>supplementary step-10/11 waits matched
+<code>queue → in_progress</code> / <code>in_progress → queue</code> for
+002 (after D4 stale-closure fix)</td>
+<td><strong>PASS</strong></td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td><code>s</code> starts the real agent pipeline</td>
+<td>step-03-wait-auth matched <code>Authentication required…</code> —
+the vendored AgentManager's real pre-flight event, rendered in AGENT
+STREAM (step-03-shot-stream.png)</td>
+<td><strong>PASS</strong> (real outcome)</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>Agent stream shows real spec/plan/code output; progress
+advances</td>
+<td>requires provider credentials; none in this environment</td>
+<td><strong>UNVERIFIED — no credentials</strong> (not simulated)</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>Regression: Phase 1 gates re-run</td>
+<td>step-07: term <code>live PTY</code>, road <code>Foundation</code>,
+insights <code>entries</code>, tree snapshot (⑂ develop), settings
+<code>THEME</code>, palette placeholder, help <code>KEYBINDINGS</code> —
+all matched; screenshot step-07</td>
+<td><strong>PASS</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Defects: D4 stale keybinding closures → fixed in
+<code>useKeymap</code> (useRef dispatch), re-verified by this run's
+step-02/05/06 and supplementary step-10/11.</p>
+<p>Blocking note for Phase 4/5 gates: same credential constraint
+applies.</p>
+</div></section>
+</main>
+  <div class="statusline"><span><b>DOC · phase-2-VALIDATION</b></span><span>: cmd &nbsp; ? help</span></div>
+</div>
+<footer>
+  <div class="wrap" style="padding:0">
+    <span>APERANT TUI — vendored runtime, zero mocks, gate-proven.</span>
+    &nbsp;<a href="https://github.com/krzemienski/aperant-tui">github.com/krzemienski/aperant-tui</a>
+    &nbsp;· upstream <a href="https://github.com/AndyMik90/Aperant">AndyMik90/Aperant</a> @ 20250db0
+  </div>
+</footer>
+</div>
+</body>
+</html>

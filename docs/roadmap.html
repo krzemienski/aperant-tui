@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>roadmap — APERANT TUI</title>
+<meta name="description" content="Aperant TUI — the full Aperant agent runtime in your terminal. Real gates, real evidence.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<div class="chrome">
+  <div class="chrome-bar">
+    <span class="brand">APERANT</span><span class="sep">│</span>
+    <span class="meta">aperant-tui</span><span class="sep">│</span>
+    <span class="branch">⑂ main</span><span class="sep">│</span>
+    <span class="meta"><span class="led ok"></span>2 phases gated</span>
+    <span class="meta"><span class="led warn"></span>1 unverified</span>
+    <span class="meta"><span class="led idle"></span>6 pending</span>
+  </div>
+  <nav class="tabs"><a href="index.html" class=""><span class="n">1</span>overview</a><a href="roadmap.html" class="on"><span class="n">2</span>roadmap</a><a href="phases.html" class=""><span class="n">3</span>phases</a><a href="evidence.html" class=""><span class="n">4</span>evidence</a><a href="docs.html" class=""><span class="n">5</span>docs</a></nav>
+  
+<main>
+
+<section>
+  <div class="marker">ROADMAP</div>
+  <h1>Eight phases, eight gates<span class="cursor"></span></h1>
+  <p>Gates are cumulative: phase N re-runs every gate from phases 1…N−1. A regression blocks
+  advancement. Every criterion gets a per-criterion VERDICT with run-scoped evidence.</p>
+  
+  <div class="doc"><h1 id="roadmap--aperant-tui-from-spec-part-6">ROADMAP — Aperant TUI
+(from spec Part 6)</h1>
+<p>Gates are cumulative: Phase N re-runs every gate from Phases 1..N-1.
+A regression blocks advancement. Evidence standard: spec Part 7.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Phase</th>
+<th>Scope</th>
+<th>Gate (verbatim from spec)</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>Shell &amp; Service Layer</td>
+<td><code>aperant</code> launches against a real project directory;
+title bar shows the actual project name, real git branch, and real task
+counts read from <code>.aperant/</code>; <code>:</code> opens palette;
+<code>?</code> opens help; all 6 tabs switch.</td>
+<td><strong>PASSED</strong> 2026-08-12</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>Board &amp; Task Lifecycle</td>
+<td>Board lists real tasks from a live project. Pressing <code>s</code>
+on a queued task actually starts an agent — the agent stream shows real
+spec/plan/code phase output, and progress advances. Task status changes
+persist to disk and survive restart.</td>
+<td>pending</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>Terminal Emulation</td>
+<td>PTY pane runs a real shell; <code>ls --color</code>,
+<code>htop</code>, and <code>vim</code> all render correctly. Claude
+Code invoked from a pane produces streaming output with correct ANSI
+colors. Four simultaneous panes sustain &gt;=30fps under continuous
+output. Zoom mode renders vim byte-identically to a native
+terminal.</td>
+<td>pending</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>Roadmap, Insights, Ideation</td>
+<td>Roadmap generates from real codebase analysis with visible streaming
+progress. Insights answers a real question about the actual codebase
+with a correct file reference. Ideation returns real findings in all
+five categories.</td>
+<td>pending</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>Worktrees, Merge, Git Forges</td>
+<td>Worktree list matches <code>git worktree list</code> exactly. A
+merge executed from the TUI actually merges — verified by
+<code>git log</code> on the target branch. A PR created from the TUI
+appears on GitHub. AI conflict resolution resolves a real induced
+conflict.</td>
+<td>pending</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>Context, Settings, Onboarding</td>
+<td>Theme change applies instantly across all views. Profile switch
+changes the active credential and the next agent run uses it. Onboarding
+completes on a machine with no <code>~/.aperant/</code> and ends in a
+working board.</td>
+<td>pending</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>Performance &amp; Resilience</td>
+<td>200-task board scrolls at &gt;=60fps. Resize from 200x50 -&gt; 80x24
+reflows without corruption. Killing a PTY child leaves the TUI
+responsive. Renders coherently in <code>TERM=xterm-256color</code> and
+<code>TERM=xterm</code>.</td>
+<td>pending</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>Distribution</td>
+<td><code>npm i -g @aperant/tui &amp;&amp; aperant</code> works on a
+clean macOS, Ubuntu, and WSL2 machine.</td>
+<td>pending</td>
+</tr>
+</tbody>
+</table>
+<h2 id="harness-note">Harness note</h2>
+<p>Gate execution uses <code>agent-tty</code> (terminal automation:
+create/run/type/send-keys/ wait/snapshot/screenshot/record) driving the
+real TUI as an end user, per-step direct CLI calls saved as JSON
+envelopes into the run dir. Monolithic batch driving was tried and
+rejected (wait-baseline quirks); blind burst-typing into overlay-opening
+keys races React mounts — all driving is observe-then-act.</p>
+<h2 id="credential-constraint-affects-phases-245-gates">Credential
+constraint (affects Phases 2/4/5 gates)</h2>
+<p>Gates requiring a live AI provider (agent start, roadmap generation,
+insights Q&amp;A, AI conflict resolution) need real provider credentials
+in <code>settings.json</code>. If none are available in the build
+environment, those sub-criteria are reported <strong>UNVERIFIED — no
+credentials</strong>, never simulated.</p>
+</div>
+</section>
+
+</main>
+  <div class="statusline"><span><b>ROADMAP</b></span><span>: cmd &nbsp; ? help</span></div>
+</div>
+<footer>
+  <div class="wrap" style="padding:0">
+    <span>APERANT TUI — vendored runtime, zero mocks, gate-proven.</span>
+    &nbsp;<a href="https://github.com/krzemienski/aperant-tui">github.com/krzemienski/aperant-tui</a>
+    &nbsp;· upstream <a href="https://github.com/AndyMik90/Aperant">AndyMik90/Aperant</a> @ 20250db0
+  </div>
+</footer>
+</div>
+</body>
+</html>

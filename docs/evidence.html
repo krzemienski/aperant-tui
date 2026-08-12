@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>gate evidence — APERANT TUI</title>
+<meta name="description" content="Aperant TUI — the full Aperant agent runtime in your terminal. Real gates, real evidence.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<div class="chrome">
+  <div class="chrome-bar">
+    <span class="brand">APERANT</span><span class="sep">│</span>
+    <span class="meta">aperant-tui</span><span class="sep">│</span>
+    <span class="branch">⑂ main</span><span class="sep">│</span>
+    <span class="meta"><span class="led ok"></span>2 phases gated</span>
+    <span class="meta"><span class="led warn"></span>1 unverified</span>
+    <span class="meta"><span class="led idle"></span>6 pending</span>
+  </div>
+  <nav class="tabs"><a href="index.html" class=""><span class="n">1</span>overview</a><a href="roadmap.html" class=""><span class="n">2</span>roadmap</a><a href="phases.html" class=""><span class="n">3</span>phases</a><a href="evidence.html" class="on"><span class="n">4</span>evidence</a><a href="docs.html" class=""><span class="n">5</span>docs</a></nav>
+  
+<main>
+
+<section>
+  <div class="marker">EVIDENCE</div>
+  <h1>Recorded, hashed, re-runnable<span class="cursor"></span></h1>
+  <p>Every gate drives the real TUI as an end user through a terminal-automation harness:
+  per-step JSON envelopes, text snapshots, rendered screenshots with SHA-256, and asciicast
+  recordings. Runs are scoped directories under <code>evidence/phase-N/</code> in the repo.</p>
+    <div class="term-shot">
+    <div class="tbar"><b>gate-1 · board</b><span>sha256-verified capture</span></div>
+    <img src="assets/img/gate1-board.png" alt="gate-1 · board">
+    <div class="cap"><b>PASS</b> — 4 real tasks from .auto-claude/specs · real branch · real counts</div>
+  </div>
+  <div class="term-shot">
+    <div class="tbar"><b>gate-1 · terminal</b><span>sha256-verified capture</span></div>
+    <img src="assets/img/gate1-term.png" alt="gate-1 · terminal">
+    <div class="cap"><b>PASS</b> — live PTY — real bash prompt inside the pane</div>
+  </div>
+  <div class="term-shot">
+    <div class="tbar"><b>theme probe · before</b><span>sha256-verified capture</span></div>
+    <img src="assets/img/gate1-theme-matrix.png" alt="theme probe · before">
+    <div class="cap"><b>PASS</b> — matrix — boot-loaded from persisted tui.json</div>
+  </div>
+  <div class="term-shot">
+    <div class="tbar"><b>theme probe · after</b><span>sha256-verified capture</span></div>
+    <img src="assets/img/gate1-theme-amber.png" alt="theme probe · after">
+    <div class="cap"><b>PASS</b> — amber — palette command applied live: 23,846 px changed</div>
+  </div>
+  <div class="term-shot">
+    <div class="tbar"><b>gate-1 · help (post-fix)</b><span>sha256-verified capture</span></div>
+    <img src="assets/img/gate1-help.png" alt="gate-1 · help (post-fix)">
+    <div class="cap"><b>PASS</b> — KEYBINDINGS — full-area replacement after bleed-through fix</div>
+  </div>
+  <div class="term-shot">
+    <div class="tbar"><b>gate-2 · lifecycle</b><span>sha256-verified capture</span></div>
+    <img src="assets/img/gate2-stream.png" alt="gate-2 · lifecycle">
+    <div class="cap"><b>PASS</b> — move persisted · vendored AgentManager real auth outcome</div>
+  </div>
+  <div class="term-shot">
+    <div class="tbar"><b>gate-2 · phase-1 regression</b><span>sha256-verified capture</span></div>
+    <img src="assets/img/gate2-regression.png" alt="gate-2 · phase-1 regression">
+    <div class="cap"><b>PASS</b> — all 8 phase-1 waits re-matched on a fresh session</div>
+  </div>
+  <h2>Run register</h2>
+  <table>
+    <tr><th>run</th><th>scope</th><th>result</th></tr>
+    <tr><td>run-20260811T233239-phase1-gate</td><td>phase 1 · first drive</td><td class="v-unv">RED — caught D1 (clipped panel titles)</td></tr>
+    <tr><td>run-20260812T003000-phase1-gate-recheck</td><td>phase 1 · recheck + theme probe</td><td class="v-pass">GREEN — 13/13 waits</td></tr>
+    <tr><td>run-20260812T011430-phase2-gate</td><td>phase 2 · first drive</td><td class="v-unv">RED — caught D4 (stale keybinding closures)</td></tr>
+    <tr><td>run-20260812T011904-phase2-gate</td><td>phase 2 · recheck + P1 regression</td><td class="v-pass">GREEN — restart-persistence proven</td></tr>
+  </table>
+</section>
+
+</main>
+  <div class="statusline"><span><b>EVIDENCE</b></span><span>: cmd &nbsp; ? help</span></div>
+</div>
+<footer>
+  <div class="wrap" style="padding:0">
+    <span>APERANT TUI — vendored runtime, zero mocks, gate-proven.</span>
+    &nbsp;<a href="https://github.com/krzemienski/aperant-tui">github.com/krzemienski/aperant-tui</a>
+    &nbsp;· upstream <a href="https://github.com/AndyMik90/Aperant">AndyMik90/Aperant</a> @ 20250db0
+  </div>
+</footer>
+</div>
+</body>
+</html>

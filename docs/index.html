@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>terminal-native agent control — APERANT TUI</title>
+<meta name="description" content="Aperant TUI — the full Aperant agent runtime in your terminal. Real gates, real evidence.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<div class="chrome">
+  <div class="chrome-bar">
+    <span class="brand">APERANT</span><span class="sep">│</span>
+    <span class="meta">aperant-tui</span><span class="sep">│</span>
+    <span class="branch">⑂ main</span><span class="sep">│</span>
+    <span class="meta"><span class="led ok"></span>2 phases gated</span>
+    <span class="meta"><span class="led warn"></span>1 unverified</span>
+    <span class="meta"><span class="led idle"></span>6 pending</span>
+  </div>
+  <nav class="tabs"><a href="index.html" class="on"><span class="n">1</span>overview</a><a href="roadmap.html" class=""><span class="n">2</span>roadmap</a><a href="phases.html" class=""><span class="n">3</span>phases</a><a href="evidence.html" class=""><span class="n">4</span>evidence</a><a href="docs.html" class=""><span class="n">5</span>docs</a></nav>
+  
+<main>
+
+<section>
+  <div class="marker">01 / WHAT IT IS</div>
+  <h1>The whole agent runtime,<br>now in your terminal<span class="cursor"></span></h1>
+  <p><strong>Aperant TUI</strong> runs the vendored Aperant desktop agent runtime
+  <strong>in-process in plain Node</strong> — no Electron, no IPC, no API gateway.
+  The TypeScript services the desktop app uses are imported directly by an Ink
+  terminal UI through a real electron-shim. Every claim on this site is backed by
+  a gate run with recorded evidence.</p>
+  <div class="cmdline">
+    <div><span class="p">~$</span> <span class="c">npx @aperant/tui ~/src/my-project</span></div>
+    <div class="out">APERANT │ my-project ~/src/my-project │ ⑂ develop &nbsp;&nbsp;<span class="hl">◉ 1 running</span> ◆ 0 review ● no profile</div>
+    <div class="out">&nbsp;1 board &nbsp; 2 term &nbsp; 3 road &nbsp; 4 chat &nbsp; 5 tree &nbsp; 6 set</div>
+  </div>
+  <div class="grid3">
+    <div class="panel"><div class="ptitle">VENDORED, NOT FORKED</div>
+      <p>1,288 upstream files carried unmodified with a SHA-256 manifest. The TUI imports
+      <code>src/main/**</code> the same way the desktop does.</p></div>
+    <div class="panel"><div class="ptitle">ZERO MOCKS</div>
+      <p>An electron-shim provides real Node implementations of the Electron API subset.
+      Empty states report factual reasons. Unsupported calls fail loudly.</p></div>
+    <div class="panel"><div class="ptitle">GATE-PROVEN</div>
+      <p>Each phase ends in a scripted end-user drive of the real TUI — per-step JSON
+      envelopes, screenshots, asciicast recordings, per-criterion verdicts.</p></div>
+  </div>
+</section>
+<section>
+  <div class="marker">02 / GATE BOARD</div>
+  <h2>Where the build stands</h2>
+  <div class="board">
+    <div class="brow"><span class="idx">P1</span><span><span class="name">Shell &amp; Service Layer</span>
+      <span class="gate">launch · real title bar · palette · help · 6 tabs</span></span>
+      <span class="badge pass">PASS</span></div>
+    <div class="brow"><span class="idx">P2</span><span><span class="name">Board &amp; Task Lifecycle</span>
+      <span class="gate">real moves persist · restart survival · real start pipeline — agent stream unverified (no credentials)</span></span>
+      <span class="badge part">PASS*</span></div>
+    <div class="brow"><span class="idx">P3</span><span><span class="name">Terminal Emulation</span>
+      <span class="gate">real shell · ls/htop/vim · 4 panes ≥30fps · zoom</span></span>
+      <span class="badge pend">PENDING</span></div>
+    <div class="brow"><span class="idx">P4</span><span><span class="name">Roadmap · Insights · Ideation</span>
+      <span class="gate">real generation · real Q&amp;A · real findings</span></span>
+      <span class="badge pend">PENDING</span></div>
+    <div class="brow"><span class="idx">P5</span><span><span class="name">Worktrees · Merge · Forges</span>
+      <span class="gate">real merge · real PR · real conflict resolution</span></span>
+      <span class="badge pend">PENDING</span></div>
+    <div class="brow"><span class="idx">P6</span><span><span class="name">Context · Settings · Onboarding</span>
+      <span class="gate">instant theme · profile switch · cold-start onboarding</span></span>
+      <span class="badge pend">PENDING</span></div>
+    <div class="brow"><span class="idx">P7</span><span><span class="name">Performance &amp; Resilience</span>
+      <span class="gate">200 tasks @60fps · resize reflow · PTY kill survival · 256/16-color</span></span>
+      <span class="badge pend">PENDING</span></div>
+    <div class="brow"><span class="idx">P8</span><span><span class="name">Distribution</span>
+      <span class="gate">npm i -g on clean macOS / Ubuntu / WSL2</span></span>
+      <span class="badge pend">PENDING</span></div>
+  </div>
+  <p style="font-size:13px">* agent streaming requires provider credentials the build environment
+  does not have — reported UNVERIFIED, never simulated.</p>
+</section>
+<section>
+  <div class="marker">03 / THE PRODUCT, RUNNING</div>
+  <h2>Real gate evidence</h2>
+  <div class="term-shot">
+    <div class="tbar"><b>gate-2 · session A · board after L-move + s-start</b><span>110×32 · ghostty-web render</span></div>
+    <img src="assets/img/gate2-stream.png" alt="Aperant TUI board: task moved to BUILDING, agent stream shows real pipeline outcome">
+    <div class="cap"><b>PASS</b> — H/L move persisted to implementation_plan.json · <b>s</b> ran the vendored AgentManager, real auth outcome in AGENT STREAM</div>
+  </div>
+  <p><a href="evidence.html">All gate evidence →</a></p>
+</section>
+
+</main>
+  <div class="statusline"><span><b>OVERVIEW</b></span><span>: cmd &nbsp; ? help</span></div>
+</div>
+<footer>
+  <div class="wrap" style="padding:0">
+    <span>APERANT TUI — vendored runtime, zero mocks, gate-proven.</span>
+    &nbsp;<a href="https://github.com/krzemienski/aperant-tui">github.com/krzemienski/aperant-tui</a>
+    &nbsp;· upstream <a href="https://github.com/AndyMik90/Aperant">AndyMik90/Aperant</a> @ 20250db0
+  </div>
+</footer>
+</div>
+</body>
+</html>

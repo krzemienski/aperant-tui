@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>brief — APERANT TUI</title>
+<meta name="description" content="Aperant TUI — the full Aperant agent runtime in your terminal. Real gates, real evidence.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<div class="chrome">
+  <div class="chrome-bar">
+    <span class="brand">APERANT</span><span class="sep">│</span>
+    <span class="meta">aperant-tui</span><span class="sep">│</span>
+    <span class="branch">⑂ main</span><span class="sep">│</span>
+    <span class="meta"><span class="led ok"></span>2 phases gated</span>
+    <span class="meta"><span class="led warn"></span>1 unverified</span>
+    <span class="meta"><span class="led idle"></span>6 pending</span>
+  </div>
+  <nav class="tabs"><a href="index.html" class=""><span class="n">1</span>overview</a><a href="roadmap.html" class=""><span class="n">2</span>roadmap</a><a href="phases.html" class=""><span class="n">3</span>phases</a><a href="evidence.html" class=""><span class="n">4</span>evidence</a><a href="docs.html" class="on"><span class="n">5</span>docs</a></nav>
+  
+<main>
+<section><div class="marker">DOC / BRIEF</div><div class="doc"><h1 id="brief--aperant-tui">BRIEF — Aperant TUI</h1>
+<p>Source spec: <code>aperant-tui-specification.md</code> (user upload,
+583 lines). Upstream prototype: github.com/AndyMik90/Aperant @
+<code>20250db069a849ab001ac6ab9e3e9779886ab9e2</code> (branch
+<code>develop</code>, v2.8.0-beta.6), vendored UNMODIFIED into
+<code>apps/desktop/</code> (integrity manifest:
+<code>apps/DESKTOP-SHA256SUMS.txt</code>).</p>
+<h2 id="true-success-criteria">True success criteria</h2>
+<ol type="1">
+<li>A terminal UI (<code>aperant</code>) that imports the vendored
+Electron app's TypeScript agent runtime
+(<code>apps/desktop/src/main/**</code>) IN-PROCESS — no IPC, no API
+gateway, no language bridge — via <code>libs/electron-shim</code> (real
+Node implementations of the Electron API subset, not mocks).</li>
+<li>Functional parity per the spec's Part 2 matrix: board/task
+lifecycle, terminal-in-terminal PTY panes, roadmap, insights, worktrees,
+settings, themes, command palette.</li>
+<li>Every phase gate (spec Part 6) proven by real execution with
+run-scoped evidence under <code>evidence/phase-{N}/</code>; regression
+gates cumulative (Phase N re-runs gates 1..N-1). Per-criterion VERDICT
+for every gate.</li>
+<li>No mocks, no stubs, no placeholder data anywhere in the product.
+Empty states must report factual reasons.</li>
+<li>Repo: github.com/krzemienski/aperant-tui (public), all work
+pushed.</li>
+</ol>
+<h2 id="iron-rule-spec-part-6">Iron Rule (spec Part 6)</h2>
+<p>Real system execution, real evidence, no mocks, no stubs.</p>
+<h2 id="current-status">Current status</h2>
+<ul>
+<li>Phase 1 — <strong>GATE PASSED</strong>
+(run-20260812T003000-phase1-gate-recheck, green; supersedes red
+run-20260811T233239-phase1-gate which caught 2 real defects)</li>
+<li>Phases 2–8 — not started</li>
+</ul>
+</div></section>
+</main>
+  <div class="statusline"><span><b>DOC · BRIEF</b></span><span>: cmd &nbsp; ? help</span></div>
+</div>
+<footer>
+  <div class="wrap" style="padding:0">
+    <span>APERANT TUI — vendored runtime, zero mocks, gate-proven.</span>
+    &nbsp;<a href="https://github.com/krzemienski/aperant-tui">github.com/krzemienski/aperant-tui</a>
+    &nbsp;· upstream <a href="https://github.com/AndyMik90/Aperant">AndyMik90/Aperant</a> @ 20250db0
+  </div>
+</footer>
+</div>
+</body>
+</html>

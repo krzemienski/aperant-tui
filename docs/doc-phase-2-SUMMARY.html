@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>phase-2-summary — APERANT TUI</title>
+<meta name="description" content="Aperant TUI — the full Aperant agent runtime in your terminal. Real gates, real evidence.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<div class="chrome">
+  <div class="chrome-bar">
+    <span class="brand">APERANT</span><span class="sep">│</span>
+    <span class="meta">aperant-tui</span><span class="sep">│</span>
+    <span class="branch">⑂ main</span><span class="sep">│</span>
+    <span class="meta"><span class="led ok"></span>2 phases gated</span>
+    <span class="meta"><span class="led warn"></span>1 unverified</span>
+    <span class="meta"><span class="led idle"></span>6 pending</span>
+  </div>
+  <nav class="tabs"><a href="index.html" class=""><span class="n">1</span>overview</a><a href="roadmap.html" class=""><span class="n">2</span>roadmap</a><a href="phases.html" class=""><span class="n">3</span>phases</a><a href="evidence.html" class=""><span class="n">4</span>evidence</a><a href="docs.html" class="on"><span class="n">5</span>docs</a></nav>
+  
+<main>
+<section><div class="marker">DOC / phase-2-SUMMARY</div><div class="doc"><h1 id="phase-2-summary--board--task-lifecycle">Phase 2 SUMMARY — Board
+&amp; Task Lifecycle</h1>
+<h2 id="what-was-built">What was built</h2>
+<ul>
+<li><code>task-lifecycle-service</code>: H/L moves write the real
+<code>implementation_plan.json</code> through the vendored
+<code>persistPlanStatusSync</code> (the same function the desktop's IPC
+handlers call) — no TUI-side shadow.</li>
+<li><code>agent-start-service</code>: <code>s</code> runs the vendored
+<code>AgentManager. startTaskExecution</code> in-process; the AGENT
+STREAM panel shows the pipeline's real outcome. Provider SDK set
+mirrored from upstream's package.json so the vendored import closure
+(157 files) really resolves.</li>
+<li>Toolchain aligned to upstream (TS 5.9, @types/node 25, DOM lib) —
+vendored sources now typecheck unmodified alongside TUI sources.</li>
+</ul>
+<h2 id="defect-found-by-the-gate-and-fixed">Defect found by the gate and
+fixed</h2>
+<p><strong>D4 (real product bug): stale keybinding closures.</strong>
+<code>useKeymap</code> memoized bindings by key names only, freezing
+first-render closures. Handlers using functional setState
+(<code>j</code>/<code>k</code>) worked; handlers closing over state
+acted on boot-time state — the gate caught <code>L</code> moving task
+001 while the cursor sat on 002. Fixed by dispatching through a
+<code>useRef</code> that always holds the latest bindings. Re-verified:
+supplementary probe moved the correct task both ways (step-10/11 in the
+run dir).</p>
+<p><strong>Harness note:</strong> the <code>(persisted)</code> stream
+line is truncated at 110 cols; wait strings must target visible text
+(<code>queue → in_progress</code>). Two monolithic-run waits failed on
+this — disk reads provided the authoritative proof.</p>
+<p><strong>Cosmetic:</strong> vendored <code>console.log</code> (e.g.
+ClaudeProfileManager init) escapes above the Ink frame. Logged for Phase
+7 (redirect vendored stdout to the log service).</p>
+<h2 id="verdict">Verdict</h2>
+<ul>
+<li>Move + persistence + restart survival: <strong>PASS</strong></li>
+<li><code>s</code> real pipeline outcome: <strong>PASS</strong> (real
+auth error surfaced)</li>
+<li>Agent actually runs + streams phases: <strong>UNVERIFIED — no
+credentials</strong></li>
+<li>Phase 1 regression: <strong>PASS</strong> (all 8 waits green on
+session B)</li>
+</ul>
+<p>See phase-2-VALIDATION.md for the per-criterion table.</p>
+</div></section>
+</main>
+  <div class="statusline"><span><b>DOC · phase-2-SUMMARY</b></span><span>: cmd &nbsp; ? help</span></div>
+</div>
+<footer>
+  <div class="wrap" style="padding:0">
+    <span>APERANT TUI — vendored runtime, zero mocks, gate-proven.</span>
+    &nbsp;<a href="https://github.com/krzemienski/aperant-tui">github.com/krzemienski/aperant-tui</a>
+    &nbsp;· upstream <a href="https://github.com/AndyMik90/Aperant">AndyMik90/Aperant</a> @ 20250db0
+  </div>
+</footer>
+</div>
+</body>
+</html>

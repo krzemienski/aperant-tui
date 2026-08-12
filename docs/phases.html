@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>phase gates — APERANT TUI</title>
+<meta name="description" content="Aperant TUI — the full Aperant agent runtime in your terminal. Real gates, real evidence.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<div class="chrome">
+  <div class="chrome-bar">
+    <span class="brand">APERANT</span><span class="sep">│</span>
+    <span class="meta">aperant-tui</span><span class="sep">│</span>
+    <span class="branch">⑂ main</span><span class="sep">│</span>
+    <span class="meta"><span class="led ok"></span>2 phases gated</span>
+    <span class="meta"><span class="led warn"></span>1 unverified</span>
+    <span class="meta"><span class="led idle"></span>6 pending</span>
+  </div>
+  <nav class="tabs"><a href="index.html" class=""><span class="n">1</span>overview</a><a href="roadmap.html" class=""><span class="n">2</span>roadmap</a><a href="phases.html" class="on"><span class="n">3</span>phases</a><a href="evidence.html" class=""><span class="n">4</span>evidence</a><a href="docs.html" class=""><span class="n">5</span>docs</a></nav>
+  
+<main>
+
+<section>
+  <div class="marker">PHASE FILES</div>
+  <h1>Plan → summary → validation<span class="cursor"></span></h1>
+  <p>Each phase carries a blocking proof obligation. The validation re-verifies all earlier
+  phases — cumulative proof, no trust-me.</p>
+  <div class="grid2">
+    <div class="panel"><div class="ptitle">PHASE 1 — SHELL &amp; SERVICE LAYER</div>
+      <p>Gate <strong style="color:var(--ok)">PASS</strong> · 2 defects caught &amp; fixed · 13/13 waits matched</p>
+      <p><a href="doc-phase-1-PLAN.html">PLAN</a> · <a href="doc-phase-1-SUMMARY.html">SUMMARY</a> · <a href="doc-phase-1-VALIDATION.html">VALIDATION</a></p></div>
+    <div class="panel"><div class="ptitle">PHASE 2 — BOARD &amp; TASK LIFECYCLE</div>
+      <p>Gate <strong style="color:var(--warn)">PASS*</strong> · 1 defect caught &amp; fixed · restart-persistence proven</p>
+      <p><a href="doc-phase-2-PLAN.html">PLAN</a> · <a href="doc-phase-2-SUMMARY.html">SUMMARY</a> · <a href="doc-phase-2-VALIDATION.html">VALIDATION</a></p></div>
+  </div>
+  <h2>Phase 1 validation</h2>
+  <div class="doc"><h1 id="phase-1-validation--per-criterion-verdicts">Phase 1 VALIDATION —
+per-criterion verdicts</h1>
+<p>Run:
+<code>evidence/phase-1/e2e-evidence/run-20260812T003000-phase1-gate-recheck/</code>
+(green; supersedes red run-20260811T233239-phase1-gate) Session
+01KZSNMHZ2NCA27VTVZ9YPY6Q9 · 110x32 · agent-tty 0.5.0 · asciicast
+step-20-record-export.cast (54.1s, sha256 cc26cecb…44dc8)</p>
+<p>Gate criteria (spec Part 6, Phase 1):</p>
+<table>
+<thead>
+<tr class="header">
+<th>#</th>
+<th>Criterion</th>
+<th>Evidence</th>
+<th>VERDICT</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td><code>aperant</code> launches against a real project directory</td>
+<td>step-05-run (launch), step-06-wait-title matched "APERANT"</td>
+<td><strong>PASS</strong></td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>Title bar shows actual project name</td>
+<td>step-07: <code>aperant-fixture</code> (= directory name, via
+vendored addProject)</td>
+<td><strong>PASS</strong></td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>Title bar shows real git branch</td>
+<td>step-07: <code>⑂ develop</code> (= <code>git rev-parse</code> of
+fixture, branch develop)</td>
+<td><strong>PASS</strong></td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>Title bar shows real task counts</td>
+<td>step-07: <code>◉ 1 running ◆ 0 review</code> — matches 4 fixture
+specs: 001 in_progress, 002 queue, 003 done, 004 backlog; board lists
+all 4 with real titles/priority/subtask counts (3/5, 50%)</td>
+<td><strong>PASS</strong></td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td><code>:</code> opens palette</td>
+<td>step-15-wait-palette matched placeholder text; palette snapshot</td>
+<td><strong>PASS</strong></td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>Palette executes real commands</td>
+<td>theme-change-probe: `:theme matrix</td>
+<td>amber</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td><code>?</code> opens help</td>
+<td>step-18-wait matched "KEYBINDINGS"; step-18b screenshot readable
+after D2 fix</td>
+<td><strong>PASS</strong></td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>All 6 tabs switch</td>
+<td>step-10..14: term (live PTY + real shell prompt), road (Foundation),
+insights (entries 3), worktrees (⑂ develop head b6d252a5fd), settings
+(THEME)</td>
+<td><strong>PASS</strong></td>
+</tr>
+<tr class="odd">
+<td>9</td>
+<td>(evidence standard) screenshots + recording</td>
+<td>step-08/10/14/16 PNGs with sha256; step-20 asciicast</td>
+<td><strong>PASS</strong></td>
+</tr>
+<tr class="even">
+<td>10</td>
+<td>Clean exit</td>
+<td>step-19: ctrl+c ×2 → shell prompt returned</td>
+<td><strong>PASS</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Cross-checks:</p>
+<ul>
+<li>Boot-loaded config: step-14 shows <code>matrix ACTIVE</code> at
+launch — tui.json written by an earlier process was honored at boot
+(persistence PROVEN).</li>
+<li>Board navigation: <code>j</code> moved ❯ 001-migr → 002-fix
+(step-09).</li>
+<li>Terminal pane: real bash prompt
+<code>kimi@…:/tmp/aperant-fixture$</code> inside pane (step-10 snapshot)
+— vendored pty-manager spawning a real PTY.</li>
+</ul>
+<p>Regression obligations carried into Phase 2: this gate re-runs in
+full.</p>
+<h2 id="defects-all-closed">Defects (all closed)</h2>
+<p>D1 Panel titles clipped → fixed, re-verified. D2 HelpOverlay
+bleed-through → fixed, re-verified (step-18b). D3 harness burst-type
+race → driving discipline corrected; product hardening candidate logged
+for Phase 7.</p>
+<h2 id="unverified-items">UNVERIFIED items</h2>
+<p>None for Phase 1 scope.</p>
+</div>
+  <h2>Phase 2 validation</h2>
+  <div class="doc"><h1 id="phase-2-validation--per-criterion-verdicts">Phase 2 VALIDATION —
+per-criterion verdicts</h1>
+<p>Run:
+<code>evidence/phase-2/e2e-evidence/run-20260812T011904-phase2-gate/</code>
+Sessions A 01K…(phase2-gate-a) / B (phase2-gate-b) · 110x32 · asciicast
+step-04-record.cast + step-08-record.cast · screenshots step-02/03/07
+PNG</p>
+<p>Gate criteria (spec Part 6, Phase 2):</p>
+<table>
+<thead>
+<tr class="header">
+<th>#</th>
+<th>Criterion</th>
+<th>Evidence</th>
+<th>VERDICT</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>Board lists real tasks from a live project</td>
+<td>step-01-snap-board: 4 real tasks in 4 columns, real
+titles/priority/subtasks</td>
+<td><strong>PASS</strong></td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>Status change persists to disk</td>
+<td>step-02-disk-status.txt: <code>queued</code> →
+<code>in_progress</code> after <code>L</code>; step-06:
+<code>in_progress</code> → <code>queue</code> after <code>H</code>
+(direct reads of implementation_plan.json)</td>
+<td><strong>PASS</strong></td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>Change survives restart</td>
+<td>session A quit (step-04); session B launch: step-05-wait-building
+matched <code>BUILDING (2)</code> — state re-read from disk</td>
+<td><strong>PASS</strong></td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>Move acts on the selected task</td>
+<td>supplementary step-10/11 waits matched
+<code>queue → in_progress</code> / <code>in_progress → queue</code> for
+002 (after D4 stale-closure fix)</td>
+<td><strong>PASS</strong></td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td><code>s</code> starts the real agent pipeline</td>
+<td>step-03-wait-auth matched <code>Authentication required…</code> —
+the vendored AgentManager's real pre-flight event, rendered in AGENT
+STREAM (step-03-shot-stream.png)</td>
+<td><strong>PASS</strong> (real outcome)</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>Agent stream shows real spec/plan/code output; progress
+advances</td>
+<td>requires provider credentials; none in this environment</td>
+<td><strong>UNVERIFIED — no credentials</strong> (not simulated)</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>Regression: Phase 1 gates re-run</td>
+<td>step-07: term <code>live PTY</code>, road <code>Foundation</code>,
+insights <code>entries</code>, tree snapshot (⑂ develop), settings
+<code>THEME</code>, palette placeholder, help <code>KEYBINDINGS</code> —
+all matched; screenshot step-07</td>
+<td><strong>PASS</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Defects: D4 stale keybinding closures → fixed in
+<code>useKeymap</code> (useRef dispatch), re-verified by this run's
+step-02/05/06 and supplementary step-10/11.</p>
+<p>Blocking note for Phase 4/5 gates: same credential constraint
+applies.</p>
+</div>
+</section>
+
+</main>
+  <div class="statusline"><span><b>PHASES</b></span><span>: cmd &nbsp; ? help</span></div>
+</div>
+<footer>
+  <div class="wrap" style="padding:0">
+    <span>APERANT TUI — vendored runtime, zero mocks, gate-proven.</span>
+    &nbsp;<a href="https://github.com/krzemienski/aperant-tui">github.com/krzemienski/aperant-tui</a>
+    &nbsp;· upstream <a href="https://github.com/AndyMik90/Aperant">AndyMik90/Aperant</a> @ 20250db0
+  </div>
+</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>phase-1-plan — APERANT TUI</title>
+<meta name="description" content="Aperant TUI — the full Aperant agent runtime in your terminal. Real gates, real evidence.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<div class="chrome">
+  <div class="chrome-bar">
+    <span class="brand">APERANT</span><span class="sep">│</span>
+    <span class="meta">aperant-tui</span><span class="sep">│</span>
+    <span class="branch">⑂ main</span><span class="sep">│</span>
+    <span class="meta"><span class="led ok"></span>2 phases gated</span>
+    <span class="meta"><span class="led warn"></span>1 unverified</span>
+    <span class="meta"><span class="led idle"></span>6 pending</span>
+  </div>
+  <nav class="tabs"><a href="index.html" class=""><span class="n">1</span>overview</a><a href="roadmap.html" class=""><span class="n">2</span>roadmap</a><a href="phases.html" class=""><span class="n">3</span>phases</a><a href="evidence.html" class=""><span class="n">4</span>evidence</a><a href="docs.html" class="on"><span class="n">5</span>docs</a></nav>
+  
+<main>
+<section><div class="marker">DOC / phase-1-PLAN</div><div class="doc"><h1 id="phase-1-plan--shell--service-layer">Phase 1 PLAN — Shell &amp;
+Service Layer</h1>
+<h2 id="proof-obligation">Proof obligation</h2>
+<p><code>aperant</code> launches against a real project directory; title
+bar shows the actual project name, real git branch, and real task
+counts; <code>:</code> opens palette; <code>?</code> opens help; all 6
+tabs switch — proven by run-scoped agent-tty evidence (snapshots +
+rendered screenshots + asciicast).</p>
+<h2 id="work-items">Work items</h2>
+<ol type="1">
+<li>Vendor <code>apps/desktop</code> @ 20250db0 unmodified + SHA256SUMS
+manifest.</li>
+<li><code>libs/electron-shim</code> — real Node implementations of the
+Electron API subset used by <code>src/main</code> (app paths, ipcMain
+registry, safeStorage honesty, shell.openPath, net.fetch). BrowserWindow
+constructor throws <code>UnsupportedInTuiError</code>; statics return
+empty honestly.</li>
+<li><code>libs/sentry-adapter</code> — <code>@sentry/electron</code>
+export-compatible adapter writing crash reports to
+<code>&lt;userData&gt;/logs/crash-report.log</code>.</li>
+<li><code>apps/tui</code> — Ink/React TUI: cli (TTY check, SHELL
+normalization), App shell, TitleBar/TabBar/StatusLine,
+Board/Terminal/Roadmap/Insights/Worktree/ Settings/Logs views reading
+REAL data via vendored projectStore, CommandPalette, HelpOverlay, 5
+truecolor themes with 256/16 degradation, zustand store, config service
+(zod-validated, malformed -&gt; .broken-<ts> + clear error), keymap hook
+with tui.json remaps.</li>
+<li><code>bin/aperant.js</code> — cwd-independent launcher (pins
+TSX_TSCONFIG_PATH).</li>
+<li>Smoke: 6/6 vendored runtime modules import + execute in plain Node
+20.</li>
+<li>Gate run via agent-tty per-step drive + asciicast.</li>
+</ol>
+<h2 id="data-sources-all-real">Data sources (all real)</h2>
+<ul>
+<li>Tasks:
+<code>&lt;project&gt;/.auto-claude/specs/*/implementation_plan.json</code>
+etc. via vendored <code>projectStore.getTasks</code> (3s TTL cache, real
+disk scan)</li>
+<li>Branch: <code>git rev-parse --abbrev-ref HEAD</code>; worktrees:
+<code>git worktree list --porcelain</code></li>
+<li>Roadmap: <code>.auto-claude/roadmap/roadmap.json</code>; index:
+<code>.auto-claude/ project_index.json</code></li>
+<li>Config: <code>&lt;APERANT_USER_DATA&gt;/tui.json</code> (theme
+persists across restarts)</li>
+</ul>
+<h2 id="known-limitations-entering-phase-2">Known limitations entering
+Phase 2</h2>
+<ul>
+<li>Pasting/burst-typing a full <code>:</code>command in one stdin write
+can drop chars (palette mounts after the opening <code>:</code>;
+same-chunk chars are lost). Human typing is unaffected. Candidate
+hardening for Phase 7.</li>
+<li>Logs view is only reachable from board (<code>L</code>); no recorded
+runs fixture yet.</li>
+<li>PtyPane renders an ellipsis gutter on the right edge
+(cosmetic).</li>
+</ul>
+</div></section>
+</main>
+  <div class="statusline"><span><b>DOC · phase-1-PLAN</b></span><span>: cmd &nbsp; ? help</span></div>
+</div>
+<footer>
+  <div class="wrap" style="padding:0">
+    <span>APERANT TUI — vendored runtime, zero mocks, gate-proven.</span>
+    &nbsp;<a href="https://github.com/krzemienski/aperant-tui">github.com/krzemienski/aperant-tui</a>
+    &nbsp;· upstream <a href="https://github.com/AndyMik90/Aperant">AndyMik90/Aperant</a> @ 20250db0
+  </div>
+</footer>
+</div>
+</body>
+</html>

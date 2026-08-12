@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>phase-1-summary — APERANT TUI</title>
+<meta name="description" content="Aperant TUI — the full Aperant agent runtime in your terminal. Real gates, real evidence.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<div class="chrome">
+  <div class="chrome-bar">
+    <span class="brand">APERANT</span><span class="sep">│</span>
+    <span class="meta">aperant-tui</span><span class="sep">│</span>
+    <span class="branch">⑂ main</span><span class="sep">│</span>
+    <span class="meta"><span class="led ok"></span>2 phases gated</span>
+    <span class="meta"><span class="led warn"></span>1 unverified</span>
+    <span class="meta"><span class="led idle"></span>6 pending</span>
+  </div>
+  <nav class="tabs"><a href="index.html" class=""><span class="n">1</span>overview</a><a href="roadmap.html" class=""><span class="n">2</span>roadmap</a><a href="phases.html" class=""><span class="n">3</span>phases</a><a href="evidence.html" class=""><span class="n">4</span>evidence</a><a href="docs.html" class="on"><span class="n">5</span>docs</a></nav>
+  
+<main>
+<section><div class="marker">DOC / phase-1-SUMMARY</div><div class="doc"><h1 id="phase-1-summary--shell--service-layer">Phase 1 SUMMARY — Shell
+&amp; Service Layer</h1>
+<h2 id="what-was-built">What was built</h2>
+<ul>
+<li>Vendored <code>apps/desktop</code> @ 20250db0 (1,288 files,
+SHA256SUMS manifest).</li>
+<li><code>libs/electron-shim</code> + <code>libs/sentry-adapter</code>:
+the vendored agent runtime imports and executes UNMODIFIED in plain Node
+20 — smoke 6/6 PASS (<code>scripts/smoke-main-imports.mts</code>:
+settings-utils round-trip on disk, project-store, rate-limit-detector
+parse hit/miss, task-log-service, pty-manager exports, taskMachine boots
+to "backlog").</li>
+<li><code>apps/tui</code> Ink application: 7 views, command palette,
+help screen, 5 themes with truecolor-&gt;256-&gt;16 degradation, config
+persistence, remappable keymap.</li>
+<li><code>bin/aperant.js</code> cwd-independent launcher (fixed a real
+tsconfig-paths bug: tsx resolves aliases from the process CWD, so the
+bin must pin TSX_TSCONFIG_PATH — otherwise <code>aperant</code> only
+works from the repo).</li>
+<li>SHELL normalization in cli.tsx: vendored pty-manager defaults to
+<code>/bin/zsh</code>; on zsh-less systems the term pane died instantly.
+cli.tsx now picks the first existing of /bin/bash, /bin/sh, /bin/zsh
+WITHOUT touching vendored code.</li>
+<li><code>@xterm/headless</code> v6 is UMD (no exports map) — loaded via
+createRequire.</li>
+</ul>
+<h2 id="how-the-gate-was-executed">How the gate was executed</h2>
+<p>agent-tty end-user harness (per user directive after kimi-find-skills
+discovery): real PTY session, per-step direct CLI calls, each step saved
+as its own JSON envelope; text snapshots + rendered PNG screenshots
+(sha256) + asciicast recording; screen states examined personally by the
+builder.</p>
+<p>Two runs:</p>
+<ul>
+<li><code>run-20260811T233239-phase1-gate</code> — RED: caught D1 (Panel
+titles never render), and the palette drive raced (D3,
+harness-side).</li>
+<li><code>run-20260812T003000-phase1-gate-recheck</code> — GREEN after
+fixes; includes theme-change probe (matrix-&gt;amber, 23,846 px diff)
+and help re-shoot.</li>
+</ul>
+<h2 id="defects-found-by-the-gate-and-fixed">Defects found by the gate
+and fixed</h2>
+<table>
+<thead>
+<tr class="header">
+<th>#</th>
+<th>Defect</th>
+<th>Fix</th>
+<th>Re-verified by</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>D1</td>
+<td>Panel titles clipped (<code>position:absolute;marginTop:-1</code>
+inside <code>overflow:hidden</code>)</td>
+<td>in-flow title row</td>
+<td>"live PTY"/"THEME" waits match; titles visible in PNGs</td>
+</tr>
+<tr class="even">
+<td>D2</td>
+<td>HelpOverlay transparent bleed-through (Ink has no compositing)</td>
+<td>full-area replacement render</td>
+<td>step-18b-shot-help-fixed.png</td>
+</tr>
+<tr class="odd">
+<td>D3</td>
+<td>Burst-typed <code>:</code>commands lose chars (palette mount
+race)</td>
+<td>harness sequencing (product limitation noted)</td>
+<td>theme-change-probe</td>
+</tr>
+</tbody>
+</table>
+<p>Earlier build-time defects also caught by real execution: bin CWD
+dependence, xterm UMD import, /bin/zsh default (all fixed, see git
+history).</p>
+<h2 id="verdict">Verdict</h2>
+<p><strong>GATE 1: PASS</strong> — see phase-1-VALIDATION.md for
+per-criterion verdicts.</p>
+</div></section>
+</main>
+  <div class="statusline"><span><b>DOC · phase-1-SUMMARY</b></span><span>: cmd &nbsp; ? help</span></div>
+</div>
+<footer>
+  <div class="wrap" style="padding:0">
+    <span>APERANT TUI — vendored runtime, zero mocks, gate-proven.</span>
+    &nbsp;<a href="https://github.com/krzemienski/aperant-tui">github.com/krzemienski/aperant-tui</a>
+    &nbsp;· upstream <a href="https://github.com/AndyMik90/Aperant">AndyMik90/Aperant</a> @ 20250db0
+  </div>
+</footer>
+</div>
+</body>
+</html>
