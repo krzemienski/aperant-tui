@@ -1,7 +1,7 @@
 {
   "ok": true,
   "command": "doctor",
-  "timestamp": "2026-08-12T04:38:13.987Z",
+  "timestamp": "2026-08-12T04:54:03.686Z",
   "result": {
     "ok": true,
     "checks": {
@@ -22,42 +22,42 @@
           "name": "temp-dir",
           "status": "pass",
           "message": "temp dir ok: /tmp",
-          "durationMs": 48
+          "durationMs": 84
         },
         {
           "name": "home_isolation",
           "status": "pass",
           "message": "agent-tty home is isolated from system home: /tmp/agent-tty-home",
-          "durationMs": 0
+          "durationMs": 1
         },
         {
           "name": "home-writable",
           "status": "pass",
           "message": "home writable: /tmp/agent-tty-home",
-          "durationMs": 42
+          "durationMs": 16
         },
         {
           "name": "pty-spawn",
           "status": "pass",
           "message": "spawned /home/kimi/node24/bin/node",
-          "durationMs": 32
+          "durationMs": 38
         },
         {
           "name": "socket-viable",
           "status": "pass",
-          "message": "socket ok: /tmp/agent-tty/79a18ce9/38ea7bccd342",
+          "message": "socket ok: /tmp/agent-tty/79a18ce9/086734e71240",
           "durationMs": 6
         },
         {
           "name": "artifact-atomicity",
           "status": "pass",
-          "message": "atomic rename ok: /tmp/agent-tty-home/sessions/doctor-8966-msplmjft-3/artifacts",
-          "durationMs": 3
+          "message": "atomic rename ok: /tmp/agent-tty-home/sessions/doctor-12187-mspm6w8u-3/artifacts",
+          "durationMs": 2
         },
         {
           "name": "event-log-writable",
           "status": "pass",
-          "message": "append ok: /tmp/agent-tty-home/sessions/doctor-8966-msplmjfw-5/events.jsonl",
+          "message": "append ok: /tmp/agent-tty-home/sessions/doctor-12187-mspm6w8x-5/events.jsonl",
           "durationMs": 2
         }
       ],
@@ -66,7 +66,7 @@
           "name": "playwright_available",
           "status": "pass",
           "message": "available",
-          "durationMs": 0
+          "durationMs": 1
         },
         {
           "name": "browser_cache_accessible",
@@ -78,7 +78,7 @@
           "name": "browser_launch",
           "status": "pass",
           "message": "chromium launches",
-          "durationMs": 194
+          "durationMs": 181
         },
         {
           "name": "ghostty_web_available",
@@ -90,7 +90,7 @@
           "name": "screenshot_viable",
           "status": "pass",
           "message": "viable",
-          "durationMs": 297
+          "durationMs": 292
         },
         {
           "name": "libghostty_vt_available",

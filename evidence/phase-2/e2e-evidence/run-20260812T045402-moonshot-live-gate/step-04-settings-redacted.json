@@ -1,18 +1,18 @@
 {
   "providerAccounts": [
     {
-      "id": "moonshot-msplnato",
+      "id": "moonshot-mspm7o6z",
       "provider": "moonshot",
       "name": "Moonshot AI (Kimi)",
       "authType": "api-key",
       "billingModel": "pay-per-use",
       "apiKey": "sk-b455\u2026REDACTED",
       "baseUrl": "http://home.hack.ski:20128/v1",
-      "createdAt": 1786509528972,
-      "updatedAt": 1786509528972
+      "createdAt": 1786510479419,
+      "updatedAt": 1786510479419
     }
   ],
   "globalPriorityOrder": [
-    "moonshot-msplnato"
+    "moonshot-mspm7o6z"
   ]
 }

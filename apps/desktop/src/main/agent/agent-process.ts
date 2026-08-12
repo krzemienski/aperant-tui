@@ -884,6 +884,13 @@ export class AgentProcessManager {
       this.emitter.emit('task-event', tId, event, pId);
     });
 
+    // [APERANT-PATCH observability-tap]: forward raw stream events from the
+    // bridge to the manager emitter (the bridge re-emit alone only reaches
+    // bridge-local listeners — D10 catch via flight-recorder absence).
+    bridge.on('stream-event', (tId: string, event: unknown, pId?: string) => {
+      this.emitter.emit('stream-event', tId, event, pId);
+    });
+
     bridge.on('exit', (tId: string, code: number | null, pType: ProcessType, pId?: string) => {
       this.state.deleteProcess(tId);
 

@@ -1,14 +1,14 @@
 {
   "ok": true,
   "command": "wait",
-  "timestamp": "2026-08-12T04:38:19.945Z",
+  "timestamp": "2026-08-12T04:54:33.777Z",
   "result": {
     "matched": true,
     "timedOut": false,
     "matchedText": "TASKS",
     "cursorRow": 26,
     "cursorCol": 0,
-    "capturedAtSeq": 7,
-    "screenHash": "77f1b3e814f21d9ddf8cc957f77debda72bf95bd998517329335bbe726cb67e3"
+    "capturedAtSeq": 8,
+    "screenHash": "0920f67dda03b2c78f9121f7824fc4f758ad4009cd86ef8d68a596f44ebb53a6"
   }
 }

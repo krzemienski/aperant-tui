@@ -21,6 +21,7 @@ const VIEW_CMDS: Record<string, ViewName> = {
   chat: 'chat', i: 'chat',
   tree: 'tree', w: 'tree',
   set: 'set', s: 'set',
+  agents: 'agents', ag: 'agents',
   logs: 'logs',
 };
 
@@ -49,7 +50,7 @@ export function CommandPalette({ theme: c, ctx }: { theme: Theme; ctx: PaletteCo
       <TextInput
         value={val}
         onChange={setVal}
-        placeholder={`theme ${THEME_NAMES.join('|')} │ board │ term │ road │ chat │ tree │ set │ q`}
+        placeholder={`theme ${THEME_NAMES.join('|')} │ board │ term │ road │ chat │ tree │ set │ agents │ q`}
         onSubmit={(v) => { closePalette(); runCommand(v, ctx); }}
       />
     </Box>

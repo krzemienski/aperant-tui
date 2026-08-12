@@ -44,6 +44,7 @@ const OBSERVED_EVENTS = [
   'error',
   'execution-progress',
   'task-event',
+  'stream-event',
   'exit',
   'sdk-rate-limit',
 ] as const;

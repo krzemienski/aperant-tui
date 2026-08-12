@@ -1,7 +1,7 @@
 {
   "ok": true,
   "command": "wait",
-  "timestamp": "2026-08-12T04:38:47.924Z",
+  "timestamp": "2026-08-12T04:54:14.296Z",
   "result": {
     "matched": true,
     "timedOut": false,
@@ -9,6 +9,6 @@
     "cursorRow": 27,
     "cursorCol": 0,
     "capturedAtSeq": 13,
-    "screenHash": "fe2540366287d42e97637504c41c0360774fa3cf6e22140c7eb3e8e65a78147c"
+    "screenHash": "b675f5416e6a8f425f45453bb0e12471d0146b20cdea13b29c579a55a30f0d51"
   }
 }
