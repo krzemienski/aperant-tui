@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "command": "wait",
+  "timestamp": "2026-08-12T17:21:41.095Z",
+  "result": {
+    "matched": true,
+    "timedOut": false,
+    "matchedText": "001-migrate-provider-registry",
+    "cursorRow": 26,
+    "cursorCol": 0,
+    "capturedAtSeq": 24,
+    "screenHash": "f67a768aae1339cdc26c58749f3f0ef62b9fe24aa2f13d8ae22cc4a979391f8c"
+  }
+}

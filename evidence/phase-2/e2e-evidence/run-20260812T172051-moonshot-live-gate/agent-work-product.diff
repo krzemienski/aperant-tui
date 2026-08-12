@@ -1,0 +1,47 @@
+diff --git a/.auto-claude/specs/002-fix-terminal-blank/implementation_plan.json b/.auto-claude/specs/002-fix-terminal-blank/implementation_plan.json
+index c7596be..6fa45d2 100644
+--- a/.auto-claude/specs/002-fix-terminal-blank/implementation_plan.json
++++ b/.auto-claude/specs/002-fix-terminal-blank/implementation_plan.json
+@@ -1,25 +1,33 @@
+ {
+   "feature": "Fix Terminal Blank Screen",
+-  "status": "queue",
+-  "planStatus": "queued",
+-  "updated_at": "2026-08-11T22:05:00Z",
+   "phases": [
+     {
++      "id": "1",
+       "phase": 1,
+       "name": "Repro & fix",
+-      "status": "pending",
+       "subtasks": [
+         {
+           "id": "002-1",
+           "title": "Reproduce blank screen",
+-          "status": "pending"
++          "description": "Reproduce blank screen",
++          "status": "completed",
++          "completed_at": "2026-08-12T17:23:00.493Z"
+         },
+         {
+           "id": "002-2",
+           "title": "Patch redraw path",
+-          "status": "pending"
++          "description": "Patch redraw path",
++          "status": "completed",
++          "completed_at": "2026-08-12T17:23:19.664Z"
+         }
+-      ]
++      ],
++      "status": "pending"
+     }
+-  ]
++  ],
++  "status": "human_review",
++  "planStatus": "review",
++  "updated_at": "2026-08-12T17:23:31.304Z",
++  "executionPhase": "complete",
++  "reviewReason": "completed",
++  "xstateState": "human_review"
+ }
+\ No newline at end of file

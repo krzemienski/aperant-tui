@@ -1,0 +1,2 @@
+ M .auto-claude/specs/002-fix-terminal-blank/implementation_plan.json
+?? .auto-claude/specs/002-fix-terminal-blank/task_logs.json

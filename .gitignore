@@ -5,3 +5,6 @@ out/
 .e2e-tmp/
 .DS_Store
 apps/tui/dist/
+
+# gate evidence logs are proof artifacts — never ignore them
+!evidence/**/*.log

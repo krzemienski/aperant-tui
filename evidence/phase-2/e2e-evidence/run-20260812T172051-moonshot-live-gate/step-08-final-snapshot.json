@@ -1,0 +1,16 @@
+{
+  "ok": true,
+  "command": "snapshot",
+  "timestamp": "2026-08-12T17:24:58.436Z",
+  "result": {
+    "format": "text",
+    "sessionId": "01KZVFW5BGVG5X6QA2Y2FGYJKA",
+    "capturedAtSeq": 92,
+    "cols": 110,
+    "rows": 32,
+    "cursorRow": 31,
+    "cursorCol": 0,
+    "text": "    url: 'http://home.hack.ski:20128/v1/chat/completions',\n    requestBodyValues: {\n      model: 'kimi/kimi-for-coding',\n      user: undefined,\n      max_tokens: undefined,\n      temperature: undefined,\n      top_p: undefined,\n      frequency_penalty: undefined,\n      presence_penalty: undefined,\n      response_format: undefined,\n      stop: undefined,\n┌────────────────────────────────────────────────────────────────────────────────────────────────────────────┐\n│APERANT │ aperant-fixture /tmp/aperant-fixture │ ⑂ develop             ◉ 1 running  ◆ 1 review  ● no profile│\n│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                      │\n│ ┌──────────────────────────────────────────────┐ ┌───────────────────────────────────────────────────────┐ │\n│ │ TASKS                                        │ │ DETAIL                                                │ │\n│ │ ◆ BACKLOG (1)                                │ │ 002-fix- [REVIEW]                                     │ │\n│ │   004-qa-l ▽ QA Loop Docs  50%               │ │ Fix Terminal Blank Screen                             │ │\n│ │ ◆ BUILDING (1)                               │ │ progress ███████░░░░░░░ 50%                           │ │\n│ │   001-migr ▲ Migrate Provider Registry  50%  │ │ subtasks 2/2 complete                                 │ │\n│ │ ◆ HUMAN (1)                                  │ │ phase complete                                        │ │\n│ │ ❯ 002-fix- ◆ Fix Terminal Blank Screen  50%  │ │ location main  spec 002-fix-terminal-blank            │ │\n│ │ ◆ DONE (1)                                   │ └───────────────────────────────────────────────────────┘ │\n│ │   003-arch ▽ Archive Button Fixes  50%       │                                                           │\n│ │                                              │ ┌───────────────────────────────────────────────────────┐ │\n│ │                                              │ │ AGENT STREAM                                          │ │\n│ │                                              │ │ 17:21:45 start 002-fix- → vendored AgentManager…      │ │\n│ │                                              │ │ 17:21:47 started 002-fix-: agent started — phase pla… │ │\n│ └──────────────────────────────────────────────┘ └───────────────────────────────────────────────────────┘ │\n│ BOARD  j/k move · ⏎ focus · s start · x stop · H/L column · l logs · / filter                 : cmd  ? help│\n└────────────────────────────────────────────────────────────────────────────────────────────────────────────┘\n",
+    "screenHash": "bdd3bf212a73373f7f6538dab9f83c12adb16925ae020c92f7c3fc745b0a92d4"
+  }
+}

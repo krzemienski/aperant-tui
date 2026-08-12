@@ -1,0 +1,142 @@
+{
+  "ok": true,
+  "command": "doctor",
+  "timestamp": "2026-08-12T17:28:58.096Z",
+  "result": {
+    "ok": false,
+    "checks": {
+      "environment": [
+        {
+          "name": "node-runtime",
+          "status": "pass",
+          "message": "Node 24.12.0 ok",
+          "durationMs": 0
+        },
+        {
+          "name": "cwd-access",
+          "status": "pass",
+          "message": "cwd read/write: /tmp/build/aperant-tui",
+          "durationMs": 1
+        },
+        {
+          "name": "temp-dir",
+          "status": "pass",
+          "message": "temp dir ok: /tmp",
+          "durationMs": 61
+        },
+        {
+          "name": "home_isolation",
+          "status": "pass",
+          "message": "agent-tty home is isolated from system home: /tmp/agent-tty-home",
+          "durationMs": 1
+        },
+        {
+          "name": "home-writable",
+          "status": "pass",
+          "message": "home writable: /tmp/agent-tty-home",
+          "durationMs": 29
+        },
+        {
+          "name": "pty-spawn",
+          "status": "pass",
+          "message": "spawned /home/kimi/.cache/node24/bin/node",
+          "durationMs": 35
+        },
+        {
+          "name": "socket-viable",
+          "status": "pass",
+          "message": "socket ok: /tmp/agent-tty/79a18ce9/c6827d00e0f9",
+          "durationMs": 5
+        },
+        {
+          "name": "artifact-atomicity",
+          "status": "pass",
+          "message": "atomic rename ok: /tmp/agent-tty-home/sessions/doctor-2250-msqd5pzp-3/artifacts",
+          "durationMs": 3
+        },
+        {
+          "name": "event-log-writable",
+          "status": "pass",
+          "message": "append ok: /tmp/agent-tty-home/sessions/doctor-2250-msqd5pzr-5/events.jsonl",
+          "durationMs": 2
+        }
+      ],
+      "renderer": [
+        {
+          "name": "playwright_available",
+          "status": "pass",
+          "message": "available",
+          "durationMs": 0
+        },
+        {
+          "name": "browser_cache_accessible",
+          "status": "pass",
+          "message": "browser cache accessible: /home/kimi/.cache/ms-playwright",
+          "durationMs": 1
+        },
+        {
+          "name": "browser_launch",
+          "status": "fail",
+          "message": "browserType.launch: Executable doesn't exist at /home/kimi/.cache/ms-playwright/chromium_headless_shell-1223/chrome-headless-shell-linux64/chrome-headless-shell\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝",
+          "durationMs": 13
+        },
+        {
+          "name": "ghostty_web_available",
+          "status": "pass",
+          "message": "WASM available",
+          "durationMs": 6
+        },
+        {
+          "name": "screenshot_viable",
+          "status": "fail",
+          "message": "browserType.launch: Executable doesn't exist at /home/kimi/.cache/ms-playwright/chromium_headless_shell-1223/chrome-headless-shell-linux64/chrome-headless-shell\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝",
+          "durationMs": 2
+        },
+        {
+          "name": "libghostty_vt_available",
+          "status": "pass",
+          "message": "@coder/libghostty-vt-node exposes createTerminal()",
+          "durationMs": 0
+        }
+      ]
+    },
+    "capabilities": [
+      {
+        "name": "snapshot",
+        "status": "available",
+        "reason": "libghostty-vt semantic renderer available",
+        "detail": "@coder/libghostty-vt-node exposes createTerminal()"
+      },
+      {
+        "name": "wait",
+        "status": "available",
+        "reason": "libghostty-vt semantic renderer available",
+        "detail": "@coder/libghostty-vt-node exposes createTerminal()"
+      },
+      {
+        "name": "screenshot",
+        "status": "degraded",
+        "reason": "browser launch failed",
+        "detail": "browserType.launch: Executable doesn't exist at /home/kimi/.cache/ms-playwright/chromium_headless_shell-1223/chrome-headless-shell-linux64/chrome-headless-shell\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝"
+      },
+      {
+        "name": "record-export-asciicast",
+        "status": "available",
+        "reason": "built-in capability",
+        "detail": "available without external renderer dependencies"
+      },
+      {
+        "name": "record-export-webm",
+        "status": "degraded",
+        "reason": "browser launch failed",
+        "detail": "browserType.launch: Executable doesn't exist at /home/kimi/.cache/ms-playwright/chromium_headless_shell-1223/chrome-headless-shell-linux64/chrome-headless-shell\n╔════════════════════════════════════════════════════════════╗\n║ Looks like Playwright was just installed or updated.       ║\n║ Please run the following command to download new browsers: ║\n║                                                            ║\n║     npx playwright install                                 ║\n║                                                            ║\n║ <3 Playwright Team                                         ║\n╚════════════════════════════════════════════════════════════╝"
+      },
+      {
+        "name": "dashboard",
+        "status": "available",
+        "reason": "libghostty-vt native module available",
+        "detail": "@coder/libghostty-vt-node exposes createTerminal()"
+      }
+    ]
+  }
+}

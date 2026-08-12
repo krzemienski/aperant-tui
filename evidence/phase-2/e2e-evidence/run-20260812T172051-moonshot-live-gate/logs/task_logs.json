@@ -1,0 +1,116 @@
+{
+  "spec_id": "002-fix-terminal-blank",
+  "created_at": "2026-08-12T17:21:51.057Z",
+  "updated_at": "2026-08-12T17:24:43.505Z",
+  "phases": {
+    "planning": {
+      "phase": "planning",
+      "status": "pending",
+      "started_at": null,
+      "completed_at": null,
+      "entries": []
+    },
+    "coding": {
+      "phase": "coding",
+      "status": "completed",
+      "started_at": "2026-08-12T17:22:43.291Z",
+      "completed_at": "2026-08-12T17:23:22.665Z",
+      "entries": [
+        {
+          "timestamp": "2026-08-12T17:22:43.291Z",
+          "type": "phase_start",
+          "content": "Starting implementation",
+          "phase": "coding"
+        },
+        {
+          "timestamp": "2026-08-12T17:23:00.485Z",
+          "type": "error",
+          "content": "failed after 3 attempts. last error: ai_apicallerror: cannot connect to api: connect ehostunreach 100.33.238.199:20128",
+          "phase": "coding",
+          "subtask_id": "002-1"
+        },
+        {
+          "timestamp": "2026-08-12T17:23:19.661Z",
+          "type": "error",
+          "content": "failed after 3 attempts. last error: ai_apicallerror: cannot connect to api: connect ehostunreach 100.33.238.199:20128",
+          "phase": "coding",
+          "subtask_id": "002-2"
+        }
+      ]
+    },
+    "validation": {
+      "phase": "validation",
+      "status": "failed",
+      "started_at": "2026-08-12T17:24:27.418Z",
+      "completed_at": "2026-08-12T17:24:43.504Z",
+      "entries": [
+        {
+          "timestamp": "2026-08-12T17:23:22.665Z",
+          "type": "phase_start",
+          "content": "Running QA review",
+          "phase": "validation"
+        },
+        {
+          "timestamp": "2026-08-12T17:23:38.760Z",
+          "type": "error",
+          "content": "failed after 3 attempts. last error: ai_apicallerror: cannot connect to api: connect ehostunreach 100.33.238.199:20128",
+          "phase": "validation"
+        },
+        {
+          "timestamp": "2026-08-12T17:23:38.764Z",
+          "type": "phase_start",
+          "content": "Fixing QA issues",
+          "phase": "validation"
+        },
+        {
+          "timestamp": "2026-08-12T17:23:55.011Z",
+          "type": "error",
+          "content": "failed after 3 attempts. last error: ai_apicallerror: cannot connect to api: connect ehostunreach 100.33.238.199:20128",
+          "phase": "validation"
+        },
+        {
+          "timestamp": "2026-08-12T17:23:55.013Z",
+          "type": "phase_start",
+          "content": "Re-running QA review after fixes",
+          "phase": "validation"
+        },
+        {
+          "timestamp": "2026-08-12T17:24:11.261Z",
+          "type": "error",
+          "content": "failed after 3 attempts. last error: ai_apicallerror: cannot connect to api: connect ehostunreach 100.33.238.199:20128",
+          "phase": "validation"
+        },
+        {
+          "timestamp": "2026-08-12T17:24:11.264Z",
+          "type": "phase_start",
+          "content": "Fixing QA issues",
+          "phase": "validation"
+        },
+        {
+          "timestamp": "2026-08-12T17:24:27.416Z",
+          "type": "error",
+          "content": "failed after 3 attempts. last error: ai_apicallerror: cannot connect to api: connect ehostunreach 100.33.238.199:20128",
+          "phase": "validation"
+        },
+        {
+          "timestamp": "2026-08-12T17:24:27.418Z",
+          "type": "phase_start",
+          "content": "Re-running QA review after fixes",
+          "phase": "validation"
+        },
+        {
+          "timestamp": "2026-08-12T17:24:43.502Z",
+          "type": "error",
+          "content": "failed after 3 attempts. last error: ai_apicallerror: cannot connect to api: connect ehostunreach 100.33.238.199:20128",
+          "phase": "validation"
+        },
+        {
+          "timestamp": "2026-08-12T17:24:43.504Z",
+          "type": "phase_end",
+          "content": "Failed validation phase",
+          "phase": "validation"
+        }
+      ]
+    }
+  }
+}

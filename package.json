@@ -2,7 +2,7 @@
   "name": "aperant-tui-workspace",
   "version": "0.1.0",
   "private": true,
-  "description": "Aperant TUI \u2014 Ink/React terminal renderer over the Aperant TypeScript agent runtime",
+  "description": "Aperant TUI — Ink/React terminal renderer over the Aperant TypeScript agent runtime",
   "workspaces": [
     "apps/tui",
     "libs/*"
@@ -20,9 +20,8 @@
   },
   "license": "AGPL-3.0",
   "dependencies": {
-    "ai": "^7.0.62",
-    "@ai-sdk/anthropic": "^4.0.38",
     "@ai-sdk/amazon-bedrock": "^5.0.54",
+    "@ai-sdk/anthropic": "^4.0.38",
     "@ai-sdk/azure": "^4.0.41",
     "@ai-sdk/google": "^4.0.42",
     "@ai-sdk/groq": "^4.0.28",
@@ -32,11 +31,13 @@
     "@ai-sdk/openai-compatible": "^3.0.30",
     "@ai-sdk/xai": "^4.0.36",
     "@anthropic-ai/sdk": "^0.116.0",
-    "@openrouter/ai-sdk-provider": "^3.0.0",
+    "@aperant/moonshot-provider": "file:libs/moonshot-provider",
     "@libsql/client": "^0.17.4",
     "@modelcontextprotocol/sdk": "^1.30.0",
+    "@openrouter/ai-sdk-provider": "^3.0.0",
     "@tavily/core": "^0.7.7",
-    "zod": "^4.4.3",
-    "@aperant/moonshot-provider": "file:libs/moonshot-provider"
+    "ai": "^7.0.62",
+    "react-devtools-core": "^4.28.5",
+    "zod": "^4.4.3"
   }
 }

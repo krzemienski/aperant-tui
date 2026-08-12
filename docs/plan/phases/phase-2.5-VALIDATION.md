@@ -21,6 +21,24 @@ the TUI's real TTY guard (D7).
 | 6 | No secrets in evidence | step-09 scan: no key material anywhere in the run dir | **PASS** |
 | 7 | Regression: protocol + executor suites | 9/9 vitest: provider (real HTTP/SSE/401/garbage via loopback server), parallel-executor `onSubtaskQueued` (6 subtasks @ concurrency 3) | **PASS** |
 
+## Prompt & ordering measurements (remediation sweep 2026-08-12 PM)
+
+- **Prompt source (empirical)**: the main thread's `prompt-loader` resolves
+  `apps/desktop/prompts/` via repo-root traversal; the bundled worker's own
+  `loadPrompt` resolves the same real directory
+  (`join(dist,'..','..','..','apps','desktop','prompts')` — probed
+  standalone, RESOLVED). The planner phase therefore ran the real
+  `prompts/planner.md` (30,116 bytes; mandates Write of
+  `implementation_plan.json` — which the agent demonstrably did), and
+  coder/QA phases inside the worker load their real prompt files from the
+  same tree. No fallback prompts were used.
+- **Phase ordering**: sequence extracted from this run's committed
+  `agent-events.jsonl`: `planning → [structured CODING_STARTED] → coding →
+  (idle: session boundary) → planning → qa_review → qa_fixing`. Splitting at
+  session boundaries, every segment is monotonic per `PHASE_ORDER_INDEX`
+  (0→1 and 0→2→3); `qa_review → qa_fixing` is the legal 80–95% QA cycle.
+  **No phase regression in 1,886 events.**
+
 ## Defects caught by this gate family
 
 - **D5** — agent-start-service listened for `task-started`/`task-failed` events

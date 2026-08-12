@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "command": "wait",
+  "timestamp": "2026-08-12T17:30:17.208Z",
+  "result": {
+    "matched": true,
+    "timedOut": false,
+    "matchedText": "EVENT TRACE",
+    "cursorRow": 31,
+    "cursorCol": 0,
+    "capturedAtSeq": 208,
+    "screenHash": "49370265373adaeda9da364bf423c4caa185149c32916b95df614138411a4e67"
+  }
+}

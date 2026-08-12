@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "command": "wait",
+  "timestamp": "2026-08-12T17:21:06.697Z",
+  "result": {
+    "matched": true,
+    "timedOut": false,
+    "matchedText": "no API key",
+    "cursorRow": 28,
+    "cursorCol": 0,
+    "capturedAtSeq": 17,
+    "screenHash": "b484cb443206a5c162c6fe56b354062ae5e4b2ceb4df4d7676ff25e2e5a95dc8"
+  }
+}

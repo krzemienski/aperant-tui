@@ -1,0 +1,9 @@
+total events: 67
+  execution-progress: 30
+  log: 21
+  task-event: 7
+  stream-event: 7
+  error: 1
+  exit: 1
+stream-event kinds: {'error': 7}
+task-events: 7 ['CODING_STARTED', 'QA_STARTED', 'QA_FIXING_STARTED', 'QA_STARTED', 'QA_FIXING_STARTED', 'QA_STARTED']

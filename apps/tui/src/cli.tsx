@@ -39,7 +39,7 @@ if (args.includes('--help') || args.includes('-h')) {
 
 usage: aperant [path-to-project]
 
-keys: 1-6 switch views · j/k navigate · ':' command palette · '?' help · ctrl+c ×2 quit
+keys: 1-7 switch views · j/k navigate · ':' command palette · '?' help · ctrl+c ×2 quit
 config: ~/.aperant/tui.json`);
   process.exit(0);
 }

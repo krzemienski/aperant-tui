@@ -2,7 +2,7 @@
 
 Run: `evidence/phase-3.5/e2e-evidence/run-20260812T084209-phase35-gate/`
 Session `phase35` · 110x32 · screenshots ×7 · console log ·
-agent-events.jsonl (1807 events) · real sentinel intervention.
+agent-events.jsonl (275 events) · real sentinel intervention.
 Verdict: **GATE FAILS: 0** · SECRET-SCAN-OK.
 
 | Spec Part 8 gate | Evidence | VERDICT |
@@ -15,10 +15,10 @@ Verdict: **GATE FAILS: 0** · SECRET-SCAN-OK.
 | Token accuracy | D11 fix verified: step-finish usage 14,035/147 → cumulative 43,216 tokens from the real endpoint (pre-fix runs recorded 0) | **PASS** |
 | Cache hit | usage carries `cacheReadTokens: 0` from this endpoint — arithmetic runs, no cache traffic to measure | **UNVERIFIED — no cache traffic** |
 | Tool grants | step-04e GRANTS-BYTEMATCH-OK: planner (`thinkingDefault: high`) and coder (`low`) dumped from the imported vendored AGENT_CONFIGS | **PASS** |
-| Trace completeness | step-09 census: 898 stream-events (thinking-delta ×118, tool-call ×4, tool-result ×4, step-finish ×3, usage-update ×3) — every tool-call paired | **PASS** |
+| Trace completeness | step-09 census: 132 stream-events (thinking-delta ×118, tool-call ×4, tool-result ×4, step-finish ×3, usage-update ×3) — every tool-call paired | **PASS** |
 | Graph topology | phase pipeline + regression guard rendered (step-05 waits); subagent nodes require SpawnSubagent traffic — none in this run | **PASS (pipeline)** / subagent nodes **UNVERIFIED — no spawn traffic** |
 | Phase provenance | step-04c wait matched `~ inferred` during planning (honest — no structured planning event exists); `▪ structured` path verified via task-event census (CODING_STARTED) | **PASS** |
-| Throughput | 898-event live stream ingested with 16ms coalescing; no UI stalls observed across 7 screenshots | **PASS (observational)**; 100 events/sec synthetic burst not performed |
+| Throughput | 275-event live stream ingested with 16ms coalescing; no UI stalls observed across 7 screenshots | **PASS (observational)**; 100 events/sec synthetic burst not performed |
 
 ## Defects caught by this gate family
 

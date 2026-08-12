@@ -11,8 +11,8 @@
   },
   "scripts": {
     "dev": "tsx src/cli.tsx",
-    "build": "tsc -p tsconfig.build.json && node scripts/postbuild.mjs",
-    "start": "node dist/cli.js",
+    "build": "node ../../tools/build-worker.mjs && node ../../tools/build-cli.mjs",
+    "start": "node dist/cli.mjs",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },

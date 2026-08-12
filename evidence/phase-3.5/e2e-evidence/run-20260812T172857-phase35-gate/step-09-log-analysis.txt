@@ -1,0 +1,2 @@
+total: 41 {'execution-progress': 18, 'log': 15, 'task-event': 4, 'stream-event': 4}
+stream kinds: {'error': 4}

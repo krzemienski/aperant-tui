@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "command": "wait",
+  "timestamp": "2026-08-12T17:29:16.231Z",
+  "result": {
+    "matched": true,
+    "timedOut": false,
+    "matchedText": "Fix Terminal Blank",
+    "cursorRow": 26,
+    "cursorCol": 0,
+    "capturedAtSeq": 18,
+    "screenHash": "f36516d6056af2293bbc69f029d41b7b63ceb24d179244ddf0ebff9168fef00a"
+  }
+}

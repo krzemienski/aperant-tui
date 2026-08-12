@@ -1,7 +1,0 @@
-total events: 1886
-  execution-progress: 1878
-  log: 7
-  task-event: 1
-stream-event kinds: {}
-task-events: 1
-  task-event: CODING_STARTED

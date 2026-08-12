@@ -124,6 +124,9 @@ step 9 "log facet: event log + trace completeness"
 sleep 20
 EVLOG="$UD/logs/agent-events.jsonl"
 [ -f "$EVLOG" ] && cp "$EVLOG" "$RUN/logs/agent-events.jsonl" || { echo MISSING; FAILS=$((FAILS+1)); }
+[ -f "$FIX/.auto-claude/specs/002-fix-terminal-blank/task_logs.json" ] && cp "$FIX/.auto-claude/specs/002-fix-terminal-blank/task_logs.json" "$RUN/logs/task_logs.json" || true
+[ -f "$UD/logs/crash-report.log" ] && cp "$UD/logs/crash-report.log" "$RUN/logs/crash-report.log" || echo "no crash-report.log (clean)" > "$RUN/logs/crash-report.log.absent"
+(cd "$FIX" && git diff > "$RUN/agent-work-product.diff" 2>/dev/null; git status --short > "$RUN/agent-work-product.status.txt" 2>/dev/null)
 python3 - "$RUN/logs/agent-events.jsonl" > "$RUN/step-09-log-analysis.txt" 2>&1 <<'EOF'
 import json, sys, collections
 events = [json.loads(l) for l in open(sys.argv[1]) if l.strip()]
