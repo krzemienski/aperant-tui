@@ -1,0 +1,12 @@
+{
+  "ok": true,
+  "command": "send-keys",
+  "timestamp": "2026-08-12T01:16:29.391Z",
+  "result": {
+    "accepted": [
+      "Escape"
+    ],
+    "bytesWritten": 1,
+    "seq": 45
+  }
+}

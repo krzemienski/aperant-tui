@@ -1,0 +1,12 @@
+{
+  "ok": true,
+  "command": "send-keys",
+  "timestamp": "2026-08-12T01:19:43.899Z",
+  "result": {
+    "accepted": [
+      "Ctrl+C"
+    ],
+    "bytesWritten": 1,
+    "seq": 34
+  }
+}

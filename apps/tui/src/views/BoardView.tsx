@@ -1,7 +1,9 @@
 /**
  * BoardView — kanban over REAL tasks discovered by the vendored projectStore
- * from the project's .auto-claude/specs tree. Phase 2 wires start/stop/move;
- * Phase 1 renders the real store state with selection, detail, and log tails.
+ * from the project's .auto-claude/specs tree. H/L moves persist through the
+ * vendored persistPlanStatusSync; `s` starts the real vendored AgentManager
+ * pipeline (its real outcome — started, or the real error — lands in AGENT
+ * STREAM). No TUI-side state shadowing: after a move we re-read from disk.
  */
 import React, { useMemo, useState } from 'react';
 import { Box, Text } from 'ink';
@@ -11,7 +13,10 @@ import { Panel } from '../components/Panel';
 import { StatusBadge, statusMeta, prioColor, prioGlyph } from '../components/StatusBadge';
 import { ProgressBar } from '../components/ProgressBar';
 import { groupByStatus } from '../services/task-service';
+import { moveTask } from '../services/task-lifecycle-service';
+import { startTask, type StartOutcome } from '../services/agent-start-service';
 import { useKeymap } from '../hooks/useKeymap';
+import { useAppStore } from '../stores/app-store';
 
 const COLUMN_LABELS: Record<string, string> = {
   backlog: 'BACKLOG', queue: 'QUEUE', in_progress: 'BUILDING',
@@ -30,15 +35,49 @@ interface Props {
   project: Project;
   tasks: Task[];
   onOpenLogs: (task: Task) => void;
+  /** Re-read tasks from disk after a lifecycle write (move, start, ...). */
+  onTasksChanged: () => void;
   isActive: boolean;
 }
 
-export function BoardView({ theme: c, project, tasks, onOpenLogs, isActive }: Props) {
+export function BoardView({ theme: c, project, tasks, onOpenLogs, onTasksChanged, isActive }: Props) {
   const [sel, setSel] = useState(0);
   const [focus, setFocus] = useState<'list' | 'detail'>('list');
+  const [starting, setStarting] = useState(false);
+  // Real lifecycle events, newest last — rendered in AGENT STREAM.
+  const [stream, setStream] = useState<string[]>([]);
   const flat = tasks;
   const clamped = Math.min(sel, Math.max(0, flat.length - 1));
   const task = flat[clamped];
+  const flash = useAppStore((s) => s.flash);
+
+  const log = (line: string) => setStream((s) => [...s.slice(-40), line]);
+
+  const move = (dir: 1 | -1) => {
+    if (!task) return;
+    const r = moveTask(project, task, dir);
+    if (r.ok) {
+      flash(`${task.id.slice(0, 8)}: ${r.from} → ${r.to}`);
+      log(`${new Date().toISOString().slice(11, 19)} move ${task.id.slice(0, 8)} ${r.from} → ${r.to} (persisted)`);
+      onTasksChanged();
+    } else {
+      flash(r.reason);
+      log(`${new Date().toISOString().slice(11, 19)} move ${task.id.slice(0, 8)} refused: ${r.reason}`);
+    }
+  };
+
+  const start = () => {
+    if (!task || starting) return;
+    setStarting(true);
+    log(`${new Date().toISOString().slice(11, 19)} start ${task.id.slice(0, 8)} → vendored AgentManager…`);
+    startTask(project, task)
+      .then((o: StartOutcome) => {
+        log(`${new Date().toISOString().slice(11, 19)} ${o.ok ? 'started' : 'failed'} ${o.taskId.slice(0, 8)}: ${o.detail}`);
+        flash(o.ok ? `agent started: ${task.id.slice(0, 8)}` : `start failed: ${o.detail.slice(0, 60)}`);
+        onTasksChanged();
+      })
+      .finally(() => setStarting(false));
+  };
 
   useKeymap({
     j: () => setSel((s) => Math.min(s + 1, flat.length - 1)),
@@ -46,7 +85,11 @@ export function BoardView({ theme: c, project, tasks, onOpenLogs, isActive }: Pr
     down: () => setSel((s) => Math.min(s + 1, flat.length - 1)),
     up: () => setSel((s) => Math.max(s - 1, 0)),
     return: () => setFocus((f) => (f === 'list' ? 'detail' : 'list')),
-    L: () => task && onOpenLogs(task),
+    H: () => move(-1),
+    L: () => move(1),
+    s: start,
+    x: () => flash('stop: no live agent process is owned by this TUI session'),
+    l: () => task && onOpenLogs(task),
   }, { isActive });
 
   const groups = useMemo(() => groupByStatus(tasks), [tasks]);
@@ -115,7 +158,11 @@ export function BoardView({ theme: c, project, tasks, onOpenLogs, isActive }: Pr
         </Panel>
 
         <Panel title="AGENT STREAM" theme={c} flexGrow={1}>
-          {task?.logs?.length ? (
+          {stream.length ? (
+            stream.slice(-12).map((l, i) => (
+              <Text key={i} color={l.includes('failed') || l.includes('refused') ? c.err : c.dim} wrap="truncate-end">{l}</Text>
+            ))
+          ) : task?.logs?.length ? (
             task.logs.slice(-12).map((l, i) => (
               <Text key={i} color={c.dim} wrap="truncate-end">{l}</Text>
             ))

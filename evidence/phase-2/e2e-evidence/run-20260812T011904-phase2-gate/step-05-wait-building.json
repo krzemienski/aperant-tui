@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "command": "wait",
+  "timestamp": "2026-08-12T01:19:55.589Z",
+  "result": {
+    "matched": true,
+    "timedOut": false,
+    "matchedText": "BUILDING (2)",
+    "cursorRow": 21,
+    "cursorCol": 0,
+    "capturedAtSeq": 7,
+    "screenHash": "a7bcc65f89fc007f77ce86329064d479da5aa380a5d9db28966e097049d6816f"
+  }
+}

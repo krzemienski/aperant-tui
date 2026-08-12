@@ -4,7 +4,7 @@ import type { Theme } from '../theme/themes';
 import type { ViewName } from '../stores/app-store';
 
 const HINTS: Record<ViewName, string> = {
-  board: 'j/k move · ⏎ focus · s start · x stop · H/L column · L logs · / filter',
+  board: 'j/k move · ⏎ focus · s start · x stop · H/L column · l logs · / filter',
   term: '⇥ cycle panes · z zoom · x kill pane',
   road: 'g generate · c convert→spec · a add feature',
   chat: '⏎ send · / history search',

@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "command": "wait",
+  "timestamp": "2026-08-12T01:21:56.602Z",
+  "result": {
+    "matched": true,
+    "timedOut": false,
+    "matchedText": "in_progress → queue",
+    "cursorRow": 22,
+    "cursorCol": 0,
+    "capturedAtSeq": 20,
+    "screenHash": "7e2a47b56926272264ec73c6395c912af80ba082a0cfb0d2bec7495b6cc10f5d"
+  }
+}

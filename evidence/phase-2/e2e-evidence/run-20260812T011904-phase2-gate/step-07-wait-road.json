@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "command": "wait",
+  "timestamp": "2026-08-12T01:20:21.826Z",
+  "result": {
+    "matched": true,
+    "timedOut": false,
+    "matchedText": "Foundation",
+    "cursorRow": 18,
+    "cursorCol": 0,
+    "capturedAtSeq": 26,
+    "screenHash": "0e5e769619e1f7720b8a0c5908c08073f13452c4019c44edb23f87e7d9990384"
+  }
+}

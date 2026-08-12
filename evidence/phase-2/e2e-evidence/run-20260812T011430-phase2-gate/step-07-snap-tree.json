@@ -1,0 +1,16 @@
+{
+  "ok": true,
+  "command": "snapshot",
+  "timestamp": "2026-08-12T01:16:21.237Z",
+  "result": {
+    "format": "text",
+    "sessionId": "01KZSRKRYWSQXVC8Y66N1JV9PG",
+    "capturedAtSeq": 32,
+    "cols": 110,
+    "rows": 32,
+    "cursorRow": 16,
+    "cursorCol": 0,
+    "text": "nt-fixture\n┌────────────────────────────────────────────────────────────────────────────────────────────────────────────┐\n│APERANT │ aperant-fixture /tmp/aperant-fixture │ ⑂ develop             ◉ 1 running  ◆ 0 review  ● no profile│\n│  1 board    2 term    3 road    4 chat    5 tree    6 set                                                  │\n│ ┌─────────────────────────────────────┐ ┌────────────────────────────────────────────────────────────────┐ │\n│ │ WORKTREES                           │ │ STATUS · develop                                               │ │\n│ │ ❯ ⑂ develop                         │ │ head 5596975562                                                │ │\n│ │     /tmp/aperant-fixture            │ │ diff 1 file changed, 6 insertions(+), 6 deletions(-)           │ │\n│ │                                     │ │ unified diff + merge arrive in Phase 5                         │ │\n│ │                                     │ │                                                                │ │\n│ │                                     │ │                                                                │ │\n│ │                                     │ │                                                                │ │\n│ │                                     │ │                                                                │ │\n│ └─────────────────────────────────────┘ └────────────────────────────────────────────────────────────────┘ │\n│ TREE  d diff · m merge · p PR · D discard                                                     : cmd  ? help│\n└────────────────────────────────────────────────────────────────────────────────────────────────────────────┘\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "screenHash": "4cbe57bdba0caacffeb694217b3c5515aa39acc0731cdf4d006f3c3109bb0dc3"
+  }
+}

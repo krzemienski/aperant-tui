@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "command": "wait",
+  "timestamp": "2026-08-12T01:16:12.995Z",
+  "result": {
+    "matched": true,
+    "timedOut": false,
+    "matchedText": "live PTY",
+    "cursorRow": 31,
+    "cursorCol": 0,
+    "capturedAtSeq": 23,
+    "screenHash": "786937e50d1bc12ed136068e016d70fd5e62ec5d2a932bfebf6208e283f7aab2"
+  }
+}

@@ -128,7 +128,8 @@ export function App({ projectPath }: AppProps) {
         {helpOpen ? <HelpOverlay theme={theme} /> : null}
         {!helpOpen && view === 'board' && (
           <BoardView theme={theme} project={opened.project} tasks={tasks} isActive={viewActive}
-            onOpenLogs={(t) => { setLogsTask(t); store.setView('logs'); }} />
+            onOpenLogs={(t) => { setLogsTask(t); store.setView('logs'); }}
+            onTasksChanged={() => setTasks(refreshTasks(opened.project))} />
         )}
         {!helpOpen && view === 'term' && <TerminalView theme={theme} project={opened.project} isActive={viewActive} />}
         {!helpOpen && view === 'road' && <RoadmapView theme={theme} project={opened.project} />}

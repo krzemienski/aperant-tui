@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "command": "wait",
+  "timestamp": "2026-08-12T01:15:33.090Z",
+  "result": {
+    "matched": true,
+    "timedOut": false,
+    "matchedText": "APERANT",
+    "cursorRow": 21,
+    "cursorCol": 0,
+    "capturedAtSeq": 7,
+    "screenHash": "c6ff3a2561da47fc2317a6cc932082d7c2938f395cf0e75641918b7a7b6ff39d"
+  }
+}

@@ -29,15 +29,31 @@
     "react": "^18.3.1",
     "uuid": "^11.0.0",
     "xstate": "^5.19.0",
-    "zod": "^3.23.0",
-    "zustand": "^5.0.0"
+    "zod": "^4.3.6",
+    "zustand": "^5.0.0",
+    "ai": "^6.0.116",
+    "@ai-sdk/anthropic": "^3.0.58",
+    "@anthropic-ai/sdk": "^0.78.0",
+    "@ai-sdk/amazon-bedrock": "^4.0.77",
+    "@ai-sdk/azure": "^3.0.42",
+    "@ai-sdk/google": "^3.0.43",
+    "@ai-sdk/groq": "^3.0.29",
+    "@ai-sdk/mcp": "^1.0.25",
+    "@ai-sdk/mistral": "^3.0.24",
+    "@ai-sdk/openai": "^3.0.41",
+    "@ai-sdk/openai-compatible": "^2.0.35",
+    "@ai-sdk/xai": "^3.0.67",
+    "@openrouter/ai-sdk-provider": "^2.3.1",
+    "@libsql/client": "^0.17.0",
+    "@modelcontextprotocol/sdk": "^1.27.1",
+    "@tavily/core": "^0.7.2"
   },
   "devDependencies": {
-    "@types/node": "^20.14.0",
+    "@types/node": "^25.5.0",
     "@types/react": "^18.3.0",
     "@types/uuid": "^10.0.0",
     "tsx": "^4.19.0",
-    "typescript": "~5.6.3",
+    "typescript": "^5.9.3",
     "vitest": "^2.1.0"
   }
 }

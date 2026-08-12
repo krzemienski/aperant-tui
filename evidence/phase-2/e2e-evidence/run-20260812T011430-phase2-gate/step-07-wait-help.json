@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "command": "wait",
+  "timestamp": "2026-08-12T01:16:28.498Z",
+  "result": {
+    "matched": true,
+    "timedOut": false,
+    "matchedText": "KEYBINDINGS",
+    "cursorRow": 27,
+    "cursorCol": 0,
+    "capturedAtSeq": 44,
+    "screenHash": "db0480c4133aa2f131fd4cf001ec259742d5320e4cd00e16a070624c599052b8"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "ok": true,
+  "command": "record export",
+  "timestamp": "2026-08-12T01:20:44.402Z",
+  "result": {
+    "sessionId": "01KZSRVR3Q9FTB46MAEB2XNZNW",
+    "format": "asciicast",
+    "artifactPath": "/tmp/agent-tty-home/sessions/01KZSRVR3Q9FTB46MAEB2XNZNW/artifacts/recording-53-asciicast.cast",
+    "bytes": 111294,
+    "sha256": "0cd9f31abaf8cad52ed9f5ec9a5703256f64822f5b7dd7d7809e096f14a099a1",
+    "capturedAtSeq": 53,
+    "durationMs": 50528,
+    "metadata": {
+      "width": 110,
+      "height": 32,
+      "title": "01KZSRVR3Q9FTB46MAEB2XNZNW",
+      "timestamp": 1786497590,
+      "outputEventCount": 40,
+      "resizeEventCount": 0,
+      "markerCount": 0
+    }
+  }
+}

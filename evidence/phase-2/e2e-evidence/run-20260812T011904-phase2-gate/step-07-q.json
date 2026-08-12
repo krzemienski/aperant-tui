@@ -1,0 +1,8 @@
+{
+  "ok": true,
+  "command": "type",
+  "timestamp": "2026-08-12T01:20:34.239Z",
+  "result": {
+    "seq": 42
+  }
+}

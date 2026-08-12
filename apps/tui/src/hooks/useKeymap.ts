@@ -11,7 +11,7 @@
  */
 import { useInput } from 'ink';
 import type { Key } from 'ink';
-import { useMemo } from 'react';
+import { useRef } from 'react';
 import { loadConfig } from '../services/config-service';
 
 export type KeyHandler = () => void;
@@ -48,9 +48,14 @@ export function withRemaps(actions: Record<string, { key: string; run: KeyHandle
 
 export function useKeymap(bindings: Bindings, opts: { isActive?: boolean } = {}): void {
   const { isActive = true } = opts;
-  const memo = useMemo(() => bindings, Object.keys(bindings).sort());
+  // Always dispatch through the LATEST bindings. Memoizing on key names (an
+  // earlier version) froze first-render closures: handlers that read component
+  // state (selected task, view data) acted on stale state — caught by the
+  // Phase 2 gate when `L` moved the task selected at boot, not the current one.
+  const ref = useRef(bindings);
+  ref.current = bindings;
   useInput((input, key) => {
     const name = normalizeKey(input, key);
-    if (name && memo[name]) memo[name]();
+    if (name && ref.current[name]) ref.current[name]();
   }, { isActive });
 }

@@ -1,0 +1,30 @@
+EVIDENCE INVENTORY — run-20260812T011904-phase2-gate (GREEN with one UNVERIFIED)
+================================================================================
+Supersedes red run-20260812T011430-phase2-gate (caught D4 stale keybinding
+closures: `L` moved boot-selected task instead of cursor task).
+
+SESSION A (move + start pipeline)
+  step-01-*            launch, title bar matched
+  step-02-*            j select 002 → L move; snapshot shows BUILDING (2),
+                       ❯ on 002, AGENT STREAM "move 002-fix- queue →
+                       in_progress (persiste…"; step-02-disk-status.txt:
+                       implementation_plan.json status queued → in_progress;
+                       screenshot step-02-shot-moved.png
+  step-03-*            s → vendored AgentManager real outcome "Authentication
+                       required…" in stream (red); screenshot step-03-shot-stream.png
+  step-04-*            quit, asciicast export, destroy
+
+SESSION B (restart persistence + regression)
+  step-05-*            relaunch; BUILDING (2) matched from disk — restart survival
+  step-06-*            H move back; disk status in_progress → queue (fixture restored)
+  step-07-*            Phase 1 regression: term/road/insights/tree/settings/
+                       palette/help all matched; screenshot step-07-shot-regression.png
+  step-08-*            quit, asciicast export, destroy
+
+SUPPLEMENTARY (harness wait-string fix: visible text, not truncated tail)
+  step-10-wait-move-visible.json   matched "queue → in_progress"
+  step-10-wait-building2.json      matched "BUILDING (2)"
+  step-11-wait-move-back.json      matched "in_progress → queue"
+
+UNVERIFIED: agent actually running with phase output — no AI credentials in
+this environment; honestly reported, never simulated.

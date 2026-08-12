@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "command": "wait",
+  "timestamp": "2026-08-12T01:15:18.679Z",
+  "result": {
+    "matched": true,
+    "timedOut": false,
+    "matchedText": "Authentication required",
+    "cursorRow": 25,
+    "cursorCol": 0,
+    "capturedAtSeq": 27,
+    "screenHash": "b7606190c71b435334e10435509acb6d848abd4e6234883ca492d4fb6d21aa17"
+  }
+}
