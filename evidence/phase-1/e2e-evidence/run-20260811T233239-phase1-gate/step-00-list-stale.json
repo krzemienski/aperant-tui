@@ -1,0 +1,19 @@
+{
+  "ok": true,
+  "command": "list",
+  "timestamp": "2026-08-12T00:15:23.161Z",
+  "result": {
+    "sessions": [
+      {
+        "sessionId": "01KZSM4D7ECBY7QARY9JYY8D3S",
+        "status": "running",
+        "command": [
+          "/bin/bash"
+        ],
+        "createdAt": "2026-08-11T23:57:10.256Z",
+        "name": "phase1-gate",
+        "pid": 6799
+      }
+    ]
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "ok": true,
+  "command": "snapshot",
+  "timestamp": "2026-08-12T00:24:19.729Z",
+  "result": {
+    "format": "text",
+    "sessionId": "01KZSNMHZ2NCA27VTVZ9YPY6Q9",
+    "capturedAtSeq": 49,
+    "cols": 110,
+    "rows": 32,
+    "cursorRow": 20,
+    "cursorCol": 0,
+    "text": "nt-fixture\n┌─────────────────────────│────────────────────────────────────────────────────────│─────────────────────────┐\n│APERANT │ aperant-fixture│/tmKEYBINDINGSixture │ ⑂ develop             ◉ 1 running│ ◆ 0 review  ● no profile│\n│  1 board    2 term    3 │oad    4 chat    5 tree    6 set                        │                         │\n│ ┌───────────────────────│───1-6───────────switch view────────────────────────────│───────────────────────┐ │\n│ │ TASKS                 │   j / k         move selectionL                        │                       │ │\n│ │ ◆ BACKLOG (1)         │   ⏎             focus / open-migr [BUILD]              │                       │ │\n│ │   004-qa-l ▽ Document │he H / Lop escalamove task column (board)r registry to A│ SDK v6                │ │\n│ │ ◆ QUEUE (1)           │   s / x         start / stop task ███████░░░░░░░ 50%   │                       │ │\n│ │   002-fix- ◆ Fix termi│al nlank on pane new task subtasks 3/5 complete         │                       │ │\n│ │ ◆ BUILDING (1)        │   m             merge worktree coding                  │                       │ │\n│ │ ❯ 001-migr ▲ Migrate p│oviLer registry ttask logslocation main  spec 001-migrat│-provider-registry     │ │\n│ │ ◆ DONE (1)            │   z             zoom terminal pane (raw passthrough)───│───────────────────────┘ │\n│ │   003-arch ▽ Archive b│tto: on done taskcommand palette                        │                         │\n│ │                       │   ?             toggle help────────────────────────────│───────────────────────┐ │\n│ │                       │   ctrl+c ×2     quit │ │ AGENT STREAM                  │                       │ │\n│ │                       │   esc           close / backrecorded runs for this task│                       │ │\n│ └───────────────────────│─── ──────────────────┘ └───────────────────────────────│───────────────────────┘ │\n│ BOARD  j/k move · ⏎ focu│ · :theme cyberpunk│matrix│amber│synth│ice· / filter    │            : cmd  ? help│\n└─────────────────────────│────────────────────────────────────────────────────────│─────────────────────────┘\n\n\n\n\n\n\n\n\n\n\n\n",
+    "screenHash": "40cb84780106db9e0a61d9343747318ba65411c99fae388fd2ab1922ac51e00f"
+  }
+}

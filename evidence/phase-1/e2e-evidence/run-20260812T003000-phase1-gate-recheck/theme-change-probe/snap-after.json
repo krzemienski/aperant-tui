@@ -1,0 +1,16 @@
+{
+  "ok": true,
+  "command": "snapshot",
+  "timestamp": "2026-08-12T00:26:07.880Z",
+  "result": {
+    "format": "text",
+    "sessionId": "01KZSNRVSTG0ZKXCW359J1VSCK",
+    "capturedAtSeq": 25,
+    "cols": 110,
+    "rows": 32,
+    "cursorRow": 18,
+    "cursorCol": 0,
+    "text": "kimi@k2087298852332675072:/tmp/aperant-fixture$ node /tmp/build/aperant-tui/apps/tui/bin/aperant.js /tmp/apera\nnt-fixture\n┌────────────────────────────────────────────────────────────────────────────────────────────────────────────┐\n│APERANT │ aperant-fixture /tmp/aperant-fixture │ ⑂ develop             ◉ 1 running  ◆ 0 review  ● no profile│\n│  1 board    2 term    3 road    4 chat    5 tree    6 set                                                  │\n│ ┌─────────────────────────────────────────────┐ ┌────────────────────────────────────────────────────────┐ │\n│ │ THEME                                       │ │ CONFIG                                                 │ │\n│ │        cyberpunk                            │ │ tui config       /tmp/aperant-fixture-userdata/tui.js… │ │\n│ │        matrix                               │ │ desktop         /tmp/aperant-fixture-userdata/settings…│ │\n│ │ ❯      amber  ACTIVE                        │ │ settings                                               │ │\n│ │        synth                                │ │ provider          not configured                       │ │\n│ │        ice                                  │ │ model             not configured                       │ │\n│ │                                             │ │                                                        │ │\n│ │ j/k select · applies live · persists to     │ │                                                        │ │\n│ │ tui.json                                    │ │                                                        │ │\n│ └─────────────────────────────────────────────┘ └────────────────────────────────────────────────────────┘ │\n│ SET  j/k select theme · ⏎ apply                                                               : cmd  ? help│\n└────────────────────────────────────────────────────────────────────────────────────────────────────────────┘\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "screenHash": "0c5191a95190f99bd4e1410adacfd99852d7286114d93641a2731e89e9dc0b5c"
+  }
+}

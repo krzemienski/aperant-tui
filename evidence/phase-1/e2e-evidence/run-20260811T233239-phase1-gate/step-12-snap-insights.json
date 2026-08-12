@@ -1,0 +1,16 @@
+{
+  "ok": true,
+  "command": "snapshot",
+  "timestamp": "2026-08-12T00:16:06.010Z",
+  "result": {
+    "format": "text",
+    "sessionId": "01KZSN5TDNMK8F82XG0JQ96QV1",
+    "capturedAtSeq": 25,
+    "cols": 110,
+    "rows": 32,
+    "cursorRow": 17,
+    "cursorCol": 0,
+    "text": "kimi@k2087298852332675072:/tmp/aperant-fixture$ node /tmp/build/aperant-tui/apps/tui/bin/aperant.js /tmp/apera\nnt-fixture\n┌────────────────────────────────────────────────────────────────────────────────────────────────────────────┐\n│APERANT │ aperant-fixture /tmp/aperant-fixture │ ⑂ develop             ◉ 1 running  ◆ 0 review  ● no profile│\n│  1 board    2 term    3 road    4 chat    5 tree    6 set                                                  │\n│ ┌────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │\n│ │                                                                                                        │ │\n│ │ index /tmp/aperant-fixture/.auto-claude/project_index.json                                             │ │\n│ │ entries 3                                                                                              │ │\n│ │ Q&A streaming arrives in Phase 4                                                                       │ │\n│ │                                                                                                        │ │\n│ │                                                                                                        │ │\n│ │                                                                                                        │ │\n│ │                                                                                                        │ │\n│ └────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │\n│ CHAT  ⏎ send · / history search                                                               : cmd  ? help│\n└────────────────────────────────────────────────────────────────────────────────────────────────────────────┘\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "screenHash": "03fc8c05ea5f80496ccf5d8b69ed53381787509ab90440e1742dc854fd1a7c5c"
+  }
+}

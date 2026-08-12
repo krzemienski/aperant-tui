@@ -20,8 +20,11 @@ const ROWS: Array<[string, string]> = [
 ];
 
 export function HelpOverlay({ theme: c }: { theme: Theme }) {
+  // NOTE: rendered as a full-area REPLACEMENT (App swaps it in for the view),
+  // not an absolute overlay — Ink has no compositing/background fill, so an
+  // absolute box lets the underlying view bleed through and is unreadable.
   return (
-    <Box position="absolute" width="100%" height="100%" justifyContent="center" alignItems="center">
+    <Box width="100%" height="100%" justifyContent="center" alignItems="center">
       <Box flexDirection="column" borderStyle="single" borderColor={c.accent} paddingX={3} paddingY={1}>
         <Text color={c.accent} bold>KEYBINDINGS</Text>
         <Text> </Text>

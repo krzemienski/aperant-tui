@@ -1,0 +1,16 @@
+{
+  "ok": true,
+  "command": "snapshot",
+  "timestamp": "2026-08-12T00:23:47.936Z",
+  "result": {
+    "format": "text",
+    "sessionId": "01KZSNMHZ2NCA27VTVZ9YPY6Q9",
+    "capturedAtSeq": 22,
+    "cols": 110,
+    "rows": 32,
+    "cursorRow": 18,
+    "cursorCol": 0,
+    "text": "nt-fixture\n┌────────────────────────────────────────────────────────────────────────────────────────────────────────────┐\n│APERANT │ aperant-fixture /tmp/aperant-fixture │ ⑂ develop             ◉ 1 running  ◆ 0 review  ● no profile│\n│  1 board    2 term    3 road    4 chat    5 tree    6 set                                                  │\n│ ┌─────────────────────────────────────┐ ┌────────────────────────────────────────────────────────────────┐ │\n│ │ PHASES                              │ │ DETAIL                                                         │ │\n│ │ ● PHASE 1 Foundation                │ │ select a phase (Phase 4 wires feature detail + convert→spec)   │ │\n│ │   ██████████████████ 2/2 features   │ │                                                                │ │\n│ │                                     │ │                                                                │ │\n│ │ ◉ PHASE 2 AI SDK Migration          │ │                                                                │ │\n│ │   █████████░░░░░░░░░ 2/4 features   │ │                                                                │ │\n│ │                                     │ │                                                                │ │\n│ │ ○ PHASE 3 Cloud Sync                │ │                                                                │ │\n│ │   ░░░░░░░░░░░░░░░░░░ 0/0 features   │ │                                                                │ │\n│ │                                     │ │                                                                │ │\n│ └─────────────────────────────────────┘ └────────────────────────────────────────────────────────────────┘ │\n│ ROAD  g generate · c convert→spec · a add feature                                             : cmd  ? help│\n└────────────────────────────────────────────────────────────────────────────────────────────────────────────┘\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "screenHash": "b95f14a8b8e29935a01c724cb30a1d0ac9f91ba85efcd576104eb3eef6bd7612"
+  }
+}

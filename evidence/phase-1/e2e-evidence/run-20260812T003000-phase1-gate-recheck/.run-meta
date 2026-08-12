@@ -1,0 +1,5 @@
+run_id=run-20260812T003000-phase1-gate-recheck
+started=2026-08-12T00:23:27Z
+supersedes=run-20260811T233239-phase1-gate (red: Panel titles clipped, palette burst-type)
+fixes=Panel in-flow title; human-paced palette drive
+finished=2026-08-12T00:24:28Z

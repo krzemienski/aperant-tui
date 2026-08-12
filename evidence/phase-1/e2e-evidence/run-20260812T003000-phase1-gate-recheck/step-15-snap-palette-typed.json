@@ -1,0 +1,16 @@
+{
+  "ok": true,
+  "command": "snapshot",
+  "timestamp": "2026-08-12T00:24:06.186Z",
+  "result": {
+    "format": "text",
+    "sessionId": "01KZSNMHZ2NCA27VTVZ9YPY6Q9",
+    "capturedAtSeq": 37,
+    "cols": 110,
+    "rows": 32,
+    "cursorRow": 19,
+    "cursorCol": 0,
+    "text": "nt-fixture\n┌────────────────────────────────────────────────────────────────────────────────────────────────────────────┐\n│APERANT │ aperant-fixture /tmp/aperant-fixture │ ⑂ develop             ◉ 1 running  ◆ 0 review  ● no profile│\n│  1 board    2 term    3 road    4 chat    5 tree    6 set                                                  │\n│ ┌─────────────────────────────────────────────┐ ┌────────────────────────────────────────────────────────┐ │\n│ │ THEME                                       │ │ CONFIG                                                 │ │\n│ │        cyberpunk                            │ │ tui config       /tmp/aperant-fixture-userdata/tui.js… │ │\n│ │ ❯      matrix  ACTIVE                       │ │ desktop         /tmp/aperant-fixture-userdata/settings…│ │\n│ │        amber                                │ │ settings                                               │ │\n│ │        synth                                │ │ provider          not configured                       │ │\n│ │        ice                                  │ │ model             not configured                       │ │\n│ │                                             │ │                                                        │ │\n│ │ j/k select · applies live · persists to     │ │                                                        │ │\n│ │ tui.json                                    │ │                                                        │ │\n│ └─────────────────────────────────────────────┘ └────────────────────────────────────────────────────────┘ │\n│┌──────────────────────────────────────────────────────────────────────────────────────────────────────────┐│\n││ :theme matrix                                                                                            ││\n│└──────────────────────────────────────────────────────────────────────────────────────────────────────────┘│\n└────────────────────────────────────────────────────────────────────────────────────────────────────────────┘\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "screenHash": "38bff4088f88f325a33d19e8d50c92f34901a9df890dfc860e9db4e6b6ea37a4"
+  }
+}

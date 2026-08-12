@@ -1,0 +1,16 @@
+{
+  "ok": true,
+  "command": "snapshot",
+  "timestamp": "2026-08-12T00:24:03.229Z",
+  "result": {
+    "format": "text",
+    "sessionId": "01KZSNMHZ2NCA27VTVZ9YPY6Q9",
+    "capturedAtSeq": 34,
+    "cols": 110,
+    "rows": 32,
+    "cursorRow": 19,
+    "cursorCol": 0,
+    "text": "nt-fixture\n┌────────────────────────────────────────────────────────────────────────────────────────────────────────────┐\n│APERANT │ aperant-fixture /tmp/aperant-fixture │ ⑂ develop             ◉ 1 running  ◆ 0 review  ● no profile│\n│  1 board    2 term    3 road    4 chat    5 tree    6 set                                                  │\n│ ┌─────────────────────────────────────────────┐ ┌────────────────────────────────────────────────────────┐ │\n│ │ THEME                                       │ │ CONFIG                                                 │ │\n│ │        cyberpunk                            │ │ tui config       /tmp/aperant-fixture-userdata/tui.js… │ │\n│ │ ❯      matrix  ACTIVE                       │ │ desktop         /tmp/aperant-fixture-userdata/settings…│ │\n│ │        amber                                │ │ settings                                               │ │\n│ │        synth                                │ │ provider          not configured                       │ │\n│ │        ice                                  │ │ model             not configured                       │ │\n│ │                                             │ │                                                        │ │\n│ │ j/k select · applies live · persists to     │ │                                                        │ │\n│ │ tui.json                                    │ │                                                        │ │\n│ └─────────────────────────────────────────────┘ └────────────────────────────────────────────────────────┘ │\n│┌──────────────────────────────────────────────────────────────────────────────────────────────────────────┐│\n││ :theme cyberpunk|matrix|amber|synth|ice │ board │ term │ road │ chat │ tree │ set │ q                    ││\n│└──────────────────────────────────────────────────────────────────────────────────────────────────────────┘│\n└────────────────────────────────────────────────────────────────────────────────────────────────────────────┘\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "screenHash": "c9fa8b854941f153679e1d31bd32e544bbf218342fecfaf8a6ac56c7d0fe2033"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "ok": true,
+  "command": "snapshot",
+  "timestamp": "2026-08-12T00:23:57.983Z",
+  "result": {
+    "format": "text",
+    "sessionId": "01KZSNMHZ2NCA27VTVZ9YPY6Q9",
+    "capturedAtSeq": 31,
+    "cols": 110,
+    "rows": 32,
+    "cursorRow": 17,
+    "cursorCol": 0,
+    "text": "nt-fixture\n┌────────────────────────────────────────────────────────────────────────────────────────────────────────────┐\n│APERANT │ aperant-fixture /tmp/aperant-fixture │ ⑂ develop             ◉ 1 running  ◆ 0 review  ● no profile│\n│  1 board    2 term    3 road    4 chat    5 tree    6 set                                                  │\n│ ┌─────────────────────────────────────────────┐ ┌────────────────────────────────────────────────────────┐ │\n│ │ THEME                                       │ │ CONFIG                                                 │ │\n│ │        cyberpunk                            │ │ tui config       /tmp/aperant-fixture-userdata/tui.js… │ │\n│ │ ❯      matrix  ACTIVE                       │ │ desktop         /tmp/aperant-fixture-userdata/settings…│ │\n│ │        amber                                │ │ settings                                               │ │\n│ │        synth                                │ │ provider          not configured                       │ │\n│ │        ice                                  │ │ model             not configured                       │ │\n│ │                                             │ │                                                        │ │\n│ │ j/k select · applies live · persists to     │ │                                                        │ │\n│ │ tui.json                                    │ │                                                        │ │\n│ └─────────────────────────────────────────────┘ └────────────────────────────────────────────────────────┘ │\n│ SET  j/k select theme · ⏎ apply                                                               : cmd  ? help│\n└────────────────────────────────────────────────────────────────────────────────────────────────────────────┘\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "screenHash": "37d7b2bdbfc088f3adc9b0aef1824f2e1297414dda6bc9b30504d9a3b6317533"
+  }
+}

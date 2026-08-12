@@ -125,20 +125,20 @@ export function App({ projectPath }: AppProps) {
         branch={opened.branch} counts={counts} profile={profile} />
       <TabBar view={view} theme={theme} />
       <Box flexDirection="column" flexGrow={1} paddingX={1} minHeight={10}>
-        {view === 'board' && (
+        {helpOpen ? <HelpOverlay theme={theme} /> : null}
+        {!helpOpen && view === 'board' && (
           <BoardView theme={theme} project={opened.project} tasks={tasks} isActive={viewActive}
             onOpenLogs={(t) => { setLogsTask(t); store.setView('logs'); }} />
         )}
-        {view === 'term' && <TerminalView theme={theme} project={opened.project} isActive={viewActive} />}
-        {view === 'road' && <RoadmapView theme={theme} project={opened.project} />}
-        {view === 'chat' && <InsightsView theme={theme} project={opened.project} />}
-        {view === 'tree' && <WorktreeView theme={theme} project={opened.project} isActive={viewActive} />}
-        {view === 'set' && <SettingsView theme={theme} isActive={viewActive} />}
-        {view === 'logs' && <LogsView theme={theme} task={logsTask} isActive={viewActive} onBack={() => store.setView('board')} />}
+        {!helpOpen && view === 'term' && <TerminalView theme={theme} project={opened.project} isActive={viewActive} />}
+        {!helpOpen && view === 'road' && <RoadmapView theme={theme} project={opened.project} />}
+        {!helpOpen && view === 'chat' && <InsightsView theme={theme} project={opened.project} />}
+        {!helpOpen && view === 'tree' && <WorktreeView theme={theme} project={opened.project} isActive={viewActive} />}
+        {!helpOpen && view === 'set' && <SettingsView theme={theme} isActive={viewActive} />}
+        {!helpOpen && view === 'logs' && <LogsView theme={theme} task={logsTask} isActive={viewActive} onBack={() => store.setView('board')} />}
       </Box>
       {paletteOpen ? <CommandPalette theme={theme} ctx={paletteCtx} /> : <StatusLine view={view} theme={theme} />}
       {toast ? <Toast msg={toast} theme={theme} /> : null}
-      {helpOpen ? <HelpOverlay theme={theme} /> : null}
     </Box>
   );
 }

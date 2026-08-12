@@ -1,0 +1,16 @@
+{
+  "ok": true,
+  "command": "snapshot",
+  "timestamp": "2026-08-12T00:15:36.987Z",
+  "result": {
+    "format": "text",
+    "sessionId": "01KZSN5TDNMK8F82XG0JQ96QV1",
+    "capturedAtSeq": 13,
+    "cols": 110,
+    "rows": 32,
+    "cursorRow": 19,
+    "cursorCol": 0,
+    "text": "kimi@k2087298852332675072:/tmp/aperant-fixture$ node /tmp/build/aperant-tui/apps/tui/bin/aperant.js /tmp/apera\nnt-fixture\n┌────────────────────────────────────────────────────────────────────────────────────────────────────────────┐\n│APERANT │ aperant-fixture /tmp/aperant-fixture │ ⑂ develop             ◉ 1 running  ◆ 0 review  ● no profile│\n│  1 board    2 term    3 road    4 chat    5 tree    6 set                                                  │\n│ ┌──────────────────────────────────────────────┐ ┌───────────────────────────────────────────────────────┐ │\n│ │ ◆ BACKLOG (1)                                │ │ 002-fix- [QUEUED]                                     │ │\n│ │   004-qa-l ▽ Document the QA loop escalation…│ │ Fix terminal blank on pane switch                     │ │\n│ │ ◆ QUEUE (1)                                  │ │ progress ███████░░░░░░░ 50%                           │ │\n│ │ ❯ 002-fix- ◆ Fix terminal blank on pane swit…│ │ subtasks 0/2 complete                                 │ │\n│ │ ◆ BUILDING (1)                               │ │ phase idle                                            │ │\n│ │   001-migr ▲ Migrate provider registry to AI…│ │ location main  spec 002-fix-terminal-blank            │ │\n│ │ ◆ DONE (1)                                   │ └───────────────────────────────────────────────────────┘ │\n│ │   003-arch ▽ Archive button on done tasks  5…│                                                           │\n│ │                                              │ ┌───────────────────────────────────────────────────────┐ │\n│ │                                              │ │ no recorded runs for this task                        │ │\n│ └──────────────────────────────────────────────┘ └───────────────────────────────────────────────────────┘ │\n│ BOARD  j/k move · ⏎ focus · s start · x stop · H/L column · L logs · / filter                 : cmd  ? help│\n└────────────────────────────────────────────────────────────────────────────────────────────────────────────┘\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "screenHash": "c721b48551c189a333775b0cd6ef83419c243c58246a63aa55e500c35ff658ca"
+  }
+}

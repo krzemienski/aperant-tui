@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "command": "wait",
+  "timestamp": "2026-08-12T00:26:01.074Z",
+  "result": {
+    "matched": true,
+    "timedOut": false,
+    "matchedText": "theme cyberpunk",
+    "cursorRow": 20,
+    "cursorCol": 0,
+    "capturedAtSeq": 15,
+    "screenHash": "232100f65801c8cb251ec5188b85bababc576d661c74ba017d8011ab9b657938"
+  }
+}

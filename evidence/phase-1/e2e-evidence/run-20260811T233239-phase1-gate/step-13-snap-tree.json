@@ -1,0 +1,16 @@
+{
+  "ok": true,
+  "command": "snapshot",
+  "timestamp": "2026-08-12T00:16:10.006Z",
+  "result": {
+    "format": "text",
+    "sessionId": "01KZSN5TDNMK8F82XG0JQ96QV1",
+    "capturedAtSeq": 29,
+    "cols": 110,
+    "rows": 32,
+    "cursorRow": 17,
+    "cursorCol": 0,
+    "text": "kimi@k2087298852332675072:/tmp/aperant-fixture$ node /tmp/build/aperant-tui/apps/tui/bin/aperant.js /tmp/apera\nnt-fixture\n┌────────────────────────────────────────────────────────────────────────────────────────────────────────────┐\n│APERANT │ aperant-fixture /tmp/aperant-fixture │ ⑂ develop             ◉ 1 running  ◆ 0 review  ● no profile│\n│  1 board    2 term    3 road    4 chat    5 tree    6 set                                                  │\n│ ┌────────────────────────────────────────────┐ ┌─────────────────────────────────────────────────────────┐ │\n│ │ ❯ ⑂ develop                                │ │ head b6d252a5fd                                         │ │\n│ │     /tmp/aperant-fixture                   │ │ diff clean                                              │ │\n│ │                                            │ │ unified diff + merge arrive in Phase 5                  │ │\n│ │                                            │ │                                                         │ │\n│ │                                            │ │                                                         │ │\n│ │                                            │ │                                                         │ │\n│ │                                            │ │                                                         │ │\n│ │                                            │ │                                                         │ │\n│ └────────────────────────────────────────────┘ └─────────────────────────────────────────────────────────┘ │\n│ TREE  d diff · m merge · p PR · D discard                                                     : cmd  ? help│\n└────────────────────────────────────────────────────────────────────────────────────────────────────────────┘\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "screenHash": "a91a35dd0c4344b1ee8bd9740857f3067232cc268570ed581d95143eb1701c4a"
+  }
+}

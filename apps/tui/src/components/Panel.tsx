@@ -13,8 +13,11 @@ interface PanelProps {
   children?: React.ReactNode;
 }
 
-/** Bordered box with inset title and focus ring — the TUI's core container. */
+/** Bordered box with title row and focus ring — the TUI's core container. */
 export function Panel({ title, focused = false, theme: c, flexGrow, flexBasis, width, height, children }: PanelProps) {
+  // NOTE: the title renders in-flow as the first row. An earlier design used
+  // position="absolute" + marginTop={-1} to inset the title into the border,
+  // but overflow="hidden" on the border box clips it — titles never rendered.
   return (
     <Box
       flexDirection="column"
@@ -27,9 +30,9 @@ export function Panel({ title, focused = false, theme: c, flexGrow, flexBasis, w
       overflow="hidden"
     >
       {title ? (
-        <Box marginTop={-1} marginLeft={1} position="absolute">
-          <Text backgroundColor={c.bg} color={focused ? c.borderFocus : c.dim} bold={focused}>
-            {` ${title} `}
+        <Box paddingX={1}>
+          <Text color={focused ? c.borderFocus : c.dim} bold={focused}>
+            {title}
           </Text>
         </Box>
       ) : null}

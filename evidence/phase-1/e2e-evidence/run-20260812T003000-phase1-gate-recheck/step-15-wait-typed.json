@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "command": "wait",
+  "timestamp": "2026-08-12T00:24:05.270Z",
+  "result": {
+    "matched": true,
+    "timedOut": false,
+    "matchedText": "theme matrix",
+    "cursorRow": 19,
+    "cursorCol": 0,
+    "capturedAtSeq": 37,
+    "screenHash": "38bff4088f88f325a33d19e8d50c92f34901a9df890dfc860e9db4e6b6ea37a4"
+  }
+}
