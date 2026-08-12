@@ -1,0 +1,11 @@
+{
+  "ok": false,
+  "command": "wait",
+  "timestamp": "2026-08-12T08:18:48.362Z",
+  "error": {
+    "code": "RPC_ERROR",
+    "message": "Promise.withResolvers is not a function",
+    "retryable": true,
+    "details": {}
+  }
+}

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>phase-2.5-PLAN — APERANT TUI</title>
+<meta name="description" content="Aperant TUI — the full Aperant agent runtime in your terminal. Real gates, real evidence.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<div class="chrome">
+  <div class="chrome-bar">
+    <span class="brand">APERANT</span><span class="sep">│</span>
+    <span class="meta">aperant-tui</span><span class="sep">│</span>
+    <span class="branch">⑂ main</span><span class="sep">│</span>
+    <span class="meta"><span class="led ok"></span>4 phases gated</span>
+    <span class="meta"><span class="led idle"></span>generated 2026-08-12</span>
+  </div>
+  <nav class="tabs"><a href="index.html" class=""><span class="n">1</span>overview</a><a href="roadmap.html" class=""><span class="n">2</span>roadmap</a><a href="phases.html" class=""><span class="n">3</span>phases</a><a href="evidence.html" class=""><span class="n">4</span>evidence</a><a href="docs.html" class="on"><span class="n">5</span>docs</a></nav>
+
+<main>
+<section><div class="marker">DOC / phase-2.5-PLAN</div><div class="doc">
+<h1 id="phase-25-plan--live-provider-e2e-moonshotkimi--log-facet">Phase
+2.5 PLAN — Live provider E2E (Moonshot/Kimi) + log facet</h1>
+<p>Inserted between Phase 2 and Phase 3 by operator directive
+(2026-08-12): "How are you proving that a QB is actually fully
+functional? You need logs… upgrade the agent SDK for JavaScript and add
+the provider you're currently using." The operator supplied a live
+OpenAI-compatible combo endpoint
+(<code>http://home.hack.ski:20128/v1</code>) serving <code>kimi/*</code>
+models.</p>
+<h2 id="scope">Scope</h2>
+<ol type="1">
+<li><strong>AI SDK upgrade</strong>: <code>ai</code> v6→v7 and the full
+<code>@ai-sdk/*</code> constellation to latest, keeping the vendored
+closure compiling and running.</li>
+<li><strong>Moonshot (Kimi) provider</strong>: real provider package
+(<code>libs/moonshot-provider</code>), vendored
+registry/auth/equivalence wiring (marked
+<code>[APERANT-PATCH moonshot-provider]</code>, see
+<code>VENDORED-PATCHES.md</code>), TUI account provisioning (Settings →
+ACCOUNTS, <code>a</code> key).</li>
+<li><strong>Worker runtime</strong>: esbuild-bundled agent worker for
+the non-Electron runtime (<code>tools/build-worker.mjs</code> +
+<code>APERANT_WORKER_PATH</code>).</li>
+<li><strong>Log facet (the proof upgrade)</strong>: every gate now
+captures
+<ul>
+<li><code>agent-events.jsonl</code> — the TUI flight recorder (all
+AgentManager events)</li>
+<li><code>tui-console.raw.log</code> — full PTY byte stream via
+<code>script(1)</code> sub-PTY (a pipe breaks Ink's TTY guard — defect
+D7)</li>
+<li><code>crash-report.log</code> — sentry-adapter local crash log</li>
+<li><code>task_logs.json</code> — the worker's own per-spec log</li>
+<li>worktree/disk diffs, exit codes, wait envelopes with
+<code>result.matched</code> assertions (defect D8: envelope
+<code>ok</code> is transport-level, not a match)</li>
+</ul></li>
+<li><strong>Live agent run</strong>: <code>s</code> on queued task 002 →
+real planner/coder session against the real endpoint.</li>
+</ol>
+<h2 id="gates-three-facet-ui--persistence--logs">Gates (three-facet: UI
++ persistence + logs)</h2>
+<table>
+<thead>
+<tr class="header">
+<th>#</th>
+<th>Criterion</th>
+<th>Facets</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>Provisioning refusal without credentials (clear, safe)</td>
+<td>UI flash + absent settings.json</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td><code>a</code> provisions a real moonshot account</td>
+<td>UI flash + settings.json disk read (redacted copy)</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>Account resolves through the vendored queue</td>
+<td>console log
+<code>[AgentManager] Resolved auth… provider=moonshot</code></td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>Agent starts and streams for real</td>
+<td><code>agent-events.jsonl</code> lifecycle + screenshots</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>Agent does real work</td>
+<td>fixture disk diff (plan status, source files, task_logs.json)</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>No secrets in evidence</td>
+<td>automated grep scan of the run dir</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>Regression: provider protocol suite</td>
+<td>9/9 vitest (provider HTTP/SSE/401/garbage + executor queue)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="credential-handling">Credential handling</h2>
+<p>Keys enter via env at session creation only. Evidence carries
+redacted copies; a scripted scan asserts no key material in the run
+dir.</p>
+</div></section>
+</main>
+  <div class="statusline"><span><b>DOC · phase-2.5-PLAN</b></span><span>: cmd &nbsp; ? help</span></div>
+</div>
+<footer>
+  <div class="wrap" style="padding:0">
+    <span>APERANT TUI — vendored runtime, zero mocks, gate-proven.</span>
+    &nbsp;<a href="https://github.com/krzemienski/aperant-tui">github.com/krzemienski/aperant-tui</a>
+    &nbsp;· upstream <a href="https://github.com/AndyMik90/Aperant">AndyMik90/Aperant</a> @ 20250db0
+  </div>
+</footer>
+</div>
+</body>
+</html>

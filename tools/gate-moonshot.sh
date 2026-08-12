@@ -3,7 +3,7 @@
 # agent-tty 0.5.0. Waits assert result.matched (envelope ok is transport-level).
 # Creds via env only: MOONSHOT_GATE_KEY / MOONSHOT_GATE_BASE. Never written to the repo.
 set -u
-export PATH=$HOME/node24/bin:/tmp/agent-tty-install/node_modules/.bin:$PATH
+export PATH=$HOME/.cache/node24/bin:/tmp/agent-tty-install/node_modules/.bin:$PATH
 ATTY="agent-tty --home ${AGENT_TTY_HOME:-/tmp/agent-tty-home}"
 REPO="${APERANT_REPO:-/tmp/build/aperant-tui}"
 
@@ -42,11 +42,11 @@ $ATTY doctor --json > "$RUN/step-00-doctor.json" 2>&1 || true
 step 1 "negative provisioning (no creds env) → real refusal, nothing written"
 SNEG=$($ATTY create --json --cols 110 --rows 32 --cwd "$FIX" \
   --env APERANT_USER_DATA=$UDNEG --env COLORTERM=truecolor \
-  --env PATH=$HOME/node24/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+  --env PATH=$HOME/.cache/node24/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
   --name moonshot-neg -- /bin/bash | sid)
 echo "{\"session\":\"$SNEG\"}" > "$RUN/step-01-neg-session.json"
 $ATTY run "$SNEG" "cd $REPO && script -qfc 'npm run dev -w @aperant/tui -- $FIX' $RUN/logs/tui-console-neg.raw.log" --no-wait --json > "$RUN/step-01b-neg-boot.json" 2>&1
-wait_assert "$SNEG" "TASKS" 120000 "$RUN/step-01c-neg-boot-wait.json" critical
+wait_assert "$SNEG" "TASKS" 300000 "$RUN/step-01c-neg-boot-wait.json" critical
 $ATTY send-keys "$SNEG" 6 --json > /dev/null 2>&1; sleep 2
 wait_assert "$SNEG" "ACCOUNTS" 20000 "$RUN/step-01d-neg-settings.json"
 $ATTY send-keys "$SNEG" a --json > /dev/null 2>&1; sleep 2
@@ -66,12 +66,12 @@ $ATTY destroy "$SNEG" --json > /dev/null 2>&1
 step 2 "positive provisioning via TUI 'a' key (real endpoint creds via env)"
 S1=$($ATTY create --json --cols 110 --rows 32 --cwd "$FIX" \
   --env APERANT_USER_DATA=$UD --env COLORTERM=truecolor \
-  --env PATH=$HOME/node24/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+  --env PATH=$HOME/.cache/node24/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
   --env MOONSHOT_API_KEY="$MS_KEY" --env MOONSHOT_BASE_URL="$MS_BASE" \
   --name moonshot-live -- /bin/bash | sid)
 echo "{\"session\":\"$S1\"}" > "$RUN/step-02-session.json"
 $ATTY run "$S1" "cd $REPO && script -qfc 'npm run dev -w @aperant/tui -- $FIX' $RUN/logs/tui-console.raw.log" --no-wait --json > "$RUN/step-02b-boot.json" 2>&1
-wait_assert "$S1" "TASKS" 120000 "$RUN/step-02c-boot-wait.json" critical
+wait_assert "$S1" "TASKS" 300000 "$RUN/step-02c-boot-wait.json" critical
 
 step 3 "settings tab → 'a' provisions real account"
 $ATTY send-keys "$S1" 6 --json > /dev/null 2>&1; sleep 2

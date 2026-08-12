@@ -1,7 +1,7 @@
 {
   "goal": "Aperant TUI: Moonshot/Kimi provider + AI SDK v7 upgrade + log-facet proofs (user directive 2026-08-12 AM) + Agent Coordination & Observability (Phase 3.5 spec, implement --auto --parallel)",
   "criteria": [
-    "C1: JS agent SDK set upgraded to latest (ai@7 era) — typecheck clean, real tests pass",
+    "C1: JS agent SDK set upgraded to latest (ai@7 era) \u2014 typecheck clean, real tests pass",
     "C2: Moonshot provider wired end-to-end: TUI 'a' provisions a real account into settings.json (disk proof); 's' on a queued task runs the REAL vendored pipeline against the REAL endpoint; the run's lifecycle appears in durable logs (agent-events.jsonl + console log + task_logs.json)",
     "C3: Malformed/absent credentials refuse clearly and write nothing",
     "C4: No secret material in any committed evidence",
@@ -12,43 +12,138 @@
     "P1: proofpunk static site live on GitHub Pages (delegated lane)"
   ],
   "tasks": [
-    {"id": "T1", "scope": "AI SDK v7 upgrade across workspace", "depends_on": [],
-     "proof_obligation": {"end_user_test": "tsc --noEmit on the full vendored closure", "assertion": "exit 0"},
-     "status": "done", "artifact": "commit e36c024c; typecheck output"},
-    {"id": "T2", "scope": "libs/moonshot-provider real provider package", "depends_on": [],
-     "proof_obligation": {"end_user_test": "vitest moonshot-provider.test.ts against a real loopback HTTP/SSE server", "assertion": "6/6 pass incl. real 401 APICallError and garbage-payload failure"},
-     "status": "done", "artifact": "apps/tui/src/services/__tests__/moonshot-provider.test.ts"},
-    {"id": "T3", "scope": "vendored moonshot wiring (8 patch sites)", "depends_on": ["T1", "T2"],
-     "proof_obligation": {"end_user_test": "TUI provisions account and AgentManager resolves provider=moonshot model=kimi/kimi-for-coding", "assertion": "console log line + settings.json disk read"},
-     "status": "done", "artifact": "evidence/phase-2 e2e run (gate), VENDORED-PATCHES.md"},
-    {"id": "T4", "scope": "TUI account provisioning service + Settings ACCOUNTS panel", "depends_on": ["T3"],
-     "proof_obligation": {"end_user_test": "press 'a' with/without creds env", "assertion": "with: settings.json gains account priority-first; without: refusal flash, no file"},
-     "status": "done", "artifact": "gate steps 1-4 (NEG-DISK-OK, DISK-PASS, screenshots)"},
-    {"id": "T5", "scope": "worker bundling for non-Electron runtime", "depends_on": [],
-     "proof_obligation": {"end_user_test": "node Worker boots dist/agent-worker.cjs and executes a session attempt", "assertion": "real log + error messages from the bundle"},
-     "status": "done", "artifact": "tools/build-worker.mjs + boot smoke output"},
-    {"id": "T6", "scope": "D5 event-contract fix + agent-events.jsonl flight recorder", "depends_on": [],
-     "proof_obligation": {"end_user_test": "'s' start resolves on execution-progress; JSONL accumulates lifecycle events", "assertion": "execution-progress present; stream-event kinds recorded"},
-     "status": "done", "artifact": "gate step 7 log analysis"},
-    {"id": "T7", "scope": "live agent run against real endpoint", "depends_on": ["T2", "T3", "T4", "T5", "T6"],
-     "proof_obligation": {"end_user_test": "gate step 5-7: agent starts, streams, writes files", "assertion": "implementation_plan.json + src/index.ts modified by the agent; task_logs.json written; zero-garbage event log"},
-     "status": "done", "artifact": "agent-diff-002.patch (real code + plan status changes), task_logs.json"},
-    {"id": "T8", "scope": "onSubtaskQueued patch + proof", "depends_on": [],
-     "proof_obligation": {"end_user_test": "vitest: 6 subtasks @ concurrency 3 through the real executeParallel", "assertion": "exactly s4/s5/s6 announced with batchIndex 1, positions 0-2; allSettled failure semantics preserved"},
-     "status": "done", "artifact": "parallel-executor-queued.test.ts 3/3"},
-    {"id": "T9", "scope": "observability service + six views", "depends_on": ["T6"],
-     "proof_obligation": {"end_user_test": "Phase 3.5 gate: tab 7 tour with a live agent", "assertion": "swarm row with real type/phase; inspect grants byte-match; waits sentinel detection + RESUME on disk"},
-     "status": "in_progress", "artifact": "evidence/phase-3.5 run (pending)"},
-    {"id": "T10", "scope": "proofpunk Pages site", "depends_on": [],
-     "proof_obligation": {"end_user_test": "Pages API status built + browser fetch of pages", "assertion": "https://krzemienski.github.io/proofpunk/ live with real repo content"},
-     "status": "done", "artifact": "proofpunk commit b6a91002, /mnt/agents/output/proofpunk-site/"}
+    {
+      "id": "T1",
+      "scope": "AI SDK v7 upgrade across workspace",
+      "depends_on": [],
+      "proof_obligation": {
+        "end_user_test": "tsc --noEmit on the full vendored closure",
+        "assertion": "exit 0"
+      },
+      "status": "done",
+      "artifact": "commit e36c024c; typecheck output"
+    },
+    {
+      "id": "T2",
+      "scope": "libs/moonshot-provider real provider package",
+      "depends_on": [],
+      "proof_obligation": {
+        "end_user_test": "vitest moonshot-provider.test.ts against a real loopback HTTP/SSE server",
+        "assertion": "6/6 pass incl. real 401 APICallError and garbage-payload failure"
+      },
+      "status": "done",
+      "artifact": "apps/tui/src/services/__tests__/moonshot-provider.test.ts"
+    },
+    {
+      "id": "T3",
+      "scope": "vendored moonshot wiring (8 patch sites)",
+      "depends_on": [
+        "T1",
+        "T2"
+      ],
+      "proof_obligation": {
+        "end_user_test": "TUI provisions account and AgentManager resolves provider=moonshot model=kimi/kimi-for-coding",
+        "assertion": "console log line + settings.json disk read"
+      },
+      "status": "done",
+      "artifact": "evidence/phase-2 e2e run (gate), VENDORED-PATCHES.md"
+    },
+    {
+      "id": "T4",
+      "scope": "TUI account provisioning service + Settings ACCOUNTS panel",
+      "depends_on": [
+        "T3"
+      ],
+      "proof_obligation": {
+        "end_user_test": "press 'a' with/without creds env",
+        "assertion": "with: settings.json gains account priority-first; without: refusal flash, no file"
+      },
+      "status": "done",
+      "artifact": "gate steps 1-4 (NEG-DISK-OK, DISK-PASS, screenshots)"
+    },
+    {
+      "id": "T5",
+      "scope": "worker bundling for non-Electron runtime",
+      "depends_on": [],
+      "proof_obligation": {
+        "end_user_test": "node Worker boots dist/agent-worker.cjs and executes a session attempt",
+        "assertion": "real log + error messages from the bundle"
+      },
+      "status": "done",
+      "artifact": "tools/build-worker.mjs + boot smoke output"
+    },
+    {
+      "id": "T6",
+      "scope": "D5 event-contract fix + agent-events.jsonl flight recorder",
+      "depends_on": [],
+      "proof_obligation": {
+        "end_user_test": "'s' start resolves on execution-progress; JSONL accumulates lifecycle events",
+        "assertion": "execution-progress present; stream-event kinds recorded"
+      },
+      "status": "done",
+      "artifact": "gate step 7 log analysis"
+    },
+    {
+      "id": "T7",
+      "scope": "live agent run against real endpoint",
+      "depends_on": [
+        "T2",
+        "T3",
+        "T4",
+        "T5",
+        "T6"
+      ],
+      "proof_obligation": {
+        "end_user_test": "gate step 5-7: agent starts, streams, writes files",
+        "assertion": "implementation_plan.json + src/index.ts modified by the agent; task_logs.json written; zero-garbage event log"
+      },
+      "status": "done",
+      "artifact": "agent-diff-002.patch (real code + plan status changes), task_logs.json"
+    },
+    {
+      "id": "T8",
+      "scope": "onSubtaskQueued patch + proof",
+      "depends_on": [],
+      "proof_obligation": {
+        "end_user_test": "vitest: 6 subtasks @ concurrency 3 through the real executeParallel",
+        "assertion": "exactly s4/s5/s6 announced with batchIndex 1, positions 0-2; allSettled failure semantics preserved"
+      },
+      "status": "done",
+      "artifact": "parallel-executor-queued.test.ts 3/3"
+    },
+    {
+      "id": "T9",
+      "scope": "observability service + six views",
+      "depends_on": [
+        "T6"
+      ],
+      "proof_obligation": {
+        "end_user_test": "Phase 3.5 gate: tab 7 tour with a live agent",
+        "assertion": "swarm row with real type/phase; inspect grants byte-match; waits sentinel detection + RESUME on disk"
+      },
+      "status": "done",
+      "artifact": "evidence/phase-3.5/e2e-evidence/run-20260812T084209-phase35-gate (0 fails, 7 screenshots, real tokens 43,216)"
+    },
+    {
+      "id": "T10",
+      "scope": "proofpunk Pages site",
+      "depends_on": [],
+      "proof_obligation": {
+        "end_user_test": "Pages API status built + browser fetch of pages",
+        "assertion": "https://krzemienski.github.io/proofpunk/ live with real repo content"
+      },
+      "status": "done",
+      "artifact": "proofpunk commit b6a91002, /mnt/agents/output/proofpunk-site/"
+    }
   ],
   "defects_caught_by_gates": [
     "D5: agent-start-service listened for vendored events that never exist ('task-started'); would have timed out every successful start",
-    "D6: __dirname used under tsx ESM — crashed TUI at boot; caught by boot wait + screenshot",
+    "D6: __dirname used under tsx ESM \u2014 crashed TUI at boot; caught by boot wait + screenshot",
     "D7: tee pipe broke the TUI's real TTY guard; console capture moved to script(1) sub-PTY",
-    "D8: agent-tty wait envelope ok:true on timeout — assertions moved to result.matched",
-    "D9: fixture used .aperant/ while the vendored runtime only discovers .auto-claude/ — board silently empty; caught by wait mismatch + title-bar counts"
+    "D8: agent-tty wait envelope ok:true on timeout \u2014 assertions moved to result.matched",
+    "D9: fixture used .aperant/ while the vendored runtime only discovers .auto-claude/ \u2014 board silently empty; caught by wait mismatch + title-bar counts",
+    "D10: bridge stream-event re-emit never reached the manager emitter \u2014 forward added in agent-process.ts",
+    "D11: AI SDK v7 renamed usage fields (inputTokens/outputTokens); vendored stream-handler read v6 names, silently recorded 0 tokens \u2014 dual-shape read, verified with real counts"
   ],
   "escalations": []
 }

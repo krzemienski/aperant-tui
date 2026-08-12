@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "command": "wait",
+  "timestamp": "2026-08-12T08:43:00.354Z",
+  "result": {
+    "matched": true,
+    "timedOut": false,
+    "matchedText": "inferred",
+    "cursorRow": 31,
+    "cursorCol": 109,
+    "capturedAtSeq": 94,
+    "screenHash": "8ae488705762ce1e1b19d1f7cd4fe742e8e895df0114a80a2a477663bcc6d6ce"
+  }
+}

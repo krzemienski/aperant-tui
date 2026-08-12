@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>phase-3.5-PLAN — APERANT TUI</title>
+<meta name="description" content="Aperant TUI — the full Aperant agent runtime in your terminal. Real gates, real evidence.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<div class="chrome">
+  <div class="chrome-bar">
+    <span class="brand">APERANT</span><span class="sep">│</span>
+    <span class="meta">aperant-tui</span><span class="sep">│</span>
+    <span class="branch">⑂ main</span><span class="sep">│</span>
+    <span class="meta"><span class="led ok"></span>4 phases gated</span>
+    <span class="meta"><span class="led idle"></span>generated 2026-08-12</span>
+  </div>
+  <nav class="tabs"><a href="index.html" class=""><span class="n">1</span>overview</a><a href="roadmap.html" class=""><span class="n">2</span>roadmap</a><a href="phases.html" class=""><span class="n">3</span>phases</a><a href="evidence.html" class=""><span class="n">4</span>evidence</a><a href="docs.html" class="on"><span class="n">5</span>docs</a></nav>
+
+<main>
+<section><div class="marker">DOC / phase-3.5-PLAN</div><div class="doc">
+<h1 id="phase-35-plan--agent-coordination--observability">Phase 3.5 PLAN
+— Agent Coordination &amp; Observability</h1>
+<p>Spec: <code>aperant-agent-observability-spec.md</code> (uploaded
+2026-08-12). Inserted after terminal emulation per spec Part 8, executed
+early by operator directive
+(<code>implement --auto --parallel</code>).</p>
+<h2 id="scope-delivered">Scope delivered</h2>
+<ol type="1">
+<li><strong>Event tap</strong> —
+<code>apps/tui/src/services/observability.ts</code>: subscribes to the
+real AgentManager event stream (<code>execution-progress</code>,
+<code>task-event</code>, <code>stream-event</code>, <code>log</code>,
+<code>error</code>, <code>exit</code>), polls spec-dir sentinel files
+(<code>RATE_LIMIT_PAUSE</code> / <code>AUTH_PAUSE</code> /
+<code>RESUME</code>), imports <code>AGENT_CONFIGS</code> from the
+vendored config for tool grants (byte-match — nothing retyped),
+10k-event ring buffer, 16ms snapshot coalescing, wait-state
+recomputation only on tool-call/tool-result/step-finish.</li>
+<li><strong>Six views</strong> —
+<code>apps/tui/src/views/AgentsView.tsx</code> (tab <code>7</code>):
+SWARM / GRAPH / INSPECT / TRACE / TOKENS / WAITS, sub-view keys 1-6
+inside the tab, <code>j/k</code> select, <code>⏎</code> inspect,
+<code>f</code> trace filter, <code>r</code> writes a real RESUME
+sentinel.</li>
+<li><strong>Upstream additions</strong> (spec §7.2, additive-only):
+<code>onSubtaskQueued</code> in parallel-executor; raw
+<code>stream-event</code> relay through worker-bridge → agent-process →
+AgentManager. Marked <code>[APERANT-PATCH observability-tap]</code>,
+catalogued in VENDORED-PATCHES.md.</li>
+</ol>
+<h2 id="gate-mapping-spec-part-8">Gate mapping (spec Part 8)</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Spec gate</th>
+<th>How proven here</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Swarm accuracy</td>
+<td>live agent row with real type/phase during a real run (step-03)</td>
+</tr>
+<tr class="even">
+<td>Wait detection — tool</td>
+<td>stream-event tool-call without matching tool-result → ⚙ TOOL
+row</td>
+</tr>
+<tr class="odd">
+<td>Wait detection — concurrency</td>
+<td>executor-level behavioral proof (vitest 3/3); live multi-coder swarm
+needs a ≥4-subtask task — reported honestly</td>
+</tr>
+<tr class="even">
+<td>Wait detection — ratelimit</td>
+<td>real <code>RATE_LIMIT_PAUSE</code> sentinel written to the spec dir
+→ ⏱ 429 row; <code>r</code> writes real RESUME (disk proof)</td>
+</tr>
+<tr class="odd">
+<td>Wait detection — context</td>
+<td>needs a session driven past 90% context — long-horizon; UNVERIFIED
+unless the gate run crosses it</td>
+</tr>
+<tr class="even">
+<td>Token accuracy</td>
+<td>TOKENS ledger from real step-finish/usage-update events</td>
+</tr>
+<tr class="odd">
+<td>Cache hit</td>
+<td>computed from real usage fields when present</td>
+</tr>
+<tr class="even">
+<td>Tool grants</td>
+<td>rendered from the imported AGENT_CONFIGS; planner byte-match dump
+(step-05e)</td>
+</tr>
+<tr class="odd">
+<td>Trace completeness</td>
+<td>flight-recorder event counts + stream-kind census (step-09)</td>
+</tr>
+<tr class="even">
+<td>Graph topology</td>
+<td>subagent nodes appear when SpawnSubagent traffic exists; otherwise
+honest empty state</td>
+</tr>
+<tr class="odd">
+<td>Phase provenance</td>
+<td>▪ structured (task-event) vs ~ inferred (tracker) rendered in
+INSPECT</td>
+</tr>
+<tr class="even">
+<td>Throughput</td>
+<td>16ms coalescing + ring buffer by construction; 1886-event live run
+ingested without UI stalls in Phase 2.5</td>
+</tr>
+</tbody>
+</table>
+</div></section>
+</main>
+  <div class="statusline"><span><b>DOC · phase-3.5-PLAN</b></span><span>: cmd &nbsp; ? help</span></div>
+</div>
+<footer>
+  <div class="wrap" style="padding:0">
+    <span>APERANT TUI — vendored runtime, zero mocks, gate-proven.</span>
+    &nbsp;<a href="https://github.com/krzemienski/aperant-tui">github.com/krzemienski/aperant-tui</a>
+    &nbsp;· upstream <a href="https://github.com/AndyMik90/Aperant">AndyMik90/Aperant</a> @ 20250db0
+  </div>
+</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>INTENT-MATRIX — APERANT TUI</title>
+<meta name="description" content="Aperant TUI — the full Aperant agent runtime in your terminal. Real gates, real evidence.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<div class="chrome">
+  <div class="chrome-bar">
+    <span class="brand">APERANT</span><span class="sep">│</span>
+    <span class="meta">aperant-tui</span><span class="sep">│</span>
+    <span class="branch">⑂ main</span><span class="sep">│</span>
+    <span class="meta"><span class="led ok"></span>4 phases gated</span>
+    <span class="meta"><span class="led idle"></span>generated 2026-08-12</span>
+  </div>
+  <nav class="tabs"><a href="index.html" class=""><span class="n">1</span>overview</a><a href="roadmap.html" class=""><span class="n">2</span>roadmap</a><a href="phases.html" class=""><span class="n">3</span>phases</a><a href="evidence.html" class=""><span class="n">4</span>evidence</a><a href="docs.html" class="on"><span class="n">5</span>docs</a></nav>
+
+<main>
+<section><div class="marker">DOC / INTENT-MATRIX</div><div class="doc">
+<h1
+id="session-intent-matrix--aperant-tui-build-2026-08-11--2026-08-12">Session
+Intent Matrix — aperant-tui build (2026-08-11 → 2026-08-12)</h1>
+<p>Intent lane note (session-intent skill doctrine): no Claude Code
+JSONL transcripts exist in this sandbox (<code>~/.claude/projects</code>
+absent — parser run 2026-08-12 reports NO TRANSCRIPTS; lane BLOCKED for
+pre-sandbox sessions). The intent sources below are the operator's
+verbatim prompts preserved in the active session context — the
+transcript-equivalent for this session.</p>
+<table>
+<thead>
+<tr class="header">
+<th>#</th>
+<th>Intent source (verbatim, abbreviated)</th>
+<th>Steering?</th>
+<th>Implementation verdict</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>I1</td>
+<td>"attached is a spec and also an actual prototype I want you to build
+it fully with the skills as a test… a new GitHub repo… functional
+tests"</td>
+<td>initial</td>
+<td>INTENT-MATCHED — krzemienski/aperant-tui; phases 1, 2, 2.5, 3.5
+gated</td>
+</tr>
+<tr class="even">
+<td>I2</td>
+<td>"functional gates that measure the real thing"</td>
+<td>initial</td>
+<td>INTENT-MATCHED — agent-tty end-user gates, three-facet evidence</td>
+</tr>
+<tr class="odd">
+<td>I3</td>
+<td>"make any changes to any of the skills… at least five improvements
+after you have fully built and fully validated"</td>
+<td>initial</td>
+<td>INTENT-PARTIAL — defect harvest D1–D11 documented; skill replication
+owed after TUI completion</td>
+</tr>
+<tr class="even">
+<td>I4</td>
+<td>"make a proper github pagws static site with the same flat black
+hyper theme and brand with all docs"</td>
+<td>steering</td>
+<td>INTENT-MATCHED — krzemienski.github.io/aperant-tui</td>
+</tr>
+<tr class="odd">
+<td>I5</td>
+<td>"You need logs, you need all the if not that you haven't actually
+proved anything. upgrade a agent SDK for javascript … and add a
+provider, which is the provider that you're currently using right
+now."</td>
+<td>steering</td>
+<td>INTENT-MATCHED — AI SDK v7, @aperant/moonshot-provider, live run,
+flight-recorder logs</td>
+</tr>
+<tr class="even">
+<td>I6</td>
+<td>"<a
+href="http://home.hack.ski:20128/v1">http://home.hack.ski:20128/v1</a>
+and api key of sk-… Is what os to be used not moonshot or atlwast use
+this"</td>
+<td>steering</td>
+<td>INTENT-MATCHED — account baseUrl targets the operator endpoint;
+kimi/kimi-for-coding model</td>
+</tr>
+<tr class="odd">
+<td>I7</td>
+<td>"the understanding pf latest claude agent sdk for tsc is being done
+correctly"</td>
+<td>steering</td>
+<td>INTENT-MATCHED — vendored loop verified Vercel-AI-SDK-based (not
+claude-agent-sdk); v7 break caught live (D11 usage-shape)</td>
+</tr>
+<tr class="even">
+<td>I8</td>
+<td>"implement —auto —parallel" + observability spec + React prototype
+artifact</td>
+<td>steering</td>
+<td>INTENT-MATCHED — Phase 3.5 six views + event tap + onSubtaskQueued;
+gate 0-fail</td>
+</tr>
+<tr class="odd">
+<td>I9</td>
+<td>"finish the above as well as finishjgn the propfpunk static
+site"</td>
+<td>steering</td>
+<td>INTENT-MATCHED — krzemienski.github.io/proofpunk (commit
+b6a91002)</td>
+</tr>
+<tr class="even">
+<td>I10</td>
+<td>"finjsh" (session-intent)</td>
+<td>steering</td>
+<td>this run — D11 token proof + docs + ledger</td>
+</tr>
+</tbody>
+</table>
+<p>Alignment signals: all rows share branch <code>main</code> of
+krzemienski/aperant-tui (except I9 → krzemienski/proofpunk) and
+overlapping files per commit window.</p>
+</div></section>
+</main>
+  <div class="statusline"><span><b>DOC · INTENT-MATRIX</b></span><span>: cmd &nbsp; ? help</span></div>
+</div>
+<footer>
+  <div class="wrap" style="padding:0">
+    <span>APERANT TUI — vendored runtime, zero mocks, gate-proven.</span>
+    &nbsp;<a href="https://github.com/krzemienski/aperant-tui">github.com/krzemienski/aperant-tui</a>
+    &nbsp;· upstream <a href="https://github.com/AndyMik90/Aperant">AndyMik90/Aperant</a> @ 20250db0
+  </div>
+</footer>
+</div>
+</body>
+</html>

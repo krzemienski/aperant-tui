@@ -17,8 +17,8 @@
     <span class="brand">APERANT</span><span class="sep">│</span>
     <span class="meta">aperant-tui</span><span class="sep">│</span>
     <span class="branch">⑂ main</span><span class="sep">│</span>
-    <span class="meta"><span class="led ok"></span>2 phases gated</span>
-    <span class="meta"><span class="led warn"></span>1 unverified</span>
+    <span class="meta"><span class="led ok"></span>4 phases gated</span>
+    <span class="meta"><span class="led ok"></span>live agent run proven</span>
     <span class="meta"><span class="led idle"></span>6 pending</span>
   </div>
   <nav class="tabs"><a href="index.html" class=""><span class="n">1</span>overview</a><a href="roadmap.html" class=""><span class="n">2</span>roadmap</a><a href="phases.html" class="on"><span class="n">3</span>phases</a><a href="evidence.html" class=""><span class="n">4</span>evidence</a><a href="docs.html" class=""><span class="n">5</span>docs</a></nav>
@@ -35,8 +35,14 @@
       <p>Gate <strong style="color:var(--ok)">PASS</strong> · 2 defects caught &amp; fixed · 13/13 waits matched</p>
       <p><a href="doc-phase-1-PLAN.html">PLAN</a> · <a href="doc-phase-1-SUMMARY.html">SUMMARY</a> · <a href="doc-phase-1-VALIDATION.html">VALIDATION</a></p></div>
     <div class="panel"><div class="ptitle">PHASE 2 — BOARD &amp; TASK LIFECYCLE</div>
-      <p>Gate <strong style="color:var(--warn)">PASS*</strong> · 1 defect caught &amp; fixed · restart-persistence proven</p>
+      <p>Gate <strong style="color:var(--ok)">PASS</strong> · 1 defect caught &amp; fixed · restart-persistence proven · agent start verified live in 2.5</p>
       <p><a href="doc-phase-2-PLAN.html">PLAN</a> · <a href="doc-phase-2-SUMMARY.html">SUMMARY</a> · <a href="doc-phase-2-VALIDATION.html">VALIDATION</a></p></div>
+    <div class="panel"><div class="ptitle">PHASE 2.5 — LIVE PROVIDER E2E + LOG FACET</div>
+      <p>Gate <strong style="color:var(--ok)">PASS</strong> · Moonshot/Kimi wired end-to-end · real agent wrote real code · 6 defects caught &amp; fixed (D5–D10)</p>
+      <p><a href="doc-phase-2.5-PLAN.html">PLAN</a> · <a href="doc-phase-2.5-VALIDATION.html">VALIDATION</a></p></div>
+    <div class="panel"><div class="ptitle">PHASE 3.5 — AGENT COORDINATION &amp; OBSERVABILITY</div>
+      <p>Gate <strong style="color:var(--ok)">PASS</strong> · 6 live views · grants byte-match · RESUME intervention on disk · real stream census</p>
+      <p><a href="doc-phase-3.5-PLAN.html">PLAN</a> · <a href="doc-phase-3.5-VALIDATION.html">VALIDATION</a></p></div>
   </div>
   <h2>Phase 1 validation</h2>
   <div class="doc"><h1 id="phase-1-validation--per-criterion-verdicts">Phase 1 VALIDATION —

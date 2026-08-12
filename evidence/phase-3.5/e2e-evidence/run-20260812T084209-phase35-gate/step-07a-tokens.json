@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "command": "wait",
+  "timestamp": "2026-08-12T08:43:25.492Z",
+  "result": {
+    "matched": true,
+    "timedOut": false,
+    "matchedText": "TOKEN LEDGER",
+    "cursorRow": 27,
+    "cursorCol": 0,
+    "capturedAtSeq": 127,
+    "screenHash": "37ccc71610b740706725ba348beb1ed8ef94056e028a7fc6e2a17fb3586d9660"
+  }
+}

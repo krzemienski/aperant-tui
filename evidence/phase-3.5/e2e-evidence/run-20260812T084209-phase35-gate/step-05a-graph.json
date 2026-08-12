@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "command": "wait",
+  "timestamp": "2026-08-12T08:43:08.516Z",
+  "result": {
+    "matched": true,
+    "timedOut": false,
+    "matchedText": "PHASE PIPELINE",
+    "cursorRow": 31,
+    "cursorCol": 0,
+    "capturedAtSeq": 121,
+    "screenHash": "5f8a779bed28400688891af07257d038430b9e945c139d5dc0a3a6720d515355"
+  }
+}

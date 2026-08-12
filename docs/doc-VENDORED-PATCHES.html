@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VENDORED-PATCHES — APERANT TUI</title>
+<meta name="description" content="Aperant TUI — the full Aperant agent runtime in your terminal. Real gates, real evidence.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<div class="chrome">
+  <div class="chrome-bar">
+    <span class="brand">APERANT</span><span class="sep">│</span>
+    <span class="meta">aperant-tui</span><span class="sep">│</span>
+    <span class="branch">⑂ main</span><span class="sep">│</span>
+    <span class="meta"><span class="led ok"></span>4 phases gated</span>
+    <span class="meta"><span class="led idle"></span>generated 2026-08-12</span>
+  </div>
+  <nav class="tabs"><a href="index.html" class=""><span class="n">1</span>overview</a><a href="roadmap.html" class=""><span class="n">2</span>roadmap</a><a href="phases.html" class=""><span class="n">3</span>phases</a><a href="evidence.html" class=""><span class="n">4</span>evidence</a><a href="docs.html" class="on"><span class="n">5</span>docs</a></nav>
+
+<main>
+<section><div class="marker">DOC / VENDORED-PATCHES</div><div class="doc">
+<h1 id="vendored-patch-manifest">Vendored Patch Manifest</h1>
+<p><code>apps/desktop/</code> is vendored from upstream Aperant
+2.8.0-beta.6 (see <code>VENDORED.md</code>,
+<code>apps/DESKTOP-SHA256SUMS.txt</code>). The following intentional
+downstream patches exist. Every one is marked inline with
+<code>[APERANT-PATCH &lt;name&gt;]</code> and is additive-only: no
+upstream behavior changes when the patch's trigger is absent.</p>
+<h2 id="moonshot-provider-2026-08-12">moonshot-provider
+(2026-08-12)</h2>
+<p>Adds Moonshot AI (Kimi) as a first-class provider via the workspace
+package <code>@aperant/moonshot-provider</code>
+(<code>libs/moonshot-provider</code>).</p>
+<table>
+<thead>
+<tr class="header">
+<th>File</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>shared/types/provider-account.ts</code></td>
+<td><code>BuiltinProvider</code> += <code>'moonshot'</code>;
+<code>ProviderAccount</code> += optional <code>headers</code>,
+<code>kimiChatId</code></td>
+</tr>
+<tr class="even">
+<td><code>main/ai/providers/types.ts</code></td>
+<td><code>SupportedProvider.Moonshot = 'moonshot'</code></td>
+</tr>
+<tr class="odd">
+<td><code>main/ai/providers/factory.ts</code></td>
+<td><code>case Moonshot</code> →
+<code>createMoonshot({apiKey, baseURL, headers})</code></td>
+</tr>
+<tr class="even">
+<td><code>main/ai/providers/registry.ts</code></td>
+<td>same case for the registry path</td>
+</tr>
+<tr class="odd">
+<td><code>main/ai/auth/resolver.ts</code></td>
+<td><code>BUILTIN_TO_SUPPORTED</code> += moonshot; API-key resolution
+passes account <code>headers</code>/<code>kimiChatId</code> through
+(e.g. <code>X-Kimi-Chat-Id</code> for agent-gw)</td>
+</tr>
+<tr class="even">
+<td><code>main/ai/auth/types.ts</code></td>
+<td><code>PROVIDER_ENV_VARS.moonshot = 'MOONSHOT_API_KEY'</code></td>
+</tr>
+<tr class="odd">
+<td><code>main/ai/config/types.ts</code></td>
+<td><code>MODEL_PROVIDER_MAP</code> += <code>kimi-</code>,
+<code>kimi/</code>, <code>moonshot-</code>, <code>moonshot/</code></td>
+</tr>
+<tr class="even">
+<td><code>shared/constants/models.ts</code></td>
+<td>moonshot entries in <code>DEFAULT_MODEL_EQUIVALENCES</code>
+(opus/sonnet tiers) + native <code>kimi-k2</code> /
+<code>kimi-k2-turbo</code> shorthands</td>
+</tr>
+</tbody>
+</table>
+<h2 id="worker-path-2026-08-12">worker-path (2026-08-12)</h2>
+<table>
+<thead>
+<tr class="header">
+<th>File</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>main/ai/agent/worker-bridge.ts</code></td>
+<td><code>resolveWorkerPath()</code> honors
+<code>APERANT_WORKER_PATH</code> when set — the TUI bundles the worker
+with esbuild (<code>tools/build-worker.mjs</code> →
+<code>apps/tui/dist/agent-worker.cjs</code>) because the electron-vite
+output tree the default path expects does not exist outside
+Electron.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="observability-tap-2026-08-12">observability-tap
+(2026-08-12)</h2>
+<p>Spec: <code>aperant-agent-observability-spec.md</code> §7.1–7.2
+("needs no new instrumentation… except queued-subtask visibility").</p>
+<table>
+<thead>
+<tr class="header">
+<th>File</th>
+<th>Change</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>main/ai/agent/worker-bridge.ts</code></td>
+<td>re-emits the raw <code>StreamEvent</code> as
+<code>stream-event</code> alongside the existing tracker feed
+(tool-call/tool-result/step-finish/usage-update visibility)</td>
+</tr>
+<tr class="even">
+<td><code>main/agent/types.ts</code></td>
+<td><code>AgentManagerEvents</code> += <code>'stream-event'</code>
+(payload <code>unknown</code>; subscribers narrow to
+<code>StreamEvent</code>)</td>
+</tr>
+<tr class="odd">
+<td><code>main/ai/orchestration/parallel-executor.ts</code></td>
+<td><code>ParallelExecutorConfig.onSubtaskQueued</code> (optional) —
+fired for subtasks in batches beyond the first, before execution begins;
+behavioral proof in
+<code>apps/tui/src/services/__tests__/parallel-executor-queued.test.ts</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="upgrade-note-ai-sdk-v7-2026-08-12">Upgrade note: AI SDK v7
+(2026-08-12)</h2>
+<p>The workspace runs <code>ai@^7</code>,
+<code>@ai-sdk/anthropic@^4</code>,
+<code>@ai-sdk/openai-compatible@^3</code>,
+<code>@anthropic-ai/sdk@^0.116</code>,
+<code>@openrouter/ai-sdk-provider@^3</code> (full set in root
+<code>package.json</code>, anchored there so vendored sources resolve
+the hoisted copy). Vendored call sites required zero changes for v7 —
+the used surface (<code>streamText</code>, <code>generateText</code>,
+<code>tool</code>, <code>stepCountIs</code>, <code>Output</code>,
+<code>createProviderRegistry</code>, <code>embed</code>,
+<code>embedMany</code>, <code>LanguageModel</code>,
+<code>ProviderV3</code>) is stable across the major.</p>
+</div></section>
+</main>
+  <div class="statusline"><span><b>DOC · VENDORED-PATCHES</b></span><span>: cmd &nbsp; ? help</span></div>
+</div>
+<footer>
+  <div class="wrap" style="padding:0">
+    <span>APERANT TUI — vendored runtime, zero mocks, gate-proven.</span>
+    &nbsp;<a href="https://github.com/krzemienski/aperant-tui">github.com/krzemienski/aperant-tui</a>
+    &nbsp;· upstream <a href="https://github.com/AndyMik90/Aperant">AndyMik90/Aperant</a> @ 20250db0
+  </div>
+</footer>
+</div>
+</body>
+</html>

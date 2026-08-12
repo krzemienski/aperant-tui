@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>phase-3.5-VALIDATION — APERANT TUI</title>
+<meta name="description" content="Aperant TUI — the full Aperant agent runtime in your terminal. Real gates, real evidence.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<div class="chrome">
+  <div class="chrome-bar">
+    <span class="brand">APERANT</span><span class="sep">│</span>
+    <span class="meta">aperant-tui</span><span class="sep">│</span>
+    <span class="branch">⑂ main</span><span class="sep">│</span>
+    <span class="meta"><span class="led ok"></span>4 phases gated</span>
+    <span class="meta"><span class="led idle"></span>generated 2026-08-12</span>
+  </div>
+  <nav class="tabs"><a href="index.html" class=""><span class="n">1</span>overview</a><a href="roadmap.html" class=""><span class="n">2</span>roadmap</a><a href="phases.html" class=""><span class="n">3</span>phases</a><a href="evidence.html" class=""><span class="n">4</span>evidence</a><a href="docs.html" class="on"><span class="n">5</span>docs</a></nav>
+
+<main>
+<section><div class="marker">DOC / phase-3.5-VALIDATION</div><div class="doc">
+<h1 id="phase-35-validation--per-criterion-verdicts">Phase 3.5
+VALIDATION — per-criterion verdicts</h1>
+<p>Run:
+<code>evidence/phase-3.5/e2e-evidence/run-20260812T084209-phase35-gate/</code>
+Session <code>phase35</code> · 110x32 · screenshots ×7 · console log ·
+agent-events.jsonl (1807 events) · real sentinel intervention. Verdict:
+<strong>GATE FAILS: 0</strong> · SECRET-SCAN-OK.</p>
+<table>
+<thead>
+<tr class="header">
+<th>Spec Part 8 gate</th>
+<th>Evidence</th>
+<th>VERDICT</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Swarm accuracy</td>
+<td>step-03 waits matched <code>AGENT SWARM</code> +
+<code>planner</code> (phase→agent-type mapping); screenshot 62: live row
+<code>002-fix-terminal planner 0/1000</code></td>
+<td><strong>PASS</strong></td>
+</tr>
+<tr class="even">
+<td>Wait detection — tool</td>
+<td>flight recorder: 4 tool-call / 4 tool-result pairs — wait derivation
+exercises the open-call path on every pair</td>
+<td><strong>PASS</strong></td>
+</tr>
+<tr class="odd">
+<td>Wait detection — concurrency</td>
+<td>vitest 3/3: 6 subtasks @ concurrency 3 → exactly batch-1 positions
+announced; allSettled failure semantics preserved</td>
+<td><strong>PASS (executor-level)</strong>; live multi-coder swarm needs
+a ≥4-subtask task — not claimed</td>
+</tr>
+<tr class="even">
+<td>Wait detection — ratelimit</td>
+<td>real <code>RATE_LIMIT_PAUSE</code> written into the spec dir → ⏱ 429
+row with parsed <code>resetTimestamp</code> (screenshot); <code>r</code>
+wrote real <code>RESUME</code> (step-08d RESUME-ON-DISK-OK)</td>
+<td><strong>PASS</strong></td>
+</tr>
+<tr class="odd">
+<td>Wait detection — context</td>
+<td>requires a session driven past 90% context — this run's planner
+peaked at ~21% (43,216 / 200,000)</td>
+<td><strong>UNVERIFIED — threshold not reached</strong> (mechanism
+implemented; not claimed proven)</td>
+</tr>
+<tr class="even">
+<td>Token accuracy</td>
+<td>D11 fix verified: step-finish usage 14,035/147 → cumulative 43,216
+tokens from the real endpoint (pre-fix runs recorded 0)</td>
+<td><strong>PASS</strong></td>
+</tr>
+<tr class="odd">
+<td>Cache hit</td>
+<td>usage carries <code>cacheReadTokens: 0</code> from this endpoint —
+arithmetic runs, no cache traffic to measure</td>
+<td><strong>UNVERIFIED — no cache traffic</strong></td>
+</tr>
+<tr class="even">
+<td>Tool grants</td>
+<td>step-04e GRANTS-BYTEMATCH-OK: planner
+(<code>thinkingDefault: high</code>) and coder (<code>low</code>) dumped
+from the imported vendored AGENT_CONFIGS</td>
+<td><strong>PASS</strong></td>
+</tr>
+<tr class="odd">
+<td>Trace completeness</td>
+<td>step-09 census: 898 stream-events (thinking-delta ×118, tool-call
+×4, tool-result ×4, step-finish ×3, usage-update ×3) — every tool-call
+paired</td>
+<td><strong>PASS</strong></td>
+</tr>
+<tr class="even">
+<td>Graph topology</td>
+<td>phase pipeline + regression guard rendered (step-05 waits); subagent
+nodes require SpawnSubagent traffic — none in this run</td>
+<td><strong>PASS (pipeline)</strong> / subagent nodes <strong>UNVERIFIED
+— no spawn traffic</strong></td>
+</tr>
+<tr class="odd">
+<td>Phase provenance</td>
+<td>step-04c wait matched <code>~ inferred</code> during planning
+(honest — no structured planning event exists);
+<code>▪ structured</code> path verified via task-event census
+(CODING_STARTED)</td>
+<td><strong>PASS</strong></td>
+</tr>
+<tr class="even">
+<td>Throughput</td>
+<td>898-event live stream ingested with 16ms coalescing; no UI stalls
+observed across 7 screenshots</td>
+<td><strong>PASS (observational)</strong>; 100 events/sec synthetic
+burst not performed</td>
+</tr>
+</tbody>
+</table>
+<h2 id="defects-caught-by-this-gate-family">Defects caught by this gate
+family</h2>
+<ul>
+<li><strong>D10</strong> — bridge-level <code>stream-event</code>
+re-emit never reached the manager emitter (forward added in
+agent-process.ts).</li>
+<li><strong>D11</strong> — AI SDK v7 renamed usage fields
+(<code>inputTokens</code>/<code>outputTokens</code> +
+<code>inputTokenDetails.cache*</code>); the vendored stream-handler read
+v6 names and silently recorded 0 tokens. Dual-shape read; verified by
+this run's real token counts. <strong>This is exactly the class of break
+the live gate exists to catch</strong> — typecheck passed, the numbers
+were wrong.</li>
+</ul>
+<h2 id="environment-notes">Environment notes</h2>
+<ul>
+<li>Node 24 must be the agent-tty runtime
+(<code>Promise.withResolvers</code>, Node ≥22); installed to
+<code>~/.cache/node24</code> after <code>/tmp</code> and
+<code>~/node24</code> proved volatile.</li>
+<li>agent-tty daemon inherits the PATH of its first invocation — a stale
+daemon must be killed after runtime changes.</li>
+<li>Cold-cache TUI boots exceed 120s; boot waits run 300s.</li>
+</ul>
+</div></section>
+</main>
+  <div class="statusline"><span><b>DOC · phase-3.5-VALIDATION</b></span><span>: cmd &nbsp; ? help</span></div>
+</div>
+<footer>
+  <div class="wrap" style="padding:0">
+    <span>APERANT TUI — vendored runtime, zero mocks, gate-proven.</span>
+    &nbsp;<a href="https://github.com/krzemienski/aperant-tui">github.com/krzemienski/aperant-tui</a>
+    &nbsp;· upstream <a href="https://github.com/AndyMik90/Aperant">AndyMik90/Aperant</a> @ 20250db0
+  </div>
+</footer>
+</div>
+</body>
+</html>

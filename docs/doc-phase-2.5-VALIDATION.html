@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>phase-2.5-VALIDATION — APERANT TUI</title>
+<meta name="description" content="Aperant TUI — the full Aperant agent runtime in your terminal. Real gates, real evidence.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+<div class="chrome">
+  <div class="chrome-bar">
+    <span class="brand">APERANT</span><span class="sep">│</span>
+    <span class="meta">aperant-tui</span><span class="sep">│</span>
+    <span class="branch">⑂ main</span><span class="sep">│</span>
+    <span class="meta"><span class="led ok"></span>4 phases gated</span>
+    <span class="meta"><span class="led idle"></span>generated 2026-08-12</span>
+  </div>
+  <nav class="tabs"><a href="index.html" class=""><span class="n">1</span>overview</a><a href="roadmap.html" class=""><span class="n">2</span>roadmap</a><a href="phases.html" class=""><span class="n">3</span>phases</a><a href="evidence.html" class=""><span class="n">4</span>evidence</a><a href="docs.html" class="on"><span class="n">5</span>docs</a></nav>
+
+<main>
+<section><div class="marker">DOC / phase-2.5-VALIDATION</div><div class="doc">
+<h1 id="phase-25-validation--per-criterion-verdicts">Phase 2.5
+VALIDATION — per-criterion verdicts</h1>
+<p>Run:
+<code>evidence/phase-2/e2e-evidence/run-20260812T045402-moonshot-live-gate/</code>
+Session <code>moonshot-live</code> · 110x32 · screenshots ×4 · console
+log · agent-events.jsonl · redacted settings.json ·
+agent-work-product.diff</p>
+<p>Evidence standard: <strong>three facets</strong> — UI (waits asserted
+on <code>result.matched</code>, screenshots), persistence (direct disk
+reads), logs (flight recorder + console + worker task log). Harness
+lessons folded in: wait envelopes report <code>ok:true</code> on timeout
+(D8) so every wait is asserted on <code>result.matched</code>; console
+capture uses <code>script(1)</code> because a pipe trips the TUI's real
+TTY guard (D7).</p>
+<table>
+<thead>
+<tr class="header">
+<th>#</th>
+<th>Criterion</th>
+<th>Evidence</th>
+<th>VERDICT</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>Provisioning refuses without credentials</td>
+<td>step-01e wait matched <code>no API key</code>; step-01g:
+settings.json never created</td>
+<td><strong>PASS</strong></td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td><code>a</code> provisions a real moonshot account</td>
+<td>step-03b wait matched <code>moonshot account added</code>; step-04
+disk read: <code>provider=moonshot</code>, baseUrl <code>…/v1</code>,
+priority-first; key redacted in evidence</td>
+<td><strong>PASS</strong></td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>Account resolves through the vendored queue</td>
+<td>console log + event stream show
+<code>provider=moonshot model=kimi/kimi-for-coding</code> resolution;
+pre-flight passed</td>
+<td><strong>PASS</strong></td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>Agent starts and streams for real</td>
+<td>step-05d wait matched <code>agent started</code>;
+agent-events.jsonl: 1886 events (execution-progress ×1878, log ×7,
+task-event ×1 = <code>CODING_STARTED</code>)</td>
+<td><strong>PASS</strong></td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>Agent does real work</td>
+<td>agent-work-product.diff: plan subtask 002-1 → completed; NEW
+<code>src/repro.ts</code> + <code>src/terminal.ts</code> written by the
+agent (a real repro of the resize bug); <code>task_logs.json</code>
+written by the worker</td>
+<td><strong>PASS</strong></td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>No secrets in evidence</td>
+<td>step-09 scan: no key material anywhere in the run dir</td>
+<td><strong>PASS</strong></td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>Regression: protocol + executor suites</td>
+<td>9/9 vitest: provider (real HTTP/SSE/401/garbage via loopback
+server), parallel-executor <code>onSubtaskQueued</code> (6 subtasks @
+concurrency 3)</td>
+<td><strong>PASS</strong></td>
+</tr>
+</tbody>
+</table>
+<h2 id="defects-caught-by-this-gate-family">Defects caught by this gate
+family</h2>
+<ul>
+<li><strong>D5</strong> — agent-start-service listened for
+<code>task-started</code>/<code>task-failed</code> events the vendored
+runtime never emits; every successful start would have timed out. Fixed
+to the real contract (<code>execution-progress</code> = started).</li>
+<li><strong>D6</strong> — <code>__dirname</code> under tsx ESM crashed
+the TUI at boot; caught by boot wait + screenshot (screen showed the
+ReferenceError).</li>
+<li><strong>D7</strong> — <code>| tee</code> console capture tripped the
+TUI's TTY guard; moved to <code>script -qfc</code> sub-PTY logging.</li>
+<li><strong>D8</strong> — agent-tty wait envelope <code>ok:true</code>
+on timeout; assertions moved to <code>result.matched</code>.</li>
+<li><strong>D9</strong> — fixture used <code>.aperant/</code> while the
+vendored runtime only discovers <code>.auto-claude/</code>; board
+silently empty. Fixture corrected.</li>
+<li><strong>D10</strong> — bridge-level <code>stream-event</code>
+re-emit alone never reached the AgentManager emitter; forward added in
+agent-process.ts (found via empty stream-event count in the flight
+recorder).</li>
+</ul>
+<h2 id="honest-caveats">Honest caveats</h2>
+<ul>
+<li>The agent ran in <strong>direct mode</strong> (no task worktree
+appeared in <code>git worktree list</code>). Worktree creation under the
+TUI runtime is a real open item, visible in this run's step-06
+artifact.</li>
+<li>This run's flight recorder lacks <code>stream-event</code> kinds
+(D10, fixed in the same commit series); Phase 3.5's run captures
+them.</li>
+<li>Runs used the operator-provided combo endpoint
+(<code>kimi/kimi-for-coding</code>). The public Moonshot platform path
+(<code>api.moonshot.ai</code>) shares the same code path with a
+different base URL; not separately exercised here.</li>
+</ul>
+</div></section>
+</main>
+  <div class="statusline"><span><b>DOC · phase-2.5-VALIDATION</b></span><span>: cmd &nbsp; ? help</span></div>
+</div>
+<footer>
+  <div class="wrap" style="padding:0">
+    <span>APERANT TUI — vendored runtime, zero mocks, gate-proven.</span>
+    &nbsp;<a href="https://github.com/krzemienski/aperant-tui">github.com/krzemienski/aperant-tui</a>
+    &nbsp;· upstream <a href="https://github.com/AndyMik90/Aperant">AndyMik90/Aperant</a> @ 20250db0
+  </div>
+</footer>
+</div>
+</body>
+</html>

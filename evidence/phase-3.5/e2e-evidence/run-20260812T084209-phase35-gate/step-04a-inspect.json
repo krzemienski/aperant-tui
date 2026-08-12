@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "command": "wait",
+  "timestamp": "2026-08-12T08:42:57.835Z",
+  "result": {
+    "matched": true,
+    "timedOut": false,
+    "matchedText": "TOOL GRANTS",
+    "cursorRow": 31,
+    "cursorCol": 109,
+    "capturedAtSeq": 85,
+    "screenHash": "6eb6648dd030402e279af01fe973f6b8c7cd2bc9ab133979f81dd02798c281e9"
+  }
+}
