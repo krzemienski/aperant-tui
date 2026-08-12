@@ -18,6 +18,8 @@ import { createOpenAI } from '@ai-sdk/openai';
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import { createXai } from '@ai-sdk/xai';
+// [APERANT-PATCH moonshot-provider]: Moonshot AI (Kimi) provider package
+import { createMoonshot } from '@aperant/moonshot-provider';
 import type { LanguageModel } from 'ai';
 
 import { MODEL_PROVIDER_MAP } from '../config/types';
@@ -155,6 +157,16 @@ function createProviderInstance(config: ProviderConfig) {
         headers,
       });
     }
+
+    // [APERANT-PATCH moonshot-provider]: Moonshot AI (Kimi) — OpenAI-compatible
+    // wire protocol; defaults to https://api.moonshot.ai/v1, also supports
+    // Kimi agent-gw base URLs (…/coding → …/coding/v1 normalization).
+    case SupportedProvider.Moonshot:
+      return createMoonshot({
+        apiKey,
+        baseURL,
+        headers,
+      });
 
     default: {
       const _exhaustive: never = provider;

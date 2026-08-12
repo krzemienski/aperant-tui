@@ -34,7 +34,7 @@ config: ~/.aperant/tui.json`);
 }
 
 if (args.includes('--version') || args.includes('-v')) {
-  console.log('aperant-tui 0.1.0 (agent runtime: vendored Aperant 2.8.0-beta.6, TypeScript/AI SDK v6)');
+  console.log('aperant-tui 0.1.0 (agent runtime: vendored Aperant 2.8.0-beta.6 + aperant patches, TypeScript/AI SDK v7)');
   process.exit(0);
 }
 

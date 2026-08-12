@@ -7,7 +7,9 @@ export type CredentialSource = 'oauth' | 'api-key' | 'env' | 'keychain';
 export type BuiltinProvider =
   | 'anthropic' | 'openai' | 'google' | 'amazon-bedrock' | 'azure'
   | 'mistral' | 'groq' | 'xai' | 'openrouter' | 'zai'
-  | 'ollama' | 'openai-compatible';
+  | 'ollama' | 'openai-compatible'
+  // [APERANT-PATCH moonshot-provider]: Moonshot AI (Kimi) — via @aperant/moonshot-provider
+  | 'moonshot';
 
 export type BillingModel = 'subscription' | 'pay-per-use';
 
@@ -36,6 +38,10 @@ export interface ProviderAccount {
   rateLimitEvents?: ClaudeRateLimitEvent[];
   /** User-configured models for openai-compatible endpoints */
   customModels?: CustomModel[];
+  // [APERANT-PATCH moonshot-provider]: extra request headers (e.g. proxy/agent-gw auth)
+  headers?: Record<string, string>;
+  // [APERANT-PATCH moonshot-provider]: Kimi agent-gw chat scope → X-Kimi-Chat-Id header
+  kimiChatId?: string;
 }
 
 export type ProviderCategory = 'popular' | 'infrastructure' | 'local';

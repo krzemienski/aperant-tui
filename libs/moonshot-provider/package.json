@@ -1,0 +1,21 @@
+{
+  "name": "@aperant/moonshot-provider",
+  "version": "0.1.0",
+  "description": "Moonshot AI (Kimi) provider for the Vercel AI SDK. Speaks the OpenAI-compatible chat-completions wire protocol against api.moonshot.ai or a Kimi agent-gw deployment, with agent-gw header support (X-Kimi-Chat-Id / X-Kimi-Skill).",
+  "type": "module",
+  "main": "./index.js",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    }
+  },
+  "dependencies": {
+    "@ai-sdk/openai-compatible": "^3.0.30"
+  },
+  "peerDependencies": {
+    "@ai-sdk/provider": "^4.0.0"
+  },
+  "keywords": ["moonshot", "kimi", "ai-sdk", "provider", "agent-gw"],
+  "license": "MIT"
+}

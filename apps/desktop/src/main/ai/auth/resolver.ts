@@ -332,6 +332,8 @@ const BUILTIN_TO_SUPPORTED: Record<string, SupportedProvider> = {
   openrouter: 'openrouter',
   zai: 'zai',
   ollama: 'ollama',
+  // [APERANT-PATCH moonshot-provider]: Moonshot AI (Kimi)
+  moonshot: 'moonshot',
 };
 
 /**
@@ -540,10 +542,19 @@ async function resolveCredentialsForAccount(
       ? resolveZaiBaseUrl(account)
       : account.baseUrl;
 
+    // [APERANT-PATCH moonshot-provider]: pass per-account extra headers through
+    // (e.g. X-Kimi-Chat-Id for Kimi agent-gw endpoints). The moonshot provider
+    // also accepts kimiChatId; storing it as a header keeps the flow uniform.
+    const extraHeaders: Record<string, string> = { ...(account.headers ?? {}) };
+    if (account.kimiChatId && extraHeaders['X-Kimi-Chat-Id'] === undefined) {
+      extraHeaders['X-Kimi-Chat-Id'] = account.kimiChatId;
+    }
+
     return {
       apiKey: account.apiKey,
       source: 'profile-api-key',
       baseURL,
+      headers: Object.keys(extraHeaders).length > 0 ? extraHeaders : undefined,
     };
   }
 

@@ -414,6 +414,18 @@ export const DEFAULT_MODEL_EQUIVALENCES: Record<string, Partial<Record<BuiltinPr
     mistral: { modelId: 'mistral-large-latest', reasoning: { type: 'none' } },
     groq: { modelId: 'meta-llama/llama-4-maverick', reasoning: { type: 'none' } },
     zai: { modelId: 'glm-5', reasoning: { type: 'none' } },
+    // [APERANT-PATCH moonshot-provider]
+    moonshot: { modelId: 'kimi-k2-0905-preview', reasoning: { type: 'none' } },
+  },
+  // [APERANT-PATCH moonshot-provider]: native Moonshot (Kimi) shorthands
+  'kimi-k2': {
+    moonshot: { modelId: 'kimi-k2-0905-preview', reasoning: { type: 'none' } },
+    anthropic: { modelId: 'claude-opus-4-6', reasoning: { type: 'adaptive_effort', level: 'high' } },
+    openai: { modelId: 'gpt-5.3-codex', reasoning: { type: 'reasoning_effort', level: 'high' } },
+  },
+  'kimi-k2-turbo': {
+    moonshot: { modelId: 'kimi-k2-turbo-preview', reasoning: { type: 'none' } },
+    anthropic: { modelId: 'claude-sonnet-4-6', reasoning: { type: 'thinking_tokens', level: 'medium' } },
   },
   'glm-5': {
     zai: { modelId: 'glm-5', reasoning: { type: 'none' } },
@@ -443,6 +455,8 @@ export const DEFAULT_MODEL_EQUIVALENCES: Record<string, Partial<Record<BuiltinPr
     groq: { modelId: 'llama-3.3-70b-versatile', reasoning: { type: 'none' } },
     xai: { modelId: 'grok-3-mini', reasoning: { type: 'reasoning_effort', level: 'medium' } },
     zai: { modelId: 'glm-4.7', reasoning: { type: 'none' } },
+    // [APERANT-PATCH moonshot-provider]
+    moonshot: { modelId: 'kimi-k2-turbo-preview', reasoning: { type: 'none' } },
   },
   'haiku': {
     anthropic: { modelId: 'claude-haiku-4-5-20251001', reasoning: { type: 'none' } },

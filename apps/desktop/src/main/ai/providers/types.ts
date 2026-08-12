@@ -21,6 +21,8 @@ export const SupportedProvider = {
   OpenRouter: 'openrouter',
   ZAI: 'zai',
   Ollama: 'ollama',
+  // [APERANT-PATCH moonshot-provider]: Moonshot AI (Kimi)
+  Moonshot: 'moonshot',
 } as const;
 
 export type SupportedProvider = (typeof SupportedProvider)[keyof typeof SupportedProvider];

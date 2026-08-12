@@ -9,7 +9,7 @@ const HINTS: Record<ViewName, string> = {
   road: 'g generate · c convert→spec · a add feature',
   chat: '⏎ send · / history search',
   tree: 'd diff · m merge · p PR · D discard',
-  set: 'j/k select theme · ⏎ apply',
+  set: 'j/k select theme · ⏎ apply · a add Moonshot acct',
   logs: '↑↓ scroll · esc back',
 };
 

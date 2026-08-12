@@ -147,6 +147,9 @@ export const MODEL_PROVIDER_MAP: Record<string, SupportedProvider> = {
   'llama-': 'groq',
   'grok-': 'xai',
   'glm-': 'zai',
+  // [APERANT-PATCH moonshot-provider]: Moonshot AI (Kimi) model prefixes
+  'kimi-': 'moonshot',
+  'moonshot-': 'moonshot',
 } as const;
 
 // ============================================

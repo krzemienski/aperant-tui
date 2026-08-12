@@ -11,11 +11,14 @@ import { useAppStore } from '../stores/app-store';
 import { useKeymap } from '../hooks/useKeymap';
 import { getConfigPath } from '../services/config-service';
 import { getSettingsPath, readSettingsFile } from '@main/settings-utils';
+import { listProviderAccounts, provisionMoonshotAccount } from '../services/account-service';
 
 export function SettingsView({ theme: c, isActive }: { theme: Theme; isActive: boolean }) {
   const themeName = useAppStore((s) => s.themeName);
   const cycleTheme = useAppStore((s) => s.cycleTheme);
   const setTheme = useAppStore((s) => s.setTheme);
+  const [accountFlash, setAccountFlash] = React.useState<{ ok: boolean; msg: string } | null>(null);
+  const [accountsVersion, setAccountsVersion] = React.useState(0);
 
   useKeymap({
     j: () => cycleTheme(1),
@@ -23,9 +26,20 @@ export function SettingsView({ theme: c, isActive }: { theme: Theme; isActive: b
     down: () => cycleTheme(1),
     up: () => cycleTheme(-1),
     return: () => setTheme(themeName), // persists (already live-applied on cycle)
+    // Provision a Moonshot (Kimi) account from the environment — REAL write to
+    // settings.json in the exact shape the vendored AgentManager queue reads.
+    a: () => {
+      const r = provisionMoonshotAccount();
+      setAccountFlash(r.ok
+        ? { ok: true, msg: `moonshot account ${r.updated ? 'updated' : 'added'}: ${r.accountId} → ${r.baseUrl}` }
+        : { ok: false, msg: `not provisioned: ${r.reason}` });
+      setAccountsVersion((v) => v + 1);
+    },
   }, { isActive });
 
   const desktopSettings = readSettingsFile() ?? {};
+  const accounts = listProviderAccounts(); // re-read on accountsVersion change
+  void accountsVersion;
   const rows: Array<[string, string, string]> = [
     ['tui config', getConfigPath(), c.faint],
     ['desktop settings', getSettingsPath(), c.faint],
@@ -52,14 +66,34 @@ export function SettingsView({ theme: c, isActive }: { theme: Theme; isActive: b
         <Text> </Text>
         <Text color={c.dim}>j/k select · applies live · persists to tui.json</Text>
       </Panel>
-      <Panel title="CONFIG" theme={c} flexGrow={1}>
-        {rows.map(([k, v, col]) => (
-          <Box key={k} gap={1}>
-            <Box width={17}><Text color={c.dim}>{k}</Text></Box>
-            <Text color={col} wrap="truncate-end">{v}</Text>
-          </Box>
-        ))}
-      </Panel>
+      <Box flexDirection="column" flexGrow={1} gap={1}>
+        <Panel title="CONFIG" theme={c}>
+          {rows.map(([k, v, col]) => (
+            <Box key={k} gap={1}>
+              <Box width={17}><Text color={c.dim}>{k}</Text></Box>
+              <Text color={col} wrap="truncate-end">{v}</Text>
+            </Box>
+          ))}
+        </Panel>
+        <Panel title="ACCOUNTS" theme={c} flexGrow={1}>
+          {accounts.length === 0 ? (
+            <Text color={c.faint}>no provider accounts — press a to add Moonshot (Kimi) from env</Text>
+          ) : (
+            accounts.map((a) => (
+              <Box key={a.id} gap={1}>
+                <Box width={10}><Text color={c.accent2}>{a.provider}</Text></Box>
+                <Box width={22}><Text color={c.text} wrap="truncate-end">{a.name}</Text></Box>
+                <Text color={c.dim}>{a.hasKey ? `key ${a.keyPreview}` : 'no key'}</Text>
+                <Text color={c.faint} wrap="truncate-end">{a.baseUrl ?? ''}</Text>
+              </Box>
+            ))
+          )}
+          {accountFlash ? (
+            <Text color={accountFlash.ok ? c.ok : c.err} wrap="truncate-end">{accountFlash.msg}</Text>
+          ) : null}
+          <Text color={c.dim}>a add/update Moonshot (Kimi) from env · writes settings.json · queue-priority first</Text>
+        </Panel>
+      </Box>
     </Box>
   );
 }

@@ -80,6 +80,8 @@ export const PROVIDER_ENV_VARS: Record<SupportedProvider, string | undefined> = 
   openrouter: 'OPENROUTER_API_KEY',
   zai: 'ZHIPU_API_KEY',
   ollama: undefined,   // No auth required for local Ollama
+  // [APERANT-PATCH moonshot-provider]: Moonshot AI (Kimi)
+  moonshot: 'MOONSHOT_API_KEY',
 } as const;
 
 /**

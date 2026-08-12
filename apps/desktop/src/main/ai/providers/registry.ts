@@ -17,6 +17,8 @@ import { createOpenAI } from '@ai-sdk/openai';
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
 import { createXai } from '@ai-sdk/xai';
+// [APERANT-PATCH moonshot-provider]: Moonshot AI (Kimi) provider package
+import { createMoonshot } from '@aperant/moonshot-provider';
 import { createProviderRegistry } from 'ai';
 import type { LanguageModel } from 'ai';
 import type { ProviderV3 } from '@ai-sdk/provider';
@@ -100,6 +102,14 @@ function createProviderSDKInstance(
         headers,
       });
     }
+
+    // [APERANT-PATCH moonshot-provider]: Moonshot AI (Kimi)
+    case SupportedProvider.Moonshot:
+      return createMoonshot({
+        apiKey,
+        baseURL,
+        headers,
+      });
 
     default: {
       const _exhaustive: never = provider;
