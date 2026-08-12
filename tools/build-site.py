@@ -60,12 +60,37 @@ CHROME_TAIL = """</div></section>
 """
 
 
+MMDC = os.environ.get("MMDC", "/tmp/mmdc/node_modules/.bin/mmdc")
+_mmd_i = [0]
+
+def render_mermaid_html(html_text: str) -> str:
+    """Replace pandoc's <pre class="mermaid"> blocks with pre-rendered inline SVG.
+    Falls back to the code block + an explicit note when the renderer is absent."""
+    import html as _html
+    def repl(m):
+        code = _html.unescape(m.group(1))
+        _mmd_i[0] += 1
+        idx = _mmd_i[0]
+        if os.path.exists(MMDC):
+            src = f"/tmp/aperant-mmd-{idx}.mmd"
+            svg = f"/tmp/aperant-mmd-{idx}.svg"
+            open(src, "w").write(code)
+            r = subprocess.run([MMDC, "-i", src, "-o", svg, "-b", "transparent", "-t", "dark"],
+                               capture_output=True, text=True)
+            if r.returncode == 0 and os.path.exists(svg):
+                body = open(svg).read()
+                body = body.replace('id="my-svg"', f'id="ammd-{idx}"', 1).replace("#my-svg", f"#ammd-{idx}")
+                return f'<div class="mermaid-diagram">{body}</div>'
+        return m.group(0) + '<p class="mmd-note">(diagram source — pre-renderer unavailable)</p>'
+    return re.sub(r'<pre class="mermaid"><code>(.*?)</code></pre>', repl, html_text, flags=re.S)
+
+
 def md_to_fragment(md_path: Path) -> str:
     r = subprocess.run(
         ["pandoc", "-f", "gfm", "-t", "html", str(md_path)],
         capture_output=True, text=True, check=True,
     )
-    return r.stdout
+    return render_mermaid_html(r.stdout)
 
 
 def build_doc(md_path: Path, out_name: str, title: str, gated: int, date: str) -> None:
