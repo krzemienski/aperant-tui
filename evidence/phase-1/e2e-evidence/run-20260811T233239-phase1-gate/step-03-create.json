@@ -1,0 +1,17 @@
+{
+  "ok": true,
+  "command": "create",
+  "timestamp": "2026-08-11T23:57:11.228Z",
+  "result": {
+    "sessionId": "01KZSM4D7ECBY7QARY9JYY8D3S",
+    "createdAt": "2026-08-11T23:57:10.256Z",
+    "cols": 110,
+    "rows": 32,
+    "shell": "/bin/sh",
+    "env": {
+      "APERANT_USER_DATA": "/tmp/aperant-fixture-userdata",
+      "COLORTERM": "truecolor",
+      "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+    }
+  }
+}

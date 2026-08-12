@@ -1,0 +1,106 @@
+[
+ {
+  "run": "node /tmp/build/aperant-tui/apps/tui/bin/aperant.js /tmp/aperant-fixture",
+  "noWait": true
+ },
+ {
+  "wait": {
+   "text": "APERANT"
+  }
+ },
+ {
+  "wait": {
+   "screenStableMs": 1500
+  }
+ },
+ {
+  "type": "2"
+ },
+ {
+  "wait": {
+   "text": "live PTY"
+  }
+ },
+ {
+  "type": "3"
+ },
+ {
+  "wait": {
+   "text": "Foundation"
+  }
+ },
+ {
+  "type": "4"
+ },
+ {
+  "wait": {
+   "text": "entries"
+  }
+ },
+ {
+  "type": "5"
+ },
+ {
+  "wait": {
+   "text": "develop"
+  }
+ },
+ {
+  "type": "6"
+ },
+ {
+  "wait": {
+   "text": "cyberpunk"
+  }
+ },
+ {
+  "type": ":"
+ },
+ {
+  "type": "theme matrix"
+ },
+ {
+  "sendKeys": [
+   "Enter"
+  ]
+ },
+ {
+  "wait": {
+   "text": "matrix"
+  }
+ },
+ {
+  "type": "?"
+ },
+ {
+  "wait": {
+   "text": "KEYBINDINGS"
+  }
+ },
+ {
+  "sendKeys": [
+   "Escape"
+  ]
+ },
+ {
+  "wait": {
+   "screenStableMs": 800
+  }
+ },
+ {
+  "type": "1"
+ },
+ {
+  "wait": {
+   "text": "TASKS"
+  }
+ },
+ {
+  "type": "jj"
+ },
+ {
+  "wait": {
+   "screenStableMs": 800
+  }
+ }
+]

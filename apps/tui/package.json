@@ -1,0 +1,43 @@
+{
+  "name": "@aperant/tui",
+  "version": "0.1.0",
+  "description": "Aperant terminal UI \u2014 Ink/React renderer over the Aperant TypeScript agent runtime",
+  "type": "module",
+  "bin": {
+    "aperant": "./bin/aperant.js"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "dev": "tsx src/cli.tsx",
+    "build": "tsc -p tsconfig.build.json && node scripts/postbuild.mjs",
+    "start": "node dist/cli.js",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@lydell/node-pty": "^1.1.0",
+    "@xterm/headless": "^6.0.0",
+    "electron": "file:../../libs/electron-shim",
+    "@sentry/electron": "file:../../libs/sentry-adapter",
+    "ink": "^5.2.1",
+    "ink-select-input": "^6.2.0",
+    "ink-spinner": "^5.0.0",
+    "ink-text-input": "^6.0.0",
+    "proper-lockfile": "^4.1.2",
+    "react": "^18.3.1",
+    "uuid": "^11.0.0",
+    "xstate": "^5.19.0",
+    "zod": "^3.23.0",
+    "zustand": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@types/react": "^18.3.0",
+    "@types/uuid": "^10.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "~5.6.3",
+    "vitest": "^2.1.0"
+  }
+}

@@ -1,0 +1,186 @@
+{
+  "ok": true,
+  "command": "batch",
+  "timestamp": "2026-08-12T00:07:17.759Z",
+  "result": {
+    "steps": [
+      {
+        "index": 0,
+        "durationMs": 7,
+        "kind": "run",
+        "status": "completed",
+        "seq": 1,
+        "noWait": true,
+        "runOutcome": "started"
+      },
+      {
+        "index": 1,
+        "durationMs": 2054,
+        "kind": "wait",
+        "status": "completed",
+        "waitBaseline": 1,
+        "matched": true,
+        "timedOut": false,
+        "matchedText": "APERANT",
+        "capturedAtSeq": 7,
+        "screenHash": "70bb7ba725d5cac64d08a6d9b352f12c0247e5fce6bd8c411ee4c478e39d5582"
+      },
+      {
+        "index": 2,
+        "durationMs": 3415,
+        "kind": "wait",
+        "status": "completed",
+        "waitBaseline": 1,
+        "matched": true,
+        "timedOut": false,
+        "capturedAtSeq": 9,
+        "screenHash": "d55f3e041f39915f7e8e2654720308897fdeb3e1da2cbc7fc05ea763e58e01f4"
+      },
+      {
+        "index": 3,
+        "durationMs": 3,
+        "kind": "type",
+        "status": "completed",
+        "seq": 10
+      },
+      {
+        "index": 4,
+        "durationMs": 600003,
+        "kind": "wait",
+        "status": "failed",
+        "waitBaseline": 10,
+        "matched": false,
+        "timedOut": true,
+        "capturedAtSeq": 14,
+        "error": {
+          "code": "WAIT_TIMEOUT",
+          "message": "Render wait at step 4 timed out before its condition was met."
+        }
+      },
+      {
+        "index": 5,
+        "durationMs": 0,
+        "status": "not-run",
+        "kind": "type"
+      },
+      {
+        "index": 6,
+        "durationMs": 0,
+        "status": "not-run",
+        "kind": "wait"
+      },
+      {
+        "index": 7,
+        "durationMs": 0,
+        "status": "not-run",
+        "kind": "type"
+      },
+      {
+        "index": 8,
+        "durationMs": 0,
+        "status": "not-run",
+        "kind": "wait"
+      },
+      {
+        "index": 9,
+        "durationMs": 0,
+        "status": "not-run",
+        "kind": "type"
+      },
+      {
+        "index": 10,
+        "durationMs": 0,
+        "status": "not-run",
+        "kind": "wait"
+      },
+      {
+        "index": 11,
+        "durationMs": 0,
+        "status": "not-run",
+        "kind": "type"
+      },
+      {
+        "index": 12,
+        "durationMs": 0,
+        "status": "not-run",
+        "kind": "wait"
+      },
+      {
+        "index": 13,
+        "durationMs": 0,
+        "status": "not-run",
+        "kind": "type"
+      },
+      {
+        "index": 14,
+        "durationMs": 0,
+        "status": "not-run",
+        "kind": "type"
+      },
+      {
+        "index": 15,
+        "durationMs": 0,
+        "status": "not-run",
+        "kind": "sendKeys"
+      },
+      {
+        "index": 16,
+        "durationMs": 0,
+        "status": "not-run",
+        "kind": "wait"
+      },
+      {
+        "index": 17,
+        "durationMs": 0,
+        "status": "not-run",
+        "kind": "type"
+      },
+      {
+        "index": 18,
+        "durationMs": 0,
+        "status": "not-run",
+        "kind": "wait"
+      },
+      {
+        "index": 19,
+        "durationMs": 0,
+        "status": "not-run",
+        "kind": "sendKeys"
+      },
+      {
+        "index": 20,
+        "durationMs": 0,
+        "status": "not-run",
+        "kind": "wait"
+      },
+      {
+        "index": 21,
+        "durationMs": 0,
+        "status": "not-run",
+        "kind": "type"
+      },
+      {
+        "index": 22,
+        "durationMs": 0,
+        "status": "not-run",
+        "kind": "wait"
+      },
+      {
+        "index": 23,
+        "durationMs": 0,
+        "status": "not-run",
+        "kind": "type"
+      },
+      {
+        "index": 24,
+        "durationMs": 0,
+        "status": "not-run",
+        "kind": "wait"
+      }
+    ],
+    "completedCount": 4,
+    "failedIndices": [
+      4
+    ]
+  }
+}

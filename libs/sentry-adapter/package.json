@@ -1,0 +1,26 @@
+{
+  "name": "@sentry/electron",
+  "version": "0.0.0-tui-adapter",
+  "description": "Crash-report adapter: implements the @sentry/electron API surface src/main uses, reporting to a local log file. Telemetry only \u2014 no agent/PTY/git logic.",
+  "type": "module",
+  "main": "./index.js",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    },
+    "./main": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    },
+    "./renderer": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    },
+    "./preload": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    }
+  },
+  "types": "./index.d.ts"
+}

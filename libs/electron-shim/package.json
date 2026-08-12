@@ -1,0 +1,14 @@
+{
+  "name": "electron",
+  "version": "0.0.0-tui-shim",
+  "description": "Node implementation of the electron API subset used by Aperant src/main \u2014 lets the agent runtime run outside Electron. Not a mock of app logic: paths are real, ipcMain is a real registry, windows simply do not exist in a TUI.",
+  "type": "module",
+  "main": "./index.js",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    }
+  },
+  "types": "./index.d.ts"
+}

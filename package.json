@@ -1,0 +1,22 @@
+{
+  "name": "aperant-tui-workspace",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Aperant TUI — Ink/React terminal renderer over the Aperant TypeScript agent runtime",
+  "workspaces": [
+    "apps/tui",
+    "libs/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w @aperant/tui",
+    "build": "npm run build -w @aperant/tui",
+    "start": "npm run start -w @aperant/tui",
+    "test": "npm test -w @aperant/tui",
+    "typecheck": "npm run typecheck -w @aperant/tui"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
+  "license": "AGPL-3.0"
+}
