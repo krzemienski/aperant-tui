@@ -12,6 +12,8 @@
 
 import { Worker } from 'worker_threads';
 import path from 'path';
+// [APERANT-PATCH worker-path]
+import { existsSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { EventEmitter } from 'events';
 import { app } from 'electron';
@@ -39,6 +41,11 @@ const __dirname = path.dirname(__filename);
  * Handles both dev (source via electron-vite) and production (bundled) paths.
  */
 function resolveWorkerPath(): string {
+  // [APERANT-PATCH worker-path]: explicit worker bundle path override for
+  // non-Electron runtimes (TUI). The bundle is produced by tools/build-worker.mjs.
+  if (process.env.APERANT_WORKER_PATH && existsSync(process.env.APERANT_WORKER_PATH)) {
+    return process.env.APERANT_WORKER_PATH;
+  }
   if (app.isPackaged) {
     // Production: worker is inside app.asar at out/main/ai/agent/worker.js
     return path.join(process.resourcesPath, 'app.asar', 'out', 'main', 'ai', 'agent', 'worker.js');

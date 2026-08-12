@@ -4,3 +4,4 @@ out/
 *.log
 .e2e-tmp/
 .DS_Store
+apps/tui/dist/

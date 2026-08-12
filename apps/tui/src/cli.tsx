@@ -21,6 +21,14 @@ if (!process.env.SHELL || !fs.existsSync(process.env.SHELL)) {
   }
 }
 
+// Point the vendored worker-bridge at the esbuild-bundled agent worker
+// (tools/build-worker.mjs). The vendored default path expects an
+// electron-vite build tree that does not exist in the TUI runtime.
+if (!process.env.APERANT_WORKER_PATH) {
+  const candidate = path.resolve(__dirname, '../dist/agent-worker.cjs');
+  if (fs.existsSync(candidate)) process.env.APERANT_WORKER_PATH = candidate;
+}
+
 const args = process.argv.slice(2);
 
 if (args.includes('--help') || args.includes('-h')) {

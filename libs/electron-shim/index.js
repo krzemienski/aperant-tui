@@ -68,7 +68,14 @@ export const app = {
   },
   getAppPath() {
     // The vendored desktop package root — two levels up from libs/electron-shim.
-    return realpathSync(new URL('../../apps/desktop', import.meta.url).pathname);
+    // Dual-format safe: esbuild CJS bundles (agent worker) have no import.meta.
+    let shimDir;
+    try { shimDir = realpathSync(new URL('../../apps/desktop', import.meta.url).pathname); }
+    catch {
+      // CJS bundle (esbuild worker): __dirname = apps/tui/dist → repo root is ../..
+      shimDir = realpathSync(path.resolve(__dirname, '../../apps/desktop'));
+    }
+    return shimDir;
   },
   getVersion() {
     return process.env.APERANT_TUI_VERSION || '0.1.0';
