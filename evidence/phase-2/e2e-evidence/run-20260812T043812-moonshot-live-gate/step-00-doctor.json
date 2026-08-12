@@ -1,7 +1,7 @@
 {
   "ok": true,
   "command": "doctor",
-  "timestamp": "2026-08-12T03:57:49.156Z",
+  "timestamp": "2026-08-12T04:38:13.987Z",
   "result": {
     "ok": true,
     "checks": {
@@ -10,54 +10,54 @@
           "name": "node-runtime",
           "status": "pass",
           "message": "Node 24.12.0 ok",
-          "durationMs": 0
+          "durationMs": 1
         },
         {
           "name": "cwd-access",
           "status": "pass",
           "message": "cwd read/write: /tmp/build/aperant-tui",
-          "durationMs": 1
+          "durationMs": 0
         },
         {
           "name": "temp-dir",
           "status": "pass",
           "message": "temp dir ok: /tmp",
-          "durationMs": 67
+          "durationMs": 48
         },
         {
           "name": "home_isolation",
           "status": "pass",
           "message": "agent-tty home is isolated from system home: /tmp/agent-tty-home",
-          "durationMs": 1
+          "durationMs": 0
         },
         {
           "name": "home-writable",
           "status": "pass",
           "message": "home writable: /tmp/agent-tty-home",
-          "durationMs": 33
+          "durationMs": 42
         },
         {
           "name": "pty-spawn",
           "status": "pass",
           "message": "spawned /home/kimi/node24/bin/node",
-          "durationMs": 35
+          "durationMs": 32
         },
         {
           "name": "socket-viable",
           "status": "pass",
-          "message": "socket ok: /tmp/agent-tty/79a18ce9/b8615de8e71a",
+          "message": "socket ok: /tmp/agent-tty/79a18ce9/38ea7bccd342",
           "durationMs": 6
         },
         {
           "name": "artifact-atomicity",
           "status": "pass",
-          "message": "atomic rename ok: /tmp/agent-tty-home/sessions/doctor-3698-mspk6inr-3/artifacts",
+          "message": "atomic rename ok: /tmp/agent-tty-home/sessions/doctor-8966-msplmjft-3/artifacts",
           "durationMs": 3
         },
         {
           "name": "event-log-writable",
           "status": "pass",
-          "message": "append ok: /tmp/agent-tty-home/sessions/doctor-3698-mspk6inu-5/events.jsonl",
+          "message": "append ok: /tmp/agent-tty-home/sessions/doctor-8966-msplmjfw-5/events.jsonl",
           "durationMs": 2
         }
       ],
@@ -66,7 +66,7 @@
           "name": "playwright_available",
           "status": "pass",
           "message": "available",
-          "durationMs": 1
+          "durationMs": 0
         },
         {
           "name": "browser_cache_accessible",
@@ -78,7 +78,7 @@
           "name": "browser_launch",
           "status": "pass",
           "message": "chromium launches",
-          "durationMs": 2507
+          "durationMs": 194
         },
         {
           "name": "ghostty_web_available",
@@ -90,7 +90,7 @@
           "name": "screenshot_viable",
           "status": "pass",
           "message": "viable",
-          "durationMs": 274
+          "durationMs": 297
         },
         {
           "name": "libghostty_vt_available",

@@ -10,6 +10,7 @@ const HINTS: Record<ViewName, string> = {
   chat: '⏎ send · / history search',
   tree: 'd diff · m merge · p PR · D discard',
   set: 'j/k select theme · ⏎ apply · a add Moonshot acct',
+  agents: '1-6 sub-view · j/k select · ⏎ inspect · f filter · r resume',
   logs: '↑↓ scroll · esc back',
 };
 

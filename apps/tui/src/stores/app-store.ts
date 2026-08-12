@@ -3,8 +3,8 @@ import { create } from 'zustand';
 import { THEME_NAMES, DEFAULT_THEME } from '../theme/themes';
 import { loadConfig, updateConfig } from '../services/config-service';
 
-export type ViewName = 'board' | 'term' | 'road' | 'chat' | 'tree' | 'set' | 'logs';
-export const VIEWS: ViewName[] = ['board', 'term', 'road', 'chat', 'tree', 'set'];
+export type ViewName = 'board' | 'term' | 'road' | 'chat' | 'tree' | 'set' | 'agents' | 'logs';
+export const VIEWS: ViewName[] = ['board', 'term', 'road', 'chat', 'tree', 'set', 'agents'];
 
 interface AppState {
   view: ViewName;

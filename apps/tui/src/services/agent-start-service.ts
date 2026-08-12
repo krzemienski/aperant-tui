@@ -15,6 +15,7 @@ import type { Project, Task } from '@shared/types';
 import { appendFileSync, mkdirSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { observability } from './observability';
 
 export interface StartOutcome {
   ok: boolean;
@@ -142,6 +143,7 @@ export async function startTask(project: Project, task: Task): Promise<StartOutc
       detail: `vendored agent runtime unavailable: ${err instanceof Error ? err.message.split('\n')[0] : String(err)}`,
     };
   }
+  observability.attachToManager(am); // observability tap (swarm/trace/tokens views)
   return await new Promise<StartOutcome>((resolve) => {
     attachEventLog(am); // durable JSONL flight recorder — attached before start
     let settled = false;

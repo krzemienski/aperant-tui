@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "command": "wait",
+  "timestamp": "2026-08-12T04:39:55.147Z",
+  "result": {
+    "matched": true,
+    "timedOut": false,
+    "matchedText": "agent started",
+    "cursorRow": 31,
+    "cursorCol": 0,
+    "capturedAtSeq": 53,
+    "screenHash": "7d6ab8d6e579ad4755a889391d3768a30873ce014764d3a05fb7c172e317e8bf"
+  }
+}

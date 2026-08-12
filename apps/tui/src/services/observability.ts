@@ -199,21 +199,25 @@ export class ObservabilityService extends EventEmitter {
     return agentId ? all.filter((e) => e.agentId === agentId) : all;
   }
 
-  /** Write a RESUME sentinel into the agent's spec dir (spec §6.6 — the intervention). */
+  /**
+   * Write a RESUME sentinel for the agent (spec §6.6 — the intervention).
+   * Targets the spec dir that actually holds the pause sentinel (a worktree
+   * spec dir when the agent runs in one); falls back to the first existing
+   * candidate. This is the same file pause-handler.ts polls for.
+   */
   writeResumeSentinel(taskId: string): { ok: boolean; path?: string; reason?: string } {
     if (!this.deps) return { ok: false, reason: 'observability not configured' };
-    for (const dir of this.deps.specDirCandidates(taskId)) {
-      if (existsSync(dir)) {
-        const p = path.join(dir, 'RESUME');
-        try {
-          writeFileSync(p, new Date().toISOString() + '\n');
-          return { ok: true, path: p };
-        } catch (err) {
-          return { ok: false, reason: String(err) };
-        }
-      }
+    const candidates = this.deps.specDirCandidates(taskId).filter((d) => existsSync(d));
+    const paused = candidates.find((d) => existsSync(path.join(d, 'RATE_LIMIT_PAUSE')) || existsSync(path.join(d, 'AUTH_PAUSE')));
+    const target = paused ?? candidates[0];
+    if (!target) return { ok: false, reason: 'no live spec dir for task' };
+    const p = path.join(target, 'RESUME');
+    try {
+      writeFileSync(p, new Date().toISOString() + '\n');
+      return { ok: true, path: p };
+    } catch (err) {
+      return { ok: false, reason: String(err) };
     }
-    return { ok: false, reason: 'no live spec dir for task' };
   }
 
   // -------------------------------------------------------------------------

@@ -4,7 +4,7 @@ import type { Theme } from '../theme/themes';
 import { VIEWS, type ViewName } from '../stores/app-store';
 
 const TAB_LABELS: Record<ViewName, string> = {
-  board: '1 board', term: '2 term', road: '3 road', chat: '4 chat', tree: '5 tree', set: '6 set', logs: 'L logs',
+  board: '1 board', term: '2 term', road: '3 road', chat: '4 chat', tree: '5 tree', set: '6 set', agents: '7 agents', logs: 'L logs',
 };
 
 export function TabBar({ view, theme: c }: { view: ViewName; theme: Theme }) {

@@ -19,15 +19,20 @@ import { InsightsView } from './views/InsightsView';
 import { WorktreeView } from './views/WorktreeView';
 import { SettingsView } from './views/SettingsView';
 import { LogsView } from './views/LogsView';
+import { AgentsView } from './views/AgentsView';
 import { openProject, type OpenedProject } from './services/project-service';
 import { getTasks, getCounts, refreshTasks } from './services/task-service';
 import { readSettingsFile } from '@main/settings-utils';
+import { observability } from './services/observability';
+import { getSpecsDir } from '@shared/constants';
+import { existsSync, readFileSync } from 'node:fs';
+import path from 'node:path';
 
 interface AppProps {
   projectPath: string;
 }
 
-const VIEW_KEYS: Record<string, ViewName> = { '1': 'board', '2': 'term', '3': 'road', '4': 'chat', '5': 'tree', '6': 'set' };
+const VIEW_KEYS: Record<string, ViewName> = { '1': 'board', '2': 'term', '3': 'road', '4': 'chat', '5': 'tree', '6': 'set', '7': 'agents' };
 
 export function App({ projectPath }: AppProps) {
   const { exit } = useApp();
@@ -80,8 +85,38 @@ export function App({ projectPath }: AppProps) {
 
   const paletteCtx: PaletteContext = useMemo(() => ({ openProject: doOpenProject, quit }), [doOpenProject, quit]);
 
+  // Observability tap configuration: where sentinel files live for a task
+  // (main spec dir + task worktree spec dir) and where task metadata reads.
+  useEffect(() => {
+    if (!opened?.project) return;
+    const project = opened.project;
+    const specsRel = getSpecsDir(project.autoBuildPath);
+    observability.configure({
+      specDirCandidates: (taskId) => [
+        path.join(project.path, specsRel, taskId),
+        path.join(project.path, '.auto-claude', 'worktrees', 'tasks', taskId, specsRel, taskId),
+      ],
+      taskMeta: (taskId) => {
+        for (const dir of [
+          path.join(project.path, specsRel, taskId),
+          path.join(project.path, '.auto-claude', 'worktrees', 'tasks', taskId, specsRel, taskId),
+        ]) {
+          const metaPath = path.join(dir, 'task_metadata.json');
+          if (existsSync(metaPath)) {
+            try {
+              return JSON.parse(readFileSync(metaPath, 'utf-8')) as { model?: string; provider?: string };
+            } catch { return null; }
+          }
+        }
+        return null;
+      },
+    });
+  }, [opened]);
+
   const overlaysOpen = paletteOpen || helpOpen;
   useKeymap({
+    // Digit tab-switching yields inside the agents view, whose own 1-6 keys
+    // select observability sub-views (D4 lesson: dispatch, don't freeze).
     ...Object.fromEntries(Object.entries(VIEW_KEYS).map(([k, v]) => [k, () => store.setView(v)])),
     ':': () => store.openPalette(),
     '?': () => store.toggleHelp(),
@@ -92,7 +127,20 @@ export function App({ projectPath }: AppProps) {
       store.flash('press ctrl+c again to quit');
       setTimeout(() => { ctrlCArmed.current = false; }, 1500);
     },
-  }, { isActive: !overlaysOpen });
+  }, { isActive: !overlaysOpen && view !== 'agents' });
+
+  // While the agents view is active, only the non-digit globals live here.
+  useKeymap({
+    ':': () => store.openPalette(),
+    '?': () => store.toggleHelp(),
+    escape: () => store.closeOverlays(),
+    'ctrl+c': () => {
+      if (ctrlCArmed.current) { quit(); return; }
+      ctrlCArmed.current = true;
+      store.flash('press ctrl+c again to quit');
+      setTimeout(() => { ctrlCArmed.current = false; }, 1500);
+    },
+  }, { isActive: !overlaysOpen && view === 'agents' });
 
   // Palette open: Esc closes (TextInput consumes Enter itself).
   useInput((input, key) => {
@@ -136,6 +184,7 @@ export function App({ projectPath }: AppProps) {
         {!helpOpen && view === 'chat' && <InsightsView theme={theme} project={opened.project} />}
         {!helpOpen && view === 'tree' && <WorktreeView theme={theme} project={opened.project} isActive={viewActive} />}
         {!helpOpen && view === 'set' && <SettingsView theme={theme} isActive={viewActive} />}
+        {!helpOpen && view === 'agents' && <AgentsView theme={theme} project={opened.project} isActive={viewActive} />}
         {!helpOpen && view === 'logs' && <LogsView theme={theme} task={logsTask} isActive={viewActive} onBack={() => store.setView('board')} />}
       </Box>
       {paletteOpen ? <CommandPalette theme={theme} ctx={paletteCtx} /> : <StatusLine view={view} theme={theme} />}
