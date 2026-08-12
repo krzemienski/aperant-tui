@@ -75,8 +75,20 @@ export interface FinishStepPart {
   type: 'finish-step';
   finishReason?: string;
   usage?: {
-    promptTokens: number;
-    completionTokens: number;
+    // AI SDK v6 shape
+    promptTokens?: number;
+    completionTokens?: number;
+    cacheReadTokens?: number;
+    cacheCreationTokens?: number;
+    // [APERANT-PATCH sdk-v7-usage]: AI SDK v7 normalized shape
+    inputTokens?: number;
+    outputTokens?: number;
+    inputTokenDetails?: {
+      noCacheTokens?: number;
+      cacheReadTokens?: number;
+      cacheWriteTokens?: number;
+    };
+    outputTokenDetails?: { reasoningTokens?: number };
   };
 }
 
@@ -237,20 +249,33 @@ export function createStreamHandler(onEvent: SessionEventCallback) {
   function handleFinishStep(part: FinishStepPart): void {
     state.stepNumber++;
 
-    // AI SDK v6 finish-step usage: promptTokens/completionTokens
-    const promptTokens = part.usage?.promptTokens ?? 0;
-    const completionTokens = part.usage?.completionTokens ?? 0;
+    // [APERANT-PATCH sdk-v7-usage]: v7 normalized usage uses
+    // inputTokens/outputTokens (+ cache details); v6 used
+    // promptTokens/completionTokens. Read both — v7 first.
+    // (Caught by the live gate: v6-only reads silently recorded 0 tokens.)
+    const u = part.usage;
+    const promptTokens = u?.inputTokens ?? u?.promptTokens ?? 0;
+    const completionTokens = u?.outputTokens ?? u?.completionTokens ?? 0;
     const totalTokens = promptTokens + completionTokens;
+    const cacheRead = u?.inputTokenDetails?.cacheReadTokens ?? u?.cacheReadTokens;
+    const cacheCreate = u?.inputTokenDetails?.cacheWriteTokens ?? u?.cacheCreationTokens;
+    const thinking = u?.outputTokenDetails?.reasoningTokens;
 
     // Accumulate usage
     state.cumulativeUsage.promptTokens += promptTokens;
     state.cumulativeUsage.completionTokens += completionTokens;
     state.cumulativeUsage.totalTokens += totalTokens;
+    if (cacheRead) state.cumulativeUsage.cacheReadTokens = (state.cumulativeUsage.cacheReadTokens ?? 0) + cacheRead;
+    if (cacheCreate) state.cumulativeUsage.cacheCreationTokens = (state.cumulativeUsage.cacheCreationTokens ?? 0) + cacheCreate;
+    if (thinking) state.cumulativeUsage.thinkingTokens = (state.cumulativeUsage.thinkingTokens ?? 0) + thinking;
 
     const stepUsage: TokenUsage = {
       promptTokens,
       completionTokens,
       totalTokens,
+      ...(cacheRead !== undefined ? { cacheReadTokens: cacheRead } : {}),
+      ...(cacheCreate !== undefined ? { cacheCreationTokens: cacheCreate } : {}),
+      ...(thinking !== undefined ? { thinkingTokens: thinking } : {}),
     };
 
     emit({

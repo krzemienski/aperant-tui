@@ -1,0 +1,20 @@
+{
+  "ok": true,
+  "command": "screenshot",
+  "timestamp": "2026-08-12T05:43:55.341Z",
+  "result": {
+    "sessionId": "01KZT7Y393M1W3HNPDD2P1WVN2",
+    "capturedAtSeq": 62,
+    "profileName": "reference-dark",
+    "cols": 110,
+    "rows": 32,
+    "artifactPath": "/tmp/agent-tty-home/sessions/01KZT7Y393M1W3HNPDD2P1WVN2/artifacts/screenshot-62-reference-dark.png",
+    "pngSizeBytes": 72939,
+    "cursorVisible": false,
+    "rendererBackend": "ghostty-web",
+    "pixelWidth": 880,
+    "pixelHeight": 512,
+    "sha256": "7bfd8272376ede4354ea69251bdc2770b90ff5762d143850cc42fe5410c89ac3",
+    "renderProfileHash": "8ffed6af301ec7c0e6b69599c3be0d1d12096f9fcdfc59d0bbb4cc474d64c53d"
+  }
+}

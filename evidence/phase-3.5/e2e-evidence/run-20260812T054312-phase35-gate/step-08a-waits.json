@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "command": "wait",
+  "timestamp": "2026-08-12T05:45:14.824Z",
+  "result": {
+    "matched": true,
+    "timedOut": false,
+    "matchedText": "BLOCKING ANALYSIS",
+    "cursorRow": 31,
+    "cursorCol": 0,
+    "capturedAtSeq": 432,
+    "screenHash": "bbfb38b96ab93c73e79d95c542ff1520fa7e935d36b239a3f330ea1aff687f75"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "command": "wait",
+  "timestamp": "2026-08-12T05:52:48.953Z",
+  "result": {
+    "matched": true,
+    "timedOut": false,
+    "matchedText": "002-fix-terminal-blank",
+    "cursorRow": 26,
+    "cursorCol": 0,
+    "capturedAtSeq": 28,
+    "screenHash": "caaf0cdfc6afd9844e637fa6e59651790d9ddd348aa7db703e26a683f6943d66"
+  }
+}

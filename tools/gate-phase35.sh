@@ -65,7 +65,10 @@ step 4 "INSPECT view — identity + tool grants byte-match AGENT_CONFIGS (early:
 $ATTY send-keys "$S1" 3 --json > /dev/null 2>&1; sleep 2
 wait_assert "$S1" "TOOL GRANTS" 20000 "$RUN/step-04a-inspect.json"
 wait_assert "$S1" "thinking:high" 10000 "$RUN/step-04b-thinking.json"
-wait_assert "$S1" "structured" 10000 "$RUN/step-04c-provenance.json"
+# planning has no structured event in the vendored worker (only PLANNING_FAILED) —
+# the honest provenance marker at this point IS '~ inferred'; '▪ structured' appears
+# once CODING_STARTED lands (verified in the step-09 event census).
+wait_assert "$S1" "inferred" 10000 "$RUN/step-04c-provenance.json"
 shot "$S1" step-04d-inspect-shot.json
 python3 - > "$RUN/step-04e-grants-bytematch.txt" <<EOF
 import subprocess, json

@@ -1,0 +1,13 @@
+{
+  "ok": false,
+  "command": "record export",
+  "timestamp": "2026-08-12T05:54:49.448Z",
+  "error": {
+    "code": "INVALID_INPUT",
+    "message": "Record export format must be one of: asciicast, webm.",
+    "retryable": false,
+    "details": {
+      "format": "cast"
+    }
+  }
+}

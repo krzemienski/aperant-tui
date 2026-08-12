@@ -1,0 +1,14 @@
+{
+  "ok": true,
+  "command": "wait",
+  "timestamp": "2026-08-12T05:43:51.164Z",
+  "result": {
+    "matched": true,
+    "timedOut": false,
+    "matchedText": "AGENT SWARM",
+    "cursorRow": 31,
+    "cursorCol": 0,
+    "capturedAtSeq": 59,
+    "screenHash": "76643df3406b20140ebf66493fdbea894527cf47ad67494effd84f2004adecf9"
+  }
+}

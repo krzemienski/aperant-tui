@@ -1,0 +1,2 @@
+total: 939 {'execution-progress': 467, 'log': 7, 'task-event': 1, 'stream-event': 464}
+stream kinds: {'thinking-delta': 434, 'tool-call': 9, 'tool-result': 9, 'step-finish': 6, 'usage-update': 6}

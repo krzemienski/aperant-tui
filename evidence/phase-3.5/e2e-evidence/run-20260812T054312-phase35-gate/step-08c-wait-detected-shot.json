@@ -1,0 +1,15 @@
+{
+  "ok": false,
+  "command": "screenshot",
+  "timestamp": "2026-08-12T05:45:27.791Z",
+  "error": {
+    "code": "HOST_TIMEOUT",
+    "message": "RPC request timed out after 5000ms.",
+    "retryable": true,
+    "details": {
+      "method": "screenshot",
+      "socketPath": "/tmp/agent-tty/79a18ce9/9d951a6ed7c7",
+      "timeoutMs": 5000
+    }
+  }
+}
