@@ -1,0 +1,54 @@
+[
+  {
+    "id": "003-content-aware-evidence-assertions-with-hash-record",
+    "type": "planner",
+    "taskId": "003-content-aware-evidence-assertions-with-hash-record",
+    "phase": "failed",
+    "phaseSource": "structured",
+    "state": "error",
+    "parentId": null,
+    "depth": 0,
+    "model": "default",
+    "thinkingLevel": "high",
+    "stepsExecuted": 12,
+    "maxSteps": 1000,
+    "sessionNumber": 1,
+    "continuationCount": 0,
+    "usage": {
+      "promptTokens": 450558,
+      "completionTokens": 5389,
+      "totalTokens": 455947,
+      "thinkingTokens": 1877,
+      "cacheReadTokens": 0,
+      "cacheCreationTokens": 0
+    },
+    "contextWindowLimit": 200000,
+    "tools": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Write",
+      "Edit",
+      "Bash",
+      "WebFetch",
+      "WebSearch"
+    ],
+    "mcpServers": [
+      "context7",
+      "memory",
+      "auto-claude"
+    ],
+    "autoClaudeTools": [
+      "mcp__auto-claude__get_build_progress",
+      "mcp__auto-claude__get_session_context",
+      "mcp__auto-claude__record_discovery"
+    ],
+    "waiting": {
+      "kind": "context",
+      "usagePct": 225.3,
+      "willCompact": true
+    },
+    "startedAt": 1789534258000,
+    "lastMessage": "Stream inactivity timeout — no data received from provider for 60s"
+  }
+]

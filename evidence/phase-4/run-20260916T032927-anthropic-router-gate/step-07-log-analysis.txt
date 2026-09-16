@@ -1,0 +1,8 @@
+total events: 642
+pre-fix 001 (04:37): 12 events {'execution-progress': 3, 'log': 6, 'task-event': 1, 'error': 1, 'exit': 1}
+post-fix 001 (04:43-44): 105 events {'execution-progress': 51, 'log': 6, 'stream-event': 48}
+002 (04:47-04:50): 485 events {'execution-progress': 221, 'log': 50, 'stream-event': 213, 'task-event': 1}
+003 (04:52+): 40 events {'execution-progress': 20, 'stream-event': 18, 'log': 1, 'task-event': 1}
+phase failed at 2026-09-16T04:37:40.285Z Phase: failed \u2014 Implementation plan is invalid and cannot be executed: At \"phases\": array must have at least 1 it
+phase failed at 2026-09-16T04:49:42.970Z Phase: failed \u2014 Stream inactivity timeout \u2014 no data received from provider for 60s", "vigil-loop"]}
+phase failed at 2026-09-16T04:53:14.921Z Phase: failed \u2014 Stream inactivity timeout \u2014 no data received from provider for 60s", "vigil-loop"]}

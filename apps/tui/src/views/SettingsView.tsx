@@ -11,7 +11,7 @@ import { useAppStore } from '../stores/app-store';
 import { useKeymap } from '../hooks/useKeymap';
 import { getConfigPath } from '../services/config-service';
 import { getSettingsPath, readSettingsFile } from '@main/settings-utils';
-import { listProviderAccounts, provisionMoonshotAccount } from '../services/account-service';
+import { listProviderAccounts, provisionAnthropicAccount, provisionMoonshotAccount } from '../services/account-service';
 
 export function SettingsView({ theme: c, isActive }: { theme: Theme; isActive: boolean }) {
   const themeName = useAppStore((s) => s.themeName);
@@ -26,9 +26,18 @@ export function SettingsView({ theme: c, isActive }: { theme: Theme; isActive: b
     down: () => cycleTheme(1),
     up: () => cycleTheme(-1),
     return: () => setTheme(themeName), // persists (already live-applied on cycle)
-    // Provision a Moonshot (Kimi) account from the environment — REAL write to
-    // settings.json in the exact shape the vendored AgentManager queue reads.
+    // Provision an account from the environment — REAL write to settings.json
+    // in the exact shape the vendored AgentManager queue reads. `a` targets
+    // the Anthropic-compatible router (ANTHROPIC_AUTH_TOKEN/ANTHROPIC_BASE_URL);
+    // `m` keeps the Moonshot (Kimi) path (MOONSHOT_API_KEY/…_BASE_URL).
     a: () => {
+      const r = provisionAnthropicAccount();
+      setAccountFlash(r.ok
+        ? { ok: true, msg: `anthropic account ${r.updated ? 'updated' : 'added'}: ${r.accountId} → ${r.baseUrl}` }
+        : { ok: false, msg: `not provisioned: ${r.reason}` });
+      setAccountsVersion((v) => v + 1);
+    },
+    m: () => {
       const r = provisionMoonshotAccount();
       setAccountFlash(r.ok
         ? { ok: true, msg: `moonshot account ${r.updated ? 'updated' : 'added'}: ${r.accountId} → ${r.baseUrl}` }
@@ -77,7 +86,7 @@ export function SettingsView({ theme: c, isActive }: { theme: Theme; isActive: b
         </Panel>
         <Panel title="ACCOUNTS" theme={c} flexGrow={1}>
           {accounts.length === 0 ? (
-            <Text color={c.faint}>no provider accounts — press a to add Moonshot (Kimi) from env</Text>
+            <Text color={c.faint}>no provider accounts — press a (anthropic router) or m (moonshot) from env</Text>
           ) : (
             accounts.map((a) => (
               <Box key={a.id} gap={1}>
@@ -91,7 +100,7 @@ export function SettingsView({ theme: c, isActive }: { theme: Theme; isActive: b
           {accountFlash ? (
             <Text color={accountFlash.ok ? c.ok : c.err} wrap="truncate-end">{accountFlash.msg}</Text>
           ) : null}
-          <Text color={c.dim}>a add/update Moonshot (Kimi) from env · writes settings.json · queue-priority first</Text>
+          <Text color={c.dim}>a add/update Anthropic router from env · m Moonshot (Kimi) · writes settings.json · queue-priority first</Text>
         </Panel>
       </Box>
     </Box>

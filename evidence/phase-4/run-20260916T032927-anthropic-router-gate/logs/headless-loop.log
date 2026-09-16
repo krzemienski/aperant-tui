@@ -1,0 +1,344 @@
+[setup] settings path: /tmp/p4-loop-ud/settings.json
+[provision] ok account=anthropic-mu3lmjgx baseUrl=https://router.hack.ski
+[roadmap] analyzing 10% — Starting roadmap generation...   [roadmap] discovery 30% — Running discovery phase...   APICallError [AI_APICallError]: Not Found
+    at <anonymous> (/Users/nick/dev/aperant-tui/node_modules/@ai-sdk/provider-utils/src/response-handler.ts:88:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async postToApi (/Users/nick/dev/aperant-tui/node_modules/@ai-sdk/provider-utils/src/post-to-api.ts:118:28)
+    at async postJsonToApi (/Users/nick/dev/aperant-tui/node_modules/@ai-sdk/provider-utils/src/post-to-api.ts:31:3)
+    at async _AnthropicMessagesBatchLanguageModel.doStream (/Users/nick/dev/aperant-tui/node_modules/@ai-sdk/anthropic/src/anthropic-language-model.ts:1542:50)
+    at async execute (/Users/nick/dev/aperant-tui/node_modules/ai/src/generate-text/stream-language-model-call.ts:351:7)
+    at async runWithTracingChannelSpan (/Users/nick/dev/aperant-tui/node_modules/ai/src/telemetry/tracing-channel-publisher.ts:76:12)
+    at async executeLanguageModelCall (/Users/nick/dev/aperant-tui/node_modules/ai/src/telemetry/create-telemetry-dispatcher.ts:184:14)
+    at async streamLanguageModelCall (/Users/nick/dev/aperant-tui/node_modules/ai/src/generate-text/stream-language-model-call.ts:348:7)
+    at async retryWithExponentialBackoffInternal (/Users/nick/dev/aperant-tui/node_modules/@ai-sdk/provider-utils/src/retry-with-exponential-backoff.ts:87:12) {
+  cause: undefined,
+  url: 'https://router.hack.ski/messages',
+  requestBodyValues: {
+    model: 'cc/claude-opus-5',
+    max_tokens: 128000,
+    temperature: undefined,
+    top_k: undefined,
+    top_p: undefined,
+    stop_sequences: undefined,
+    system: [ [Object] ],
+    messages: [ [Object] ],
+    tools: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ],
+    tool_choice: { type: 'auto', disable_parallel_tool_use: undefined },
+    stream: true
+  },
+  statusCode: 404,
+  responseHeaders: {
+    'alt-svc': 'h3=":443"; ma=86400',
+    'cache-control': 'private, no-cache, no-store, max-age=0, must-revalidate',
+    'cf-cache-status': 'DYNAMIC',
+    'cf-ray': 'a3bd1d502f4a012e-EWR',
+    connection: 'keep-alive',
+    'content-encoding': 'br',
+    'content-security-policy': "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; media-src 'self' data: blob:; connect-src 'self' http://localhost:* http://127.0.0.1:* ws://localhost:* ws://127.0.0.1:* https: ws: wss:; worker-src 'self' blob:; manifest-src 'self'",
+    'content-type': 'text/html; charset=utf-8',
+    date: 'Wed, 16 Sep 2026 04:26:42 GMT',
+    nel: '{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}',
+    'permissions-policy': 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), serial=()',
+    'referrer-policy': 'strict-origin-when-cross-origin',
+    'report-to': '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=EiitxADPXp5q4gXq6znzQ%2FRXGbKlYFDA3j0atrbDrQlfvkvR8N8TB414sue7qbXsvebFfM6P%2FDrwcnAoUL6GXqgmay9OWiO3MjbZcsFNXi3yar6ceIztRy4Nw9OEdkCKTMo%3D"}]}',
+    server: 'cloudflare',
+    'strict-transport-security': 'max-age=63072000; includeSubDomains; preload',
+    'transfer-encoding': 'chunked',
+    vary: 'rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Accept-Encoding',
+    'x-content-type-options': 'nosniff',
+    'x-frame-options': 'DENY',
+    'x-powered-by': 'Next.js'
+  },
+  responseBody: '<!DOCTYPE html><html lang="en" dir="ltr"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/><link rel="stylesheet" href="/_next/static/chunks/1vpmbl4hekwi8.css" data-precedence="next"/><link rel="stylesheet" href="/_next/static/chunks/1u_9znff49tlh.css" data-precedence="next"/><link rel="preload" as="script" fetchPriority="low" href="/_next/static/chunks/2m5a65cn7-g0k.js"/><script src="/_next/static/chunks/26g4tn5b226u5.js" async=""></script><script src="/_next/static/chunks/2-f08ea-ihvso.js" async=""></script><script src="/_next/static/chunks/1a9yct252he6q.js" async=""></script><script src="/_next/static/chunks/turbopack-2nnyng7tv74wc.js" async=""></script><script src="/_next/static/chunks/3fq09gag9f-sz.js" async="" crossorigin=""></script><script src="/_next/static/chunks/2eeo6fwxs_kaz.js" async="" crossorigin=""></script><script src="/_next/static/chunks/3fdlv012m_v03.js" async="" crossorigin=""></script><script src="/_next/static/chunks/1gj597f6jeu-_.js" async="" crossorigin=""></script><script src="/_next/static/chunks/056l27djj62hh.js" async="" crossorigin=""></script><script src="/_next/static/chunks/1i5np61-_fgfa.js" async="" crossorigin=""></script><script src="/_next/static/chunks/1m3v6x512hwcy.js" async="" crossorigin=""></script><script src="/_next/static/chunks/0kosn528b0pum.js" async="" crossorigin=""></script><script src="/_next/static/chunks/1_v3biv0xhtgv.js" async="" crossorigin=""></script><meta name="robots" content="noindex"/><meta name="theme-color" content="#0b0f1a"/><title>OmniRoute — AI Gateway for Multi-Provider LLMs</title><meta name="description" content="OmniRoute is an AI gateway for multi-provider LLMs. One endpoint for all your AI providers."/><meta name="application-name" content="OmniRoute"/><link rel="manifest" href="/manifest.webmanifest"/><meta name="mobile-web-app-capable" content="yes"/><meta name="mobile-web-app-capable" content="yes"/><meta name="apple-mobile-web-app-title" content="OmniRoute"/><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/><link rel="icon" href="/favicon.ico" sizes="any"/><link rel="icon" href="/favicon.svg" type="image/svg+xml"/><link rel="icon" href="/icon-512.png" type="image/png" sizes="512x512"/><link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" type="image/png"/><meta name="next-size-adjust" content=""/><script>\n' +
+    '              (function () {\n' +
+    '                var ATTRS = ["bis_skin_checked", "data-google-query-id", "data-new-gr-c-s-check-loaded", "data-gr-ext-installed", "data-lt-installed", "data-lt-tmp-id"];\n' +
+    '                function strip(el) {\n' +
+    '                  for (var i = 0; i < ATTRS.length; i++) {\n' +
+    '                    if (el.hasAttribute(ATTRS[i])) el.removeAttribute(ATTRS[i]);\n' +
+    '                  }\n' +
+    '                }\n' +
+    '                strip(document.documentElement);\n' +
+    '                if (typeof MutationObserver === "undefined") return;\n' +
+    '                var obs = new MutationObserver(function (muts) {\n' +
+    '                  for (var i = 0; i < muts.length; i++) {\n' +
+    '                    var m = muts[i];\n' +
+    '                    if (m.type === "attributes" && ATTRS.indexOf(m.attributeName) !== -1) {\n' +
+    '                      m.target.removeAttribute(m.attributeName);\n' +
+    '                    }\n' +
+    '                  }\n' +
+    '                });\n' +
+    '                obs.observe(document.documentElement, { attributes: true, subtree: true, attributeFilter: ATTRS });\n' +
+    '                setTimeout(function () { obs.disconnect(); }, 5000);\n' +
+    '              })();\n' +
+    '            </script><script>\n' +
+    "              if (typeof window !== 'undefined') {\n" +
+    '                if (!window.crypto) {\n' +
+    '                  window.crypto = {};\n' +
+    '                }\n' +
+    '                if (!window.crypto.randomUUID) {\n' +
+    '                  window.crypto.randomUUID = function() {\n' +
+    '                    if (window.crypto.getRandomValues) {\n' +
+    "                      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {\n" +
+    '                        const r = window.crypto.getRandomValues(new Uint8Array(1))[0] % 16;\n' +
+    "                        const v = c === 'x' ? r : (r & 0x3 | 0x8);\n" +
+    '                        return v.toString(16);\n' +
+    '                      });\n' +
+    '                    }\n' +
+    "                    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {\n" +
+    '                      const r = Math.random() * 16 | 0;\n' +
+    "                      const v = c === 'x' ? r : (r & 0x3 | 0x8);\n" +
+    '                      return v.toString(16);\n' +
+    '                    });\n' +
+    '                  };\n' +
+    '                }\n' +
+    '              }\n' +
+    '              try {\n' +
+    "                const stored = localStorage.getItem('theme');\n" +
+    '                const parsed = stored ? JSON.parse(stored) : null;\n' +
+    "                const theme = parsed?.state?.theme || 'system';\n" +
+    "                if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {\n" +
+    "                  document.documentElement.classList.add('dark');\n" +
+    '                } else {\n' +
+    "                  document.documentElement.classList.remove('dark');\n" +
+    '                }\n' +
+    '              } catch (e) {}\n' +
+    '            </script><script src="/_next/static/chunks/0cz1d0mv5g_q7.js" noModule=""></script></head><body class="inter_5901b7c6-module__ec5Qua__variable font-sans antialiased"><div hidden=""><!--$--><!--/$--></div><a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-[#6366f1] focus:text-white focus:rounded-lg focus:text-sm focus:font-semibold focus:shadow-lg">Skip to content</a><!--$--><div class="flex flex-col items-center justify-center min-h-screen p-6 bg-bg text-text-main text-center" role="main" aria-labelledby="not-found-title"><div class="text-[96px] font-extrabold leading-none mb-2 bg-gradient-to-br from-primary to-primary-hover bg-clip-text text-transparent" aria-hidden="true">404</div><h1 id="not-found-title" class="text-2xl font-semibold mb-2">Page not found</h1><p class="text-[15px] text-text-muted max-w-[400px] leading-relaxed mb-8">The page you&#x27;re looking for doesn&#x27;t exist or has been moved.</p><div class="flex flex-col sm:flex-row items-center gap-3"><a class="px-8 py-3 rounded-xl text-white text-sm font-medium no-underline transition-all duration-200 motion-reduce:transition-none shadow-warm hover:-translate-y-0.5 bg-gradient-to-br from-primary to-primary-hover hover:shadow-elevated focus:outline-2 focus:outline-offset-2 focus:outline-primary" aria-label="Return to dashboard" href="/dashboard">Go to Dashboard</a><a class="px-8 py-3 rounded-xl text-sm font-medium no-underline border border-border hover:bg-bg-alt transition-colors duration-200 motion-reduce:transition-none focus:outline-2 focus:outline-offset-2 focus:outline-primary" aria-label="Open system status page" href="/status">System Status</a></div></div><!--$--><!--/$--><!--/$--><script src="/_next/static/chunks/2m5a65cn7-g0k.js" id="_R_" async=""></script><script>(self.__next_f=self.__next_f||[]).push([0])</script><script>self.__next_f.push([1,"1:I[339756,[\\"/_next/static/chunks/3fq09gag9f-sz.js\\",\\"/_next/static/chunks/2eeo6fwxs_kaz.js\\",\\"/_next/static/chunks/3fdlv012m_v03.js\\"],\\"LoadingBoundaryProvider\\"]\\n2:I[654696,[\\"/_next/static/chunks/3fq09gag9f-sz.js\\",\\"/_next/static/chunks/2eeo6fwxs_kaz.js\\",\\"/_next/static/chunks/3fdlv012m_v03.js\\",\\"/_next/static/chunks/1gj597f6jeu-_.js\\",\\"/_next/static/chunks/056l27djj62hh.js\\"],\\"default\\"]\\n3:\\"$Sreact.fragment\\"\\n5:I[339756,[\\"/_next/static/chunks/3fq09gag9f-sz.js\\",\\"/_next/static/chunks/2eeo6fwxs_kaz.js\\",\\"/_next/static/chunks/3fdlv012m_v03.js\\"],\\"default\\"]\\n6:I[837457,[\\"/_next/static/chunks/3fq09gag9f-sz.js\\",\\"/_next/static/chunks/2eeo6fwxs_kaz.js\\",\\"/_next/static/chunks/3fdlv012m_v03.js\\"],\\"default\\"]\\n7:I[347257,[\\"/_next/static/chunks/3fq09gag9f-sz.js\\",\\"/_next/static/chunks/2eeo6fwxs_kaz.js\\",\\"/_next/static/chunks/3fdlv012m_v03.js\\"],\\"ClientPageRoot\\"]\\n8:I[329306,[\\"/_next/static/chunks/3fq09gag9f-sz.js\\",\\"/_next/static/chunks/2eeo6fwxs_kaz.js\\",\\"/_next/static/chunks/3fdlv012m_v03.js\\",\\"/_next/static/chunks/1i5np61-_fgfa.js\\"],\\"default\\"]\\n9:I[897367,[\\"/_next/static/chunks/3fq09gag9f-sz.js\\",\\"/_next/static/chunks/2eeo6fwxs_kaz.js\\",\\"/_next/static/chunks/3fdlv012m_v03.js\\"],\\"OutletBoundary\\"]\\na:\\"$Sreact.suspense\\"\\nd:I[897367,[\\"/_next/static/chunks/3fq09gag9f-sz.js\\",\\"/_next/static/chunks/2eeo6fwxs_kaz.js\\",\\"/_next/static/chunks/3fdlv012m_v03.js\\"],\\"ViewportBoundary\\"]\\nf:I[897367,[\\"/_next/static/chunks/3fq09gag9f-sz.js\\",\\"/_next/static/chunks/2eeo6fwxs_kaz.js\\",\\"/_next/static/chunks/3fdlv012m_v03.js\\"],\\"MetadataBoundary\\"]\\n11:I[563491,[\\"/_next/static/chunks/3fq09gag9f-sz.js\\",\\"/_next/static/chunks/2eeo6fwxs_kaz.js\\",\\"/_next/static/chunks/3fdlv012m_v03.js\\",\\"/_next/static/chunks/1m3v6x512hwcy.js\\",\\"/_next/static/chunks/0kosn528b0pum.js\\"],\\"default\\"]\\n:HL[\\"/_next/static/chunks/1vpmbl4hekwi8.css\\",\\"style\\"]\\n:HL[\\"/_next/static/chunks/1u_9znff49tlh.css\\",\\"style\\"]\\nc:X\\n0:{\\"P\\":null,\\"c\\":[\\"\\",\\"messages\\"],\\"q\\":\\"\\",\\"i\\":false,\\"f\\":[[[\\"\\",{\\"children\\":[\\"/_not-found\\",{\\"children\\":[\\"__PAGE__\\",{},\\"$undefined\\",\\"$undefined\\",4096]},\\"$undefined\\",\\"$undefined\\",4096]},\\"$undefined\\",\\"$undefined\\",4116],[[\\"$\\",\\"$L1\\",null,{\\"loading\\":[[\\"$\\",\\"$L2\\",\\"l\\",{}],[],[[\\"$\\",\\"script\\",\\"script-0\\",{\\"src\\":\\"/_next/static/chunks/1gj597f6jeu-_.js\\",\\"async\\":true}],[\\"$\\",\\"script\\",\\"script-1\\",{\\"src\\":\\"/_next/static/chunks/056l27djj62hh.js\\",\\"async\\":true}]]],\\"children\\":[\\"$\\",\\"$3\\",\\"c\\",{\\"children\\":[[[\\"$\\",\\"link\\",\\"0\\",{\\"rel\\":\\"stylesheet\\",\\"href\\":\\"/_next/static/chunks/1vpmbl4hekwi8.css\\",\\"precedence\\":\\"next\\",\\"crossOrigin\\":\\"$undefined\\",\\"nonce\\":\\"$undefined\\"}],[\\"$\\",\\"link\\",\\"1\\",{\\"rel\\":\\"stylesheet\\",\\"href\\":\\"/_next/static/chunks/1u_9znff49tlh.css\\",\\"precedence\\":\\"next\\",\\"crossOrigin\\":\\"$undefined\\",\\"nonce\\":\\"$undefined\\"}],[\\"$\\",\\"script\\",\\"script-0\\",{\\"sr'... 710644 more characters,
+  isRetryable: false,
+  data: undefined,
+  [Symbol(vercel.ai.error)]: true,
+  [Symbol(vercel.ai.error.AI_APICallError)]: true
+}
+APICallError [AI_APICallError]: Not Found
+    at <anonymous> (/Users/nick/dev/aperant-tui/node_modules/@ai-sdk/provider-utils/src/response-handler.ts:88:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async postToApi (/Users/nick/dev/aperant-tui/node_modules/@ai-sdk/provider-utils/src/post-to-api.ts:118:28)
+    at async postJsonToApi (/Users/nick/dev/aperant-tui/node_modules/@ai-sdk/provider-utils/src/post-to-api.ts:31:3)
+    at async _AnthropicMessagesBatchLanguageModel.doStream (/Users/nick/dev/aperant-tui/node_modules/@ai-sdk/anthropic/src/anthropic-language-model.ts:1542:50)
+    at async execute (/Users/nick/dev/aperant-tui/node_modules/ai/src/generate-text/stream-language-model-call.ts:351:7)
+    at async runWithTracingChannelSpan (/Users/nick/dev/aperant-tui/node_modules/ai/src/telemetry/tracing-channel-publisher.ts:76:12)
+    at async executeLanguageModelCall (/Users/nick/dev/aperant-tui/node_modules/ai/src/telemetry/create-telemetry-dispatcher.ts:184:14)
+    at async streamLanguageModelCall (/Users/nick/dev/aperant-tui/node_modules/ai/src/generate-text/stream-language-model-call.ts:348:7)
+    at async retryWithExponentialBackoffInternal (/Users/nick/dev/aperant-tui/node_modules/@ai-sdk/provider-utils/src/retry-with-exponential-backoff.ts:87:12) {
+  cause: undefined,
+  url: 'https://router.hack.ski/messages',
+  requestBodyValues: {
+    model: 'cc/claude-opus-5',
+    max_tokens: 128000,
+    temperature: undefined,
+    top_k: undefined,
+    top_p: undefined,
+    stop_sequences: undefined,
+    system: [ [Object] ],
+    messages: [ [Object] ],
+    tools: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ],
+    tool_choice: { type: 'auto', disable_parallel_tool_use: undefined },
+    stream: true
+  },
+  statusCode: 404,
+  responseHeaders: {
+    'alt-svc': 'h3=":443"; ma=86400',
+    'cache-control': 'private, no-cache, no-store, max-age=0, must-revalidate',
+    'cf-cache-status': 'DYNAMIC',
+    'cf-ray': 'a3bd1d511977012e-EWR',
+    connection: 'keep-alive',
+    'content-encoding': 'br',
+    'content-security-policy': "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; media-src 'self' data: blob:; connect-src 'self' http://localhost:* http://127.0.0.1:* ws://localhost:* ws://127.0.0.1:* https: ws: wss:; worker-src 'self' blob:; manifest-src 'self'",
+    'content-type': 'text/html; charset=utf-8',
+    date: 'Wed, 16 Sep 2026 04:26:42 GMT',
+    nel: '{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}',
+    'permissions-policy': 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), serial=()',
+    'referrer-policy': 'strict-origin-when-cross-origin',
+    'report-to': '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=5dnshjifvZhxBMtfToyk%2FRnwWi6iDDpmo0zTIX8%2B7F3nWEb2chx8Z2hS1h%2Bd2%2FIaTJ6f66t%2FhKFk1U65MIUUaMlEX%2BQ9HZruJn%2FQ9lBHSt9vyhOu%2FARALG8aji96RN%2B8Ao8%3D"}]}',
+    server: 'cloudflare',
+    'strict-transport-security': 'max-age=63072000; includeSubDomains; preload',
+    'transfer-encoding': 'chunked',
+    vary: 'rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Accept-Encoding',
+    'x-content-type-options': 'nosniff',
+    'x-frame-options': 'DENY',
+    'x-powered-by': 'Next.js'
+  },
+  responseBody: '<!DOCTYPE html><html lang="en" dir="ltr"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/><link rel="stylesheet" href="/_next/static/chunks/1vpmbl4hekwi8.css" data-precedence="next"/><link rel="stylesheet" href="/_next/static/chunks/1u_9znff49tlh.css" data-precedence="next"/><link rel="preload" as="script" fetchPriority="low" href="/_next/static/chunks/2m5a65cn7-g0k.js"/><script src="/_next/static/chunks/26g4tn5b226u5.js" async=""></script><script src="/_next/static/chunks/2-f08ea-ihvso.js" async=""></script><script src="/_next/static/chunks/1a9yct252he6q.js" async=""></script><script src="/_next/static/chunks/turbopack-2nnyng7tv74wc.js" async=""></script><script src="/_next/static/chunks/3fq09gag9f-sz.js" async="" crossorigin=""></script><script src="/_next/static/chunks/2eeo6fwxs_kaz.js" async="" crossorigin=""></script><script src="/_next/static/chunks/3fdlv012m_v03.js" async="" crossorigin=""></script><script src="/_next/static/chunks/1gj597f6jeu-_.js" async="" crossorigin=""></script><script src="/_next/static/chunks/056l27djj62hh.js" async="" crossorigin=""></script><script src="/_next/static/chunks/1i5np61-_fgfa.js" async="" crossorigin=""></script><script src="/_next/static/chunks/1m3v6x512hwcy.js" async="" crossorigin=""></script><script src="/_next/static/chunks/0kosn528b0pum.js" async="" crossorigin=""></script><script src="/_next/static/chunks/1_v3biv0xhtgv.js" async="" crossorigin=""></script><meta name="robots" content="noindex"/><meta name="theme-color" content="#0b0f1a"/><title>OmniRoute — AI Gateway for Multi-Provider LLMs</title><meta name="description" content="OmniRoute is an AI gateway for multi-provider LLMs. One endpoint for all your AI providers."/><meta name="application-name" content="OmniRoute"/><link rel="manifest" href="/manifest.webmanifest"/><meta name="mobile-web-app-capable" content="yes"/><meta name="mobile-web-app-capable" content="yes"/><meta name="apple-mobile-web-app-title" content="OmniRoute"/><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/><link rel="icon" href="/favicon.ico" sizes="any"/><link rel="icon" href="/favicon.svg" type="image/svg+xml"/><link rel="icon" href="/icon-512.png" type="image/png" sizes="512x512"/><link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" type="image/png"/><meta name="next-size-adjust" content=""/><script>\n' +
+    '              (function () {\n' +
+    '                var ATTRS = ["bis_skin_checked", "data-google-query-id", "data-new-gr-c-s-check-loaded", "data-gr-ext-installed", "data-lt-installed", "data-lt-tmp-id"];\n' +
+    '                function strip(el) {\n' +
+    '                  for (var i = 0; i < ATTRS.length; i++) {\n' +
+    '                    if (el.hasAttribute(ATTRS[i])) el.removeAttribute(ATTRS[i]);\n' +
+    '                  }\n' +
+    '                }\n' +
+    '                strip(document.documentElement);\n' +
+    '                if (typeof MutationObserver === "undefined") return;\n' +
+    '                var obs = new MutationObserver(function (muts) {\n' +
+    '                  for (var i = 0; i < muts.length; i++) {\n' +
+    '                    var m = muts[i];\n' +
+    '                    if (m.type === "attributes" && ATTRS.indexOf(m.attributeName) !== -1) {\n' +
+    '                      m.target.removeAttribute(m.attributeName);\n' +
+    '                    }\n' +
+    '                  }\n' +
+    '                });\n' +
+    '                obs.observe(document.documentElement, { attributes: true, subtree: true, attributeFilter: ATTRS });\n' +
+    '                setTimeout(function () { obs.disconnect(); }, 5000);\n' +
+    '              })();\n' +
+    '            </script><script>\n' +
+    "              if (typeof window !== 'undefined') {\n" +
+    '                if (!window.crypto) {\n' +
+    '                  window.crypto = {};\n' +
+    '                }\n' +
+    '                if (!window.crypto.randomUUID) {\n' +
+    '                  window.crypto.randomUUID = function() {\n' +
+    '                    if (window.crypto.getRandomValues) {\n' +
+    "                      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {\n" +
+    '                        const r = window.crypto.getRandomValues(new Uint8Array(1))[0] % 16;\n' +
+    "                        const v = c === 'x' ? r : (r & 0x3 | 0x8);\n" +
+    '                        return v.toString(16);\n' +
+    '                      });\n' +
+    '                    }\n' +
+    "                    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {\n" +
+    '                      const r = Math.random() * 16 | 0;\n' +
+    "                      const v = c === 'x' ? r : (r & 0x3 | 0x8);\n" +
+    '                      return v.toString(16);\n' +
+    '                    });\n' +
+    '                  };\n' +
+    '                }\n' +
+    '              }\n' +
+    '              try {\n' +
+    "                const stored = localStorage.getItem('theme');\n" +
+    '                const parsed = stored ? JSON.parse(stored) : null;\n' +
+    "                const theme = parsed?.state?.theme || 'system';\n" +
+    "                if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {\n" +
+    "                  document.documentElement.classList.add('dark');\n" +
+    '                } else {\n' +
+    "                  document.documentElement.classList.remove('dark');\n" +
+    '                }\n' +
+    '              } catch (e) {}\n' +
+    '            </script><script src="/_next/static/chunks/0cz1d0mv5g_q7.js" noModule=""></script></head><body class="inter_5901b7c6-module__ec5Qua__variable font-sans antialiased"><div hidden=""><!--$--><!--/$--></div><a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-[#6366f1] focus:text-white focus:rounded-lg focus:text-sm focus:font-semibold focus:shadow-lg">Skip to content</a><!--$--><div class="flex flex-col items-center justify-center min-h-screen p-6 bg-bg text-text-main text-center" role="main" aria-labelledby="not-found-title"><div class="text-[96px] font-extrabold leading-none mb-2 bg-gradient-to-br from-primary to-primary-hover bg-clip-text text-transparent" aria-hidden="true">404</div><h1 id="not-found-title" class="text-2xl font-semibold mb-2">Page not found</h1><p class="text-[15px] text-text-muted max-w-[400px] leading-relaxed mb-8">The page you&#x27;re looking for doesn&#x27;t exist or has been moved.</p><div class="flex flex-col sm:flex-row items-center gap-3"><a class="px-8 py-3 rounded-xl text-white text-sm font-medium no-underline transition-all duration-200 motion-reduce:transition-none shadow-warm hover:-translate-y-0.5 bg-gradient-to-br from-primary to-primary-hover hover:shadow-elevated focus:outline-2 focus:outline-offset-2 focus:outline-primary" aria-label="Return to dashboard" href="/dashboard">Go to Dashboard</a><a class="px-8 py-3 rounded-xl text-sm font-medium no-underline border border-border hover:bg-bg-alt transition-colors duration-200 motion-reduce:transition-none focus:outline-2 focus:outline-offset-2 focus:outline-primary" aria-label="Open system status page" href="/status">System Status</a></div></div><!--$--><!--/$--><!--/$--><script src="/_next/static/chunks/2m5a65cn7-g0k.js" id="_R_" async=""></script><script>(self.__next_f=self.__next_f||[]).push([0])</script><script>self.__next_f.push([1,"1:I[339756,[\\"/_next/static/chunks/3fq09gag9f-sz.js\\",\\"/_next/static/chunks/2eeo6fwxs_kaz.js\\",\\"/_next/static/chunks/3fdlv012m_v03.js\\"],\\"LoadingBoundaryProvider\\"]\\n2:I[654696,[\\"/_next/static/chunks/3fq09gag9f-sz.js\\",\\"/_next/static/chunks/2eeo6fwxs_kaz.js\\",\\"/_next/static/chunks/3fdlv012m_v03.js\\",\\"/_next/static/chunks/1gj597f6jeu-_.js\\",\\"/_next/static/chunks/056l27djj62hh.js\\"],\\"default\\"]\\n3:\\"$Sreact.fragment\\"\\n5:I[339756,[\\"/_next/static/chunks/3fq09gag9f-sz.js\\",\\"/_next/static/chunks/2eeo6fwxs_kaz.js\\",\\"/_next/static/chunks/3fdlv012m_v03.js\\"],\\"default\\"]\\n6:I[837457,[\\"/_next/static/chunks/3fq09gag9f-sz.js\\",\\"/_next/static/chunks/2eeo6fwxs_kaz.js\\",\\"/_next/static/chunks/3fdlv012m_v03.js\\"],\\"default\\"]\\n7:I[347257,[\\"/_next/static/chunks/3fq09gag9f-sz.js\\",\\"/_next/static/chunks/2eeo6fwxs_kaz.js\\",\\"/_next/static/chunks/3fdlv012m_v03.js\\"],\\"ClientPageRoot\\"]\\n8:I[329306,[\\"/_next/static/chunks/3fq09gag9f-sz.js\\",\\"/_next/static/chunks/2eeo6fwxs_kaz.js\\",\\"/_next/static/chunks/3fdlv012m_v03.js\\",\\"/_next/static/chunks/1i5np61-_fgfa.js\\"],\\"default\\"]\\n9:I[897367,[\\"/_next/static/chunks/3fq09gag9f-sz.js\\",\\"/_next/static/chunks/2eeo6fwxs_kaz.js\\",\\"/_next/static/chunks/3fdlv012m_v03.js\\"],\\"OutletBoundary\\"]\\na:\\"$Sreact.suspense\\"\\nd:I[897367,[\\"/_next/static/chunks/3fq09gag9f-sz.js\\",\\"/_next/static/chunks/2eeo6fwxs_kaz.js\\",\\"/_next/static/chunks/3fdlv012m_v03.js\\"],\\"ViewportBoundary\\"]\\nf:I[897367,[\\"/_next/static/chunks/3fq09gag9f-sz.js\\",\\"/_next/static/chunks/2eeo6fwxs_kaz.js\\",\\"/_next/static/chunks/3fdlv012m_v03.js\\"],\\"MetadataBoundary\\"]\\n11:I[563491,[\\"/_next/static/chunks/3fq09gag9f-sz.js\\",\\"/_next/static/chunks/2eeo6fwxs_kaz.js\\",\\"/_next/static/chunks/3fdlv012m_v03.js\\",\\"/_next/static/chunks/1m3v6x512hwcy.js\\",\\"/_next/static/chunks/0kosn528b0pum.js\\"],\\"default\\"]\\n:HL[\\"/_next/static/chunks/1vpmbl4hekwi8.css\\",\\"style\\"]\\n:HL[\\"/_next/static/chunks/1u_9znff49tlh.css\\",\\"style\\"]\\nc:X\\n0:{\\"P\\":null,\\"c\\":[\\"\\",\\"messages\\"],\\"q\\":\\"\\",\\"i\\":false,\\"f\\":[[[\\"\\",{\\"children\\":[\\"/_not-found\\",{\\"children\\":[\\"__PAGE__\\",{},\\"$undefined\\",\\"$undefined\\",4096]},\\"$undefined\\",\\"$undefined\\",4096]},\\"$undefined\\",\\"$undefined\\",4116],[[\\"$\\",\\"$L1\\",null,{\\"loading\\":[[\\"$\\",\\"$L2\\",\\"l\\",{}],[],[[\\"$\\",\\"script\\",\\"script-0\\",{\\"src\\":\\"/_next/static/chunks/1gj597f6jeu-_.js\\",\\"async\\":true}],[\\"$\\",\\"script\\",\\"script-1\\",{\\"src\\":\\"/_next/static/chunks/056l27djj62hh.js\\",\\"async\\":true}]]],\\"children\\":[\\"$\\",\\"$3\\",\\"c\\",{\\"children\\":[[[\\"$\\",\\"link\\",\\"0\\",{\\"rel\\":\\"stylesheet\\",\\"href\\":\\"/_next/static/chunks/1vpmbl4hekwi8.css\\",\\"precedence\\":\\"next\\",\\"crossOrigin\\":\\"$undefined\\",\\"nonce\\":\\"$undefined\\"}],[\\"$\\",\\"link\\",\\"1\\",{\\"rel\\":\\"stylesheet\\",\\"href\\":\\"/_next/static/chunks/1u_9znff49tlh.css\\",\\"precedence\\":\\"next\\",\\"crossOrigin\\":\\"$undefined\\",\\"nonce\\":\\"$undefined\\"}],[\\"$\\",\\"script\\",\\"script-0\\",{\\"sr'... 710644 more characters,
+  isRetryable: false,
+  data: undefined,
+  [Symbol(vercel.ai.error)]: true,
+  [Symbol(vercel.ai.error.AI_APICallError)]: true
+}
+APICallError [AI_APICallError]: Not Found
+    at <anonymous> (/Users/nick/dev/aperant-tui/node_modules/@ai-sdk/provider-utils/src/response-handler.ts:88:16)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async postToApi (/Users/nick/dev/aperant-tui/node_modules/@ai-sdk/provider-utils/src/post-to-api.ts:118:28)
+    at async postJsonToApi (/Users/nick/dev/aperant-tui/node_modules/@ai-sdk/provider-utils/src/post-to-api.ts:31:3)
+    at async _AnthropicMessagesBatchLanguageModel.doStream (/Users/nick/dev/aperant-tui/node_modules/@ai-sdk/anthropic/src/anthropic-language-model.ts:1542:50)
+    at async execute (/Users/nick/dev/aperant-tui/node_modules/ai/src/generate-text/stream-language-model-call.ts:351:7)
+    at async runWithTracingChannelSpan (/Users/nick/dev/aperant-tui/node_modules/ai/src/telemetry/tracing-channel-publisher.ts:76:12)
+    at async executeLanguageModelCall (/Users/nick/dev/aperant-tui/node_modules/ai/src/telemetry/create-telemetry-dispatcher.ts:184:14)
+    at async streamLanguageModelCall (/Users/nick/dev/aperant-tui/node_modules/ai/src/generate-text/stream-language-model-call.ts:348:7)
+    at async retryWithExponentialBackoffInternal (/Users/nick/dev/aperant-tui/node_modules/@ai-sdk/provider-utils/src/retry-with-exponential-backoff.ts:87:12) {
+  cause: undefined,
+  url: 'https://router.hack.ski/messages',
+  requestBodyValues: {
+    model: 'cc/claude-opus-5',
+    max_tokens: 128000,
+    temperature: undefined,
+    top_k: undefined,
+    top_p: undefined,
+    stop_sequences: undefined,
+    system: [ [Object] ],
+    messages: [ [Object] ],
+    tools: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ],
+    tool_choice: { type: 'auto', disable_parallel_tool_use: undefined },
+    stream: true
+  },
+  statusCode: 404,
+  responseHeaders: {
+    'alt-svc': 'h3=":443"; ma=86400',
+    'cache-control': 'private, no-cache, no-store, max-age=0, must-revalidate',
+    'cf-cache-status': 'DYNAMIC',
+    'cf-ray': 'a3bd1d51bac5012e-EWR',
+    connection: 'keep-alive',
+    'content-encoding': 'br',
+    'content-security-policy': "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; media-src 'self' data: blob:; connect-src 'self' http://localhost:* http://127.0.0.1:* ws://localhost:* ws://127.0.0.1:* https: ws: wss:; worker-src 'self' blob:; manifest-src 'self'",
+    'content-type': 'text/html; charset=utf-8',
+    date: 'Wed, 16 Sep 2026 04:26:42 GMT',
+    nel: '{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}',
+    'permissions-policy': 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), serial=()',
+    'referrer-policy': 'strict-origin-when-cross-origin',
+    'report-to': '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=tw%2B6v50pu8tkPHcsK%2FoYBvxkCbfP7ZhT51EmTTpXN9xbquqJQv%2Fm9NHSL6GXcvRfwhk%2BM1op0jJ9zggIGpEEvS7aR4r43lKYCwPE%2Fgn%2By6bkl34t%2FVkgUjFLPGUx0b%2F2Sb8%3D"}]}',
+    server: 'cloudflare',
+    'strict-transport-security': 'max-age=63072000; includeSubDomains; preload',
+    'transfer-encoding': 'chunked',
+    vary: 'rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, Accept-Encoding',
+    'x-content-type-options': 'nosniff',
+    'x-frame-options': 'DENY',
+    'x-powered-by': 'Next.js'
+  },
+  responseBody: '<!DOCTYPE html><html lang="en" dir="ltr"><head><meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/><link rel="stylesheet" href="/_next/static/chunks/1vpmbl4hekwi8.css" data-precedence="next"/><link rel="stylesheet" href="/_next/static/chunks/1u_9znff49tlh.css" data-precedence="next"/><link rel="preload" as="script" fetchPriority="low" href="/_next/static/chunks/2m5a65cn7-g0k.js"/><script src="/_next/static/chunks/26g4tn5b226u5.js" async=""></script><script src="/_next/static/chunks/2-f08ea-ihvso.js" async=""></script><script src="/_next/static/chunks/1a9yct252he6q.js" async=""></script><script src="/_next/static/chunks/turbopack-2nnyng7tv74wc.js" async=""></script><script src="/_next/static/chunks/3fq09gag9f-sz.js" async="" crossorigin=""></script><script src="/_next/static/chunks/2eeo6fwxs_kaz.js" async="" crossorigin=""></script><script src="/_next/static/chunks/3fdlv012m_v03.js" async="" crossorigin=""></script><script src="/_next/static/chunks/1gj597f6jeu-_.js" async="" crossorigin=""></script><script src="/_next/static/chunks/056l27djj62hh.js" async="" crossorigin=""></script><script src="/_next/static/chunks/1i5np61-_fgfa.js" async="" crossorigin=""></script><script src="/_next/static/chunks/1m3v6x512hwcy.js" async="" crossorigin=""></script><script src="/_next/static/chunks/0kosn528b0pum.js" async="" crossorigin=""></script><script src="/_next/static/chunks/1_v3biv0xhtgv.js" async="" crossorigin=""></script><meta name="robots" content="noindex"/><meta name="theme-color" content="#0b0f1a"/><title>OmniRoute — AI Gateway for Multi-Provider LLMs</title><meta name="description" content="OmniRoute is an AI gateway for multi-provider LLMs. One endpoint for all your AI providers."/><meta name="application-name" content="OmniRoute"/><link rel="manifest" href="/manifest.webmanifest"/><meta name="mobile-web-app-capable" content="yes"/><meta name="mobile-web-app-capable" content="yes"/><meta name="apple-mobile-web-app-title" content="OmniRoute"/><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/><link rel="icon" href="/favicon.ico" sizes="any"/><link rel="icon" href="/favicon.svg" type="image/svg+xml"/><link rel="icon" href="/icon-512.png" type="image/png" sizes="512x512"/><link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" type="image/png"/><meta name="next-size-adjust" content=""/><script>\n' +
+    '              (function () {\n' +
+    '                var ATTRS = ["bis_skin_checked", "data-google-query-id", "data-new-gr-c-s-check-loaded", "data-gr-ext-installed", "data-lt-installed", "data-lt-tmp-id"];\n' +
+    '                function strip(el) {\n' +
+    '                  for (var i = 0; i < ATTRS.length; i++) {\n' +
+    '                    if (el.hasAttribute(ATTRS[i])) el.removeAttribute(ATTRS[i]);\n' +
+    '                  }\n' +
+    '                }\n' +
+    '                strip(document.documentElement);\n' +
+    '                if (typeof MutationObserver === "undefined") return;\n' +
+    '                var obs = new MutationObserver(function (muts) {\n' +
+    '                  for (var i = 0; i < muts.length; i++) {\n' +
+    '                    var m = muts[i];\n' +
+    '                    if (m.type === "attributes" && ATTRS.indexOf(m.attributeName) !== -1) {\n' +
+    '                      m.target.removeAttribute(m.attributeName);\n' +
+    '                    }\n' +
+    '                  }\n' +
+    '                });\n' +
+    '                obs.observe(document.documentElement, { attributes: true, subtree: true, attributeFilter: ATTRS });\n' +
+    '                setTimeout(function () { obs.disconnect(); }, 5000);\n' +
+    '              })();\n' +
+    '            </script><script>\n' +
+    "              if (typeof window !== 'undefined') {\n" +
+    '                if (!window.crypto) {\n' +
+    '                  window.crypto = {};\n' +
+    '                }\n' +
+    '                if (!window.crypto.randomUUID) {\n' +
+    '                  window.crypto.randomUUID = function() {\n' +
+    '                    if (window.crypto.getRandomValues) {\n' +
+    "                      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {\n" +
+    '                        const r = window.crypto.getRandomValues(new Uint8Array(1))[0] % 16;\n' +
+    "                        const v = c === 'x' ? r : (r & 0x3 | 0x8);\n" +
+    '                        return v.toString(16);\n' +
+    '                      });\n' +
+    '                    }\n' +
+    "                    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {\n" +
+    '                      const r = Math.random() * 16 | 0;\n' +
+    "                      const v = c === 'x' ? r : (r & 0x3 | 0x8);\n" +
+    '                      return v.toString(16);\n' +
+    '                    });\n' +
+    '                  };\n' +
+    '                }\n' +
+    '              }\n' +
+    '              try {\n' +
+    "                const stored = localStorage.getItem('theme');\n" +
+    '                const parsed = stored ? JSON.parse(stored) : null;\n' +
+    "                const theme = parsed?.state?.theme || 'system';\n" +
+    "                if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {\n" +
+    "                  document.documentElement.classList.add('dark');\n" +
+    '                } else {\n' +
+    "                  document.documentElement.classList.remove('dark');\n" +
+    '                }\n' +
+    '              } catch (e) {}\n' +
+    '            </script><script src="/_next/static/chunks/0cz1d0mv5g_q7.js" noModule=""></script></head><body class="inter_5901b7c6-module__ec5Qua__variable font-sans antialiased"><div hidden=""><!--$--><!--/$--></div><a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-[#6366f1] focus:text-white focus:rounded-lg focus:text-sm focus:font-semibold focus:shadow-lg">Skip to content</a><!--$--><div class="flex flex-col items-center justify-center min-h-screen p-6 bg-bg text-text-main text-center" role="main" aria-labelledby="not-found-title"><div class="text-[96px] font-extrabold leading-none mb-2 bg-gradient-to-br from-primary to-primary-hover bg-clip-text text-transparent" aria-hidden="true">404</div><h1 id="not-found-title" class="text-2xl font-semibold mb-2">Page not found</h1><p class="text-[15px] text-text-muted max-w-[400px] leading-relaxed mb-8">The page you&#x27;re looking for doesn&#x27;t exist or has been moved.</p><div class="flex flex-col sm:flex-row items-center gap-3"><a class="px-8 py-3 rounded-xl text-white text-sm font-medium no-underline transition-all duration-200 motion-reduce:transition-none shadow-warm hover:-translate-y-0.5 bg-gradient-to-br from-primary to-primary-hover hover:shadow-elevated focus:outline-2 focus:outline-offset-2 focus:outline-primary" aria-label="Return to dashboard" href="/dashboard">Go to Dashboard</a><a class="px-8 py-3 rounded-xl text-sm font-medium no-underline border border-border hover:bg-bg-alt transition-colors duration-200 motion-reduce:transition-none focus:outline-2 focus:outline-offset-2 focus:outline-primary" aria-label="Open system status page" href="/status">System Status</a></div></div><!--$--><!--/$--><!--/$--><script src="/_next/static/chunks/2m5a65cn7-g0k.js" id="_R_" async=""></script><script>(self.__next_f=self.__next_f||[]).push([0])</script><script>self.__next_f.push([1,"1:I[339756,[\\"/_next/static/chunks/3fq09gag9f-sz.js\\",\\"/_next/static/chunks/2eeo6fwxs_kaz.js\\",\\"/_next/static/chunks/3fdlv012m_v03.js\\"],\\"LoadingBoundaryProvider\\"]\\n2:I[654696,[\\"/_next/static/chunks/3fq09gag9f-sz.js\\",\\"/_next/static/chunks/2eeo6fwxs_kaz.js\\",\\"/_next/static/chunks/3fdlv012m_v03.js\\",\\"/_next/static/chunks/1gj597f6jeu-_.js\\",\\"/_next/static/chunks/056l27djj62hh.js\\"],\\"default\\"]\\n3:\\"$Sreact.fragment\\"\\n5:I[339756,[\\"/_next/static/chunks/3fq09gag9f-sz.js\\",\\"/_next/static/chunks/2eeo6fwxs_kaz.js\\",\\"/_next/static/chunks/3fdlv012m_v03.js\\"],\\"default\\"]\\n6:I[837457,[\\"/_next/static/chunks/3fq09gag9f-sz.js\\",\\"/_next/static/chunks/2eeo6fwxs_kaz.js\\",\\"/_next/static/chunks/3fdlv012m_v03.js\\"],\\"default\\"]\\n7:I[347257,[\\"/_next/static/chunks/3fq09gag9f-sz.js\\",\\"/_next/static/chunks/2eeo6fwxs_kaz.js\\",\\"/_next/static/chunks/3fdlv012m_v03.js\\"],\\"ClientPageRoot\\"]\\n8:I[329306,[\\"/_next/static/chunks/3fq09gag9f-sz.js\\",\\"/_next/static/chunks/2eeo6fwxs_kaz.js\\",\\"/_next/static/chunks/3fdlv012m_v03.js\\",\\"/_next/static/chunks/1i5np61-_fgfa.js\\"],\\"default\\"]\\n9:I[897367,[\\"/_next/static/chunks/3fq09gag9f-sz.js\\",\\"/_next/static/chunks/2eeo6fwxs_kaz.js\\",\\"/_next/static/chunks/3fdlv012m_v03.js\\"],\\"OutletBoundary\\"]\\na:\\"$Sreact.suspense\\"\\nd:I[897367,[\\"/_next/static/chunks/3fq09gag9f-sz.js\\",\\"/_next/static/chunks/2eeo6fwxs_kaz.js\\",\\"/_next/static/chunks/3fdlv012m_v03.js\\"],\\"ViewportBoundary\\"]\\nf:I[897367,[\\"/_next/static/chunks/3fq09gag9f-sz.js\\",\\"/_next/static/chunks/2eeo6fwxs_kaz.js\\",\\"/_next/static/chunks/3fdlv012m_v03.js\\"],\\"MetadataBoundary\\"]\\n11:I[563491,[\\"/_next/static/chunks/3fq09gag9f-sz.js\\",\\"/_next/static/chunks/2eeo6fwxs_kaz.js\\",\\"/_next/static/chunks/3fdlv012m_v03.js\\",\\"/_next/static/chunks/1m3v6x512hwcy.js\\",\\"/_next/static/chunks/0kosn528b0pum.js\\"],\\"default\\"]\\n:HL[\\"/_next/static/chunks/1vpmbl4hekwi8.css\\",\\"style\\"]\\n:HL[\\"/_next/static/chunks/1u_9znff49tlh.css\\",\\"style\\"]\\nc:X\\n0:{\\"P\\":null,\\"c\\":[\\"\\",\\"messages\\"],\\"q\\":\\"\\",\\"i\\":false,\\"f\\":[[[\\"\\",{\\"children\\":[\\"/_not-found\\",{\\"children\\":[\\"__PAGE__\\",{},\\"$undefined\\",\\"$undefined\\",4096]},\\"$undefined\\",\\"$undefined\\",4096]},\\"$undefined\\",\\"$undefined\\",4116],[[\\"$\\",\\"$L1\\",null,{\\"loading\\":[[\\"$\\",\\"$L2\\",\\"l\\",{}],[],[[\\"$\\",\\"script\\",\\"script-0\\",{\\"src\\":\\"/_next/static/chunks/1gj597f6jeu-_.js\\",\\"async\\":true}],[\\"$\\",\\"script\\",\\"script-1\\",{\\"src\\":\\"/_next/static/chunks/056l27djj62hh.js\\",\\"async\\":true}]]],\\"children\\":[\\"$\\",\\"$3\\",\\"c\\",{\\"children\\":[[[\\"$\\",\\"link\\",\\"0\\",{\\"rel\\":\\"stylesheet\\",\\"href\\":\\"/_next/static/chunks/1vpmbl4hekwi8.css\\",\\"precedence\\":\\"next\\",\\"crossOrigin\\":\\"$undefined\\",\\"nonce\\":\\"$undefined\\"}],[\\"$\\",\\"link\\",\\"1\\",{\\"rel\\":\\"stylesheet\\",\\"href\\":\\"/_next/static/chunks/1u_9znff49tlh.css\\",\\"precedence\\":\\"next\\",\\"crossOrigin\\":\\"$undefined\\",\\"nonce\\":\\"$undefined\\"}],[\\"$\\",\\"script\\",\\"script-0\\",{\\"sr'... 710644 more characters,
+  isRetryable: false,
+  data: undefined,
+  [Symbol(vercel.ai.error)]: true,
+  [Symbol(vercel.ai.error.AI_APICallError)]: true
+}
+[FATAL] Error: roadmap failed: Discovery failed: Attempt 1: Discovery file not created; Attempt 2: Discovery file not created; Attempt 3: Discovery file not created
+    at main (/Users/nick/dev/aperant-tui/apps/tui/drive-loop.tmp.ts:44:20)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)

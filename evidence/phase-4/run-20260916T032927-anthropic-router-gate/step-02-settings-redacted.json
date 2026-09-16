@@ -1,0 +1,18 @@
+{
+  "providerAccounts": [
+    {
+      "id": "anthropic-mu3lmjgx",
+      "provider": "anthropic",
+      "name": "Anthropic (operator router)",
+      "authType": "api-key",
+      "billingModel": "pay-per-use",
+      "apiKey": "sk-9159[REDACTED]",
+      "baseUrl": "https://router.hack.ski/v1",
+      "createdAt": 1789532802321,
+      "updatedAt": 1789532870812
+    }
+  ],
+  "globalPriorityOrder": [
+    "anthropic-mu3lmjgx"
+  ]
+}

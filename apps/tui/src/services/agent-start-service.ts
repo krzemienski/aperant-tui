@@ -12,9 +12,10 @@
  * SDK set; a resolution failure is itself a real, reportable error.
  */
 import type { Project, Task } from '@shared/types';
-import { appendFileSync, mkdirSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { getSpecsDir } from '@shared/constants';
 import { observability } from './observability';
 
 export interface StartOutcome {
@@ -47,6 +48,10 @@ const OBSERVED_EVENTS = [
   'stream-event',
   'exit',
   'sdk-rate-limit',
+  'roadmap-progress',
+  'roadmap-log',
+  'roadmap-complete',
+  'roadmap-error',
 ] as const;
 
 let eventLogAttached = false;
@@ -90,7 +95,7 @@ function attachEventLog(am: AgentManagerLike): void {
   }
 }
 
-type AgentManagerLike = {
+export type AgentManagerLike = {
   startTaskExecution: (
     taskId: string,
     projectPath: string,
@@ -98,13 +103,33 @@ type AgentManagerLike = {
     options?: Record<string, unknown>,
     projectId?: string,
   ) => Promise<void>;
+  startRoadmapGeneration: (
+    projectId: string, projectPath: string, refresh?: boolean,
+    enableCompetitorAnalysis?: boolean, refreshCompetitorAnalysis?: boolean,
+    config?: { model?: string; thinkingLevel?: string },
+  ) => void;
+  startSpecCreation: (
+    taskId: string,
+    projectPath: string,
+    taskDescription: string,
+    specDir?: string,
+    metadata?: { model?: string; provider?: string; phaseModels?: Record<string, string>; requireReviewBeforeCoding?: boolean },
+    baseBranch?: string,
+    projectId?: string,
+  ) => Promise<void>;
+  stopRoadmap: (projectId: string) => boolean;
+  isRoadmapRunning: (projectId: string) => boolean;
   once: (event: string, cb: (...args: never[]) => void) => unknown;
   on: (event: string, cb: (...args: never[]) => void) => unknown;
+  removeListener?: (event: string, cb: (...args: never[]) => void) => unknown;
 };
 
 let managerPromise: Promise<AgentManagerLike> | null = null;
 
-function getManager(): Promise<AgentManagerLike> {
+/** The shared AgentManager singleton — roadmap/ideation services MUST reuse
+ *  this instance: a second manager would fork the event stream and bypass
+ *  the flight recorder and observability tap. */
+export function getManager(): Promise<AgentManagerLike> {
   if (!managerPromise) {
     managerPromise = import('@main/agent/agent-manager').then(
       (m) => new m.AgentManager() as unknown as AgentManagerLike,
@@ -168,8 +193,29 @@ export async function startTask(project: Project, task: Task): Promise<StartOutc
       handlers.push({ event, cb });
       am.once(event, cb as never);
     }
-    am.startTaskExecution(task.id, project.path, task.specId, {}, project.id).catch((err: unknown) => {
-      finish(false, `startTaskExecution rejected: ${err instanceof Error ? err.message.split('\n')[0] : String(err)}`);
+    // Port of the desktop TASK_START branch (execution-handlers.ts:292-360):
+    // no spec.md → spec creation; spec.md but no plan subtasks → task
+    // execution in sequential mode (the planner agent generates the plan
+    // before the coder starts); else normal execution.
+    const specsRel = getSpecsDir(project.autoBuildPath);
+    const specDir = path.join(project.path, specsRel, task.specId);
+    const hasSpec = existsSync(path.join(specDir, 'spec.md'));
+    const planPath = path.join(specDir, 'implementation_plan.json');
+    let planHasSubtasks = false;
+    let taskDescription = task.title ?? task.id;
+    try {
+      const plan = JSON.parse(readFileSync(planPath, 'utf8')) as { phases?: unknown[]; description?: string };
+      planHasSubtasks = Array.isArray(plan.phases)
+        && plan.phases.some((ph) => Array.isArray((ph as { subtasks?: unknown[] }).subtasks) && (ph as { subtasks?: unknown[] }).subtasks!.length > 0);
+      if (typeof plan.description === 'string' && plan.description) taskDescription = plan.description;
+    } catch {
+      // invalid/missing plan — treat as no subtasks (planner regenerates)
+    }
+    const starter: Promise<void> = !hasSpec
+      ? am.startSpecCreation(task.id, project.path, taskDescription, specDir, { requireReviewBeforeCoding: false }, undefined, project.id)
+      : am.startTaskExecution(task.id, project.path, task.specId, { parallel: false, workers: 1 }, project.id);
+    starter.catch((err: unknown) => {
+      finish(false, `start rejected: ${err instanceof Error ? err.message.split('\n')[0] : String(err)}`);
     });
   });
 }

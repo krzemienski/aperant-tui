@@ -1,0 +1,40 @@
+APERANT_USER_DATA=/tmp/p4-ud COLORTERM=truecolor npx tsx src/cli.tsx /Users/nick/Desktop/vigil
+~/dev/aperant-tui/apps/tui
+❯ APERANT_USER_DATA=/tmp/p4-ud COLORTERM=truecolor npx tsx src/cli.tsx /Users/nick/Desktop/vigil
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ vigil /Users/nick/Desktop/vigil │ ⑂ main                               ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                │
+│ ┌───────────────────────────────────────────────────┐ ┌────────────────────────────────────────────────────────────┐ │
+│ │ TASKS                                             │ │ DETAIL                                                     │ │
+│ │ ◆ BACKLOG (1)                                     │ │ 001-verd [BACKLOG]                                         │ │
+│ │ ❯ 001-verd ▽ Verdict parser fuzz & conformance s… │ │ Verdict parser fuzz & conformance suite                    │ │
+│ │                                                   │ │ progress ███████░░░░░░░ 50%                                │ │
+│ │                                                   │ │ subtasks 0/0 complete                                      │ │
+│ │                                                   │ │ phase idle                                                 │ │
+│ │                                                   │ │ location main  spec 001-verdict-parser-fuzz-conformance-su…│ │
+│ │                                                   │ └────────────────────────────────────────────────────────────┘ │
+│ │                                                   │                                                                │
+│ │                                                   │ ┌────────────────────────────────────────────────────────────┐ │
+│ │                                                   │ │ AGENT STREAM                                               │ │
+│ │                                                   │ │ no recorded runs for this task                             │ │
+│ └───────────────────────────────────────────────────┘ └────────────────────────────────────────────────────────────┘ │
+│ BOARD  j/k move · ⏎ focus · s start · x stop · H/L column · l logs · / filter                           : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

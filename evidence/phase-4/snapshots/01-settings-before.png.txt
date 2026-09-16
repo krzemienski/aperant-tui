@@ -1,0 +1,40 @@
+APERANT_USER_DATA=/tmp/p4-ud COLORTERM=truecolor MOONSHOT_API_KEY=[REDACTED-KEY] MOONSHOT_BASE_URL=
+http://127.0.0.1:20219/v1 npx tsx src/cli.tsx /Users/nick/Desktop/vigil
+~/dev/aperant-tui/apps/tui
+❯ APERANT_USER_DATA=/tmp/p4-ud COLORTERM=truecolor MOONSHOT_API_KEY=[REDACTED-KEY] MOONSHOT_BASE_UR
+L=http://127.0.0.1:20219/v1 npx tsx src/cli.tsx /Users/nick/Desktop/vigil
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ vigil /Users/nick/Desktop/vigil │ ⑂ main                               ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                │
+│ ┌─────────────────────────────────────────┐ ┌──────────────────────────────────────────────────────────────────────┐ │
+│ │ THEME                                   │ │ CONFIG                                                               │ │
+│ │ ❯      cyberpunk  ACTIVE                │ │ tui config        /tmp/p4-ud/tui.json                                │ │
+│ │        matrix                           │ │ desktop settings  /tmp/p4-ud/settings.json                           │ │
+│ │        amber                            │ │ provider          not configured                                     │ │
+│ │        synth                            │ │ model             not configured                                     │ │
+│ │        ice                              │ └──────────────────────────────────────────────────────────────────────┘ │
+│ │                                         │                                                                          │
+│ │ j/k select · applies live · persists to │ ┌──────────────────────────────────────────────────────────────────────┐ │
+│ │ tui.json                                │ │ ACCOUNTS                                                             │ │
+│ │                                         │ │ no provider accounts — press a to add Moonshot (Kimi) from env       │ │
+│ │                                         │ │ a add/update Moonshot (Kimi) from env · writes settings.json ·       │ │
+│ │                                         │ │ queue-priority first                                                 │ │
+│ └─────────────────────────────────────────┘ └──────────────────────────────────────────────────────────────────────┘ │
+│ SET  j/k select theme · ⏎ apply · a add Moonshot acct                                                   : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

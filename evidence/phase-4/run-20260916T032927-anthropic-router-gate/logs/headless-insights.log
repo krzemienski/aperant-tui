@@ -1,0 +1,48 @@
+[insights] question: Which file implements the verdict parser, and what function does it expose for parsing verdict lines? Cite the exact file path.
+I'll search the codebase for the verdict parser implementation.**File:** `/Users/nick/Desktop/vigil/src/plan/verdict.ts`
+
+**Exposed parsing function:** `parseVerdictLines(text: string): VerdictLine[]`
+
+### How it works
+
+It splits input text on newlines and tests each line against three regexes, in priority order:
+
+| Order | Regex | Matches | Result |
+|---|---|---|---|
+| 1 | `PLAN_RE` | `PLAN <id>: PASS\|FAIL` | `{ type: "plan", planId, verdict }` |
+| 2 | `GATE_RE` | `VG-XXX: PASS\|FAIL [reason]` | `{ type: "gate", gateId, verdict, reason? }` |
+| 3 | `TASK_RE` | `TASK <id>: DONE` | `{ type: "task", taskId }` |
+
+Notable details:
+- All patterns tolerate surrounding markdown noise (`` ` ``, `*`, `_`) since agents often emit verdicts inside formatted output.
+- Matching is case-insensitive; `gateId` is normalized to uppercase and `verdict` to lowercase.
+- Gate reasons get leading separators (`-`, `–`, `—`, `:`) stripped.
+- `continue` after each match means one line yields at most one verdict.
+
+### Companion export
+
+The same file exports `LineBuffer`, a small incremental splitter for streamed text — `push(chunk)` returns complete lines and retains the trailing partial line, `flush()` drains the remainder. This is what lets the runner parse verdicts from a live SDK stream rather than waiting for a complete message.
+
+### Consumers
+
+`src/plan/parser.ts`, `src/engine/session.ts`, and `src/engine/runner.ts` reference verdicts; tests live in `tests/parser.test.ts`, `tests/verdict-rails.test.ts`, and `tests/session-verdict.test.ts`.
+
+One thing worth flagging: the regexes are permissive about markdown wrappers but they only strip a *contiguous* run of decorators at fixed positions. A line like `**VG-1: PASS**` works, but nested or unbalanced forms may slip through inconsistently — and because verdicts gate plan progress, a false positive from agent prose quoting an example verdict would be a correctness issue. That aligns with your backlog item on rail evaluation hardening.
+
+Want me to trace how `parseVerdictLines` results flow into the state reducer and gate enforcement?
+[insights] answer length: 2093 | cites source file: true
+[ideation] prompts dir: /Users/nick/dev/apps/desktop/prompts | exists: false
+[ideation] running code_improvements …
+[ideation] code_improvements success=false err=Prompt not found: /Users/nick/dev/apps/desktop/prompts/ideation_code_improvement
+[ideation] running ui_ux_improvements …
+[ideation] ui_ux_improvements success=false err=Prompt not found: /Users/nick/dev/apps/desktop/prompts/ideation_ui_ux.md
+[ideation] running documentation_gaps …
+[ideation] documentation_gaps success=false err=Prompt not found: /Users/nick/dev/apps/desktop/prompts/ideation_documentation.md
+[ideation] running security_hardening …
+[ideation] security_hardening success=false err=Prompt not found: /Users/nick/dev/apps/desktop/prompts/ideation_security.md
+[ideation] running performance_optimizations …
+[ideation] performance_optimizations success=false err=Prompt not found: /Users/nick/dev/apps/desktop/prompts/ideation_performance.md
+[ideation] running code_quality …
+[ideation] code_quality success=false err=Prompt not found: /Users/nick/dev/apps/desktop/prompts/ideation_code_quality.md
+[ideation] output files: 
+exit: 0

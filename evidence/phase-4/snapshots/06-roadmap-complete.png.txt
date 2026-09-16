@@ -1,0 +1,40 @@
+APERANT_USER_DATA=/tmp/p4-ud COLORTERM=truecolor npx tsx src/cli.tsx /Users/nick/Desktop/vigil
+~/dev/aperant-tui/apps/tui
+❯ APERANT_USER_DATA=/tmp/p4-ud COLORTERM=truecolor npx tsx src/cli.tsx /Users/nick/Desktop/vigil
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ vigil /Users/nick/Desktop/vigil │ ⑂ main                               ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                │
+│ ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ GENERATION                                                                                                       │ │
+│ │ idle                                                                                                             │ │
+│ │  and                                                                                                             │ │
+│ │  the                                                                                                             │ │
+│ │  JSON                                                                                                            │ │
+│ │  passes                                                                                                          │ │
+│ │  structural                                                                                                      │ │
+│ │  validation                                                                                                      │ │
+│ │ .                                                                                                                │ │
+│ │ Phase features completed                                                                                         │ │
+│ └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ ┌─────────────────────────────────────────────────┐┌───────────────────────────────────────────────────────────────┐ │
+│ │ PHASES                                          ││ DETAIL                                                        │ │
+│ │ ❯ ○ PHASE phase-1 Trust Core Hardening          ││ Trust Core Hardening                                          │ │
+│ │   ░░░░░░░░░░░░░░░░░░ 0/5 features               ││  · Verdict parser fuzz & conformance suite [planned · Must]   │ │
+│ │                                                 ││    c → convert to task spec                                   │ │
+│ │   ○ PHASE phase-2 Generalization & Operator     ││  · Config-driven default rails with shipped templates [plann… │ │
+│ │ Ergonomics                                      ││    c → convert to task spec                                   │ │
+│ │   ░░░░░░░░░░░░░░░░░░ 0/4 features               ││  · Rail sandbox & dry-run evaluator [planned · Should]        │ │
+│ │                                                 ││    c → convert to task spec                                   │ │
+│ │   ○ PHASE phase-3 CI/Team Integration &         ││  · Evidence integrity: checksums & provenance in gates.json … │ │
+│ │ Observability Scale                             ││    c → convert to task spec                                   │ │
+│ │   ░░░░░░░░░░░░░░░░░░ 0/4 features               ││  · Structured command linting to complement regex rails [pla… │ │
+│ │                                                 ││    c → convert to task spec                                   │ │
+│ └─────────────────────────────────────────────────┘└───────────────────────────────────────────────────────────────┘ │
+│  g generate · G refresh · j/k phase · c convert→spec                                                                 │
+│ ROAD  g generate · c convert→spec · a add feature                                                       : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+
+
+

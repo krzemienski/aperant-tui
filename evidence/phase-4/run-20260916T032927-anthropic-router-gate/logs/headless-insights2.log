@@ -1,0 +1,42 @@
+[insights] question: Which file implements the verdict parser, and what function does it expose for parsing verdict lines? Cite the exact file path.
+I'll search the codebase for the verdict parser implementation.**File: `/Users/nick/Desktop/vigil/src/plan/verdict.ts`**
+
+### Exposed function
+
+```ts
+export function parseVerdictLines(text: string): VerdictLine[]
+```
+
+It takes a block of text, splits it on `\r?\n`, and returns every recognized verdict line as a structured object.
+
+### What it recognizes
+
+The `VerdictLine` union has three variants, matched by three regexes in priority order:
+
+| Order | Regex | Shape | Example line |
+|---|---|---|---|
+| 1 | `PLAN_RE` | `{ type: "plan", planId, verdict }` | `PLAN my-plan: PASS` |
+| 2 | `GATE_RE` | `{ type: "gate", gateId, verdict, reason? }` | `VG-BUILD-01: FAIL missing artifact` |
+| 3 | `TASK_RE` | `{ type: "task", taskId }` | `TASK 003-evidence: DONE` |
+
+Notable details:
+- All patterns tolerate surrounding markdown noise via `[`*_]*` — so `` `VG-X: PASS` `` or `**PLAN p: PASS**` still parse.
+- All are case-insensitive; `gateId` is normalized to uppercase and `verdict` to lowercase.
+- Gate `reason` is the trailing remainder, trimmed of leading separators (`-`, `–`, `—`, `:`), and becomes `undefined` if empty.
+- The `continue` after each match means one line yields at most one verdict, and `PLAN` wins over `VG-` which wins over `TASK`.
+
+### Companion export
+
+The same file also exports `LineBuffer`, a small stateful splitter for streamed output — `push(chunk)` returns complete lines and retains the partial tail; `flush()` drains it. This is what lets the runner parse verdicts incrementally from the SDK stream rather than waiting for the full message.
+
+### Consumers
+
+`src/engine/runner.ts` and `src/engine/session.ts` are the main users, with coverage in `tests/parser.test.ts`, `tests/verdict-rails.test.ts`, and `tests/session-verdict.test.ts`.
+
+One observation: `GATE_RE` hardcodes the `VG-` prefix. If you ever want project-configurable gate ID prefixes (plausible alongside the planned `vigil init` scaffolding work), that regex becomes the place to parameterize.
+[insights] answer length: 1990 | cites source file: true
+[ideation] prompts dir: /Users/nick/dev/aperant-tui/desktop/prompts | exists: false
+[FATAL] Error: prompts dir missing — aborting ideation
+    at main (/Users/nick/dev/aperant-tui/apps/tui/drive-insights.tmp.ts:40:41)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+exit: 1

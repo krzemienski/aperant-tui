@@ -1,0 +1,40 @@
+APERANT_USER_DATA=/tmp/p4-ud COLORTERM=truecolor MOONSHOT_API_KEY=[REDACTED-KEY] MOONSHOT_BASE_URL=
+http://127.0.0.1:20219/v1 npx tsx src/cli.tsx /Users/nick/Desktop/vigil
+~/dev/aperant-tui/apps/tui
+❯ APERANT_USER_DATA=/tmp/p4-ud COLORTERM=truecolor MOONSHOT_API_KEY=[REDACTED-KEY] MOONSHOT_BASE_UR
+L=http://127.0.0.1:20219/v1 npx tsx src/cli.tsx /Users/nick/Desktop/vigil
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ vigil /Users/nick/Desktop/vigil │ ⑂ main                               ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                │
+│ ┌───────────────────────────────────────────────────────────────────────────────┐┌─────────────────────────────────┐ │
+│ │ PHASES                                                                        ││ DETAIL                          │ │
+│ │                                                                               ││ generate a roadmap first (g)    │ │
+│ │ no roadmap at /Users/nick/Desktop/vigil/.auto-claude/roadmap/roadmap.json     ││                                 │ │
+│ │ press g to generate from real codebase analysis                               ││                                 │ │
+│ │                                                                               ││                                 │ │
+│ │                                                                               ││                                 │ │
+│ │                                                                               ││                                 │ │
+│ └───────────────────────────────────────────────────────────────────────────────┘└─────────────────────────────────┘ │
+│  g generate · G refresh · j/k phase · c convert→spec                                                                 │
+│ ROAD  g generate · c convert→spec · a add feature                                                       : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

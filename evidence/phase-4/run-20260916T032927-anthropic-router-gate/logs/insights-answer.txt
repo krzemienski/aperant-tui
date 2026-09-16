@@ -1,0 +1,29 @@
+Q: Which file implements the verdict parser, and what function does it expose for parsing verdict lines? Cite the exact file path.
+
+A: I'll search the codebase for the verdict parser implementation.**File:** `/Users/nick/Desktop/vigil/src/plan/verdict.ts`
+
+**Exposed parsing function:** `parseVerdictLines(text: string): VerdictLine[]`
+
+### How it works
+
+It splits input on `\r?\n` and tests each line against three regexes, in priority order:
+
+| Order | Regex | Matches | Emits |
+|---|---|---|---|
+| 1 | `PLAN_RE` | `PLAN <id>: PASS\|FAIL` | `{ type: "plan", planId, verdict }` |
+| 2 | `GATE_RE` | `VG-<ID>: PASS\|FAIL [reason]` | `{ type: "gate", gateId, verdict, reason? }` |
+| 3 | `TASK_RE` | `TASK <id>: DONE` | `{ type: "task", taskId }` |
+
+Notable details:
+- All patterns tolerate surrounding Markdown noise via `[`*_]*` — so ``**VG-01: PASS**`` parses fine.
+- All are case-insensitive; `gateId` is normalized to uppercase and `verdict` to lowercase.
+- Gate reasons get leading separators stripped (`-`, `–`, `—`, `:`, whitespace), and empty reasons become `undefined`.
+- Matching is first-win per line via `continue`, so a line can only produce one verdict.
+
+### Companion export
+
+The same file exports `LineBuffer`, a small stateful splitter for streamed output. `push(chunk)` returns only complete lines and retains the trailing partial; `flush()` drains the remainder. This is what lets the runner parse verdicts incrementally from the SDK stream rather than waiting for a full message.
+
+Consumers include `src/engine/runner.ts`, `src/engine/session.ts`, and `src/plan/reports.ts`, with tests in `tests/verdict-rails.test.ts` and `tests/session-verdict.test.ts`.
+
+One observation worth flagging: `GATE_RE` requires the `VG-` prefix while `TASK_RE`/`PLAN_RE` accept any `[\w-]+` id, and none of the patterns anchor against text appearing mid-sentence in agent prose — so a model narrating "I'll now check VG-01: PASS criteria" would emit a spurious gate verdict. That relates directly to your backlog item on rail evaluation hardening.

@@ -135,6 +135,7 @@ export const DEFAULT_PHASE_THINKING: PhaseThinkingConfig = {
  * Used to auto-detect which provider to use for a given model.
  */
 export const MODEL_PROVIDER_MAP: Record<string, SupportedProvider> = {
+  'cc/': 'anthropic',
   'claude-': 'anthropic',
   'gpt-': 'openai',
   'o1-': 'openai',
@@ -147,10 +148,15 @@ export const MODEL_PROVIDER_MAP: Record<string, SupportedProvider> = {
   'llama-': 'groq',
   'grok-': 'xai',
   'glm-': 'zai',
+  // ('cc/' covers the operator's Anthropic-compatible router ids like
+  //  'cc/claude-opus-5' — Anthropic wire protocol, custom base URL)
   // [APERANT-PATCH moonshot-provider]: Moonshot AI (Kimi) model prefixes
   // ('kimi/' covers combo-proxy ids like 'kimi/kimi-for-coding')
+  // ('kmc/' covers the operator gateway's kimi-model-credit ids like
+  //  'kmc/kimi-for-coding' — same moonshot wire protocol)
   'kimi-': 'moonshot',
   'kimi/': 'moonshot',
+  'kmc/': 'moonshot',
   'moonshot-': 'moonshot',
   'moonshot/': 'moonshot',
 } as const;

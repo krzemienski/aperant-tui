@@ -1,0 +1,158 @@
+{
+  "code_improvements": [
+    {
+      "id": "ci-001",
+      "type": "code_improvements",
+      "title": "Byte-accurate, self-terminating `vigil tail`",
+      "description": "Rewrite the tail pump in src/cli.ts so it tracks a byte offset with a positioned read (fs.read / createReadStream({start})) instead of slicing a fully re-read UTF-8 string, buffers partial trailing lines across polls, and clears its interval when a `run.end` event arrives (with `--follow` to keep watching). Reuse RunStore.readEvents' JSONL parsing rather than an inline try/catch JSON.parse.",
+      "rationale": "The code reveals a concrete defect and an unfinished loop: `const size = statSync(f).size` yields BYTES, but `readFileSync(f, 'utf8').slice(pos)` slices by UTF-16 code units, so any non-ASCII byte in tool output (the cockpit emits ✓/✗/▶/·, and agent output is arbitrary) permanently desynchronises the tail and corrupts every subsequent line. The same loop also re-reads the entire events.jsonl from disk every 500ms and never exits, even though the event vocabulary already has a terminal `run.end` event that both `vigil runs` (cli.ts:138) and the reducer (reducer.ts:52) use as the end-of-run marker. All the pieces — RunStore.readEvents JSONL parsing, plainLine formatting, the run.end sentinel — already exist; only the read path is wrong.",
+      "builds_upon": [
+        "`vigil tail` command (src/cli.ts:119-130)",
+        "plainLine() event formatter (src/cli.ts:79-98)",
+        "RunStore.readEvents JSONL parsing (src/engine/store.ts:57-61)",
+        "`run.end` terminal event in the RunEvent union (src/engine/events.ts:18)"
+      ],
+      "estimated_effort": "trivial",
+      "affected_files": [
+        "src/cli.ts",
+        "src/engine/store.ts",
+        "tests/reducer.test.ts"
+      ],
+      "existing_patterns": [
+        "Append-only events.jsonl as the single source of truth (store.ts append())",
+        "plainLine(ev) returning `string | null` to filter noisy events, already shared by tail, replay --plain and --plain run mode",
+        "`run.end` detection via `evs.find((e) => e.kind === 'run.end')` in the `runs` command"
+      ],
+      "implementation_approach": "Add `static tailEvents(dir, onEvent, opts)` to RunStore next to readEvents: keep `pos` (bytes) and a `carry` string; each poll, if statSync(f).size > pos, open a read stream with `{ start: pos, end: size - 1 }`, concatenate to `carry`, split on /\\r?\\n/, keep the last fragment in `carry`, and JSON.parse each complete line into a RunEvent. Set pos = size. In cli.ts, replace the inline pump with this helper, printing plainLine(ev), and `clearInterval` + `process.exit(ev.ok ? 0 : 1)` when `ev.kind === 'run.end'` unless `--follow` was passed. Add a unit test that feeds a JSONL chunk containing multibyte characters split mid-line and asserts every event is recovered in order.",
+      "status": "draft",
+      "created_at": "2026-09-16T04:59:47Z"
+    },
+    {
+      "id": "ci-002",
+      "type": "code_improvements",
+      "title": "Write a derived runs/<id>/summary.json manifest from RunStore",
+      "description": "Extend RunStore.append()'s derived-artifact switch with `run.start`, `plan.end`, `session.result` and `run.end` cases that maintain and rewrite a `summary.json` per run: runId, label, mode, model, baseUrl, cwd, startedAt/endedAt, ok, per-plan verdicts and durations, gate pass/fail counts, total cost and token usage, and event count. `vigil runs` then reads summary.json (falling back to the existing full-events scan for legacy runs).",
+      "rationale": "The store already derives three side-car JSON files (gates.json, cost.json, session.json) from the same event stream using an identical 'mutate a private record, writeFileSync the whole thing' pattern — a fourth is a direct copy of that pattern. And the consumer is already written against a missing index: `vigil runs` (cli.ts:132-142) calls `RunStore.readEvents()` on EVERY run directory, parsing every line of every events.jsonl into memory just to find one `run.end` and the last `session.result`. A long-lived plan root makes `vigil runs` O(total events ever recorded). A summary manifest is the index that command already wants, and it is the natural input for any later cross-run tooling (prune, cost aggregation, diffing) that has to enumerate runs.",
+      "builds_upon": [
+        "RunStore derived artifacts gates.json / cost.json / session.json (src/engine/store.ts:45-51)",
+        "`vigil runs` listing command (src/cli.ts:132-142)",
+        "GateRecord shape and gatesForPlan() (src/engine/store.ts:13, 55)"
+      ],
+      "estimated_effort": "small",
+      "affected_files": [
+        "src/engine/store.ts",
+        "src/cli.ts",
+        "tests/reducer.test.ts"
+      ],
+      "existing_patterns": [
+        "switch (ev.kind) in RunStore.append() writing a derived JSON file per event class",
+        "Private accumulator field (`this.gates`, `this.cost`, `this.sessions`) rewritten in full on each update",
+        "`static readEvents(dir)` as the read-side accessor for run directories"
+      ],
+      "implementation_approach": "Add `export interface RunSummary` to store.ts and a private `this.summary: RunSummary`. In append(), add cases: `run.start` seeds runId/label/mode/model/baseUrl/cwd/startedAt; `plan.start`/`plan.end` push or update a `plans[]` entry with verdict + durationMs; `session.result` accumulates costUsd and usage totals; `run.end` sets endedAt/ok/reason and gate counters computed from `this.gates`. Write with the same `writeFileSync(join(this.dir, 'summary.json'), JSON.stringify(..., null, 2))` call used for gates.json, and bump an `events` counter on every append. Add `static readSummary(dir): RunSummary | null` mirroring readEvents, and change the `runs` action to prefer it, keeping the events scan as the fallback branch so existing run directories still list. Cover with a store test that replays a fixture event sequence and asserts the summary fields.",
+      "status": "draft",
+      "created_at": "2026-09-16T04:59:47Z"
+    },
+    {
+      "id": "ci-003",
+      "type": "code_improvements",
+      "title": "Rail action `\"ask\"` routed into the existing approval overlay",
+      "description": "Add a third rail action alongside `deny` and `warn`: `ask`. When a rail with action `ask` matches in the PreToolUse hook, PlanSession emits the existing ApprovalRequest so the cockpit's ApprovalOverlay pops for that single tool call — regardless of approval mode — and records `approval.resolve` with `by: \"rail\"`. Denying returns the same PreToolUse deny payload the rails already produce.",
+      "rationale": "Every piece of this already exists and one of them is literally dead code waiting for it. The `approval.resolve` event declares `by: \"user\" | \"auto\" | \"rail\"` (events.ts:31), but session.ts only ever emits `by: \"user\"` — the vocabulary anticipated rail-originated approvals that were never wired. Meanwhile the approval pipeline is complete end to end (canUseTool → emit('approval', ApprovalRequest) → Runner re-emit → App onApproval → ApprovalOverlay with y/Y/n → resolve), the rails engine already classifies hits by action with deny-wins ordering, and the PreToolUse hook already returns a structured deny decision. Today the only granularity is all-or-nothing: `approvals: 'auto'` prompts for nothing and `approvals: 'all'` prompts for every Read and Glob, which is unusable for long runs. `ask` gives per-pattern prompting with zero new UI.",
+      "builds_upon": [
+        "Rail type with action deny|warn and DEFAULT_RAILS (src/engine/rails.ts:5-27)",
+        "preToolUse hook decision path (src/engine/session.ts:84-97)",
+        "ApprovalRequest → runner → App → ApprovalOverlay pipeline (src/engine/session.ts:105-115, src/ui/App.tsx:29,48-53, src/ui/overlays.tsx)",
+        "Unused `by: \"rail\"` case on the approval.resolve event (src/engine/events.ts:31)"
+      ],
+      "estimated_effort": "small",
+      "affected_files": [
+        "src/engine/rails.ts",
+        "src/engine/session.ts",
+        "src/config.ts",
+        "src/cli.ts",
+        "tests/verdict-rails.test.ts"
+      ],
+      "existing_patterns": [
+        "evaluateRails() returning sorted RailHit[] with deny ranked above warn",
+        "`canUseTool` promise-bridge: emit an ApprovalRequest, await resolve, emit approval.request/approval.resolve around it",
+        "Zod enum in RailSchema mirroring the TypeScript Rail union (config.ts:7)",
+        "hook RunEvent with decision + `<railId>: <reason>` message formatting"
+      ],
+      "implementation_approach": "Widen `Rail['action']` to `\"deny\" | \"warn\" | \"ask\"` and the RailSchema z.enum to match; update evaluateRails' sort so ordering is deny > ask > warn. In preToolUse, after the deny branch, find the first `ask` hit and, if present, factor the promise-bridge currently inlined in canUseTool into a private `requestApproval(tool, input, by)` helper and await it; on deny return the same `hookSpecificOutput` deny payload with reason `Vigil rail <id> (denied by operator)`, and emit `approval.resolve` with `by: 'rail'`. Emit a `hook` event with decision `warn` carrying the rail id so the diagnostics pane shows why the prompt appeared. In --plain mode, cli.ts's existing approval handler already auto-denies and logs, so the fallback is free. Add rails unit tests for ordering and for ask-hit detection, and consider promoting the two existing `warn` defaults (real omp config, live DB) to `ask`.",
+      "status": "draft",
+      "created_at": "2026-09-16T04:59:47Z"
+    },
+    {
+      "id": "ci-004",
+      "type": "code_improvements",
+      "title": "Surface task-level progress from already-parsed tasks and TASK verdict lines",
+      "description": "Add a `task.update` RunEvent and thread it through: PlanSession acts on the `{ type: 'task' }` verdict lines it currently discards, the reducer tracks tasks per plan alongside gates, PlanPane renders task rows indented under their plan (with gates nested by `afterTask`), plainLine prints `TASK <id>: DONE`, and the VALIDATION report gains a task column. Also expose a derived 'current position' cursor from PlanModel.sequence for the header.",
+      "rationale": "The parser already produces a complete task model that is thrown away at runtime. `PlanModel.tasks`, `PlanModel.sequence` and `PlanGate.afterTask` are parsed (parser.ts:77-101), asserted in tests/parser.test.ts, and then referenced nowhere in src outside the parser — the only runtime consumers of PlanModel read `.gates` and `.file`. On the other side, verdict.ts defines `TASK_RE` and returns `{ type: 'task', taskId }` (verdict.ts:8,19), tests/verdict-rails.test.ts asserts it parses, and the runner contract explicitly instructs the agent to print `TASK <id>: DONE` (parser.ts:117) — but session.onVerdictLine (session.ts:136-158) only branches on 'gate' and 'plan', so every TASK line the agent emits is silently dropped. The data, the regex, the contract clause and the test are all in place; only the reducer/UI leg is missing, which is why a long plan shows a static gate list with no sense of progress between gates.",
+      "builds_upon": [
+        "PlanModel.tasks / sequence / PlanGate.afterTask (src/plan/parser.ts:33-43, 87-101)",
+        "TASK_RE verdict parsing (src/plan/verdict.ts:8, 19)",
+        "`TASK <id>: DONE` clause of the runner contract (src/plan/parser.ts:117)",
+        "gate.update → reducer → GateView → PlanPane GateRow rendering chain"
+      ],
+      "estimated_effort": "medium",
+      "affected_files": [
+        "src/engine/events.ts",
+        "src/engine/session.ts",
+        "src/state/reducer.ts",
+        "src/ui/panes.tsx",
+        "src/cli.ts",
+        "src/plan/reports.ts",
+        "tests/reducer.test.ts"
+      ],
+      "existing_patterns": [
+        "gate.update as the model for a per-item progress event (planId + itemId + verdict + reason)",
+        "reducer case mapping an event onto `s.plans[].gates[]` immutably (reducer.ts:90-93)",
+        "GateRow/verdictIcon rendering with animated spinner per verdict (src/ui/panes.tsx PlanPane)",
+        "planModels Map passed from cli.ts into App for static plan metadata (criteria, capture)"
+      ],
+      "implementation_approach": "Add `{ t; kind: 'task.update'; planId; taskId; name?; state: 'pending'|'running'|'done' }` to the RunEvent union. In session.onVerdictLine, add an `else if (v.type === 'task')` branch that looks up `this.opts.plan?.tasks.find(t => t.id === v.taskId)`, records it in a `taskState` Map mirroring the existing `gateState` Map, and emits task.update; mark the next task in `plan.sequence` as 'running'. In the reducer, extend PlanView with `tasks: TaskView[]`, seed it from a new `taskIds`/`sequence` field on plan.start (populated in runner.runOne from the PlanModel it already holds), and add a `task.update` case copied from the gate.update case. In PlanPane, interleave rows using `sequence` so gates appear under the task they follow via `afterTask`, reusing verdictIcon/fmtDuration. Add a plainLine case and a Tasks column in renderValidation. Extend tests/reducer.test.ts with a task.update sequence and tests/reports.test.ts with the new column.",
+      "status": "draft",
+      "created_at": "2026-09-16T04:59:47Z"
+    },
+    {
+      "id": "ci-005",
+      "type": "code_improvements",
+      "title": "Real mock-violation detection backing the report's hardcoded section",
+      "description": "Parse the `<mock_detection_protocol>` block every fixture plan already carries, compile it plus a configurable `mockPatterns[]` into rail-style matchers, evaluate them in both PreToolUse (tool input) and PostToolUse (tool output) via the existing rails engine, emit `hook` events tagged with the mock rule id, persist them as a `mocks` section in the run store, and render the VALIDATION report's 'Mock Violations' section from those observations instead of the hardcoded string. A mock hit during a gate downgrades a claimed PASS the same way missing evidence does.",
+      "rationale": "This is the product's core promise with a placeholder where the implementation should be: renderValidation (reports.ts:48-49) literally prints the string \"None observed (rails: no denied tool calls recorded in events.jsonl with reason 'mock')\" unconditionally — the report claims an observation Vigil never makes. The inputs are all present: every one of the six test fixture plans opens with a `<mock_detection_protocol>` block naming concrete banned artefacts (.test.*, mock libraries, in-memory DBs, TEST_MODE, a fake /api/health), parser.ts's BLOCK_RE is a single extensible alternation group that already handles four block types, rails.ts gives a regex-over-flattened-tool-call engine with deny/warn semantics and per-tool scoping, the PostToolUse hook is wired but currently only emits a no-op `observe` event (session.ts:99-103), and session.checkEvidence already demonstrates the exact 'downgrade a claimed PASS and inject a correction' mechanic (session.ts:144-148) that a mock hit should reuse.",
+      "builds_upon": [
+        "Hardcoded 'Mock Violations' section in renderValidation (src/plan/reports.ts:48-49)",
+        "`<mock_detection_protocol>` blocks in all six plan fixtures (tests/fixtures/omp-live-deploy/phases/**)",
+        "BLOCK_RE extensible block parser (src/plan/parser.ts:45)",
+        "evaluateRails / flattenToolCall regex engine (src/engine/rails.ts:29-49)",
+        "No-op PostToolUse hook (src/engine/session.ts:99-103)",
+        "Evidence-driven PASS downgrade + inject correction (src/engine/session.ts:144-148)"
+      ],
+      "estimated_effort": "large",
+      "affected_files": [
+        "src/plan/parser.ts",
+        "src/engine/rails.ts",
+        "src/engine/session.ts",
+        "src/engine/store.ts",
+        "src/engine/events.ts",
+        "src/plan/reports.ts",
+        "src/config.ts",
+        "src/state/reducer.ts",
+        "tests/reports.test.ts",
+        "tests/verdict-rails.test.ts"
+      ],
+      "existing_patterns": [
+        "BLOCK_RE alternation `<(task|validation_gate|regression_gate|phase_gate)…>` extended with a new tag, with the body captured verbatim like gate bodies",
+        "Capture:/Pass criteria: line extraction from a block body into structured fields (parser.ts:95-98)",
+        "Rail{ id, match, tools?, action, reason } + RailHit, sorted by severity",
+        "hook RunEvent with decision + `<ruleId>: <reason>` reason string, counted in reducer.hookCounts",
+        "RunStore.append() writing a derived per-run JSON side-car (gates.json pattern)",
+        "renderValidation building markdown sections from GateRecord[] observations"
+      ],
+      "implementation_approach": "1) Parser: add `mock_detection_protocol` to BLOCK_RE's tag group and return `PlanModel.mockProtocol?: { body: string; rules: Rail[] }`, deriving rules from backticked/quoted tokens in the body (`.test.*`, `TEST_MODE`, `/api/health`) plus a shipped default set, each as a Rail with action 'warn' and id `mock-<n>` — reuse extractCaptureTargets' tokenising style. 2) Config: add `mockPatterns: z.array(RailSchema).default(DEFAULT_MOCK_RULES)` so operators can extend or disable, exactly like `rails`. 3) rails.ts: generalise evaluateRails to take an optional `text` override so the same function can score a tool OUTPUT string, not just `flattenToolCall(tool, input)`. 4) session.ts: evaluate mock rules in preToolUse (input) and in postToolUse against the stringified `tool_response`, emit `hook` events with event 'MockDetection' and decision 'warn', and record hits in a `mockHits: {ruleId, tool, toolUseId, excerpt, t}[]`. In onVerdictLine, if a gate claims PASS while mock hits landed since the gate started, downgrade to fail and `inject()` a correction using the same wording shape as the evidence check. 5) store.ts: accumulate hits into `mocks.json` via the gates.json pattern and expose `mocksForPlan(planId)`. 6) reports.ts: replace the literal string with rows rendered from the recorded hits (rule id, tool, excerpt) or 'None observed' when the list is genuinely empty. 7) Tests: parser test for the new block on an existing fixture, a rails test for output-side matching, and a reports test asserting a seeded hit renders.",
+      "status": "draft",
+      "created_at": "2026-09-16T04:59:47Z"
+    }
+  ]
+}

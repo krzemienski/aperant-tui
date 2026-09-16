@@ -128,6 +128,83 @@ export function provisionMoonshotAccount(input: MoonshotProvisionInput = {}): Pr
   return { ok: true, accountId, baseUrl, updated };
 }
 
+const ANTHROPIC_DEFAULT_BASE_URL = 'https://router.hack.ski/v1';
+
+/**
+ * Provision (or update) an Anthropic-compatible router account from explicit
+ * input, falling back to the environment:
+ *   ANTHROPIC_AUTH_TOKEN / ANTHROPIC_BASE_URL (token via env only — never
+ *   written into settings.json; the caller must keep ANTHROPIC_AUTH_TOKEN
+ *   exported in the TUI process for every live call).
+ */
+export function provisionAnthropicAccount(
+  input: { apiKey?: string; baseUrl?: string; name?: string } = {},
+): ProvisionResult {
+  const apiKey = (input.apiKey ?? process.env.ANTHROPIC_AUTH_TOKEN ?? '').trim();
+  // The @ai-sdk/anthropic client appends '/messages' to baseURL, so the
+  // account must carry the '/v1' root the router serves (curl-proofed:
+  // https://router.hack.ski/v1/messages → 200).
+  const rawBaseUrl = (input.baseUrl ?? process.env.ANTHROPIC_BASE_URL ?? ANTHROPIC_DEFAULT_BASE_URL).trim();
+  const baseUrl = /\/v\d+$/.test(rawBaseUrl) ? rawBaseUrl : `${rawBaseUrl.replace(/\/+$/, '')}/v1`;
+
+  if (!apiKey) {
+    return { ok: false, reason: 'no token — set ANTHROPIC_AUTH_TOKEN in the environment' };
+  }
+  if (apiKey.length < 8 || /\s/.test(apiKey)) {
+    return { ok: false, reason: 'token looks malformed (too short or contains whitespace) — refusing to write' };
+  }
+  if (!/^https?:\/\//.test(baseUrl)) {
+    return { ok: false, reason: `base URL must be http(s), got "${baseUrl}"` };
+  }
+
+  const settingsPath = getSettingsPath();
+  const read = readSettingsRaw(settingsPath);
+  if (!read.ok) return { ok: false, reason: read.reason };
+  const settings = read.settings;
+
+  const accounts = Array.isArray(settings.providerAccounts)
+    ? (settings.providerAccounts as Array<Record<string, unknown>>)
+    : [];
+  const now = Date.now();
+  const existing = accounts.find((a) => a.provider === 'anthropic');
+
+  let accountId: string;
+  let updated = false;
+  if (existing) {
+    existing.apiKey = apiKey;
+    existing.baseUrl = baseUrl;
+    existing.updatedAt = now;
+    accountId = String(existing.id);
+    updated = true;
+  } else {
+    accountId = `anthropic-${now.toString(36)}`;
+    accounts.push({
+      id: accountId,
+      provider: 'anthropic',
+      name: input.name ?? 'Anthropic (operator router)',
+      authType: 'api-key',
+      billingModel: 'pay-per-use',
+      apiKey,
+      baseUrl,
+      createdAt: now,
+      updatedAt: now,
+    });
+  }
+  settings.providerAccounts = accounts;
+
+  const order = Array.isArray(settings.globalPriorityOrder)
+    ? (settings.globalPriorityOrder as string[])
+    : [];
+  settings.globalPriorityOrder = [accountId, ...order.filter((id) => id !== accountId)];
+
+  try {
+    writeSettingsAtomic(settingsPath, settings);
+  } catch (err) {
+    return { ok: false, reason: `failed to write settings.json: ${err instanceof Error ? err.message : String(err)}` };
+  }
+  return { ok: true, accountId, baseUrl, updated };
+}
+
 /** List configured provider accounts without exposing credentials. */
 export function listProviderAccounts(): AccountView[] {
   const settingsPath = getSettingsPath();

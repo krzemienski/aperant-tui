@@ -19,7 +19,7 @@ Adds Moonshot AI (Kimi) as a first-class provider via the workspace package
 | `main/ai/providers/registry.ts` | same case for the registry path |
 | `main/ai/auth/resolver.ts` | `BUILTIN_TO_SUPPORTED` += moonshot; API-key resolution passes account `headers`/`kimiChatId` through (e.g. `X-Kimi-Chat-Id` for agent-gw) |
 | `main/ai/auth/types.ts` | `PROVIDER_ENV_VARS.moonshot = 'MOONSHOT_API_KEY'` |
-| `main/ai/config/types.ts` | `MODEL_PROVIDER_MAP` += `kimi-`, `kimi/`, `moonshot-`, `moonshot/` |
+| `main/ai/config/types.ts` | `MODEL_PROVIDER_MAP` += `kimi-`, `kimi/`, `kmc/` (2026-09-15: operator gateway kimi-model-credit ids), `moonshot-`, `moonshot/`, `cc/` (2026-09-16: operator Anthropic-compatible router ids, e.g. `cc/claude-opus-5`) |
 | `shared/constants/models.ts` | moonshot entries in `DEFAULT_MODEL_EQUIVALENCES` (opus/sonnet tiers) + native `kimi-k2` / `kimi-k2-turbo` shorthands |
 
 ## worker-path (2026-08-12)

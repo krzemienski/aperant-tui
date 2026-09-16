@@ -23,6 +23,7 @@ import { AgentsView } from './views/AgentsView';
 import { openProject, type OpenedProject } from './services/project-service';
 import { getTasks, getCounts, refreshTasks } from './services/task-service';
 import { readSettingsFile } from '@main/settings-utils';
+import { registerSettingsAccessor } from '@main/ai/auth/resolver';
 import { observability } from './services/observability';
 import { getSpecsDir } from '@shared/constants';
 import { existsSync, readFileSync } from 'node:fs';
@@ -31,6 +32,19 @@ import path from 'node:path';
 interface AppProps {
   projectPath: string;
 }
+
+// The vendored auth resolver reads provider accounts through a settings
+// accessor the Electron main process registers at boot. The TUI runs the
+// same code in-process, so it must register its own accessor (raw settings
+// file, no migration) — without this, queue resolution finds zero accounts
+// and every runner falls back to unauthenticated defaults.
+registerSettingsAccessor((key: string) => {
+  // The vendored resolver handles both shapes (string-encoded JSON or raw
+  // arrays/objects) — hand the raw value through the same cast the desktop
+  // uses; filtering on typeof would hide array-valued keys like
+  // providerAccounts.
+  return readSettingsFile()?.[key] as string | undefined;
+});
 
 const VIEW_KEYS: Record<string, ViewName> = { '1': 'board', '2': 'term', '3': 'road', '4': 'chat', '5': 'tree', '6': 'set', '7': 'agents' };
 
@@ -127,7 +141,9 @@ export function App({ projectPath }: AppProps) {
       store.flash('press ctrl+c again to quit');
       setTimeout(() => { ctrlCArmed.current = false; }, 1500);
     },
-  }, { isActive: !overlaysOpen && view !== 'agents' });
+  // Chat view yields digits too: InsightsView's 1-6 keys browse ideation
+  // types when in ideation mode (same pattern as agents).
+  }, { isActive: !overlaysOpen && view !== 'agents' && view !== 'chat' });
 
   // While the agents view is active, only the non-digit globals live here.
   useKeymap({
@@ -140,7 +156,7 @@ export function App({ projectPath }: AppProps) {
       store.flash('press ctrl+c again to quit');
       setTimeout(() => { ctrlCArmed.current = false; }, 1500);
     },
-  }, { isActive: !overlaysOpen && view === 'agents' });
+  }, { isActive: !overlaysOpen && (view === 'agents' || view === 'chat') });
 
   // Palette open: Esc closes (TextInput consumes Enter itself).
   useInput((input, key) => {
@@ -187,8 +203,8 @@ export function App({ projectPath }: AppProps) {
             onTasksChanged={() => setTasks(refreshTasks(opened.project))} />
         )}
         {!helpOpen && view === 'term' && <TerminalView theme={theme} project={opened.project} isActive={viewActive} />}
-        {!helpOpen && view === 'road' && <RoadmapView theme={theme} project={opened.project} />}
-        {!helpOpen && view === 'chat' && <InsightsView theme={theme} project={opened.project} />}
+        {!helpOpen && view === 'road' && <RoadmapView theme={theme} project={opened.project} isActive={viewActive} />}
+        {!helpOpen && view === 'chat' && <InsightsView theme={theme} project={opened.project} isActive={viewActive} />}
         {!helpOpen && view === 'tree' && <WorktreeView theme={theme} project={opened.project} isActive={viewActive} />}
         {!helpOpen && view === 'set' && <SettingsView theme={theme} isActive={viewActive} />}
         {!helpOpen && view === 'agents' && <AgentsView theme={theme} project={opened.project} isActive={viewActive} />}

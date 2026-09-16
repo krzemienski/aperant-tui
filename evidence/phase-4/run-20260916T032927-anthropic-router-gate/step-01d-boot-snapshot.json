@@ -1,0 +1,16 @@
+{
+  "ok": true,
+  "command": "snapshot",
+  "timestamp": "2026-09-16T04:11:39.056Z",
+  "result": {
+    "format": "text",
+    "sessionId": "01M2M6HQ9XYG3RF2H14EN4M05Y",
+    "capturedAtSeq": 8,
+    "cols": 118,
+    "rows": 40,
+    "cursorRow": 10,
+    "cursorCol": 0,
+    "text": "bash: rbenv: command not found\nbash: /usr/local/bin/virtualenvwrapper.sh: No such file or directory\nbash: /usr/local/bin/virtualenvwrapper.sh: No such file or directory\n\nThe default interactive shell is now zsh.\nTo update your account to use zsh, please run `chsh -s /bin/zsh`.\nFor more details, please visit https://support.apple.com/kb/HT208050.\n\nnick at m4-max-959 in ~/dev/aperant-tui/apps/tui on main [!?]\n$ node dist/cli.mjs /Users/nick/Desktop/vigil\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "screenHash": "11b6d7c93ea185f1d89d3b8ca3524f00d0f16b274963cd2c7adcb987f85c16fd"
+  }
+}

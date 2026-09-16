@@ -1,0 +1,40 @@
+    'strict-transport-security': 'max-age=31536000; includeSubDomains',
+    vary: 'Origin',
+    'x-internal-adhoc-canary': '180026571',
+    'x-msh-trace-id': '4c830a4fff81dbc90988cb6d8444ede4'
+  },
+  responseBody: '{"error":{"message":"Invalid Authentication","type":"invalid_authentication_error"}}',
+  isRetryable: false,
+  data: {
+    error: {
+      message: 'Invalid Authentication',
+      type: 'invalid_authentication_error'
+    }
+  },
+  [Symbol(vercel.ai.error)]: true,
+  [Symbol(vercel.ai.error.AI_APICallError)]: true
+}
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ vigil /Users/nick/Desktop/vigil │ ⑂ main                               ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                │
+│ ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ GENERATION                                                                                                       │ │
+│ │ ERROR: Discovery failed: Attempt 1: Discovery file not created; Attempt 2: Discovery file not created; Attempt   │ │
+│ │ 3: Discovery file not created                                                                                    │ │
+│ │ Running discovery phase...                                                                                       │ │
+│ │ Error: Invalid Authentication                                                                                    │ │
+│ │ Error: Invalid Authentication                                                                                    │ │
+│ │ Error: Invalid Authentication                                                                                    │ │
+│ │ Phase discovery failed                                                                                           │ │
+│ └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ ┌───────────────────────────────────────────────────────────────────────────────┐┌─────────────────────────────────┐ │
+│ │ PHASES                                                                        ││ DETAIL                          │ │
+│ │                                                                               ││ generate a roadmap first (g)    │ │
+│ │ no roadmap at /Users/nick/Desktop/vigil/.auto-claude/roadmap/roadmap.json     ││                                 │ │
+│ │ press g to generate from real codebase analysis                               ││                                 │ │
+│ │                                                                               ││                                 │ │
+│ └───────────────────────────────────────────────────────────────────────────────┘└─────────────────────────────────┘ │
+│  g generate · G refresh · j/k phase · c convert→spec                                                                 │
+│ ROAD  g generate · c convert→spec · a add feature                                                       : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+

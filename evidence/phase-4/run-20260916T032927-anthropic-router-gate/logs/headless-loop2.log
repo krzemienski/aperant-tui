@@ -1,0 +1,3 @@
+[setup] settings path: /tmp/p4-loop-ud/settings.json
+[FATAL] Error: provision failed: no token — set ANTHROPIC_AUTH_TOKEN in the environment
+    at main (/Users/nick/dev/aperant-tui/apps/tui/drive-loop.tmp.ts:23:23)
