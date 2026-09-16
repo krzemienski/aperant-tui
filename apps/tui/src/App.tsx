@@ -147,6 +147,13 @@ export function App({ projectPath }: AppProps) {
     if (key.escape && paletteOpen) store.closePalette();
   }, { isActive: paletteOpen });
 
+  // Help overlay is a REPLACEMENT view whose own close keys must stay live
+  // while it is open (the main keymaps are disabled under overlays, so
+  // without this binding help could never be dismissed).
+  useInput((input, key) => {
+    if (helpOpen && (key.escape || input === '?')) store.closeOverlays();
+  }, { isActive: helpOpen });
+
   if (openError && !opened) {
     return (
       <Box flexDirection="column" padding={1}>

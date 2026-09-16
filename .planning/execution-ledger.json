@@ -183,6 +183,12 @@
       },
       "status": "done",
       "artifact": "proofpunk commits daaed5df + 7f65a3fb; proofpunk-skills-improvement-report-round2.md"
+    },
+    {
+      "id": "P3",
+      "title": "Phase 3 Terminal Emulation \u2014 DESCOPED",
+      "status": "descoped",
+      "note": "Operator directive 2026-09-15: terminal-in-terminal scrapped. Multi-pane/zoom/emulation-proof work reverted. Kept: D12 help-overlay close fix, D13 emulator+PTY resize lockstep (both verified post-revert: tsc clean, 9/9 tests). Single Phase-1 shell pane remains the shipped terminal surface."
     }
   ],
   "defects_caught_by_gates": [
@@ -192,7 +198,9 @@
     "D8: agent-tty wait envelope ok:true on timeout \u2014 assertions moved to result.matched",
     "D9: fixture used .aperant/ while the vendored runtime only discovers .auto-claude/ \u2014 board silently empty; caught by wait mismatch + title-bar counts",
     "D10: bridge stream-event re-emit never reached the manager emitter \u2014 forward added in agent-process.ts",
-    "D11: AI SDK v7 renamed usage fields (inputTokens/outputTokens); vendored stream-handler read v6 names, silently recorded 0 tokens \u2014 dual-shape read, verified with real counts"
+    "D11: AI SDK v7 renamed usage fields (inputTokens/outputTokens); vendored stream-handler read v6 names, silently recorded 0 tokens \u2014 dual-shape read, verified with real counts",
+    "D12: help overlay could never be closed (keymaps disabled under overlays; phase-1 gate only opened it)",
+    "D13: PtyPane resized PTY but not the xterm emulator \u2014 zoom/layout fed stale grid geometry"
   ],
   "escalations": []
 }

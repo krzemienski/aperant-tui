@@ -134,7 +134,12 @@ export function PtyPane({ cwd, theme, focused, title, onExit, onReady }: PtyPane
 
   useEffect(() => {
     const st = stateRef.current;
-    if (st) termSvc.resize(st.t, cols, rows);
+    // Resize BOTH the emulator and the PTY — a resized PTY feeding a stale
+    // emulator grid truncates/reflows output at the old cell size.
+    if (st) {
+      if (st.term.cols !== cols || st.term.rows !== rows) st.term.resize(cols, rows);
+      termSvc.resize(st.t, cols, rows);
+    }
   }, [cols, rows]);
 
   useInput((input, key) => {
