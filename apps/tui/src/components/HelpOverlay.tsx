@@ -10,7 +10,10 @@ import { THEME_NAMES } from '../theme/themes';
 // (uppercase `L` is the board's move-column-right binding, already on the
 // `H / L` row above). Keep this list in sync when bindings change.
 const ROWS: Array<[string, string]> = [
-  ['1-6', 'switch view'],
+  // VIEW_KEYS in App.tsx binds 1-7 (board term road chat tree set agents).
+  // Inside the agents and chat views these same digits are claimed locally
+  // (agents sub-views / ideation types); esc re-arms tab switching for 1.5s.
+  ['1-7', 'switch view (esc first in agents/chat)'],
   ['j / k', 'move selection'],
   ['⏎', 'focus / open'],
   ['H / L', 'move task column (board)'],
