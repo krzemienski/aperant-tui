@@ -1,0 +1,50 @@
+limited to 4096. Set maxOutputTokens explicitly to override this limit.
+(node:60643) Warning: AI SDK Warning (anthropic.messages / glm/glm-5): The feature "maxOutputTokens" is used in a compatibility mode. The model "glm/glm-5" is unknown. The max output tokens have been
+limited to 4096. Set maxOutputTokens explicitly to override this limit.
+(node:60643) Warning: AI SDK Warning (anthropic.messages / glm/glm-5): The feature "maxOutputTokens" is used in a compatibility mode. The model "glm/glm-5" is unknown. The max output tokens have been
+limited to 4096. Set maxOutputTokens explicitly to override this limit.
+(node:60643) Warning: AI SDK Warning (anthropic.messages / glm/glm-5): The feature "maxOutputTokens" is used in a compatibility mode. The model "glm/glm-5" is unknown. The max output tokens have been
+limited to 4096. Set maxOutputTokens explicitly to override this limit.
+(node:60643) Warning: AI SDK Warning (anthropic.messages / glm/glm-5): The feature "maxOutputTokens" is used in a compatibility mode. The model "glm/glm-5" is unknown. The max output tokens have been
+limited to 4096. Set maxOutputTokens explicitly to override this limit.
+(node:60643) Warning: AI SDK Warning (anthropic.messages / glm/glm-5): The feature "maxOutputTokens" is used in a compatibility mode. The model "glm/glm-5" is unknown. The max output tokens have been
+limited to 4096. Set maxOutputTokens explicitly to override this limit.
+(node:60643) Warning: AI SDK Warning (anthropic.messages / glm/glm-5): The feature "maxOutputTokens" is used in a compatibility mode. The model "glm/glm-5" is unknown. The max output tokens have been
+limited to 4096. Set maxOutputTokens explicitly to override this limit.
+(node:60643) Warning: AI SDK Warning (anthropic.messages / glm/glm-5): The feature "maxOutputTokens" is used in a compatibility mode. The model "glm/glm-5" is unknown. The max output tokens have been
+limited to 4096. Set maxOutputTokens explicitly to override this limit.
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ proofpunk-agent /Users/nick/proofpunk-agent │ ⑂ master                                                                                                 ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┌────────────────────────────────────────────────────────────────────────────────────────┐ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ TASKS                                                                                  │ │ DETAIL                                                                                                │ │
+│ │ ◆ BACKLOG (3)                                                                          │ │ 001-scre [BACKLOG]                                                                                    │ │
+│ │ ❯ 001-scre ▽ Screens 2-5 beyond the P1 shell placeholder                               │ │ Screens 2-5 beyond the P1 shell placeholder                                                           │ │
+│ │   002-prom ▽ Promote n/w from roadmap-honesty stubs to real bindings                   │ │ progress ░░░░░░░░░░░░░░ 0%                                                                            │ │
+│ │   003-term ▽ Terminal floor 100x28 blocking-resize overlay coverage                    │ │ subtasks 0/0 complete                                                                                 │ │
+│ │                                                                                        │ │ phase -                                                                                               │ │
+│ │                                                                                        │ │ location main  spec 001-screens-2-5-beyond-the-p1-shell-placeholder                                   │ │
+│ │                                                                                        │ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ │                                                                                        │                                                                                                           │
+│ │                                                                                        │ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │                                                                                        │ │ AGENT STREAM                                                                                          │ │
+│ │                                                                                        │ │ no recorded runs for this task                                                                        │ │
+│ └────────────────────────────────────────────────────────────────────────────────────────┘ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ BOARD  j/k move · ⏎ focus · s start · x stop · H/L column · l logs                                                                                                                      : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

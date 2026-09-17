@@ -14,6 +14,14 @@ interface AppState {
   helpOpen: boolean;
   toast: string | null;
   configError: string | null;
+  /**
+   * D18: true while a view has a focused text input (InsightsView's `a` ask
+   * box). Ink's useInput has no consumption semantics — every active listener
+   * sees every keystroke — so the global keymap must stand down explicitly or
+   * typing '?' or ':' fires the help/palette handler instead of entering the
+   * character. Views set this on focus and clear it on blur/submit.
+   */
+  textInputActive: boolean;
   setView: (v: ViewName) => void;
   setTheme: (name: string) => void;
   cycleTheme: (dir: 1 | -1) => void;
@@ -21,6 +29,7 @@ interface AppState {
   closePalette: () => void;
   toggleHelp: () => void;
   closeOverlays: () => void;
+  setTextInputActive: (active: boolean) => void;
   flash: (msg: string) => void;
 }
 
@@ -46,6 +55,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   helpOpen: false,
   toast: null,
   configError: bootConfigError,
+  textInputActive: false,
   setView: (v) => set((s) => ({ view: v, previousView: s.view })),
   setTheme: (name) => {
     if (!THEME_NAMES.includes(name)) {
@@ -67,6 +77,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   closePalette: () => set({ paletteOpen: false }),
   toggleHelp: () => set((s) => ({ helpOpen: !s.helpOpen })),
   closeOverlays: () => set({ paletteOpen: false, helpOpen: false }),
+  setTextInputActive: (active) => set({ textInputActive: active }),
   flash: (msg) => {
     if (toastTimer) clearTimeout(toastTimer);
     set({ toast: msg });

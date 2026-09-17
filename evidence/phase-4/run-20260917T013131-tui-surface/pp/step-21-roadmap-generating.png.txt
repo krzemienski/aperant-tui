@@ -1,0 +1,50 @@
+(node:60643) Warning: AI SDK Warning System: To turn off warning logging, set the AI_SDK_LOG_WARNINGS global to false.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:60643) Warning: AI SDK Warning (anthropic.messages / glm/glm-5): The feature "maxOutputTokens" is used in a compatibility mode. The model "glm/glm-5" is unknown. The max output tokens have been
+limited to 4096. Set maxOutputTokens explicitly to override this limit.
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ proofpunk-agent /Users/nick/proofpunk-agent │ ⑂ master                                                                                                 ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ GENERATION                                                                                                                                                                                       │ │
+│ │ RUNNING · discovery 30% — Running discovery phase...                                                                                                                                             │ │
+│ │  ███████░░░░░░░░░░░░░░░░░ discovery                                                                                                                                                              │ │
+│ │ Running discovery phase...                                                                                                                                                                       │ │
+│ └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐┌────────────────────────────────────────────────────────────────────────┐ │
+│ │ PHASES                                                                                                                 ││ DETAIL                                                                 │ │
+│ │                                                                                                                        ││ generate a roadmap first (g)                                           │ │
+│ │ no roadmap at /Users/nick/proofpunk-agent/.auto-claude/roadmap/roadmap.json                                            ││                                                                        │ │
+│ │ press g to generate from real codebase analysis                                                                        ││                                                                        │ │
+│ │                                                                                                                        ││                                                                        │ │
+│ └────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘└────────────────────────────────────────────────────────────────────────┘ │
+│  generating… x stop                                                                                                                                                                                  │
+│ ROAD  g generate · c convert→spec                                                                                                                                                       : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

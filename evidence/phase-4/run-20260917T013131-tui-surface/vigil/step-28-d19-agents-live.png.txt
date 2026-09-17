@@ -1,0 +1,50 @@
+│ │                                                                                        │ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ │                                                                                        │                                                                                                           │
+│ │                                                                                        │ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │                                                                                        │ │ AGENT STREAM                                                                                          │ │
+│ │                                                                                        │ │ 02:05:31 start 001-neut → vendored AgentManager…                                                      │ │
+│ │                                                                                        │ │ 02:05:32 started 001-neut: agent started — phase planning                                             │ │
+│ └────────────────────────────────────────────────────────────────────────────────────────┘ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ BOARD  j/k move · ⏎ focus · s start · x stop · H/L column · l logs                                                                                                                      : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+(node:46661) Warning: AI SDK Warning System: To turn off warning logging, set the AI_SDK_LOG_WARNINGS global to false.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:46661) Warning: AI SDK Warning (anthropic.messages / glm/glm-5): The feature "maxOutputTokens" is used in a compatibility mode. The model "glm/glm-5" is unknown. The max output tokens have been
+limited to 4096. Set maxOutputTokens explicitly to override this limit.
+(node:46661) Warning: AI SDK Warning (anthropic.messages / glm/glm-5): The feature "maxOutputTokens" is used in a compatibility mode. The model "glm/glm-5" is unknown. The max output tokens have been
+limited to 4096. Set maxOutputTokens explicitly to override this limit.
+(node:46661) Warning: AI SDK Warning (anthropic.messages / glm/glm-5): The feature "maxOutputTokens" is used in a compatibility mode. The model "glm/glm-5" is unknown. The max output tokens have been
+limited to 4096. Set maxOutputTokens explicitly to override this limit.
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ vigil /Users/nick/Desktop/vigil │ ⑂ main                                                                                                               ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│  1 swarm   2 graph   3 inspect   4 trace   5 tokens   6 waits  1 agent · esc then 1-7 to switch tabs                                                                                                 │
+│                                                                                                                                                                                                      │
+│ ┌────────────────────────────────────────────────────────────────────────────────┐ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ AGENT SWARM · 1 live                                                           │ │ SWARM VITALS                                                                                                  │ │
+│ │    AGENT              TYPE               STEPS      CTX      WAITING ON        │ │ running   1                                                                                                   │ │
+│ │  ❯ ● 001-neutral-defa   planner            2/1000     █░░░░    — executing     │ │ blocked   0                                                                                                   │ │
+│ │                                                       14%                      │ │ paused    0                                                                                                   │ │
+│ │                                                                                │ │ Σ tokens  27.1k                                                                                               │ │
+│ │   phase: ▪ structured vs ~ inferred provenance shown in INSPECT                │ └───────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ │                                                                                │                                                                                                                   │
+│ │                                                                                │ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │                                                                                │ │ LIVE TOOL TRACE                                                                                               │ │
+│ │                                                                                │ │ 02:07:49 001-neutral- text-delta                                                                              │ │
+│ │                                                                                │ │ 02:07:49 001-neutral- text-delta                                                                              │ │
+│ │                                                                                │ │ 02:07:49 001-neutral- text-delta                                                                              │ │
+│ │                                                                                │ │ 02:07:49 001-neutral- text-delta                                                                              │ │
+│ │                                                                                │ │ 02:07:49 001-neutral- step-finish step 11 · 21.2k tok                                                         │ │
+│ │                                                                                │ │ 02:07:49 001-neutral- task:CODING_STARTED {"type":"CODING_STARTED","taskId":"001-neutral-default-rails-with-… │ │
+│ │                                                                                │ │ 02:07:55 001-neutral- → Bash {"command":"cd /Users/nick/Desktop/vigil/.auto-claude/worktrees/tasks/001-neu…   │ │
+│ │                                                                                │ │ 02:07:55 001-neutral- ← 14ms /Users/nick/Desktop/vigil/.auto-claude/worktrees/tasks/001-neutral-default-ra…   │ │
+│ │                                                                                │ │ 02:07:55 001-neutral- step-finish step 1 · 12.0k tok                                                          │ │
+│ │                                                                                │ │ 02:08:00 001-neutral- → Bash {"command":"cat src/engine/rails.ts","description":"Read rails.ts"}              │ │
+│ │                                                                                │ │ 02:08:00 001-neutral- ← 10ms /**                                                                              │ │
+│ │                                                                                │ │  * Safety rails evaluated in PreToolUse. Each rail is a regex against a                                       │ │
+│ │                                                                                │ │  …                                                                                                            │ │
+│ │                                                                                │ │ 02:08:00 001-neutral- step-finish step 2 · 15.1k tok                                                          │ │
+│ └────────────────────────────────────────────────────────────────────────────────┘ └───────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ AGENTS  1-6 sub-view · j/k select · ⏎ inspect · f filter · r resume                                                                                                                     : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+

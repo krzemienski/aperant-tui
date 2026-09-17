@@ -74,8 +74,13 @@ export function InsightsView({ theme: c, project, isActive }: Props) {
     const ac = new AbortController(); abortRef.current = ac;
     try {
       await runInsightsQuery(
-        // full model id: provider prefix resolves to the anthropic router account
-        { projectDir: project.path, message: q, abortSignal: ac.signal, modelShorthand: (process.env.APERANT_MODEL ?? 'cc/claude-opus-5') as never },
+        // D15: the default must be a SHORTHAND, not a full router id. A full id
+        // ('cc/claude-opus-5') is passed to the queue verbatim, so when that
+        // route dies upstream the view is stuck with no way to redirect it.
+        // 'sonnet' resolves through resolveModelId, which honours
+        // ANTHROPIC_DEFAULT_SONNET_MODEL (ai/config/phase-config.ts:80) — so an
+        // operator can point it at any model their endpoint actually serves.
+        { projectDir: project.path, message: q, abortSignal: ac.signal, modelShorthand: (process.env.APERANT_MODEL ?? 'sonnet') as never },
         (ev) => {
           if (ev.type === 'text-delta') setAnswer((a) => (a ?? '') + ev.text);
           else if (ev.type === 'error') setAnswer((a) => (a ?? '') + `\n[error] ${ev.error}`);
@@ -110,7 +115,8 @@ export function InsightsView({ theme: c, project, isActive }: Props) {
         if (ac.signal.aborted) break;
         setIdeationStatus(`${t.label}…`);
         await runIdeation(
-          { projectDir: project.path, outputDir, promptsDir, ideationType: t.key, abortSignal: ac.signal, modelShorthand: (process.env.APERANT_MODEL ?? 'cc/claude-opus-5') as never },
+          // D15 (see ask()): shorthand default, redirectable via env.
+          { projectDir: project.path, outputDir, promptsDir, ideationType: t.key, abortSignal: ac.signal, modelShorthand: (process.env.APERANT_MODEL ?? 'sonnet') as never },
           (ev) => { if (ev.type === 'text-delta') setIdeationStatus(`${t.label}… streaming`); },
         );
       }
@@ -139,6 +145,15 @@ export function InsightsView({ theme: c, project, isActive }: Props) {
   }, { isActive: isActive && !asking });
 
   useEffect(() => () => abortRef.current?.abort(), []);
+
+  // D18: while the ask box is focused it owns the keyboard — the global
+  // keymap must stand down or a typed '?' opens help and a typed ':' opens the
+  // palette instead of entering the character. Cleared on unmount too, so
+  // leaving the view mid-question can never strand the global keys off.
+  useEffect(() => {
+    useAppStore.getState().setTextInputActive(asking);
+    return () => { useAppStore.getState().setTextInputActive(false); };
+  }, [asking]);
 
   const ideationFile = useMemo(() => {
     if (mode !== 'ideation') return null;

@@ -1,0 +1,50 @@
+    max_tokens: 128000,
+    temperature: undefined,
+    top_k: undefined,
+    top_p: undefined,
+    stop_sequences: undefined,
+    thinking: { type: 'enabled', budget_tokens: 16384 },
+    system: [ [Object] ],
+    messages: [ [Object] ],
+    tools: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ vigil /Users/nick/Desktop/vigil │ ⑂ main                                                                                                               ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│  1 swarm   2 graph   3 inspect   4 trace   5 tokens   6 waits  1 agent · esc then 1-7 to switch tabs                                                                                                 │
+│                                                                                                                                                                                                      │
+│ ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ EVENT TRACE · all agents · 6 events                                                                                                                                                              │ │
+│ │   TIME      AGENT         EVENT          TOOL                DUR     PAYLOAD                                                                                                                     │ │
+│ │ 01:37:41.231 001-neutral- error         —                  —       not found                                                                                                                     │ │
+│ │ 01:37:41.242 001-neutral- error         —                  —       not found                                                                                                                     │ │
+│ │ 01:37:41.252 001-neutral- error         —                  —       not found                                                                                                                     │ │
+│ │ 01:37:41.253 001-neutral- task:CODING_FAILED—                  —       {"type":"CODING_FAILED","taskId":"001-neutral-default-rails-with-environment-profiles","specId":"001-neutral-default-rai  │ │
+│ │ 01:37:41.253 001-neutral- error         —                  —       Implementation plan validation failed after 3 attempts: File not found: /Users/nick/Desktop/vigil/.auto-claude/worktrees/tas… │ │
+│ │ 01:37:41.253 001-neutral- exit          —                  —       code 1                                                                                                                        │ │
+│ │ f toggles agent filter · ring buffer 10k · outlier >3000ms highlighted                                                                                                                           │ │
+│ └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ AGENTS  1-6 sub-view · j/k select · ⏎ inspect · f filter · r resume                                                                                                                     : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

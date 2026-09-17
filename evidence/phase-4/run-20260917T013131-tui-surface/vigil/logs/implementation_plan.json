@@ -1,0 +1,288 @@
+{
+  "feature": "Neutral default rails with environment profiles",
+  "workflow_type": "refactor",
+  "phases": [
+    {
+      "id": "phase-1-neutral-rails",
+      "name": "Neutralize DEFAULT_RAILS",
+      "subtasks": [
+        {
+          "id": "subtask-1-1",
+          "title": "Rewrite DEFAULT_RAILS portable",
+          "description": "In src/engine/rails.ts: keep no-git-stash, no-pkill-pattern, no-agent-instruction-edits, no-rm-rf-home (verify it covers any home dir incl. ${HOME} token form). Rewrite no-checkout-main to deny git checkout/switch outside a worktree using ${planRoot}-relative reasoning: deny when the -C target is NOT inside ${planRoot}/.claude/worktrees — expressed with the interpolated token, no Desktop/OmniRoute literal. Remove warn-real-omp-config and warn-live-db entirely. No rail may contain '/Users/', 'OmniRoute', '.omp', port numbers, or 'launchctl'.",
+          "status": "pending",
+          "files_to_create": [],
+          "files_to_modify": [
+            "src/engine/rails.ts"
+          ],
+          "verification": {
+            "type": "command"
+          },
+          "service": "backend",
+          "patterns_from": [
+            "src/engine/rails.ts"
+          ]
+        },
+        {
+          "id": "subtask-1-2",
+          "title": "Add path-token interpolation",
+          "description": "Add interpolateTokens(match: string, ctx: { home: string; planRoot: string; cwd: string }): string to src/engine/rails.ts (or a small util) replacing literal substrings ${HOME}, ${planRoot}, ${cwd} with escaped-regex-safe values (escape regex metachars in interpolated paths). Call it in evaluateRails before compiling the RegExp, with ctx derived from os.homedir(), process.cwd(), and an optional planRoot parameter threaded through. evaluateRails gains an optional ctx param defaulting sensibly.",
+          "status": "pending",
+          "files_to_create": [],
+          "files_to_modify": [
+            "src/engine/rails.ts"
+          ],
+          "verification": {
+            "type": "command"
+          },
+          "service": "backend",
+          "patterns_from": [
+            "src/engine/rails.ts"
+          ]
+        }
+      ],
+      "depends_on": [],
+      "type": "implementation",
+      "description": "Rewrite DEFAULT_RAILS in src/engine/rails.ts as a portable generic set: no-git-stash, generic no-checkout-main using ${planRoot} token, no-pkill-pattern, no-agent-instruction-edits, no-rm-rf-home. Remove warn-real-omp-config and warn-live-db (they move to the omniroute profile). No absolute user paths, hostnames, ports anywhere.",
+      "parallel_safe": true
+    },
+    {
+      "id": "phase-2-profiles",
+      "name": "Profile loading system",
+      "subtasks": [
+        {
+          "id": "subtask-2-1",
+          "title": "Create profiles/omniroute.json",
+          "description": "Create profiles/omniroute.json containing the rails removed from DEFAULT_RAILS reproducing previous author-specific behaviour: warn-real-omp-config (using ${HOME}/.omp paths via tokens where feasible), warn-live-db (${HOME}/.omniroute/storage.sqlite), and the strict no-checkout-main variant pinning ${HOME}/Desktop/OmniRoute excluding worktrees. Profile file schema: { \"rails\": Rail[] } (may later carry probes/env). Tokens allowed in profile matches.",
+          "status": "pending",
+          "files_to_create": [
+            "profiles/omniroute.json"
+          ],
+          "files_to_modify": [],
+          "verification": {
+            "type": "command"
+          },
+          "service": "backend",
+          "patterns_from": [
+            "src/engine/rails.ts"
+          ]
+        },
+        {
+          "id": "subtask-2-2",
+          "title": "Implement profile loader",
+          "description": "Create src/engine/profiles.ts: resolveProfile(name: string, searchPaths: string[]) loads profiles/<name>.json from the package root (and VIGIL_PROFILE_PATH override), validates with the RailSchema shape, and on unknown name throws a named error ProfileNotFoundError listing available profile names. Config gains optional `profile: string` field in ConfigSchema; loadConfig merges: profile rails REPLACE default rails (profile rails appended after defaults, or replace — spec says 'loadable via config', choose append-after-defaults so neutral protection always applies; document choice). Interpolate tokens at config load with ${planRoot} resolved from the run's plan root argument where available.",
+          "status": "pending",
+          "files_to_create": [
+            "src/engine/profiles.ts"
+          ],
+          "files_to_modify": [
+            "src/config.ts"
+          ],
+          "verification": {
+            "type": "command"
+          },
+          "service": "backend",
+          "patterns_from": [
+            "src/config.ts"
+          ]
+        },
+        {
+          "id": "subtask-2-3",
+          "title": "Add --profile CLI flag",
+          "description": "In src/cli.ts common options: add .option(\"--profile <name>\", \"load a rail profile from profiles/\"). Pass through to loadConfig so CLI flag overrides config-file profile.",
+          "status": "pending",
+          "files_to_modify": [
+            "src/cli.ts"
+          ],
+          "verification": {
+            "type": "command"
+          },
+          "service": "backend",
+          "patterns_from": [
+            "src/cli.ts"
+          ]
+        }
+      ],
+      "depends_on": [
+        "phase-1-neutral-rails"
+      ],
+      "type": "implementation",
+      "description": "Create shipped profiles under profiles/ and wire loading via config.profile and --profile.",
+      "parallel_safe": false
+    },
+    {
+      "id": "phase-3-tests-config",
+      "name": "Tests and config example cleanup",
+      "subtasks": [
+        {
+          "id": "subtask-3-1",
+          "title": "Update verdict-rails tests",
+          "description": "tests/verdict-rails.test.ts: keep deny assertions for git stash, pkill -f, kill-by-PID allow, worktree checkout allow, AGENTS.md edit deny. Author-specific assertions (Desktop/OmniRoute checkout deny, .omp warn) move to loading profiles/omniroute.json rails. Add cases: checkout rail fires for an arbitrary repo path (e.g. git -C /repos/foo checkout main with planRoot ctx), rm -rf ~ and rm -rf ${HOME} denied, token interpolation unit tests for ${HOME}, ${planRoot}, ${cwd}.",
+          "status": "pending",
+          "files_to_create": [],
+          "files_to_modify": [
+            "tests/verdict-rails.test.ts"
+          ],
+          "verification": {
+            "type": "command"
+          },
+          "service": "backend",
+          "patterns_from": [
+            "tests/verdict-rails.test.ts"
+          ]
+        },
+        {
+          "id": "subtask-3-2",
+          "title": "Add profile loading tests",
+          "description": "Create tests/profiles.test.ts: loading profiles/omniroute.json yields rails reproducing old behaviour (checkout deny in main OmniRoute checkout, warn on .omp config, warn on live db with .backup exception); unknown profile name throws a named error listing available profiles (assert message contains 'omniroute').",
+          "status": "pending",
+          "files_to_create": [
+            "tests/profiles.test.ts"
+          ],
+          "files_to_modify": [],
+          "verification": {
+            "type": "command"
+          },
+          "service": "backend",
+          "patterns_from": [
+            "tests/verdict-rails.test.ts"
+          ]
+        },
+        {
+          "id": "subtask-3-3",
+          "title": "Neutralize vigil.config.example.json",
+          "description": "Replace vigil.config.example.json author content: generic baseUrl placeholder, generic cwd, remove .omniroute/.omp/LaunchAgents addDirs, remove probes referencing 20219/20128/router.hack.ski/launchctl (replace with a commented-style generic example or empty array), optionally show \"profile\": \"omniroute\" as an example.",
+          "status": "pending",
+          "files_to_create": [],
+          "files_to_modify": [
+            "vigil.config.example.json"
+          ],
+          "verification": {
+            "type": "command"
+          },
+          "service": "backend",
+          "patterns_from": []
+        }
+      ],
+      "depends_on": [
+        "phase-2-profiles"
+      ],
+      "type": "implementation",
+      "description": "Update tests for the new rail set and profiles; scrub the shipped example config of author-specific content.",
+      "parallel_safe": false
+    },
+    {
+      "id": "phase-4-verify",
+      "name": "End-to-end acceptance verification",
+      "subtasks": [
+        {
+          "id": "subtask-4-1",
+          "title": "Acceptance criteria sweep",
+          "description": "Run: grep for '/Users/nick', 'OmniRoute', '.omp', '20128', '20219', '20239', 'launchctl' across src/, tests/ fixtures if author-specific, profiles/ (note: profiles/omniroute.json legitimately contains OmniRoute/.omp strings — the spec says 'shipped config'; verify grep of src/ and default rails only is clean) and vigil.config.example.json; npm test; npm run typecheck. Record results in build-progress.txt.",
+          "status": "pending",
+          "files_to_create": [],
+          "files_to_modify": [],
+          "verification": {
+            "type": "e2e"
+          },
+          "all_services": true,
+          "patterns_from": []
+        }
+      ],
+      "depends_on": [
+        "phase-3-tests-config"
+      ],
+      "type": "integration",
+      "description": "Run the full acceptance criteria: grep sweep, full test suite, typecheck.",
+      "parallel_safe": false
+    }
+  ],
+  "workflow_rationale": "Replaces author-specific DEFAULT_RAILS with a portable set while preserving old behaviour via a shipped profile — add new (neutral rails + interpolation + profiles), migrate (move author rails to profile), verify old behaviour via profile.",
+  "summary": {
+    "total_phases": 4,
+    "total_subtasks": 8,
+    "services_involved": [
+      "backend"
+    ],
+    "parallelism": {
+      "max_parallel_phases": 1,
+      "parallel_groups": [],
+      "recommended_workers": 1,
+      "speedup_estimate": "sequential — single service, dependent phases"
+    },
+    "startup_command": "source auto-claude/.venv/bin/activate && python auto-claude/run.py --spec 001 --parallel 1"
+  },
+  "verification_strategy": {
+    "risk_level": "medium",
+    "skip_validation": false,
+    "test_creation_phase": "with_implementation",
+    "test_types_required": [
+      "unit"
+    ],
+    "security_scanning_required": false,
+    "staging_deployment_required": false,
+    "acceptance_criteria": [
+      "grep for /Users/nick, OmniRoute, .omp, 20128, 20219, 20239, launchctl across src/ and shipped default config returns zero matches",
+      "DEFAULT_RAILS denies git stash, checkout/switch outside worktree, pkill -f/killall, rm -rf home, agent-instruction file edits with no absolute user paths",
+      "${HOME}, ${planRoot}, ${cwd} interpolation resolved at config load, unit-tested per token",
+      "profiles/omniroute.json reproduces previous author behaviour, loadable via config.profile or --profile",
+      "verdict-rails tests pass with added arbitrary-repo checkout case",
+      "Unknown profile name fails validation with named error listing available profiles"
+    ],
+    "verification_steps": [
+      {
+        "name": "Unit Tests",
+        "command": "npm test",
+        "expected_outcome": "All vitest tests pass",
+        "type": "test",
+        "required": true,
+        "blocking": true
+      },
+      {
+        "name": "Typecheck",
+        "command": "npm run typecheck",
+        "expected_outcome": "No type errors",
+        "type": "test",
+        "required": true,
+        "blocking": true
+      },
+      {
+        "name": "Author-string grep",
+        "command": "grep -rn '/Users/nick\\|OmniRoute\\|\\.omp\\|20128\\|20219\\|20239\\|launchctl' src/ vigil.config.example.json",
+        "expected_outcome": "Zero matches",
+        "type": "test",
+        "required": true,
+        "blocking": true
+      }
+    ],
+    "reasoning": "Behavior-preserving refactor of safety rails with unit-test coverage; no security scanning or staging needed"
+  },
+  "qa_acceptance": {
+    "unit_tests": {
+      "required": true,
+      "commands": [
+        "npm test"
+      ],
+      "minimum_coverage": null
+    },
+    "integration_tests": {
+      "required": false,
+      "commands": [],
+      "services_to_test": []
+    },
+    "e2e_tests": {
+      "required": false,
+      "commands": [],
+      "flows": []
+    },
+    "browser_verification": {
+      "required": false,
+      "pages": []
+    },
+    "database_verification": {
+      "required": false,
+      "checks": []
+    }
+  },
+  "qa_signoff": null
+}

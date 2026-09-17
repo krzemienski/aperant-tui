@@ -1,0 +1,50 @@
+}
+
+Node.js v22.22.3
+Context7 Documentation MCP Server v4.1.1 running on stdio
+LoadAPIKeyError [AI_LoadAPIKeyError]: Anthropic API key is missing. Pass it using the 'apiKey' parameter or the ANTHROPIC_API_KEY environment variable.
+    at loadApiKey (/Users/nick/dev/aperant-tui/apps/tui/dist/agent-worker.cjs:16687:11)
+    at getHeaders (/Users/nick/dev/aperant-tui/apps/tui/dist/agent-worker.cjs:43148:20)
+    at resolve (/Users/nick/dev/aperant-tui/apps/tui/dist/agent-worker.cjs:17956:13)
+    at _AnthropicMessagesBatchLanguageModel.getBetasFromHeaders (/Users/nick/dev/aperant-tui/apps/tui/dist/agent-worker.cjs:45636:59)
+    at _AnthropicMessagesBatchLanguageModel.doStream (/Users/nick/dev/aperant-tui/apps/tui/dist/agent-worker.cjs:46202:41)
+    at execute (/Users/nick/dev/aperant-tui/apps/tui/dist/agent-worker.cjs:29567:46)
+    at async runWithTracingChannelSpan (/Users/nick/dev/aperant-tui/apps/tui/dist/agent-worker.cjs:25865:12)
+    at async executeLanguageModelCall (/Users/nick/dev/aperant-tui/apps/tui/dist/agent-worker.cjs:26069:14)
+    at async streamLanguageModelCall (/Users/nick/dev/aperant-tui/apps/tui/dist/agent-worker.cjs:29565:7)
+    at async retryWithExponentialBackoffInternal (/Users/nick/dev/aperant-tui/apps/tui/dist/agent-worker.cjs:18005:12) {
+  cause: undefined,
+  [Symbol(vercel.ai.error)]: true,
+  [Symbol(vercel.ai.error.AI_LoadAPIKeyError)]: true
+}
+LoadAPIKeyError [AI_LoadAPIKeyError]: Anthropic API key is missing. Pass it using the 'apiKey' parameter or the ANTHROPIC_API_KEY environment variable.
+    at loadApiKey (/Users/nick/dev/aperant-tui/apps/tui/dist/agent-worker.cjs:16687:11)
+    at getHeaders (/Users/nick/dev/aperant-tui/apps/tui/dist/agent-worker.cjs:43148:20)
+    at resolve (/Users/nick/dev/aperant-tui/apps/tui/dist/agent-worker.cjs:17956:13)
+    at _AnthropicMessagesBatchLanguageModel.getBetasFromHeaders (/Users/nick/dev/aperant-tui/apps/tui/dist/agent-worker.cjs:45636:59)
+    at _AnthropicMessagesBatchLanguageModel.doStream (/Users/nick/dev/aperant-tui/apps/tui/dist/agent-worker.cjs:46202:41)
+    at execute (/Users/nick/dev/aperant-tui/apps/tui/dist/agent-worker.cjs:29567:46)
+    at async runWithTracingChannelSpan (/Users/nick/dev/aperant-tui/apps/tui/dist/agent-worker.cjs:25865:12)
+    at async executeLanguageModelCall (/Users/nick/dev/aperant-tui/apps/tui/dist/agent-worker.cjs:26069:14)
+    at async streamLanguageModelCall (/Users/nick/dev/aperant-tui/apps/tui/dist/agent-worker.cjs:29565:7)
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ vigil /Users/nick/Desktop/vigil │ ⑂ main                                                                                                               ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┌────────────────────────────────────────────────────────────────────────────────────────┐ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ TASKS                                                                                  │ │ DETAIL                                                                                                │ │
+│ │ ◆ BACKLOG (3)                                                                          │ │ 001-neut [BACKLOG]                                                                                    │ │
+│ │ ❯ 001-neut ▽ Neutral default rails with environment profiles                           │ │ Neutral default rails with environment profiles                                                       │ │
+│ │   002-vigi ▽ `vigil init` config and plan scaffolding                                  │ │ progress ░░░░░░░░░░░░░░ 0%                                                                            │ │
+│ │   003-cont ▽ Content-aware evidence assertions with hash recording                     │ │ subtasks 0/0 complete                                                                                 │ │
+│ │                                                                                        │ │ phase -                                                                                               │ │
+│ │                                                                                        │ │ location main  spec 001-neutral-default-rails-with-environment-profiles                               │ │
+│ │                                                                                        │ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ │                                                                                        │                                                                                                           │
+│ │                                                                                        │ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │                                                                                        │ │ AGENT STREAM                                                                                          │ │
+│ │                                                                                        │ │ 01:40:29 start 001-neut → vendored AgentManager…                                                      │ │
+│ │                                                                                        │ │ 01:40:29 started 001-neut: agent started — phase planning                                             │ │
+│ └────────────────────────────────────────────────────────────────────────────────────────┘ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ BOARD  j/k move · ⏎ focus · s start · x stop · H/L column · l logs                                                                                                                      : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+

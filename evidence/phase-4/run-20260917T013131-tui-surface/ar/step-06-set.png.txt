@@ -1,0 +1,50 @@
+limited to 4096. Set maxOutputTokens explicitly to override this limit.
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ awesome-researcher /Users/nick/awesome-researcher │ ⑂ feat/awesome-researcher                                                                          ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┌────────────────────────────────────────────────────────────────────┐ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ THEME                                                              │ │ CONFIG                                                                                                                    │ │
+│ │        cyberpunk                                                   │ │ tui config        /Users/nick/.aperant/tui.json                                                                           │ │
+│ │ ❯      matrix  ACTIVE                                              │ │ desktop settings  /Users/nick/.aperant/settings.json                                                                      │ │
+│ │        amber                                                       │ │ provider          not configured                                                                                          │ │
+│ │        synth                                                       │ │ model             not configured                                                                                          │ │
+│ │        ice                                                         │ └───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ │                                                                    │                                                                                                                               │
+│ │ j/k select · applies live · persists to tui.json                   │ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │                                                                    │ │ ACCOUNTS                                                                                                                  │ │
+│ │                                                                    │ │ anthropic  Anthropic (operator r… key omnirou… http://127.0.0.1:20128/v1                                                  │ │
+│ │                                                                    │ │ a add/update Anthropic router from env · m Moonshot (Kimi) · writes settings.json · queue-priority first                  │ │
+│ └────────────────────────────────────────────────────────────────────┘ └───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ SET  j/k select theme · ⏎ apply · a Anthropic acct · m Moonshot acct                                                                                                                    : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,50 @@
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ vigil /Users/nick/Desktop/vigil │ ⑂ main                                                                                                               ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│                                                                      ┌────────────────────────────────────────────────────────┐                                                                      │
+│                                                                      │                                                        │                                                                      │
+│                                                                      │   KEYBINDINGS                                          │                                                                      │
+│                                                                      │                                                        │                                                                      │
+│                                                                      │   1-6           switch view                            │                                                                      │
+│                                                                      │   j / k         move selection                         │                                                                      │
+│                                                                      │   ⏎             focus / open                           │                                                                      │
+│                                                                      │   H / L         move task column (board)               │                                                                      │
+│                                                                      │   s / x         start / stop task                      │                                                                      │
+│                                                                      │   n             new task                               │                                                                      │
+│                                                                      │   m             merge worktree                         │                                                                      │
+│                                                                      │   L             task logs                              │                                                                      │
+│                                                                      │   z             zoom terminal pane (raw passthrough)   │                                                                      │
+│                                                                      │   :             command palette                        │                                                                      │
+│                                                                      │   ?             toggle help                            │                                                                      │
+│                                                                      │   ctrl+c ×2     quit                                   │                                                                      │
+│                                                                      │   esc           close / back                           │                                                                      │
+│                                                                      │                                                        │                                                                      │
+│                                                                      │   :theme cyberpunk│matrix│amber│synth│ice              │                                                                      │
+│                                                                      │                                                        │                                                                      │
+│                                                                      └────────────────────────────────────────────────────────┘                                                                      │
+│ AGENTS  1-6 sub-view · j/k select · ⏎ inspect · f filter · r resume                                                                                                                     : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

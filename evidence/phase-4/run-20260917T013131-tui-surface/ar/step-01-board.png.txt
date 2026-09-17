@@ -1,0 +1,50 @@
+(node:84554) Warning: AI SDK Warning System: To turn off warning logging, set the AI_SDK_LOG_WARNINGS global to false.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:84554) Warning: AI SDK Warning (anthropic.messages / glm/glm-5): The feature "maxOutputTokens" is used in a compatibility mode. The model "glm/glm-5" is unknown. The max output tokens have been
+limited to 4096. Set maxOutputTokens explicitly to override this limit.
+(node:84554) Warning: AI SDK Warning (anthropic.messages / glm/glm-5): The feature "maxOutputTokens" is used in a compatibility mode. The model "glm/glm-5" is unknown. The max output tokens have been
+limited to 4096. Set maxOutputTokens explicitly to override this limit.
+(node:84554) Warning: AI SDK Warning (anthropic.messages / glm/glm-5): The feature "maxOutputTokens" is used in a compatibility mode. The model "glm/glm-5" is unknown. The max output tokens have been
+limited to 4096. Set maxOutputTokens explicitly to override this limit.
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ awesome-researcher /Users/nick/awesome-researcher │ ⑂ feat/awesome-researcher                                                                          ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┌────────────────────────────────────────────────────────────────────────────────────────┐ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ TASKS                                                                                  │ │ DETAIL                                                                                                │ │
+│ │ ◆ BACKLOG (3)                                                                          │ │ 001-tri- [BACKLOG]                                                                                    │ │
+│ │ ❯ 001-tri- ▽ Tri-state link verdict: alive / blocked-but-alive / dead                  │ │ Tri-state link verdict: alive / blocked-but-alive / dead                                              │ │
+│ │   002-per- ▽ Per-host politeness and Retry-After compliance in validation              │ │ progress ░░░░░░░░░░░░░░ 0%                                                                            │ │
+│ │   003-list ▽ List-health audit mode                                                    │ │ subtasks 0/0 complete                                                                                 │ │
+│ │                                                                                        │ │ phase -                                                                                               │ │
+│ │                                                                                        │ │ location main  spec 001-tri-state-link-verdict-alive-blocked-but-alive-dead                           │ │
+│ │                                                                                        │ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ │                                                                                        │                                                                                                           │
+│ │                                                                                        │ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │                                                                                        │ │ AGENT STREAM                                                                                          │ │
+│ │                                                                                        │ │ no recorded runs for this task                                                                        │ │
+│ └────────────────────────────────────────────────────────────────────────────────────────┘ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ BOARD  j/k move · ⏎ focus · s start · x stop · H/L column · l logs                                                                                                                      : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

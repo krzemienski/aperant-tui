@@ -56,6 +56,7 @@ export function App({ projectPath }: AppProps) {
   const helpOpen = useAppStore((s) => s.helpOpen);
   const toast = useAppStore((s) => s.toast);
   const configError = useAppStore((s) => s.configError);
+  const textInputActive = useAppStore((s) => s.textInputActive);
   const store = useAppStore.getState();
 
   const tier = useMemo(() => detectColorTier(), []);
@@ -66,6 +67,16 @@ export function App({ projectPath }: AppProps) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [logsTask, setLogsTask] = useState<Task | null>(null);
   const ctrlCArmed = useRef(false);
+  // D14: agents/chat were a one-way trap — AgentsView literally tells the
+  // user on screen "esc then 1-7 to switch tabs", but escape only called
+  // closeOverlays() and never restored digit tab-navigation. `escape` now
+  // ARMS tabNavArmed; the very next digit consumes it and switches views.
+  // Ref-armed with an auto-disarm timeout, like ctrlCArmed above — but
+  // unlike ctrlCArmed, a digit press or a second escape must be able to
+  // cancel the pending disarm, so the timer handle itself is tracked in
+  // tabNavTimer rather than fired-and-forgotten.
+  const tabNavArmed = useRef(false);
+  const tabNavTimer = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const doOpenProject = useCallback((p: string) => {
     try {
@@ -127,7 +138,13 @@ export function App({ projectPath }: AppProps) {
     });
   }, [opened]);
 
+  // D18: a focused text input owns the keyboard. Ink's useInput has no
+  // consumption semantics, so unless the global keymap stands down, typing a
+  // '?' or ':' into InsightsView's ask box fires help/palette instead of
+  // entering the character (reproduced: a typed question containing '?' opened
+  // the help overlay mid-sentence).
   const overlaysOpen = paletteOpen || helpOpen;
+  const globalKeysActive = !overlaysOpen && !textInputActive;
   useKeymap({
     // Digit tab-switching yields inside the agents view, whose own 1-6 keys
     // select observability sub-views (D4 lesson: dispatch, don't freeze).
@@ -143,20 +160,49 @@ export function App({ projectPath }: AppProps) {
     },
   // Chat view yields digits too: InsightsView's 1-6 keys browse ideation
   // types when in ideation mode (same pattern as agents).
-  }, { isActive: !overlaysOpen && view !== 'agents' && view !== 'chat' });
+  }, { isActive: globalKeysActive && view !== 'agents' && view !== 'chat' });
 
-  // While the agents view is active, only the non-digit globals live here.
+  // D14: while the agents/chat view is active, the non-digit globals live
+  // here as before, PLUS digit bindings gated on tabNavArmed.
+  //
+  // When NOT armed the digit handlers below no-op — that is safe, not a
+  // swallow. Ink's useInput (hooks/useKeymap.ts wraps
+  // ink/build/hooks/use-input.js) subscribes each active instance
+  // independently on a plain EventEmitter with no stopPropagation: every
+  // active useInput/useKeymap — this one AND AgentsView's/InsightsView's
+  // own 1-6 keymap — receives every keystroke no matter what any other
+  // instance's handler does. So a ref-gated no-op here is functionally
+  // identical to conditionally omitting the binding (the heavier "only
+  // spread the bindings into the keymap object when armed, via state"
+  // alternative) — either way AgentsView's `1` still selects SWARM and
+  // InsightsView's `4` still selects ideation type 4 when we're not armed.
   useKeymap({
     ':': () => store.openPalette(),
     '?': () => store.toggleHelp(),
-    escape: () => store.closeOverlays(),
+    escape: () => {
+      store.closeOverlays();
+      tabNavArmed.current = true;
+      store.flash('press 1-7 to switch tabs');
+      clearTimeout(tabNavTimer.current);
+      tabNavTimer.current = setTimeout(() => {
+        tabNavArmed.current = false;
+        tabNavTimer.current = undefined;
+      }, 1500);
+    },
     'ctrl+c': () => {
       if (ctrlCArmed.current) { quit(); return; }
       ctrlCArmed.current = true;
       store.flash('press ctrl+c again to quit');
       setTimeout(() => { ctrlCArmed.current = false; }, 1500);
     },
-  }, { isActive: !overlaysOpen && (view === 'agents' || view === 'chat') });
+    ...Object.fromEntries(Object.entries(VIEW_KEYS).map(([k, v]) => [k, () => {
+      if (!tabNavArmed.current) return;
+      tabNavArmed.current = false;
+      clearTimeout(tabNavTimer.current);
+      tabNavTimer.current = undefined;
+      store.setView(v);
+    }])),
+  }, { isActive: globalKeysActive && (view === 'agents' || view === 'chat') });
 
   // Palette open: Esc closes (TextInput consumes Enter itself).
   useInput((input, key) => {

@@ -106,10 +106,11 @@ export function RoadmapView({ theme: c, project, isActive }: Props) {
   const generate = useCallback((refresh: boolean) => {
     setLogLines([]); setErrorMsg(null); setRunning(true);
     setProgress({ phase: 'starting', progress: 5, message: 'Starting roadmap generation…' });
-    // Full model id (not a shorthand): the queue resolver detects the
-    // provider from the prefix and matches the anthropic router account —
-    // 'cc/' is mapped as anthropic (operator router ids).
-    roadmapSvc.startGeneration(project, { refresh, model: process.env.APERANT_MODEL ?? 'cc/claude-opus-5' }).catch((e) => {
+    // D15: default to a SHORTHAND, not a full router id. Full ids reach the
+    // queue verbatim, so a dead upstream route leaves no way to redirect;
+    // 'sonnet' resolves via resolveModelId, which honours
+    // ANTHROPIC_DEFAULT_SONNET_MODEL (ai/config/phase-config.ts:80).
+    roadmapSvc.startGeneration(project, { refresh, model: process.env.APERANT_MODEL ?? 'sonnet' }).catch((e) => {
       setRunning(false);
       setErrorMsg(e instanceof Error ? e.message : String(e));
     });

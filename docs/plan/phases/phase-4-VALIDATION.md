@@ -8,15 +8,28 @@ never written to the repo; secret scan clean, `step-09-secret-scan.txt`).
 Target project: `~/Desktop/vigil` (cold: `.auto-claude/` removed pre-run).
 
 Evidence standard: three facets where the surface allows (UI / disk / logs).
-**Harness deviation (documented):** agent-tty cannot hold this Ink app's frame
-on macOS — 10+ boot attempts across every variant (tsx/PID-1/dist bundle/bash
-and zsh wrappers, node24 PATH, fresh `--home`, renderer overrides) painted
-blank or transient; prior green gates ran on Linux (phase-1 evidence shows a
-Linux container prompt). The macOS-working driver from the prior session
-(tuistory) also failed to paint this session after daemon restart. The UI
-facet is therefore **UNVERIFIED — harness limitation on this host**; every
-functional criterion was proven by driving the SAME vendored entry points the
-TUI views call, in-process, with console + disk + flight-recorder evidence.
+**Harness deviation — SUPERSEDED 2026-09-17, root cause found.** This run
+recorded the UI facet as UNVERIFIED, blaming "agent-tty cannot hold this Ink
+app's frame on macOS" after 10+ boot attempts across every variant. That
+diagnosis was wrong. The app was healthy throughout; the cause is a single
+environment variable:
+
+> `node_modules/ink/build/ink.js:111-116` — when `is-in-ci` reports true, Ink's
+> renderer stores the frame and returns **without writing a single byte**.
+
+Agent harnesses export `CI=true`, so every driver was instructing a working TUI
+to render nothing. Proven by controlled arms (same app, same PTY, same 200x50
+geometry, single variable): `CI=true` → 0 frames painted; `CI` unset → full TUI.
+A secondary trap in the same file (`ink.js:121-125`) forces a full
+`clearTerminal` every frame when `outputHeight >= stdout.rows`, so short PTYs
+sample a wiped screen — hence a ≥50-row floor.
+
+The UI facet is now **PROVEN**: `tools/tui-capture.py` (tmux PTY → ANSI → PNG)
+strips `CI` and eleven sibling triggers inside the pane, and captured 55
+screenshots across three real codebases —
+`evidence/phase-4/run-20260917T013131-tui-surface/VERDICT.md`. That run also
+found and fixed four defects (D14 digit-trap, D15 dead hardcoded model default,
+D16 queue ignoring model overrides, D17 advertised-but-unbound keys).
 
 ## What shipped (code)
 

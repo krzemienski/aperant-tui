@@ -1,0 +1,50 @@
+limited to 4096. Set maxOutputTokens explicitly to override this limit.
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ proofpunk-agent /Users/nick/proofpunk-agent │ ⑂ master                                                                                                 ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┌───────────────────────────────────────────────────────────────────────────────────────┐┌─────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ PHASES                                                                                ││ DETAIL                                                                                                  │ │
+│ │ ❯ ○ PHASE phase-0-foundation Foundation & Verification Core                           ││ Foundation & Verification Core                                                                          │ │
+│ │   ░░░░░░░░░░░░░░░░░░ 0/3 features                                                     ││  · SDK binding layer pinned to claude-agent-sdk 0.2.144 [planned · Must]                                │ │
+│ │                                                                                       ││    c → convert to task spec                                                                             │ │
+│ │   ○ PHASE phase-1-tui TUI Session Observation                                         ││  · Framed digest computation over plugin tree files [planned · Must]                                    │ │
+│ │   ░░░░░░░░░░░░░░░░░░ 0/3 features                                                     ││    c → convert to task spec                                                                             │ │
+│ │                                                                                       ││  · Gated verification workflow with fixed verdict vocabulary [planned · Must]                           │ │
+│ │   ○ PHASE phase-2-evidence Evidence & Run Traceability                                ││    c → convert to task spec                                                                             │ │
+│ │   ░░░░░░░░░░░░░░░░░░ 0/2 features                                                     ││                                                                                                         │ │
+│ │                                                                                       ││                                                                                                         │ │
+│ │   ○ PHASE phase-3-hardening Hardening & Distribution                                  ││                                                                                                         │ │
+│ │   ░░░░░░░░░░░░░░░░░░ 0/2 features                                                     ││                                                                                                         │ │
+│ │                                                                                       ││                                                                                                         │ │
+│ └───────────────────────────────────────────────────────────────────────────────────────┘└─────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│  g generate · G refresh · j/k phase · c convert→spec                                                                                                                                                 │
+│ ROAD  g generate · c convert→spec                                                                                                                                                       : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

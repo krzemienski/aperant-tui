@@ -1,0 +1,726 @@
+{
+ "VERDICT.md": {
+  "bytes": 9291,
+  "sha256": "5fb29378e14c996c"
+ },
+ "ar/step-01-board.png": {
+  "bytes": 325957,
+  "sha256": "58ff3548baafc973"
+ },
+ "ar/step-01-board.png.html": {
+  "bytes": 24912,
+  "sha256": "f53d6be7b31af5d8"
+ },
+ "ar/step-01-board.png.txt": {
+  "bytes": 7058,
+  "sha256": "af2e5894a1e7e538"
+ },
+ "ar/step-02-term.png": {
+  "bytes": 111860,
+  "sha256": "7f5eefbe5835fac7"
+ },
+ "ar/step-02-term.png.html": {
+  "bytes": 45292,
+  "sha256": "ef21f2c9d71af5bb"
+ },
+ "ar/step-02-term.png.txt": {
+  "bytes": 11750,
+  "sha256": "c40a7b71e9da7d76"
+ },
+ "ar/step-03-road.png": {
+  "bytes": 251320,
+  "sha256": "e5adcf321d8ddd9d"
+ },
+ "ar/step-03-road.png.html": {
+  "bytes": 26114,
+  "sha256": "2a4253471c9a105a"
+ },
+ "ar/step-03-road.png.txt": {
+  "bytes": 6495,
+  "sha256": "0d97883986b2cefe"
+ },
+ "ar/step-05-tree.png": {
+  "bytes": 112531,
+  "sha256": "9e634918e30bfc42"
+ },
+ "ar/step-05-tree.png.html": {
+  "bytes": 17785,
+  "sha256": "695c6a8b2c883139"
+ },
+ "ar/step-05-tree.png.txt": {
+  "bytes": 4834,
+  "sha256": "d02cb2fe2592033c"
+ },
+ "ar/step-06-set.png": {
+  "bytes": 176224,
+  "sha256": "51bdb60f17df1e4a"
+ },
+ "ar/step-06-set.png.html": {
+  "bytes": 22664,
+  "sha256": "ca63086834c16cfb"
+ },
+ "ar/step-06-set.png.txt": {
+  "bytes": 5969,
+  "sha256": "f8323a807a9c56e1"
+ },
+ "ar/step-07-agents.png": {
+  "bytes": 138662,
+  "sha256": "4ad9e7761052f279"
+ },
+ "ar/step-07-agents.png.html": {
+  "bytes": 15535,
+  "sha256": "4a326ef907685588"
+ },
+ "ar/step-07-agents.png.txt": {
+  "bytes": 4803,
+  "sha256": "3c9fc60939b2dc40"
+ },
+ "ar/step-08-help.png": {
+  "bytes": 139560,
+  "sha256": "e7b9f6bc80679890"
+ },
+ "ar/step-08-help.png.html": {
+  "bytes": 23174,
+  "sha256": "d5a181cd14cc8f30"
+ },
+ "ar/step-08-help.png.txt": {
+  "bytes": 5886,
+  "sha256": "80ac79285073fc20"
+ },
+ "ar/step-09-palette.png": {
+  "bytes": 140545,
+  "sha256": "df21b40d6cd57f2b"
+ },
+ "ar/step-09-palette.png.html": {
+  "bytes": 16985,
+  "sha256": "b7e6b51b599d1a8e"
+ },
+ "ar/step-09-palette.png.txt": {
+  "bytes": 6017,
+  "sha256": "2ecf63183b27e506"
+ },
+ "ar/step-13-logs.png": {
+  "bytes": 138662,
+  "sha256": "4ad9e7761052f279"
+ },
+ "ar/step-13-logs.png.html": {
+  "bytes": 15535,
+  "sha256": "4a326ef907685588"
+ },
+ "ar/step-13-logs.png.txt": {
+  "bytes": 4803,
+  "sha256": "3c9fc60939b2dc40"
+ },
+ "ar/step-21-insights-question.png": {
+  "bytes": 125215,
+  "sha256": "5a21202ebad80a56"
+ },
+ "ar/step-21-insights-question.png.html": {
+  "bytes": 23044,
+  "sha256": "6e0aea998a815588"
+ },
+ "ar/step-21-insights-question.png.txt": {
+  "bytes": 5813,
+  "sha256": "969cff5e0721574b"
+ },
+ "ar/step-22-insights-streaming.png": {
+  "bytes": 99469,
+  "sha256": "1aba9ea24f0ec095"
+ },
+ "ar/step-22-insights-streaming.png.html": {
+  "bytes": 15396,
+  "sha256": "4c010f29b001fbb8"
+ },
+ "ar/step-22-insights-streaming.png.txt": {
+  "bytes": 4743,
+  "sha256": "bce6769786a11636"
+ },
+ "ar/step-23-defect-question-mark.png": {
+  "bytes": 125215,
+  "sha256": "5a21202ebad80a56"
+ },
+ "ar/step-23-defect-question-mark.png.html": {
+  "bytes": 23044,
+  "sha256": "6e0aea998a815588"
+ },
+ "ar/step-23-defect-question-mark.png.txt": {
+  "bytes": 5813,
+  "sha256": "969cff5e0721574b"
+ },
+ "ar/step-24-insights-answer.png": {
+  "bytes": 315257,
+  "sha256": "5c9d72a432111ccd"
+ },
+ "ar/step-24-insights-answer.png.html": {
+  "bytes": 18168,
+  "sha256": "2349092fa60c2266"
+ },
+ "ar/step-24-insights-answer.png.txt": {
+  "bytes": 5949,
+  "sha256": "45cb6edcff1cbba9"
+ },
+ "ar/step-26-d18-fixed-question-typed.png": {
+  "bytes": 98890,
+  "sha256": "bbccb1194f769a8c"
+ },
+ "ar/step-26-d18-fixed-question-typed.png.html": {
+  "bytes": 15405,
+  "sha256": "5e2847ea8061e16a"
+ },
+ "ar/step-26-d18-fixed-question-typed.png.txt": {
+  "bytes": 4736,
+  "sha256": "8759b2ab7cc4acd5"
+ },
+ "pp/step-01-board.png": {
+  "bytes": 484476,
+  "sha256": "68aea713c47c4ba8"
+ },
+ "pp/step-01-board.png.html": {
+  "bytes": 26491,
+  "sha256": "9c0c7d968b6a8b6c"
+ },
+ "pp/step-01-board.png.txt": {
+  "bytes": 8020,
+  "sha256": "22029ffe3434aa23"
+ },
+ "pp/step-02-term-live-shell.png": {
+  "bytes": 131998,
+  "sha256": "7dd6a1c247c21195"
+ },
+ "pp/step-02-term-live-shell.png.html": {
+  "bytes": 45199,
+  "sha256": "f2a670d2c8c94c81"
+ },
+ "pp/step-02-term-live-shell.png.txt": {
+  "bytes": 11752,
+  "sha256": "db0bf1c383f555a6"
+ },
+ "pp/step-02-term.png": {
+  "bytes": 107571,
+  "sha256": "74ce3cc191fd931f"
+ },
+ "pp/step-02-term.png.html": {
+  "bytes": 45311,
+  "sha256": "5776ff913d240678"
+ },
+ "pp/step-02-term.png.txt": {
+  "bytes": 11750,
+  "sha256": "907b886eaf2b9a04"
+ },
+ "pp/step-03-road.png": {
+  "bytes": 226464,
+  "sha256": "16f3354ce2a72784"
+ },
+ "pp/step-03-road.png.html": {
+  "bytes": 24549,
+  "sha256": "bd69521436a6e060"
+ },
+ "pp/step-03-road.png.txt": {
+  "bytes": 6271,
+  "sha256": "30c86a9f1d1ca0e5"
+ },
+ "pp/step-04-chat.png": {
+  "bytes": 105326,
+  "sha256": "9344aca32a870330"
+ },
+ "pp/step-04-chat.png.html": {
+  "bytes": 15461,
+  "sha256": "6ea3accdfa84c3cb"
+ },
+ "pp/step-04-chat.png.txt": {
+  "bytes": 4809,
+  "sha256": "d03613e4a5b6892b"
+ },
+ "pp/step-05-tree.png": {
+  "bytes": 125121,
+  "sha256": "7702c6e2f7a03408"
+ },
+ "pp/step-05-tree.png.html": {
+  "bytes": 16022,
+  "sha256": "27af64ce45ed5535"
+ },
+ "pp/step-05-tree.png.txt": {
+  "bytes": 4809,
+  "sha256": "2b326a26e9abc313"
+ },
+ "pp/step-06-set-accounts.png": {
+  "bytes": 173151,
+  "sha256": "03056d086f0e55a8"
+ },
+ "pp/step-06-set-accounts.png.txt": {
+  "bytes": 5969,
+  "sha256": "89a2362a3afa0e27"
+ },
+ "pp/step-06-set.png": {
+  "bytes": 125176,
+  "sha256": "58d11721c827d274"
+ },
+ "pp/step-06-set.png.html": {
+  "bytes": 16022,
+  "sha256": "9419d8ca79fff1ac"
+ },
+ "pp/step-06-set.png.txt": {
+  "bytes": 4809,
+  "sha256": "2b326a26e9abc313"
+ },
+ "pp/step-07-agents.png": {
+  "bytes": 125176,
+  "sha256": "58d11721c827d274"
+ },
+ "pp/step-07-agents.png.html": {
+  "bytes": 16022,
+  "sha256": "9419d8ca79fff1ac"
+ },
+ "pp/step-07-agents.png.txt": {
+  "bytes": 4809,
+  "sha256": "2b326a26e9abc313"
+ },
+ "pp/step-08-help.png": {
+  "bytes": 135078,
+  "sha256": "afc271530351e1a3"
+ },
+ "pp/step-08-help.png.html": {
+  "bytes": 23202,
+  "sha256": "529ebbed15273e0f"
+ },
+ "pp/step-08-help.png.txt": {
+  "bytes": 5887,
+  "sha256": "765decdd02093800"
+ },
+ "pp/step-09-palette.png": {
+  "bytes": 176292,
+  "sha256": "7e3fbf624a4f2350"
+ },
+ "pp/step-09-palette.png.html": {
+  "bytes": 24898,
+  "sha256": "e3e412abcbbcd494"
+ },
+ "pp/step-09-palette.png.txt": {
+  "bytes": 7343,
+  "sha256": "5e44894af088c398"
+ },
+ "pp/step-11-theme-amber.png": {
+  "bytes": 176559,
+  "sha256": "236036f0d5fb4d6f"
+ },
+ "pp/step-11-theme-amber.png.html": {
+  "bytes": 23453,
+  "sha256": "deb9eed87e73ebfa"
+ },
+ "pp/step-11-theme-amber.png.txt": {
+  "bytes": 6130,
+  "sha256": "1f9ac7dffb467c60"
+ },
+ "pp/step-13-logs.png": {
+  "bytes": 86812,
+  "sha256": "49ef4b76a2aed48d"
+ },
+ "pp/step-13-logs.png.html": {
+  "bytes": 15233,
+  "sha256": "2557bf7da0d8f499"
+ },
+ "pp/step-13-logs.png.txt": {
+  "bytes": 4804,
+  "sha256": "7eab950f3d7f61c6"
+ },
+ "pp/step-21-roadmap-generating.png": {
+  "bytes": 204951,
+  "sha256": "10bbfcd4f582e9bc"
+ },
+ "pp/step-21-roadmap-generating.png.html": {
+  "bytes": 20392,
+  "sha256": "7b8b733ba5fbe530"
+ },
+ "pp/step-21-roadmap-generating.png.txt": {
+  "bytes": 6869,
+  "sha256": "a4aebf7dcb661a69"
+ },
+ "pp/step-22-roadmap-result.png": {
+  "bytes": 560537,
+  "sha256": "258a066acc0be82c"
+ },
+ "pp/step-22-roadmap-result.png.html": {
+  "bytes": 38162,
+  "sha256": "4956c9e050f21313"
+ },
+ "pp/step-22-roadmap-result.png.txt": {
+  "bytes": 11433,
+  "sha256": "af8630af830e1440"
+ },
+ "vigil/logs/agent-events-d19-fixed.jsonl": {
+  "bytes": 431697,
+  "sha256": "af330de8a8a663cf"
+ },
+ "vigil/logs/agent-events.jsonl": {
+  "bytes": 19832,
+  "sha256": "4e6f0d12571c0d3b"
+ },
+ "vigil/logs/agent-work-product.diff": {
+  "bytes": 4155,
+  "sha256": "ac152ed29f34aa10"
+ },
+ "vigil/logs/implementation_plan.json": {
+  "bytes": 12695,
+  "sha256": "820369af151e0414"
+ },
+ "vigil/step-01-board.png": {
+  "bytes": 158842,
+  "sha256": "c533e2e42e3d4840"
+ },
+ "vigil/step-01-board.png.html": {
+  "bytes": 23464,
+  "sha256": "3feb2e086a9ecfaf"
+ },
+ "vigil/step-01-board.png.txt": {
+  "bytes": 6060,
+  "sha256": "fdd7fa7cd519463f"
+ },
+ "vigil/step-02-term.png": {
+  "bytes": 89327,
+  "sha256": "48e648d5252aa4d4"
+ },
+ "vigil/step-02-term.png.html": {
+  "bytes": 45349,
+  "sha256": "da3ecbb5ff5b7447"
+ },
+ "vigil/step-02-term.png.txt": {
+  "bytes": 11681,
+  "sha256": "b6222711294f851e"
+ },
+ "vigil/step-03-road.png": {
+  "bytes": 256418,
+  "sha256": "ee054a2e91f1b354"
+ },
+ "vigil/step-03-road.png.html": {
+  "bytes": 28256,
+  "sha256": "00007dd3b6ae5b85"
+ },
+ "vigil/step-03-road.png.txt": {
+  "bytes": 6880,
+  "sha256": "7c83842562c7dfae"
+ },
+ "vigil/step-04-chat.png": {
+  "bytes": 83333,
+  "sha256": "09971d202cf89473"
+ },
+ "vigil/step-04-chat.png.html": {
+  "bytes": 15364,
+  "sha256": "1005a4620e5866a5"
+ },
+ "vigil/step-04-chat.png.txt": {
+  "bytes": 4737,
+  "sha256": "1fd293a086c974d4"
+ },
+ "vigil/step-05-tree.png": {
+  "bytes": 174829,
+  "sha256": "63b7e3d3f068e948"
+ },
+ "vigil/step-05-tree.png.html": {
+  "bytes": 19343,
+  "sha256": "68aa89dc1797f7db"
+ },
+ "vigil/step-05-tree.png.txt": {
+  "bytes": 4984,
+  "sha256": "4f87421cebbabe15"
+ },
+ "vigil/step-06-set.png": {
+  "bytes": 153123,
+  "sha256": "248fb6fec6fe7330"
+ },
+ "vigil/step-06-set.png.html": {
+  "bytes": 22399,
+  "sha256": "3a8f858a48b0769e"
+ },
+ "vigil/step-06-set.png.txt": {
+  "bytes": 5895,
+  "sha256": "189c0649188db9bd"
+ },
+ "vigil/step-07-agents.png": {
+  "bytes": 122297,
+  "sha256": "5aba75470d78f31d"
+ },
+ "vigil/step-07-agents.png.html": {
+  "bytes": 15585,
+  "sha256": "6713c75c982e6e9c"
+ },
+ "vigil/step-07-agents.png.txt": {
+  "bytes": 4732,
+  "sha256": "70eebc04901a1c8c"
+ },
+ "vigil/step-08-help-overlay.png": {
+  "bytes": 140387,
+  "sha256": "9d15a65d0f2edd18"
+ },
+ "vigil/step-08-help-overlay.png.html": {
+  "bytes": 26189,
+  "sha256": "cb5ec8465e2c67e8"
+ },
+ "vigil/step-08-help-overlay.png.txt": {
+  "bytes": 6483,
+  "sha256": "69b1f22daaffe927"
+ },
+ "vigil/step-09-palette-open.png": {
+  "bytes": 125279,
+  "sha256": "c812882e2e580f6a"
+ },
+ "vigil/step-09-palette-open.png.html": {
+  "bytes": 17042,
+  "sha256": "4f1ac55448e83058"
+ },
+ "vigil/step-09-palette-open.png.txt": {
+  "bytes": 5946,
+  "sha256": "0550a3c3ab699c1d"
+ },
+ "vigil/step-10-palette-typed.png": {
+  "bytes": 115708,
+  "sha256": "73249a7749f0332b"
+ },
+ "vigil/step-10-palette-typed.png.html": {
+  "bytes": 17093,
+  "sha256": "ae79bac87721a3e7"
+ },
+ "vigil/step-10-palette-typed.png.txt": {
+  "bytes": 5930,
+  "sha256": "cf9403643bdfd113"
+ },
+ "vigil/step-11-theme-matrix.png": {
+  "bytes": 123853,
+  "sha256": "dc71a1a475d22ea1"
+ },
+ "vigil/step-11-theme-matrix.png.html": {
+  "bytes": 15593,
+  "sha256": "ff8f1c3951a19763"
+ },
+ "vigil/step-11-theme-matrix.png.txt": {
+  "bytes": 4732,
+  "sha256": "70eebc04901a1c8c"
+ },
+ "vigil/step-12-nav-j.png": {
+  "bytes": 124086,
+  "sha256": "8cd7c1334b88f508"
+ },
+ "vigil/step-12-nav-j.png.html": {
+  "bytes": 15599,
+  "sha256": "35c894629d1cb636"
+ },
+ "vigil/step-12-nav-j.png.txt": {
+  "bytes": 4732,
+  "sha256": "70eebc04901a1c8c"
+ },
+ "vigil/step-12-nav-jj.png": {
+  "bytes": 154475,
+  "sha256": "d3f4cee9a30c9206"
+ },
+ "vigil/step-12-nav-jj.png.html": {
+  "bytes": 23326,
+  "sha256": "ef8a9174c08d3e2f"
+ },
+ "vigil/step-12-nav-jj.png.txt": {
+  "bytes": 6060,
+  "sha256": "fdd7fa7cd519463f"
+ },
+ "vigil/step-13-logs.png": {
+  "bytes": 67664,
+  "sha256": "bac104b3030d21cd"
+ },
+ "vigil/step-13-logs.png.html": {
+  "bytes": 15118,
+  "sha256": "fd3422a116d6adc8"
+ },
+ "vigil/step-13-logs.png.txt": {
+  "bytes": 4737,
+  "sha256": "5b68f19c64406def"
+ },
+ "vigil/step-14-defect-digit-trap.png": {
+  "bytes": 124629,
+  "sha256": "a784b1cdfd3d6800"
+ },
+ "vigil/step-14-defect-digit-trap.png.html": {
+  "bytes": 15599,
+  "sha256": "8e7b65813dffa34d"
+ },
+ "vigil/step-14-defect-digit-trap.png.txt": {
+  "bytes": 4732,
+  "sha256": "70eebc04901a1c8c"
+ },
+ "vigil/step-15-settings-account.png": {
+  "bytes": 160177,
+  "sha256": "a16d2b1f10cca834"
+ },
+ "vigil/step-15-settings-account.png.html": {
+  "bytes": 23303,
+  "sha256": "6d61f450a9d179ee"
+ },
+ "vigil/step-15-settings-account.png.txt": {
+  "bytes": 6109,
+  "sha256": "c1497159a22915c7"
+ },
+ "vigil/step-16-agent-start.png": {
+  "bytes": 631042,
+  "sha256": "1078d0417f789c51"
+ },
+ "vigil/step-16-agent-start.png.html": {
+  "bytes": 28500,
+  "sha256": "d12c4db5b4baa157"
+ },
+ "vigil/step-16-agent-start.png.txt": {
+  "bytes": 8713,
+  "sha256": "ab07a92e1cbb1a53"
+ },
+ "vigil/step-17-agent-running.png": {
+  "bytes": 482381,
+  "sha256": "6bfbfbbfc293643d"
+ },
+ "vigil/step-17-agent-running.png.html": {
+  "bytes": 27658,
+  "sha256": "6b238c4c1717d4ed"
+ },
+ "vigil/step-17-agent-running.png.txt": {
+  "bytes": 7817,
+  "sha256": "465c68b164ad6754"
+ },
+ "vigil/step-18-agents-1-swarm.png": {
+  "bytes": 459666,
+  "sha256": "be66948298e6bcdb"
+ },
+ "vigil/step-18-agents-1-swarm.png.html": {
+  "bytes": 31334,
+  "sha256": "c7172fd893390d5f"
+ },
+ "vigil/step-18-agents-1-swarm.png.txt": {
+  "bytes": 8381,
+  "sha256": "1c1d137e75b98e8d"
+ },
+ "vigil/step-18-agents-2-graph.png": {
+  "bytes": 396906,
+  "sha256": "94dc06ed19c9dc79"
+ },
+ "vigil/step-18-agents-2-graph.png.html": {
+  "bytes": 24730,
+  "sha256": "9e17e9288e9ab09a"
+ },
+ "vigil/step-18-agents-2-graph.png.txt": {
+  "bytes": 6858,
+  "sha256": "fe37f43c933e49b6"
+ },
+ "vigil/step-18-agents-3-inspect.png": {
+  "bytes": 327825,
+  "sha256": "d28ebeeaa68969e8"
+ },
+ "vigil/step-18-agents-3-inspect.png.html": {
+  "bytes": 41341,
+  "sha256": "283b6a17c2f27ce4"
+ },
+ "vigil/step-18-agents-3-inspect.png.txt": {
+  "bytes": 9951,
+  "sha256": "9f55d93aa45df706"
+ },
+ "vigil/step-18-agents-4-trace.png": {
+  "bytes": 268581,
+  "sha256": "6aa3e05988e38529"
+ },
+ "vigil/step-18-agents-4-trace.png.html": {
+  "bytes": 20581,
+  "sha256": "baa6b1504f70e2e2"
+ },
+ "vigil/step-18-agents-4-trace.png.txt": {
+  "bytes": 5749,
+  "sha256": "2fa5a3b2cd9ce2ed"
+ },
+ "vigil/step-18-agents-5-tokens.png": {
+  "bytes": 203400,
+  "sha256": "f9817934d8eef2a1"
+ },
+ "vigil/step-18-agents-5-tokens.png.html": {
+  "bytes": 18430,
+  "sha256": "222688cfe57f634c"
+ },
+ "vigil/step-18-agents-5-tokens.png.txt": {
+  "bytes": 5138,
+  "sha256": "f072fa75541ca08d"
+ },
+ "vigil/step-18-agents-6-waits.png": {
+  "bytes": 296579,
+  "sha256": "dcad824a3ae45eca"
+ },
+ "vigil/step-18-agents-6-waits.png.html": {
+  "bytes": 28537,
+  "sha256": "f416e5f19c41b859"
+ },
+ "vigil/step-18-agents-6-waits.png.txt": {
+  "bytes": 6821,
+  "sha256": "0784805d213f61c6"
+ },
+ "vigil/step-19-agents-live-run.png": {
+  "bytes": 677160,
+  "sha256": "cb347cf519cdf832"
+ },
+ "vigil/step-19-agents-live-run.png.html": {
+  "bytes": 32277,
+  "sha256": "5277d59823ba8a68"
+ },
+ "vigil/step-19-agents-live-run.png.txt": {
+  "bytes": 9513,
+  "sha256": "8b33662d501e138a"
+ },
+ "vigil/step-20-agents-tokens.png": {
+  "bytes": 563420,
+  "sha256": "331c94fe136159cc"
+ },
+ "vigil/step-20-agents-tokens.png.html": {
+  "bytes": 21096,
+  "sha256": "ffef91749e6c9d22"
+ },
+ "vigil/step-20-agents-tokens.png.txt": {
+  "bytes": 7134,
+  "sha256": "4e0e046c97d572d1"
+ },
+ "vigil/step-25-d14-fixed-escape-digit.png": {
+  "bytes": 153366,
+  "sha256": "59a3134bcc8c367d"
+ },
+ "vigil/step-25-d14-fixed-escape-digit.png.html": {
+  "bytes": 23333,
+  "sha256": "0a7ee8ffc2a4e785"
+ },
+ "vigil/step-25-d14-fixed-escape-digit.png.txt": {
+  "bytes": 6059,
+  "sha256": "ed55016e7d570ef7"
+ },
+ "vigil/step-27-d19-agent-planning.png": {
+  "bytes": 779227,
+  "sha256": "2ee7c340c463d197"
+ },
+ "vigil/step-27-d19-agent-planning.png.html": {
+  "bytes": 31319,
+  "sha256": "66e4dc9fcb395b13"
+ },
+ "vigil/step-27-d19-agent-planning.png.txt": {
+  "bytes": 10570,
+  "sha256": "a8cb7a7c33d10bfa"
+ },
+ "vigil/step-28-d19-agents-live.png": {
+  "bytes": 525908,
+  "sha256": "1d33ff9283d0d9c2"
+ },
+ "vigil/step-28-d19-agents-live.png.html": {
+  "bytes": 48136,
+  "sha256": "b409818133dba840"
+ },
+ "vigil/step-28-d19-agents-live.png.txt": {
+  "bytes": 12922,
+  "sha256": "b774fc6a3d89ee99"
+ },
+ "vigil/step-29-d19-trace-clean.png": {
+  "bytes": 643103,
+  "sha256": "566169658ca04b59"
+ },
+ "vigil/step-29-d19-trace-clean.png.html": {
+  "bytes": 45200,
+  "sha256": "435b716933fb3b36"
+ },
+ "vigil/step-29-d19-trace-clean.png.txt": {
+  "bytes": 11632,
+  "sha256": "e95b9bbc1b8f4110"
+ }
+}

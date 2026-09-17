@@ -16,6 +16,7 @@ import { appendFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { getSpecsDir } from '@shared/constants';
+import { readSettingsFile } from '@main/settings-utils';
 import { observability } from './observability';
 
 export interface StartOutcome {
@@ -156,8 +157,50 @@ const START_EVENTS: Array<{ event: string; ok: boolean; label: (a: unknown[]) =>
 ];
 
 /** Start a task through the real vendored pipeline; resolve with the real first outcome event. */
+/**
+ * D19 helper: mirror the highest-priority provider account (and the operator's
+ * ANTHROPIC_AUTH_TOKEN alias) into the standard SDK env names, so the agent
+ * Worker thread — which re-resolves auth from process.env — can authenticate.
+ *
+ * Never overwrites a value the operator set explicitly, and never logs a key.
+ */
+function applyAccountEnv(): void {
+  if (!process.env.ANTHROPIC_API_KEY && process.env.ANTHROPIC_AUTH_TOKEN) {
+    process.env.ANTHROPIC_API_KEY = process.env.ANTHROPIC_AUTH_TOKEN;
+  }
+  try {
+    const raw = readSettingsFile()?.providerAccounts;
+    const accounts = (typeof raw === 'string' ? JSON.parse(raw) : raw) as
+      | Array<{ provider?: string; apiKey?: string; baseUrl?: string }>
+      | undefined;
+    const anthropic = Array.isArray(accounts)
+      ? accounts.find((a) => a?.provider === 'anthropic' && a.apiKey)
+      : undefined;
+    if (!anthropic) return;
+    if (!process.env.ANTHROPIC_API_KEY && anthropic.apiKey) {
+      process.env.ANTHROPIC_API_KEY = anthropic.apiKey;
+    }
+    if (!process.env.ANTHROPIC_BASE_URL && anthropic.baseUrl) {
+      process.env.ANTHROPIC_BASE_URL = anthropic.baseUrl;
+    }
+  } catch {
+    // Malformed settings are already surfaced by the settings view; auth
+    // failure will be reported verbatim by the real pipeline.
+  }
+}
+
 export async function startTask(project: Project, task: Task): Promise<StartOutcome> {
   const at = new Date().toISOString();
+  // D19: the agent worker is a separate Worker thread; it inherits process.env
+  // and re-resolves auth itself through the AI SDK, which reads the STANDARD
+  // names (ANTHROPIC_API_KEY / ANTHROPIC_BASE_URL). The TUI's provisioned
+  // account lives in settings.json and the operator supplies the token as
+  // ANTHROPIC_AUTH_TOKEN, so the worker saw no key at all and every planner
+  // session died with "anthropic api key is missing" — surfacing downstream as
+  // the misleading "Implementation plan validation failed … File not found:
+  // implementation_plan.json" (the planner never ran, so it never wrote one).
+  // Export the account's own credentials under the names the SDK expects.
+  applyAccountEnv();
   let am: AgentManagerLike;
   try {
     am = await getManager();

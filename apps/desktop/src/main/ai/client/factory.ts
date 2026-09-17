@@ -42,6 +42,22 @@ import type {
 /** Default max steps for agent sessions */
 const DEFAULT_MAX_STEPS = 200;
 
+/**
+ * D16 (aperant patch): shorthand → env var carrying an operator's model
+ * override, mirroring ENV_VAR_MAP in ../config/phase-config.ts. Used ONLY to
+ * re-apply an explicitly-set override after queue resolution, which otherwise
+ * hardcodes vendor ids from DEFAULT_MODEL_EQUIVALENCES. Kept local (the
+ * phase-config map is not exported) and deliberately Anthropic-only: these env
+ * vars name Anthropic defaults, so they must never rewrite a model id the queue
+ * resolved for Ollama, OpenAI, Gemini or any other provider.
+ */
+const ANTHROPIC_MODEL_ENV_OVERRIDES: Record<string, string | undefined> = {
+  haiku: 'ANTHROPIC_DEFAULT_HAIKU_MODEL',
+  sonnet: 'ANTHROPIC_DEFAULT_SONNET_MODEL',
+  opus: 'ANTHROPIC_DEFAULT_OPUS_MODEL',
+  'opus-1m': 'ANTHROPIC_DEFAULT_OPUS_MODEL',
+};
+
 /** Default max steps for simple/utility clients */
 const DEFAULT_SIMPLE_MAX_STEPS = 1;
 
@@ -222,7 +238,18 @@ export async function createSimpleClient(
   } = config;
 
   // Auto-build queue config from settings if none was explicitly provided.
-  const queueConfig = explicitQueueConfig ?? buildDefaultQueueConfig(resolveModelId(modelShorthand));
+  //
+  // D16 (aperant patch): pass the SHORTHAND to the queue, not the resolved id.
+  // resolveModelId() applies the ANTHROPIC_DEFAULT_*_MODEL env overrides, so
+  // pre-resolving here handed the queue a concrete id like 'glm/glm-5'. The
+  // queue matches accounts via resolveModelEquivalent(), whose table is keyed by
+  // shorthand ('sonnet' → { anthropic: 'claude-sonnet-4-6', … }) — an overridden
+  // id is in no table and detectProviderFromModel() cannot classify it, so EVERY
+  // account was skipped and resolution failed with "No available account in
+  // priority queue for model: <overridden id>". Passing the shorthand lets the
+  // queue match the account first; the override is still applied downstream when
+  // the concrete model id is resolved for the chosen provider.
+  const queueConfig = explicitQueueConfig ?? buildDefaultQueueConfig(modelShorthand);
 
   // Resolve model + auth
   let model;
@@ -247,7 +274,24 @@ export async function createSimpleClient(
       throw new Error('No available account in priority queue for model: ' + queueConfig.requestedModel);
     }
 
-    resolvedModelId = queueAuth.resolvedModelId;
+    // D16 (aperant patch, second half): the queue resolves the concrete id from
+    // DEFAULT_MODEL_EQUIVALENCES, which hardcodes vendor ids ('claude-sonnet-4-6')
+    // and never consults the ANTHROPIC_DEFAULT_*_MODEL env overrides — so an
+    // operator pointing an Anthropic-compatible endpoint at a different model
+    // could never reach it.
+    //
+    // Narrowly scoped on purpose. resolveModelId() ALWAYS rewrites a shorthand
+    // (MODEL_ID_MAP, phase-config.ts:105) even with no env var set, so a naive
+    // "did it change?" test fires for every shorthand and would overwrite the
+    // queue's provider-specific id with a Claude id — breaking Ollama, OpenAI
+    // and Gemini accounts. The override therefore applies ONLY when the env var
+    // for that exact shorthand is actually set AND the queue picked an
+    // Anthropic-compatible account; every other route keeps queueAuth's id.
+    const envOverride = ANTHROPIC_MODEL_ENV_OVERRIDES[queueConfig.requestedModel];
+    const overrideValue = envOverride ? process.env[envOverride] : undefined;
+    resolvedModelId = overrideValue && queueAuth.resolvedProvider === 'anthropic'
+      ? overrideValue
+      : queueAuth.resolvedModelId;
     // Use createProvider() with the queue-resolved provider to avoid re-detecting
     // from model ID prefix. This is critical for providers like Ollama whose models
     // (e.g., 'llama3.1:8b') don't follow predictable prefix conventions.

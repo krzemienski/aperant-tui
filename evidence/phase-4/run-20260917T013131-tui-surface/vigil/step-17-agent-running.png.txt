@@ -1,0 +1,50 @@
+APICallError [AI_APICallError]: Not Found
+    at <anonymous> (/Users/nick/dev/aperant-tui/apps/tui/dist/agent-worker.cjs:19212:18)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async postToApi (/Users/nick/dev/aperant-tui/apps/tui/dist/agent-worker.cjs:19107:32)
+    at async postJsonToApi (/Users/nick/dev/aperant-tui/apps/tui/dist/agent-worker.cjs:19048:11)
+    at async _AnthropicMessagesBatchLanguageModel.doStream (/Users/nick/dev/aperant-tui/apps/tui/dist/agent-worker.cjs:46211:54)
+    at async execute (/Users/nick/dev/aperant-tui/apps/tui/dist/agent-worker.cjs:29567:26)
+    at async runWithTracingChannelSpan (/Users/nick/dev/aperant-tui/apps/tui/dist/agent-worker.cjs:25865:12)
+    at async executeLanguageModelCall (/Users/nick/dev/aperant-tui/apps/tui/dist/agent-worker.cjs:26069:14)
+    at async streamLanguageModelCall (/Users/nick/dev/aperant-tui/apps/tui/dist/agent-worker.cjs:29565:7)
+    at async retryWithExponentialBackoffInternal (/Users/nick/dev/aperant-tui/apps/tui/dist/agent-worker.cjs:18005:12) {
+  cause: undefined,
+  url: 'http://127.0.0.1:20128/v1/messages',
+  requestBodyValues: {
+    model: 'claude-sonnet-4-6',
+    max_tokens: 128000,
+    temperature: undefined,
+    top_k: undefined,
+    top_p: undefined,
+    stop_sequences: undefined,
+    thinking: { type: 'enabled', budget_tokens: 16384 },
+    system: [ [Object] ],
+    messages: [ [Object] ],
+    tools: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ vigil /Users/nick/Desktop/vigil │ ⑂ main                                                                                                               ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┌────────────────────────────────────────────────────────────────────────────────────────┐ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ TASKS                                                                                  │ │ DETAIL                                                                                                │ │
+│ │ ◆ BACKLOG (3)                                                                          │ │ 001-neut [BACKLOG]                                                                                    │ │
+│ │ ❯ 001-neut ▽ Neutral default rails with environment profiles                           │ │ Neutral default rails with environment profiles                                                       │ │
+│ │   002-vigi ▽ `vigil init` config and plan scaffolding                                  │ │ progress ░░░░░░░░░░░░░░ 0%                                                                            │ │
+│ │   003-cont ▽ Content-aware evidence assertions with hash recording                     │ │ subtasks 0/0 complete                                                                                 │ │
+│ │                                                                                        │ │ phase -                                                                                               │ │
+│ │                                                                                        │ │ location main  spec 001-neutral-default-rails-with-environment-profiles                               │ │
+│ │                                                                                        │ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ │                                                                                        │                                                                                                           │
+│ │                                                                                        │ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │                                                                                        │ │ AGENT STREAM                                                                                          │ │
+│ │                                                                                        │ │ 01:37:39 start 001-neut → vendored AgentManager…                                                      │ │
+│ │                                                                                        │ │ 01:37:39 started 001-neut: agent started — phase planning                                             │ │
+│ └────────────────────────────────────────────────────────────────────────────────────────┘ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ BOARD  j/k move · ⏎ focus · s start · x stop · H/L column · l logs · / filter                                                                                                           : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+

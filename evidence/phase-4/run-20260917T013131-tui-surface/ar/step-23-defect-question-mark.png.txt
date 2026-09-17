@@ -1,0 +1,50 @@
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ awesome-researcher /Users/nick/awesome-researcher │ ⑂ feat/awesome-researcher                                                                          ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│                                                                            ┌─────────────────────────────────────────────┐                                                                           │
+│                                                                            │                                             │                                                                           │
+│                                                                            │   KEYBINDINGS                               │                                                                           │
+│                                                                            │                                             │                                                                           │
+│                                                                            │   1-6           switch view                 │                                                                           │
+│                                                                            │   j / k         move selection              │                                                                           │
+│                                                                            │   ⏎             focus / open                │                                                                           │
+│                                                                            │   H / L         move task column (board)    │                                                                           │
+│                                                                            │   s / x         start / stop task           │                                                                           │
+│                                                                            │   l             task logs                   │                                                                           │
+│                                                                            │   :             command palette             │                                                                           │
+│                                                                            │   ?             toggle help                 │                                                                           │
+│                                                                            │   ctrl+c ×2     quit                        │                                                                           │
+│                                                                            │   esc           close / back                │                                                                           │
+│                                                                            │                                             │                                                                           │
+│                                                                            │   :theme cyberpunk│matrix│amber│synth│ice   │                                                                           │
+│                                                                            │                                             │                                                                           │
+│                                                                            └─────────────────────────────────────────────┘                                                                           │
+│ CHAT  a ask · q qa mode · i ideate · x stop · 1-6 ideation type                                                                                                                         : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
