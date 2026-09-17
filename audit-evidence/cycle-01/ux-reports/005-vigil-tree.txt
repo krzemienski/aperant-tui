@@ -1,0 +1,58 @@
+
+
+> aperant-tui-workspace@0.1.0 dev
+> npm run dev -w @aperant/tui --project /Users/nick/Desktop/vigil
+
+
+> @aperant/tui@0.1.0 dev
+> tsx src/cli.tsx /Users/nick/Desktop/vigil
+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ vigil /Users/nick/Desktop/vigil │ ⑂ main                                                                                           ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                            │
+│ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ ┌────────────────────────────────────────────────┐ │
+│ │ WORKTREES                                                                                                                 │ │ STATUS · main                                  │ │
+│ │ ❯ ⑂ main                                                                                                                  │ │ head eb886942cd                                │ │
+│ │     /Users/nick/Desktop/vigil                                                                                             │ │ diff clean                                     │ │
+│ │   ⑂ auto-claude/001-neutral-default-rails-with-environment-profiles                                                       │ │ unified diff + merge arrive in Phase 5         │ │
+│ │     /Users/nick/Desktop/vigil/.auto-claude/worktrees/tasks/001-neutral-default-rails-with-environment-profiles            │ │                                                │ │
+│ │   ⑂ auto-claude/002-vigil-init-config-and-plan-scaffolding                                                                │ │                                                │ │
+│ │     /Users/nick/Desktop/vigil/.auto-claude/worktrees/tasks/002-vigil-init-config-and-plan-scaffolding                     │ │                                                │ │
+│ │   ⑂ auto-claude/003-content-aware-evidence-assertions-with-hash-record                                                    │ │                                                │ │
+│ │     /Users/nick/Desktop/vigil/.auto-claude/worktrees/tasks/003-content-aware-evidence-assertions-with-hash-record         │ │                                                │ │
+│ │   ⑂ auto-claude/004-enforced-budget-and-turn-guards                                                                       │ │                                                │ │
+│ │     /Users/nick/Desktop/vigil/.auto-claude/worktrees/tasks/004-enforced-budget-and-turn-guards                            │ │                                                │ │
+│ └───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ └────────────────────────────────────────────────┘ │
+│ TREE  j/k select                                                                                                                                                    : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,56 @@
+{
+  "cycle": 1,
+  "findings": [
+    {
+      "id": "F-01",
+      "phase": "ux",
+      "severity": "MEDIUM",
+      "screen": "chat/insights",
+      "title": "Ideation empty state said 'all five' for six categories",
+      "evidence": [
+        "apps/tui/src/views/InsightsView.tsx:238"
+      ],
+      "status": "FIXED",
+      "commit": "4d44b7f"
+    },
+    {
+      "id": "F-02",
+      "phase": "ux",
+      "severity": "MEDIUM",
+      "screen": "settings",
+      "title": "Footer advertised 'return apply' but j/k applies+persists immediately",
+      "evidence": [
+        "/Users/nick/dev/aperant-tui/audit-evidence/cycle-01/ux-reports/_ctl-theme-a.png",
+        "~/.aperant/tui.json cyberpunk->matrix on bare j"
+      ],
+      "status": "FIXED",
+      "commit": "4d44b7f"
+    },
+    {
+      "id": "F-03",
+      "phase": "ux",
+      "severity": "LOW",
+      "screen": "roadmap",
+      "title": "Footer omitted G (force regen); g silently no-ops when roadmap exists",
+      "evidence": [
+        "apps/tui/src/views/RoadmapView.tsx:120-121"
+      ],
+      "status": "FIXED",
+      "commit": "4d44b7f"
+    },
+    {
+      "id": "F-04",
+      "phase": "ux",
+      "severity": "HIGH",
+      "screen": "agents",
+      "title": "Sub-view selector 1-6 does not change the rendered sub-view or move the bar highlight when no agent is live",
+      "detail": "AgentsView.tsx:131 `empty ?` short-circuits before the sub===... switch, so all six sub-views render the identical AGENT SWARM empty panel. The selector bar at :122-126 does render highlight from `sub`, but a fresh unarmed session pressing 4 produces a pixel-identical PNG. Control: a theme change (pure color) DOES change the PNG hash, so the capture is color-faithful and this is not an instrument artifact.",
+      "evidence": [
+        "/Users/nick/dev/aperant-tui/audit-evidence/cycle-01/ux-reports/_sub-start.png",
+        "/Users/nick/dev/aperant-tui/audit-evidence/cycle-01/ux-reports/_sub-after4.png",
+        "/Users/nick/dev/aperant-tui/audit-evidence/cycle-01/ux-reports/_ctl-theme-a.png (control)"
+      ],
+      "status": "OPEN"
+    }
+  ]
+}

@@ -28,6 +28,16 @@ type SubView = 'swarm' | 'graph' | 'inspect' | 'trace' | 'tokens' | 'waits';
 
 const SUBVIEWS: SubView[] = ['swarm', 'graph', 'inspect', 'trace', 'tokens', 'waits'];
 
+/** What each sub-view WILL show once an agent is live (D-F04). */
+const SUBVIEW_EMPTY_HINT: Record<SubView, string> = {
+  swarm: 'this view will list every live agent, its type, steps and what it is waiting on.',
+  graph: 'this view will draw agent relationships, the phase pipeline and the regression guard.',
+  inspect: 'this view will show one agent in full: identity, wait state, tokens and grants.',
+  trace: 'this view will stream the raw trace events, filterable to a single agent with f.',
+  tokens: 'this view will break down token spend and context pressure per agent.',
+  waits: 'this view will show what is blocking each agent and the configured wait ceilings.',
+};
+
 const STATE_GLYPH: Record<string, string> = { running: '●', blocked: '○', paused: '⏸', done: '✓', error: '✗' };
 const WAIT_META: Record<string, { g: string; label: string }> = {
   tool: { g: '⚙', label: 'TOOL' },
@@ -129,10 +139,18 @@ export function AgentsView({ theme: c, project, isActive }: { theme: Theme; proj
         </Text>
       </Box>
       {empty ? (
-        <Panel title="AGENT SWARM" focused theme={c} flexGrow={1}>
+        // D-F04: keep the selected sub-view's identity visible even with no
+        // live agents. Previously every sub-view collapsed to one identical
+        // "AGENT SWARM" panel, so 1-6 appeared inert: the body never changed
+        // and the bar highlight was the only (colour-only) signal. Titling the
+        // panel after `sub` makes the selection legible in text and in
+        // screenshots, and keeps the empty copy accurate per sub-view.
+        <Panel title={`AGENT ${sub.toUpperCase()}`} focused theme={c} flexGrow={1}>
           <Text color={c.faint}>No agent has started in this TUI session.</Text>
           <Text color={c.dim}>Start one from the board (s on a task) — this surface taps the real AgentManager</Text>
           <Text color={c.dim}>event stream, spec-dir sentinel files, and the vendored AGENT_CONFIGS registry.</Text>
+          <Text> </Text>
+          <Text color={c.faint}>{SUBVIEW_EMPTY_HINT[sub]}</Text>
         </Panel>
       ) : (
         <>
