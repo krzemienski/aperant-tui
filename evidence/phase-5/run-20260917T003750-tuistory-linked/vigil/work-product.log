@@ -1,0 +1,8 @@
+(B[md13df77 2026-09-17 01:06:56 -0400 auto-claude: Complete subtask-4-1 - BudgetGuard unit tests
+1462ad4 2026-09-17 01:03:34 -0400 auto-claude: Complete subtask-3-1 - render budget in Header
+16f5064 2026-09-17 01:00:42 -0400 auto-claude: Complete subtask-2-4 - distinct exit code 3 and plain output for budget events
+7b51b36 2026-09-17 00:59:29 -0400 auto-claude: Complete subtask-2-3 - persist run-level total to cost.json
+a11b7d6 2026-09-17 00:58:13 -0400 auto-claude: Complete subtask-2-2 - enforce budget/turn guards in Runner
+10ccd30 2026-09-17 00:56:51 -0400 auto-claude: Complete subtask-2-1 - BudgetGuard module
+431ac0f 2026-09-17 00:55:54 -0400 auto-claude: Complete subtask-1-2 - reducer cumulative cost and budget state
+b425abd 2026-09-17 00:54:34 -0400 auto-claude: Complete subtask-1-1 - budget event variants and thresholds config

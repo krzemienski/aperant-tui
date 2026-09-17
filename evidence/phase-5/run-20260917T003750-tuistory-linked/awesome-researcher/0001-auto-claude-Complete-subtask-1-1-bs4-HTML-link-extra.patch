@@ -1,0 +1,103 @@
+From f44a411357a5d7a953f5835978fe786aca06b257 Mon Sep 17 00:00:00 2001
+From: VQA Developer <krzemienski@gmail.com>
+Date: Thu, 17 Sep 2026 01:27:50 -0400
+Subject: [PATCH] auto-claude: Complete subtask-1-1 - bs4 HTML link extraction
+ in markdown parser
+
+- Files modified: awesome_researcher/parsers/markdown_parser.py
+- Verification: full suite (253 passed, 1 skipped) + manual HTML-link checks
+- Phase progress: 1/4 subtasks complete
+---
+ awesome_researcher/parsers/markdown_parser.py | 62 ++++++++++++++++++-
+ 1 file changed, 60 insertions(+), 2 deletions(-)
+
+diff --git a/awesome_researcher/parsers/markdown_parser.py b/awesome_researcher/parsers/markdown_parser.py
+index a3fc838..a3d4ed4 100644
+--- a/awesome_researcher/parsers/markdown_parser.py
++++ b/awesome_researcher/parsers/markdown_parser.py
+@@ -8,8 +8,9 @@ structure is shallow and the libraries (mistune/markdown) are not installed.
+ What we KEEP: http(s) resource links that sit under a category heading.
+ What we DROP: badge images ``![alt](src)`` and link-wrapped badges
+ ``[![alt](src)](href)``, the Table of Contents (in-page ``#anchor`` links),
+-back-to-top links, italic category-description prose, and any HTML/inline-prose
+-links. No-description links are retained with ``description=None`` — never
++back-to-top links, and italic category-description prose. Inline-HTML
++resource links (``<a href="http...">``) are additionally recovered via an
++optional BeautifulSoup fallback. No-description links are retained with ``description=None`` — never
+ dropped.
+ """
+ 
+@@ -143,6 +144,48 @@ def _clean_title(title: str) -> str:
+     return t
+ 
+ 
++def _extract_html_links(line: str) -> list[tuple[str, str, str | None]]:
++    """Extract resource links from a line containing inline HTML.
++
++    Uses BeautifulSoup (``html.parser``) lazily so environments without bs4
++    degrade to the regex-only behavior. Returns ``(title, url, description)``
++    tuples for each ``<a href="http(s)://...">`` anchor found. The anchor text
++    becomes the title; a trailing text node after a separator (``-``, ``—``,
++    ``:``) becomes the description when present.
++    """
++
++    try:
++        from bs4 import BeautifulSoup  # lazy: optional dependency
++    except ImportError:
++        return []
++
++    links: list[tuple[str, str, str | None]] = []
++    try:
++        soup = BeautifulSoup(line, "html.parser")
++    except Exception:
++        return []
++
++    for anchor in soup.find_all("a", href=True):
++        url = (anchor.get("href") or "").strip()
++        if not _is_resource_url(url):
++            continue
++        title = _clean_title(anchor.get_text())
++        description: str | None = None
++        # Text after the anchor on the same line may hold a description
++        # (" - Description" / " — Description" / ": Description").
++        tail = ""
++        node = anchor.next_sibling
++        while node is not None:
++            if getattr(node, "name", None) is None:
++                tail += str(node)
++            node = node.next_sibling
++        m = re.match(r"\s*[-—:]\s*(.*\S)", tail)
++        if m:
++            description = m.group(1).strip()
++        links.append((title or url, url, description))
++    return links
++
++
+ def parse_markdown(text: str) -> ParsedList:
+     """Parse Awesome-list markdown into a :class:`ParsedList`.
+ 
+@@ -190,6 +233,21 @@ def parse_markdown(text: str) -> ParsedList:
+ 
+         item = _ITEM_RE.match(line)
+         if not item:
++            # Fallback: a line with inline HTML (e.g. ``<a href="...">T</a>``)
++            # that the markdown regex misses. bs4 extracts resource links; the
++            # line index still points at the original source line so the
++            # SourcePatcher round trip stays byte-exact.
++            if "<a " in line:
++                for html_title, html_url, html_desc in _extract_html_links(line):
++                    current.items.append(
++                        ParsedItem(
++                            title=html_title,
++                            url=html_url,
++                            description=html_desc,
++                            raw_line=line.strip(),
++                        )
++                    )
++                    current.last_item_line = lineno
+             continue
+ 
+         url = item.group("url").strip()
+-- 
+2.55.0
+

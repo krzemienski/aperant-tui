@@ -1,0 +1,31 @@
+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ awesome-researcher /Users/nick/awesome-researcher │ ⑂ feat/awesome-researcher                                                                          ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ GENERATION                                                                                                                                                                                       │ │
+│ │ idle                                                                                                                                                                                             │ │
+│ │ Running discovery phase...                                                                                                                                                                       │ │
+│ │ Phase discovery completed                                                                                                                                                                        │ │
+│ │ Running features phase...                                                                                                                                                                        │ │
+│ │ Phase features completed                                                                                                                                                                         │ │
+│ └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ ┌─────────────────────────────────────────────────────────────────────────────┐┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ PHASES                                                                      ││ DETAIL                                                                                                            │ │
+│ │ ❯ ○ PHASE phase-1 Trust Foundation                                          ││ Trust Foundation                                                                                                  │ │
+│ │   ░░░░░░░░░░░░░░░░░░ 0/6 features                                           ││  · Tri-state link verdict: alive / blocked-but-alive / dead [idea · must]                                         │ │
+│ │                                                                             ││    c → convert to task spec                                                                                       │ │
+│ │   ○ PHASE phase-2 Health Audit Wedge                                        ││  · Per-host politeness and Retry-After compliance in validation [idea · must]                                     │ │
+│ │   ░░░░░░░░░░░░░░░░░░ 0/4 features                                           ││    c → convert to task spec                                                                                       │ │
+│ │                                                                             ││  · Maintenance-health scoring as a first-class quality dimension [idea · must]                                    │ │
+│ │   ○ PHASE phase-3 Reviewer Leverage                                         ││    c → convert to task spec                                                                                       │ │
+│ │   ░░░░░░░░░░░░░░░░░░ 0/4 features                                           ││  · Exportable provenance and human-review artifact [idea · must]                                                  │ │
+│ │                                                                             ││    c → convert to task spec                                                                                       │ │
+│ │   ○ PHASE phase-4 Breadth and Confidence                                    ││  · Post-render awesome-lint gate with rule-level explanation [idea · must]                                        │ │
+│ │   ░░░░░░░░░░░░░░░░░░ 0/4 features                                           ││    c → convert to task spec                                                                                       │ │
+│ │                                                                             ││  · Exhaustive exit-code contract verification [idea · must]                                                       │ │
+│ │                                                                             ││    c → convert to task spec                                                                                       │ │
+│ └─────────────────────────────────────────────────────────────────────────────┘└───────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│  g generate · G refresh · j/k phase · c convert→spec                                                                                                                                                 │
+│ ROAD  g generate · c convert→spec                                                                                                                                                       : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

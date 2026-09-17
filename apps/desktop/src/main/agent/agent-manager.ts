@@ -29,6 +29,35 @@ import { findTaskWorktree } from '../worktree-paths';
 import { readSettingsFile } from '../settings-utils';
 import type { ProviderAccount } from '../../shared/types/provider-account';
 import { tryLoadPrompt } from '../ai/prompts/prompt-loader';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
+
+const execFileAsync = promisify(execFile);
+
+/**
+ * D28: resolve a repo's ACTUAL default branch instead of assuming 'main'.
+ *
+ * Order: origin/HEAD (what the remote says it is) → the branch currently
+ * checked out (always a valid ref) → 'main' as a last resort. Returning a
+ * valid ref matters because the caller passes this straight to
+ * `git worktree add`, where a bad ref aborts worktree creation.
+ */
+async function detectDefaultBranch(projectPath: string): Promise<string> {
+  const tryGit = async (args: string[]): Promise<string | null> => {
+    try {
+      const { stdout } = await execFileAsync('git', args, { cwd: projectPath });
+      const v = stdout.trim();
+      return v.length > 0 ? v : null;
+    } catch {
+      return null;
+    }
+  };
+  const originHead = await tryGit(['symbolic-ref', '--short', 'refs/remotes/origin/HEAD']);
+  if (originHead) return originHead.replace(/^origin\//, '');
+  const current = await tryGit(['rev-parse', '--abbrev-ref', 'HEAD']);
+  if (current && current !== 'HEAD') return current;
+  return 'main';
+}
 
 /**
  * Main AgentManager - orchestrates agent process lifecycle
@@ -476,13 +505,28 @@ export class AgentManager extends EventEmitter {
     const useWorktree = options.useWorktree !== false; // Default to true (matching Python backend)
     if (useWorktree) {
       try {
-        const baseBranch = options.baseBranch ?? project?.settings?.mainBranch ?? 'main';
+        // D28: 'main' is a guess, not a fact. A repo whose default branch is
+        // anything else (awesome-researcher's is `feat/awesome-researcher`)
+        // made `git worktree add … main` fail with "fatal: invalid reference:
+        // main"; the agent then silently fell back to running in the project
+        // ROOT, losing worktree isolation exactly when it matters most.
+        // Ask git what the default actually is before falling back.
+        const baseBranch = options.baseBranch
+          ?? project?.settings?.mainBranch
+          ?? (await detectDefaultBranch(projectPath));
         const result = await createOrGetWorktree(
           projectPath,
           specId,
           baseBranch,
           options.useLocalBranch ?? false,
-          project?.settings?.pushNewBranches !== false,
+          // D23: the caller's explicit choice wins over the project setting.
+          // `ExecutionOptions.pushNewBranches` was declared (types.ts:61) and
+          // threaded through every desktop IPC call site, but this function
+          // ignored it and read only `project.settings`. Callers that passed
+          // `pushNewBranches: false` still published to origin. A project
+          // with no stored settings (the TUI case) also defaulted to
+          // publishing, because `undefined !== false`.
+          options.pushNewBranches ?? project?.settings?.pushNewBranches !== false,
           project?.autoBuildPath,
         );
         worktreePath = result.worktreePath;
@@ -491,8 +535,22 @@ export class AgentManager extends EventEmitter {
         console.warn(`[AgentManager] Task ${taskId} will run in worktree: ${worktreePath}`);
       } catch (err) {
         console.error(`[AgentManager] Failed to create worktree for ${taskId}:`, err);
-        // Fall back to running in project root (non-fatal)
-        console.warn(`[AgentManager] Falling back to project root for ${taskId}`);
+        // D29: FAIL CLOSED. This used to fall back to the project root, which
+        // silently converts "run this agent in an isolated worktree" into
+        // "run this agent directly on the user's checkout". Observed on
+        // awesome-researcher: worktree creation failed (D28, wrong base
+        // branch), the agent ran in the root, and the coder committed
+        // straight onto the user's `feat/awesome-researcher` branch.
+        //
+        // Isolation was REQUESTED here (useWorktree !== false), so losing it
+        // is not a degraded mode — it is a different, destructive operation.
+        // Callers that genuinely want in-place execution must ask for it with
+        // `useWorktree: false`.
+        throw new Error(
+          `Refusing to start ${taskId} without worktree isolation: ${
+            err instanceof Error ? err.message.split('\n')[0] : String(err)
+          }. Pass useWorktree:false to run in the project root deliberately.`,
+        );
       }
     }
 

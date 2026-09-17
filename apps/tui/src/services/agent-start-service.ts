@@ -256,7 +256,22 @@ export async function startTask(project: Project, task: Task): Promise<StartOutc
     }
     const starter: Promise<void> = !hasSpec
       ? am.startSpecCreation(task.id, project.path, taskDescription, specDir, { requireReviewBeforeCoding: false }, undefined, project.id)
-      : am.startTaskExecution(task.id, project.path, task.specId, { parallel: false, workers: 1 }, project.id);
+      : am.startTaskExecution(
+          task.id,
+          project.path,
+          task.specId,
+          // D23: keep task branches LOCAL. createOrGetWorktree publishes to
+          // origin by default (worktree-manager.ts:89 `pushNewBranches = true`,
+          // push at :210-222), and agent-manager.ts:485 only opts out when the
+          // project setting is exactly `false` — an absent projects.json
+          // therefore means "push". Starting an agent from the TUI would
+          // publish `auto-claude/<spec>` to whatever repo the user happened to
+          // open. A local TUI run must not write to someone's remote; the
+          // worktree and the diff are the work product, and publishing is a
+          // separate, explicit act (Phase 5 `tree` view).
+          { parallel: false, workers: 1, pushNewBranches: false },
+          project.id,
+        );
     starter.catch((err: unknown) => {
       finish(false, `start rejected: ${err instanceof Error ? err.message.split('\n')[0] : String(err)}`);
     });

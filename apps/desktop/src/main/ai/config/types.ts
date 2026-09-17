@@ -150,6 +150,15 @@ export const MODEL_PROVIDER_MAP: Record<string, SupportedProvider> = {
   'glm-': 'zai',
   // ('cc/' covers the operator's Anthropic-compatible router ids like
   //  'cc/claude-opus-5' — Anthropic wire protocol, custom base URL)
+  // [APERANT-PATCH router-glm-prefix]: the operator's local gateway exposes
+  // ZhipuAI models under 'glm/<id>' and speaks the ANTHROPIC wire protocol at
+  // its own base URL — so it resolves to 'anthropic', not 'zai'. The bare
+  // 'glm-' entry above is the direct ZhipuAI API and must keep mapping to
+  // 'zai'; 'glm/' is slash-separated and cannot collide with it.
+  // Without this, resolveAuthFromQueue returns NULL for every 'glm/' id and
+  // AgentManager logs "No available account in provider queue", silently
+  // falling back to the legacy (unauthenticated) profile path.
+  'glm/': 'anthropic',
   // [APERANT-PATCH moonshot-provider]: Moonshot AI (Kimi) model prefixes
   // ('kimi/' covers combo-proxy ids like 'kimi/kimi-for-coding')
   // ('kmc/' covers the operator gateway's kimi-model-credit ids like

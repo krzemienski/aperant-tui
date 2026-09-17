@@ -1,0 +1,60 @@
+
+[ClaudeProfileManager] Starting initialization...
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+[ClaudeProfileManager] Initialization complete
+[AgentManager] Resolved auth from provider queue: account=anthropic-mu4v0hti provider=anthropic model=glm/glm-5
+[WorktreeManager] Pruning stale worktree references...
+[WorktreeManager] Fetching latest from origin/main...
+[WorktreeManager] Creating worktree from remote: origin/main
+[WorktreeManager] Created worktree: 004-enforced-budget-and-turn-guards on branch auto-claude/004-enforced-budget-and-turn-guards
+[WorktreeManager] Leaving branch local-only (auto-push disabled): auto-claude/004-enforced-budget-and-turn-guards
+[WorktreeManager] Copying spec directory into worktree: .auto-claude/specs/004-enforced-budget-and-turn-guards
+[AgentManager] Task 004-enforced-budget-and-turn-guards will run in worktree: /Users/nick/Desktop/vigil/.auto-claude/worktrees/tasks/004-enforced-budget-and-turn-guards
+[AgentManager] Task registered with OperationRegistry: {
+  taskId: '004-enforced-budget-and-turn-guards',
+  profileId: 'primary',
+  profileName: 'Primary',
+  type: 'task-execution'
+}
+┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────│─agent started: 004-enfo─│┐
+│APERANT │ vigil /Users/nick/Desktop/vigil │ ⑂ main                                                                                                               ◉ 0 runnin└─────────────────────────┘│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┌────────────────────────────────────────────────────────────────────────────────────────┐ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ TASKS                                                                                  │ │ DETAIL                                                                                                │ │
+│ │ ◆ BACKLOG (4)                                                                          │ │ 004-enfo [BACKLOG]                                                                                    │ │
+│ │   001-neut ▽ Neutral default rails with environment profiles                           │ │ Enforced budget and turn guards                                                                       │ │
+│ │   002-vigi ▽ `vigil init` config and plan scaffolding                                  │ │ progress ░░░░░░░░░░░░░░ 0%                                                                            │ │
+│ │   003-cont ▽ Content-aware evidence assertions with hash recording                     │ │ subtasks 0/0 complete                                                                                 │ │
+│ │ ❯ 004-enfo ▽ Enforced budget and turn guards                                           │ │ phase -                                                                                               │ │
+│ │                                                                                        │ │ location main  spec 004-enforced-budget-and-turn-guards                                               │ │
+│ │                                                                                        │ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ │                                                                                        │                                                                                                           │
+│ │                                                                                        │ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │                                                                                        │ │ AGENT STREAM                                                                                          │ │
+│ │                                                                                        │ │ 04:51:42 start 004-enfo → vendored AgentManager…                                                      │ │
+│ │                                                                                        │ │ 04:51:43 started 004-enfo: agent started — phase planning                                             │ │
+│ └────────────────────────────────────────────────────────────────────────────────────────┘ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ vigil /Users/nick/Desktop/vigil │ ⑂ main                                                                                                               ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┌────────────────────────────────────────────────────────────────────────────────────────┐ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ TASKS                                                                                  │ │ DETAIL                                                                                                │ │
+│ │ ◆ BACKLOG (4)                                                                          │ │ 004-enfo [BACKLOG]                                                                                    │ │
+│ │   001-neut ▽ Neutral default rails with environment profiles                           │ │ Enforced budget and turn guards                                                                       │ │
+│ │   002-vigi ▽ `vigil init` config and plan scaffolding                                  │ │ progress ░░░░░░░░░░░░░░ 0%                                                                            │ │
+│ │   003-cont ▽ Content-aware evidence assertions with hash recording                     │ │ subtasks 0/0 complete                                                                                 │ │
+│ │ ❯ 004-enfo ▽ Enforced budget and turn guards                                           │ │ phase -                                                                                               │ │
+│ │                                                                                        │ │ location main  spec 004-enforced-budget-and-turn-guards                                               │ │
+│ │                                                                                        │ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ │                                                                                        │                                                                                                           │
+│ │                                                                                        │ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │                                                                                        │ │ AGENT STREAM                                                                                          │ │
+│ │                                                                                        │ │ 04:51:42 start 004-enfo → vendored AgentManager…                                                      │ │
+│ │                                                                                        │ │ 04:51:43 started 004-enfo: agent started — phase planning                                             │ │
+│ └────────────────────────────────────────────────────────────────────────────────────────┘ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ BOARD  j/k move · ⏎ focus · s start · x stop · H/L column · l logs                                                                                                                      : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+(node:6462) Warning: AI SDK Warning System: To turn off warning logging, set the AI_SDK_LOG_WARNINGS global to false.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:6462) Warning: AI SDK Warning (anthropic.messages / glm/glm-5): The feature "maxOutputTokens" is used in a compatibility mode. The model "glm/glm-5" is unknown. The max output tokens have been l
+imited to 4096. Set maxOutputTokens explicitly to override this limit.

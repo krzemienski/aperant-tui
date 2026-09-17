@@ -8,3 +8,6 @@ apps/tui/dist/
 
 # gate evidence logs are proof artifacts — never ignore them
 !evidence/**/*.log
+
+# Python bytecode from tools/ (tuistory driver)
+__pycache__/

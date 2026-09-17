@@ -1,0 +1,394 @@
+(B[mdiff --git a/.claude/skills/quickstart/README.md b/.claude/skills/quickstart/README.md
+new file mode 100644
+index 0000000..4ab554b
+--- /dev/null
++++ b/.claude/skills/quickstart/README.md
+@@ -0,0 +1,83 @@
++# quickstart
++
++The front door for this repo. `/quickstart` with no argument gives a
++30-second orientation and then routes you down one of three paths: a quick
++answer (Help mode), the Day-1 interactive skills, or — the newest path — a
++guided setup-and-run of the autonomous pipeline on the bundled canary
++target. With a question as argument, it answers from this repo's own docs
++and source instead of general knowledge.
++
++## Requirements
++
++- Claude Code CLI installed and authenticated
++- This repo checked out
++- For the pipeline path only (not needed for the interactive skills):
++  Python >= 3.11, Docker, and Linux x86_64/aarch64 for the gVisor sandbox
++  (`scripts/check_env.sh` validates all of these with actionable fixes)
++
++## Usage
++
++Inside Claude Code:
++
++```
++> /quickstart            # blank = 30-sec intro, then pick a path
++> /quickstart <question> # Help mode: answer from this repo's docs
++```
++
++### The three quickstart paths
++
++| Path | Time | What you get |
++|------|------|--------------|
++| 30-sec intro + Q&A | ~1 min | Orientation, ramp-up table, cited answers to questions |
++| Day-1 static skills | ~10 min | `/threat-model`, `/vuln-scan`, `/triage` on `targets/canary`; three artifacts on disk, no sandbox needed |
++| Pipeline readiness | ~15 min | Env check, sandbox provisioning, and a supervised `vuln-pipeline run targets/canary --runs 3 --parallel --stream --max-turns 100` with the flags explained |
++
++### Prerequisite table (pipeline path)
++
++| Check | Requirement | On failure |
++|-------|-------------|-----------|
++| `python` | Python >= 3.11 | Hard fail — script prints the install command |
++| `docker` | Docker CLI + reachable daemon | Hard fail — start Docker Desktop / install Docker |
++| `os` | Linux x86_64/aarch64 (gVisor) | Hard fail on macOS/Windows — use a Linux VM or `--dangerously-no-sandbox` |
++| `gvisor` | `runsc` installed | Warn-only — points at `scripts/setup_sandbox.sh` |
++
++Run `bash scripts/check_env.sh` (or `--json` for machine-readable output).
++Exit 0 = all hard checks pass; exit 1 = at least one hard failure.
++
++### Expected outputs of a canary run
++
++After the guided pipeline run, these land under `results/canary/<ts>/`:
++
++- `found_bugs.jsonl` — each crash as it's found, appended live
++- `run_000/`, `run_001/`, `run_002/` — per-run `result.json` grade results
++- `reports/bug_NN/report.json` — exploitability report per unique bug; the
++  first typically lands within minutes of the first crash, not after the
++  batch finishes
++
++### 15-minute budget breakdown
++
++| Minutes | Step |
++|---------|------|
++| 0-2 | Env check (`scripts/check_env.sh`) |
++| 2-7 | Sandbox provisioning if runsc missing (`scripts/setup_sandbox.sh`, sudo + `/etc/docker/daemon.json`) |
++| 7-8 | Model confirmation (`--model` or `VULN_PIPELINE_MODEL`) |
++| 8-13 | Canary run (3 parallel find-agents, streaming reports) |
++| 13-15 | Recap of artifacts, pointer to README Step 2 and `docs/pipeline.md` |
++
++## Output
++
++No run directory of its own — the artifacts are whatever the chosen path
++produces:
++
++- Day-1 path: `THREAT_MODEL.md`, `targets/canary/VULN-FINDINGS.md` +
++  `VULN-FINDINGS.json`, `TRIAGE.md` + `TRIAGE.json`
++- Pipeline path: `results/canary/<ts>/` as listed above
++
++The skill itself never executes target code: interactive skills only read
++and write files, and pipeline commands are run by the operator (or via
++`bin/vp-sandboxed` with explicit approval). See
++[docs/security.md](../../../docs/security.md).
++
++## Questions
++
++Reach out to your Anthropic contact.
+diff --git a/.claude/skills/quickstart/SKILL.md b/.claude/skills/quickstart/SKILL.md
+index 2fb9109..0ce4e68 100644
+--- a/.claude/skills/quickstart/SKILL.md
++++ b/.claude/skills/quickstart/SKILL.md
+@@ -14,6 +14,8 @@ allowed-tools:
+   - Grep
+   - Task
+   - AskUserQuestion
++  - Bash(bash scripts/check_env.sh:*)
++  - Bash(bash scripts/setup_sandbox.sh:*)
+ ---
+ 
+ # /quickstart
+@@ -50,12 +52,14 @@ Say roughly:
+ Remind them to `export CLAUDE_CODE_SUBAGENT_MODEL=<model-id>` so subagents
+ use the same model as the session.
+ 
+-Then **AskUserQuestion** with three options:
++Then **AskUserQuestion** with four options:
+ 
+ 1. **Walk me through Day 1 on the canary (~10 min)** → run "Guided first
+    run" below.
+-2. **I have a question** → ask what it is, then switch to Help mode.
+-3. **I'll read the README** → point at `README.md` Step 1 and stop.
++2. **Set up and run the pipeline on the canary (~15 min)** → run "Guided
++   pipeline first run" below.
++3. **I have a question** → ask what it is, then switch to Help mode.
++4. **I'll read the README** → point at `README.md` Step 1 and stop.
+ 
+ ### Guided first run
+ 
+@@ -77,7 +81,52 @@ Pause for the operator between each (AskUserQuestion); don't barrel through.
+ Close with a one-line recap of the three artifacts on disk, then point at
+ README Step 2 for the execution-verified pipeline. **Never run `vuln-pipeline`
+ or anything that executes target code here**; that's Step 2 and needs
+-Docker + a sandbox.
++Docker + a sandbox (see "Guided pipeline first run" for the supervised path).
++
++### Guided pipeline first run
++
++Sets up the prerequisites and supervises one small canary run. The skill
++itself never executes target code: it runs the env checker and (with
++confirmation) the sandbox setup script, then hands the pipeline command to
++the operator to run — or runs it via `bin/vp-sandboxed` only with their
++explicit approval.
++
++**Step A — environment check.** Run `bash scripts/check_env.sh --json` and
++interpret each key (`python`, `docker`, `os`, `gvisor`). On any hard
++failure, print the actionable fix line the script emits and stop — don't
++improvise fixes. Warnings alone are fine to continue past.
++
++**Step B — sandbox provisioning.** If gVisor `runsc` is missing, walk the
++operator through `bash scripts/setup_sandbox.sh`: confirm before running —
++it uses `sudo` and modifies `/etc/docker/daemon.json`. After it completes,
++re-run `bash scripts/check_env.sh` and confirm the `gvisor` check now
++passes (or is still a warn-only miss on non-Linux hosts).
++
++**Step C — model + launch.** Confirm a model is set: `--model` flag or
++`export VULN_PIPELINE_MODEL=<model-id>`. Then, with the operator's
++approval, have them run (or run via `bin/vp-sandboxed` with explicit
++confirmation):
++
++```bash
++bin/vp-sandboxed vuln-pipeline run targets/canary --runs 3 --parallel --stream --max-turns 100
++```
++
++Explain each flag in one line: `--runs 3` = three concurrent find-agents;
++`--parallel` = run them concurrently, round-robin over focus areas;
++`--stream` = judge + reports land as crashes grade, no batch wait;
++`--max-turns 100` = per-agent turn cap so the demo stays cheap.
++
++**Step D — expected outputs.** Describe what lands on disk, exact paths:
++
++- `results/canary/<ts>/found_bugs.jsonl` — each crash as it's found
++- `results/canary/<ts>/run_*/result.json` — per-run grade results
++- `results/canary/<ts>/reports/bug_NN/report.json` — exploitability
++  reports; the first typically lands within minutes, not hours
++
++**Step E — recap.** One-line summary of what the run produced, then point
++at README Step 2 for scaling up (`--runs`, targets) and `docs/pipeline.md`
++for the full operator guide. Offer `/triage` or `/patch` on the results if
++the operator wants to keep going.
+ 
+ ---
+ 
+diff --git a/scripts/check_env.sh b/scripts/check_env.sh
+new file mode 100755
+index 0000000..731b447
+--- /dev/null
++++ b/scripts/check_env.sh
+@@ -0,0 +1,102 @@
++#!/usr/bin/env bash
++# Copyright 2026 Anthropic PBC
++# SPDX-License-Identifier: Apache-2.0
++# Prerequisite checker for the vuln-pipeline. Verifies Python, Docker, OS/arch,
++# and (warn-only) gVisor + model env. Exit 0 when all hard checks pass,
++# exit 1 on any hard failure. `--json` emits a machine-readable summary.
++set -euo pipefail
++
++step() { printf '\n\033[1;34m== %s ==\033[0m\n' "$*"; }
++ok()   { printf '\033[1;32m  ok\033[0m  %s\n' "$*"; }
++warn() { printf '\033[1;33m  warn\033[0m %s\n' "$*"; }
++die()  { printf '\033[1;31m  fail\033[0m %s\n' "$*" >&2; exit 1; }
++
++JSON=0
++[ "${1:-}" = "--json" ] && JSON=1
++
++# Track results for --json: name=pass|warn|fail
++RESULTS=()
++record() { RESULTS+=("$1=$2"); }
++failed=0
++fail() { record "$1" fail; printf '\033[1;31m  fail\033[0m %s\n' "$2" >&2; failed=1; }
++
++# ── 1. Python >= 3.11 ───────────────────────────────────────────────────────
++step "Python >= 3.11"
++if python3 -c 'import sys; sys.exit(sys.version_info < (3,11))' 2>/dev/null; then
++    ok "$(python3 --version)"
++    record python pass
++else
++    fail python "Python >= 3.11 required ($(python3 --version 2>&1 || echo 'python3 not found')). Install: https://www.python.org/downloads/ or your package manager (e.g. 'brew install python@3.12', 'apt install python3.12')."
++fi
++
++# ── 2. Docker ───────────────────────────────────────────────────────────────
++step "Docker"
++if command -v docker >/dev/null 2>&1 && docker info >/dev/null 2>&1; then
++    ok "docker $(docker --version | sed 's/^Docker version //; s/, build.*//') daemon reachable"
++    record docker pass
++elif ! command -v docker >/dev/null 2>&1; then
++    fail docker "docker CLI not found. Install Docker: https://docs.docker.com/get-docker/"
++else
++    fail docker "docker daemon not reachable. Start Docker Desktop (macOS/Windows) or 'systemctl start docker' (Linux)."
++fi
++
++# ── 3. OS / arch ────────────────────────────────────────────────────────────
++step "OS / arch"
++OS="$(uname -s)"
++ARCH="$(uname -m)"
++if [ "$OS" = "Linux" ]; then
++    case "$ARCH" in
++        x86_64|aarch64) ok "Linux ${ARCH} (gVisor supported)"; record os pass ;;
++        *) fail os "gVisor ships for Linux x86_64/aarch64 only (${ARCH} unsupported). Use a supported host, or 'vuln-pipeline ... --dangerously-no-sandbox'." ;;
++    esac
++else
++    fail os "${OS} detected. gVisor (runsc) requires a Linux host. On macOS/Windows, run the pipeline inside a Linux VM, or use 'vuln-pipeline ... --dangerously-no-sandbox' (no syscall isolation)."
++fi
++
++# ── 4. gVisor runsc (warn-only) ─────────────────────────────────────────────
++step "gVisor (runsc) — warning only"
++if command -v runsc >/dev/null 2>&1; then
++    ok "$(runsc --version 2>/dev/null | head -1)"
++    record gvisor pass
++elif [ -x /usr/local/bin/runsc ]; then
++    ok "$(/usr/local/bin/runsc --version 2>/dev/null | head -1)"
++    record gvisor pass
++else
++    warn "runsc not installed. Run 'bash scripts/setup_sandbox.sh' to install gVisor and register the Docker runtime."
++    record gvisor warn
++fi
++
++# ── 5. Model env (warn-only) ────────────────────────────────────────────────
++step "Model configuration — warning only"
++if [ -n "${CLAUDE_CODE_SUBAGENT_MODEL:-}" ] || [ -n "${VULN_PIPELINE_MODEL:-}" ]; then
++    ok "model configured via env (CLAUDE_CODE_SUBAGENT_MODEL / VULN_PIPELINE_MODEL)"
++    record model pass
++else
++    warn "No model env set. Pass '--model <model-id>' to vuln-pipeline, or export VULN_PIPELINE_MODEL."
++    record model warn
++fi
++
++# ── Summary ─────────────────────────────────────────────────────────────────
++if [ "$JSON" -eq 1 ]; then
++    emit_json() {
++        printf '{\n'
++        first=1
++        for r in "${RESULTS[@]}"; do
++            [ $first -eq 1 ] || printf ',\n'
++            first=0
++            printf '  "%s": "%s"' "${r%%=*}" "${r#*=}"
++        done
++        printf '\n}\n'
++    }
++    if [ $failed -eq 0 ]; then
++        emit_json
++    else
++        emit_json >&2
++    fi
++fi
++
++if [ $failed -ne 0 ]; then
++    printf '\033[1;31m== prerequisite check FAILED ==\033[0m\n' >&2
++    exit 1
++fi
++step "All hard checks passed"
+diff --git a/tests/test_check_env.py b/tests/test_check_env.py
+new file mode 100644
+index 0000000..3c75f4a
+--- /dev/null
++++ b/tests/test_check_env.py
+@@ -0,0 +1,106 @@
++# Copyright 2026 Anthropic PBC
++# SPDX-License-Identifier: Apache-2.0
++"""scripts/check_env.sh: syntax, --json output, exit codes, warn-vs-fail."""
++import json
++import os
++import stat
++import subprocess
++
++SCRIPT = os.path.join(os.path.dirname(__file__), os.pardir, "scripts", "check_env.sh")
++
++PYTHON_STUB = (
++    "#!/bin/sh\n"
++    "if [ \"$1\" = \"--version\" ]; then echo 'Python 3.12.0'; exit 0; fi\n"
++    "exit 0\n"
++)
++
++DOCKER_STUB = (
++    "#!/bin/sh\n"
++    "if [ \"$1\" = \"--version\" ]; then echo 'Docker version 24.0.0, build abc'; exit 0; fi\n"
++    "exit 0\n"
++)
++
++
++def _run(env, extra_args=()):
++    e = dict(os.environ)
++    e.update(env)
++    return subprocess.run(
++        ["bash", os.path.abspath(SCRIPT), *extra_args],
++        capture_output=True, text=True, env=e,
++    )
++
++
++def _parse_json(text):
++    """Extract the JSON summary block from mixed stdout/stderr."""
++    start, end = text.find("{"), text.rfind("}")
++    assert start != -1 and end > start, f"no JSON in: {text!r}"
++    return json.loads(text[start:end + 1])
++
++
++def _make_stubs(tmp_path, docker_body=None):
++    """PATH with python3 (3.12) and docker stubs; no runsc, no model env."""
++    bin_dir = tmp_path / "bin"
++    bin_dir.mkdir()
++    (bin_dir / "python3").write_text(PYTHON_STUB)
++    (bin_dir / "docker").write_text(docker_body or DOCKER_STUB)
++    for f in bin_dir.iterdir():
++        f.chmod(f.stat().st_mode | stat.S_IEXEC)
++    return {"PATH": f"{bin_dir}{os.pathsep}{'/usr/bin:/bin'}"}
++
++
++def test_syntax_valid():
++    r = subprocess.run(["bash", "-n", os.path.abspath(SCRIPT)])
++    assert r.returncode == 0
++
++
++def test_json_output_parses_with_expected_keys(tmp_path):
++    r = _run(_make_stubs(tmp_path), ["--json"])
++    # os check is host-dependent (fails on macOS); JSON goes to stderr on failure.
++    data = _parse_json(r.stdout if r.returncode == 0 else r.stderr)
++    for key in ("python", "docker", "gvisor", "os"):
++        assert key in data
++        assert data[key] in ("pass", "warn", "fail")
++    assert data["python"] == "pass"
++    assert data["docker"] == "pass"
++    assert data["os"] in ("pass", "fail")  # host-dependent
++
++
++def test_docker_failure_exits_1(tmp_path):
++    bad_docker = "#!/bin/sh\nexit 1\n"
++    r = _run(_make_stubs(tmp_path, docker_body=bad_docker), ["--json"])
++    assert r.returncode == 1
++    data = _parse_json(r.stderr)  # JSON goes to stderr on failure
++    assert data["docker"] == "fail"
++
++
++def test_docker_missing_exits_1(tmp_path):
++    env = _make_stubs(tmp_path)
++    (tmp_path / "bin" / "docker").unlink()
++    r = _run(env)
++    assert r.returncode == 1
++    assert "docker" in r.stderr.lower()
++
++
++def test_python_missing_exits_1(tmp_path):
++    env = _make_stubs(tmp_path)
++    # Replace python3 stub with one that behaves like a too-old interpreter.
++    (tmp_path / "bin" / "python3").write_text(
++        "#!/bin/sh\nif [ \"$1\" = \"--version\" ]; then echo 'Python 3.9.0'; fi\nexit 1\n")
++    (tmp_path / "bin" / "python3").chmod(0o755)
++    r = _run(env, ["--json"])
++    assert r.returncode == 1
++    data = _parse_json(r.stderr)
++    assert data["python"] == "fail"
++
++
++def test_warn_only_checks_do_not_fail(tmp_path):
++    """No runsc and no model env → warnings recorded, but exit stays 0 on Linux."""
++    env = _make_stubs(tmp_path)
++    env.pop("VULN_PIPELINE_MODEL", None)
++    env.pop("CLAUDE_CODE_SUBAGENT_MODEL", None)
++    r = _run(env, ["--json"])
++    data = _parse_json(r.stdout if r.returncode == 0 else r.stderr)
++    assert data["gvisor"] == "warn"
++    assert data["model"] == "warn"
++    if data["os"] == "pass":  # on a Linux x86_64/aarch64 host
++        assert r.returncode == 0

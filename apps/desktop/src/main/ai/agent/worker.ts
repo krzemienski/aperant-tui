@@ -49,6 +49,20 @@ import { createMcpClientsForAgent, mergeMcpTools, closeAllMcpClients } from '../
 import type { McpClientResult } from '../mcp/types';
 import { runProjectIndexer } from '../project/project-indexer';
 
+// D21b: every worker_thread gets its OWN globalThis, so the suppression the
+// TUI applies at startup (apps/tui/src/cli.tsx:67-68) does not reach here —
+// and it is the worker, not the main thread, that makes the model calls. The
+// AI SDK prints a 5-line warning per call for any model id it does not
+// recognise (every router/proxy id qualifies). A worker's stdout is inherited
+// by the terminal, so those lines scroll the Ink frame away mid-run: an agent
+// doing real work destroys the UI that is supposed to be showing it.
+//
+// Nothing is hidden: real failures arrive as `error` stream parts and are
+// surfaced in-frame, and the durable record is the flight recorder at
+// $APERANT_USER_DATA/logs/agent-events.jsonl.
+const sdkGlobals = globalThis as typeof globalThis & { AI_SDK_LOG_WARNINGS?: boolean };
+sdkGlobals.AI_SDK_LOG_WARNINGS = false;
+
 // =============================================================================
 // Validation
 // =============================================================================

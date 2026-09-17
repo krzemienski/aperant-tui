@@ -1,0 +1,75 @@
+
+[ClaudeProfileManager] Starting initialization...
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+[ClaudeProfileManager] Initialization complete
+[AgentManager] Resolved auth from provider queue: account=anthropic-mu4v0hti provider=anthropic model=glm/glm-5
+[WorktreeManager] Pruning stale worktree references...
+[WorktreeManager] Using existing worktree: 004-enforced-budget-and-turn-guards on branch auto-claude/004-enforced-budget-and-turn-guards
+[AgentManager] Task 004-enforced-budget-and-turn-guards will run in worktree: /Users/nick/Desktop/vigil/.auto-claude/worktrees/tasks/004-enforced-budget-and-turn-guards
+[AgentManager] Task registered with OperationRegistry: {
+  taskId: '004-enforced-budget-and-turn-guards',
+  profileId: 'primary',
+  profileName: 'Primary',
+  type: 'task-execution'
+}
+┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────│─agent started: 004-enfo─│┐
+│APERANT │ vigil /Users/nick/Desktop/vigil │ ⑂ main                                                                                                               ◉ 0 runnin└─────────────────────────┘│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┌────────────────────────────────────────────────────────────────────────────────────────┐ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ TASKS                                                                                  │ │ DETAIL                                                                                                │ │
+│ │ ◆ BACKLOG (4)                                                                          │ │ 004-enfo [BACKLOG]                                                                                    │ │
+│ │   001-neut ▽ Neutral default rails with environment profiles                           │ │ Enforced budget and turn guards                                                                       │ │
+│ │   002-vigi ▽ `vigil init` config and plan scaffolding                                  │ │ progress ░░░░░░░░░░░░░░ 0%                                                                            │ │
+│ │   003-cont ▽ Content-aware evidence assertions with hash recording                     │ │ subtasks 0/0 complete                                                                                 │ │
+│ │ ❯ 004-enfo ▽ Enforced budget and turn guards                                           │ │ phase -                                                                                               │ │
+│ │                                                                                        │ │ location main  spec 004-enforced-budget-and-turn-guards                                               │ │
+│ │                                                                                        │ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ │                                                                                        │                                                                                                           │
+│ │                                                                                        │ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │                                                                                        │ │ AGENT STREAM                                                                                          │ │
+│ │                                                                                        │ │ 05:02:56 start 004-enfo → vendored AgentManager…                                                      │ │
+│ │                                                                                        │ │ 05:02:57 started 004-enfo: agent started — phase planning                                             │ │
+│ └────────────────────────────────────────────────────────────────────────────────────────┘ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ vigil /Users/nick/Desktop/vigil │ ⑂ main                                                                                                               ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┌────────────────────────────────────────────────────────────────────────────────────────┐ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ TASKS                                                                                  │ │ DETAIL                                                                                                │ │
+│ │ ◆ BACKLOG (4)                                                                          │ │ 004-enfo [BACKLOG]                                                                                    │ │
+│ │   001-neut ▽ Neutral default rails with environment profiles                           │ │ Enforced budget and turn guards                                                                       │ │
+│ │   002-vigi ▽ `vigil init` config and plan scaffolding                                  │ │ progress ░░░░░░░░░░░░░░ 0%                                                                            │ │
+│ │   003-cont ▽ Content-aware evidence assertions with hash recording                     │ │ subtasks 0/0 complete                                                                                 │ │
+│ │ ❯ 004-enfo ▽ Enforced budget and turn guards                                           │ │ phase -                                                                                               │ │
+│ │                                                                                        │ │ location main  spec 004-enforced-budget-and-turn-guards                                               │ │
+│ │                                                                                        │ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ │                                                                                        │                                                                                                           │
+│ │                                                                                        │ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │                                                                                        │ │ AGENT STREAM                                                                                          │ │
+│ │                                                                                        │ │ 05:02:56 start 004-enfo → vendored AgentManager…                                                      │ │
+│ │                                                                                        │ │ 05:02:57 started 004-enfo: agent started — phase planning                                             │ │
+│ └────────────────────────────────────────────────────────────────────────────────────────┘ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ vigil /Users/nick/Desktop/vigil │ ⑂ main                                                                                                               ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│  1 swarm   2 graph   3 inspect   4 trace   5 tokens   6 waits  1 agent · esc then 1-7 to switch tabs                                                                                                 │
+│                                                                                                                                                                                                      │
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ vigil /Users/nick/Desktop/vigil │ ⑂ main                                                                                                               ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│  1 swarm   2 graph   3 inspect   4 trace   5 tokens   6 waits  1 agent · esc then 1-7 to switch tabs                                                                                                 │
+│                                                                                                                                                                                                      │
+│ ┌────────────────────────────────────────────────────────────────────────────────────────────┐ ┌───────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ ORCHESTRATION GRAPH                                                                        │ │ PHASE PIPELINE · 004-enforced                                                                     │ │
+│ │   ◈ coder 004-enforced-bud · coding · 20%                                                  │ │ ✓ planning   0→20%                                                                                │ │
+│ │                                                                                            │ │ ⚡ coding     20→80%                                                                               │
+│
+│ │                                                                                            │ │ ○ qa_review  80→95%                                                                               │ │
+│ │                                                                                            │ │ ○ qa_fixing  80→95%                                                                               │ │
+│ │                                                                                            │ │ ○ complete   100%                                                                                 │ │
+│ │                                                                                            │ │                                                                                                   │ │
+│ │                                                                                            │ │ ⚠ regression guard active                                                                         │ │
+│ │                                                                                            │ │ PHASE_ORDER_INDEX blocks backward fallback moves;                                                 │ │
+│ │                                                                                            │ │ complete requires a structured emit, never text.                                                  │ │
+│ └────────────────────────────────────────────────────────────────────────────────────────────┘ └───────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ AGENTS  1-6 sub-view · j/k select · ⏎ inspect · f filter · r resume                                                                                                                     : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

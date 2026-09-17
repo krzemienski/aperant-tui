@@ -1,0 +1,616 @@
+(B[mdiff --git a/src/cli.ts b/src/cli.ts
+index 12ae4cc..eca1343 100644
+--- a/src/cli.ts
++++ b/src/cli.ts
+@@ -59,7 +59,7 @@ async function launch(opts: Record<string, string | boolean | undefined>, mode:
+     process.stdout.write(`vigil ${pkg.version} · config ${source} · ${mode} · approvals ${approvals} · cwd ${cwd}\n`);
+     const ok = await runner.start();
+     process.stdout.write(`\nRUN ${ok ? "PASS" : "FAIL"} · runs/${runner.store.runId}\n`);
+-    process.exit(ok ? 0 : 1);
++    process.exit(runner.budgetExceeded ? 3 : ok ? 0 : 1);
+   }
+ 
+   const planModels = new Map<string, { gates: { id: string; criteria: string; capture: string[] }[]; file: string }>();
+@@ -73,13 +73,15 @@ async function launch(opts: Record<string, string | boolean | undefined>, mode:
+   process.on("exit", () => { process.stderr.write = origErr; });
+   const ok = await startPromise;
+   await ink.waitUntilExit();
+-  process.exit(ok ? 0 : 1);
++  process.exit(runner.budgetExceeded ? 3 : ok ? 0 : 1);
+ }
+ 
+ function plainLine(ev: RunEvent): string | null {
+   const ts = clockHHMMSS(ev.t);
+   switch (ev.kind) {
+-    case "run.start": return `${ts} run ${ev.runId} (${ev.mode}) model=${ev.model}${ev.baseUrl ? ` via ${ev.baseUrl}` : ""}`;
++    case "budget.warn": return `${ts} ⚠ budget.warn ${ev.metric} ${ev.thresholdPct}% — ${ev.metric === "cost" ? `$${ev.spent.toFixed(2)} of $${ev.cap.toFixed(2)}` : `${ev.spent} of ${ev.cap} turns`}`;
++    case "budget.exceeded": return `${ts} ✗ budget.exceeded ${ev.metric} — ${ev.metric === "cost" ? `$${ev.spent.toFixed(2)} of $${ev.cap.toFixed(2)}` : `${ev.spent} of ${ev.cap} turns`} — stopping run`;
++    case "run.start": return `${ts} run ${ev.runId} (${ev.mode}) model=${ev.model}${ev.baseUrl ? ` via ${ev.baseUrl}` : ""}${ev.maxBudgetUsd !== undefined ? ` budget=$${ev.maxBudgetUsd}` : ""}${ev.maxTurns !== undefined ? ` maxTurns=${ev.maxTurns}` : ""}`;
+     case "plan.start": return `${ts} ▶ plan ${ev.planId} gates=[${ev.gateIds.join(",")}]`;
+     case "plan.end": return `${ts} ${ev.verdict === "pass" ? "✓" : "✗"} plan ${ev.planId} ${ev.verdict}${ev.reason ? " — " + ev.reason : ""} (${Math.round(ev.durationMs / 1000)}s)`;
+     case "session.init": return `${ts} session ${ev.sessionId} model=${ev.model}`;
+diff --git a/src/config.ts b/src/config.ts
+index c06a515..678693f 100644
+--- a/src/config.ts
++++ b/src/config.ts
+@@ -16,6 +16,7 @@ export const ConfigSchema = z.object({
+   approvals: z.enum(["auto", "gates", "all"]).default("auto"),
+   maxTurns: z.number().default(400),
+   maxBudgetUsd: z.number().optional(),
++  budgetWarnThresholds: z.array(z.number()).default([75, 90]),
+   unsetEnv: z.array(z.string()).default(["NODE_ENV"]),
+   env: z.record(z.string(), z.string()).default({}),
+   addDirs: z.array(z.string()).default([]),
+diff --git a/src/engine/budget.ts b/src/engine/budget.ts
+new file mode 100644
+index 0000000..fd188af
+--- /dev/null
++++ b/src/engine/budget.ts
+@@ -0,0 +1,131 @@
++/**
++ * BudgetGuard — pure cumulative cost/turn tracking across session.result events.
++ *
++ * A session.result reports the total cost/turns for that plan's session; on
++ * repeat results for the same planId only the delta is counted, so cumulative
++ * spend equals the sum of per-plan session totals.
++ */
++
++export type BudgetMetric = "cost" | "turns";
++
++export interface BudgetSignal {
++  type: "warn" | "exceeded";
++  metric: BudgetMetric;
++  thresholdPct?: number; // warn only
++  spent: number;
++  cap: number;
++  message: string;
++}
++
++export interface BudgetGuardOpts {
++  maxBudgetUsd?: number;
++  maxTurns: number;
++  warnThresholds: number[]; // ascending percentages, e.g. [75, 90]
++}
++
++export interface SessionResultLike {
++  planId: string;
++  costUsd: number;
++  turns: number;
++}
++
++export class BudgetGuard {
++  private readonly opts: BudgetGuardOpts;
++  private readonly planCosts = new Map<string, number>();
++  private readonly planTurns = new Map<string, number>();
++  private readonly warned = { cost: new Set<number>(), turns: new Set<number>() };
++  private spentUsd = 0;
++  private spentTurns = 0;
++  private exceeded = false;
++
++  constructor(opts: BudgetGuardOpts) {
++    this.opts = opts;
++  }
++
++  /** Cumulative spend/turns so far. */
++  totals(): { spentUsd: number; spentTurns: number } {
++    return { spentUsd: this.spentUsd, spentTurns: this.spentTurns };
++  }
++
++  isExceeded(): boolean {
++    return this.exceeded;
++  }
++
++  /**
++   * Observe a session.result; returns warn signals (each threshold at most
++   * once per metric) and at most one exceeded signal when a cap is reached.
++   */
++  observe(result: SessionResultLike): BudgetSignal[] {
++    const prevCost = this.planCosts.get(result.planId) ?? 0;
++    const prevTurns = this.planTurns.get(result.planId) ?? 0;
++    const dCost = result.costUsd - prevCost;
++    const dTurns = result.turns - prevTurns;
++    if (dCost > 0) this.spentUsd += dCost;
++    if (dTurns > 0) this.spentTurns += dTurns;
++    this.planCosts.set(result.planId, result.costUsd);
++    this.planTurns.set(result.planId, result.turns);
++
++    const signals: BudgetSignal[] = [];
++
++    // cost checks inert when no cap configured
++    if (this.opts.maxBudgetUsd !== undefined) {
++      const pct = (this.spentUsd / this.opts.maxBudgetUsd) * 100;
++      if (pct >= 100) {
++        this.exceeded = true;
++        signals.push({
++          type: "exceeded",
++          metric: "cost",
++          spent: round2(this.spentUsd),
++          cap: this.opts.maxBudgetUsd,
++          message: `budget exceeded: $${round2(this.spentUsd).toFixed(2)} spent of $${this.opts.maxBudgetUsd.toFixed(2)} cap`,
++        });
++        return signals;
++      }
++      for (const t of this.opts.warnThresholds) {
++        if (pct >= t && !this.warned.cost.has(t)) {
++          this.warned.cost.add(t);
++          signals.push({
++            type: "warn",
++            metric: "cost",
++            thresholdPct: t,
++            spent: round2(this.spentUsd),
++            cap: this.opts.maxBudgetUsd,
++            message: `budget ${t}% — $${round2(this.spentUsd).toFixed(2)} of $${this.opts.maxBudgetUsd.toFixed(2)}`,
++          });
++        }
++      }
++    }
++
++    const tPct = (this.spentTurns / this.opts.maxTurns) * 100;
++    if (tPct >= 100) {
++      this.exceeded = true;
++      signals.push({
++        type: "exceeded",
++        metric: "turns",
++        spent: this.spentTurns,
++        cap: this.opts.maxTurns,
++        message: `turn budget exceeded: ${this.spentTurns} turns of ${this.opts.maxTurns}`,
++      });
++      return signals;
++    }
++    for (const t of this.opts.warnThresholds) {
++      if (tPct >= t && !this.warned.turns.has(t)) {
++        this.warned.turns.add(t);
++        signals.push({
++          type: "warn",
++          metric: "turns",
++          thresholdPct: t,
++          spent: this.spentTurns,
++          cap: this.opts.maxTurns,
++          message: `turns ${t}% — ${this.spentTurns} of ${this.opts.maxTurns}`,
++        });
++      }
++    }
++
++    return signals;
++  }
++}
++
++function round2(n: number): number {
++  return Math.round(n * 100) / 100;
++}
+diff --git a/src/engine/events.ts b/src/engine/events.ts
+index d8f654f..7073ba2 100644
+--- a/src/engine/events.ts
++++ b/src/engine/events.ts
+@@ -14,7 +14,9 @@ export interface TokenUsage {
+ }
+ 
+ export type RunEvent =
+-  | { t: number; kind: "run.start"; runId: string; mode: "plan" | "prompt"; label: string; model: string; baseUrl?: string; cwd: string }
++  | { t: number; kind: "run.start"; runId: string; mode: "plan" | "prompt"; label: string; model: string; baseUrl?: string; cwd: string; maxBudgetUsd?: number; maxTurns?: number }
++  | { t: number; kind: "budget.warn"; runId: string; metric: "cost" | "turns"; thresholdPct: number; spent: number; cap: number; message: string }
++  | { t: number; kind: "budget.exceeded"; runId: string; metric: "cost" | "turns"; spent: number; cap: number; message: string }
+   | { t: number; kind: "run.end"; runId: string; ok: boolean; reason?: string }
+   | { t: number; kind: "plan.start"; planId: string; file: string; title?: string; gateIds: string[] }
+   | { t: number; kind: "plan.end"; planId: string; verdict: "pass" | "fail" | "halted"; reason?: string; durationMs: number }
+diff --git a/src/engine/runner.ts b/src/engine/runner.ts
+index 7b5a13b..cd5b87c 100644
+--- a/src/engine/runner.ts
++++ b/src/engine/runner.ts
+@@ -13,6 +13,7 @@ import { parsePlan, runnerContract, type PlanModel } from "../plan/parser.js";
+ import { discoverPlans, selectPlans, type PlanRef } from "../plan/discover.js";
+ import { renderValidation, updateRoadmapStatus, validationPath } from "../plan/reports.js";
+ import { startProbes, type ProbeDef } from "./probes.js";
++import { BudgetGuard } from "./budget.js";
+ import type { VigilConfig } from "../config.js";
+ import { buildEnv } from "../config.js";
+ import { execFileSync } from "node:child_process";
+@@ -45,6 +46,10 @@ export class Runner extends EventEmitter {
+   approvals: ApprovalMode;
+   private stopProbes: (() => void) | null = null;
+   private abort = false;
++  private guard: BudgetGuard | null = null;
++  /** True when a cost/turn cap was reached; cli exits with code 3. */
++  budgetExceeded = false;
++  private budgetExceededMetric: "cost" | "turns" | null = null;
+   planRoot = "";
+   plans: PlanRef[] = [];
+   models = new Map<string, PlanModel>();
+@@ -69,9 +74,10 @@ export class Runner extends EventEmitter {
+     }
+     const runsRoot = this.opts.runsRoot ?? (this.opts.mode === "plan" ? join(this.planRoot, "runs") : resolve(this.opts.cwd, ".vigil/runs"));
+     this.store = new RunStore(runsRoot, RunStore.newRunId(label));
+-    this.emitEv({ t: now(), kind: "run.start", runId: this.store.runId, mode: this.opts.mode, label, model: cfg.model, baseUrl: cfg.baseUrl, cwd: this.opts.cwd });
++    this.emitEv({ t: now(), kind: "run.start", runId: this.store.runId, mode: this.opts.mode, label, model: cfg.model, baseUrl: cfg.baseUrl, cwd: this.opts.cwd, maxBudgetUsd: cfg.maxBudgetUsd, maxTurns: cfg.maxTurns });
+     this.emitEv({ t: now(), kind: "log", level: "info", source: "vigil", message: `run dir ${this.store.dir}` });
+     if (cfg.probes.length) this.stopProbes = startProbes(cfg.probes as ProbeDef[], (ev) => this.emitEv(ev));
++    this.guard = new BudgetGuard({ maxBudgetUsd: cfg.maxBudgetUsd, maxTurns: cfg.maxTurns, warnThresholds: cfg.budgetWarnThresholds });
+ 
+     let ok = true;
+     if (this.opts.mode === "prompt") {
+@@ -95,13 +101,15 @@ export class Runner extends EventEmitter {
+       }
+     }
+     this.stopProbes?.();
+-    this.emitEv({ t: now(), kind: "run.end", runId: this.store.runId, ok, reason: this.abort ? "stopped by operator" : undefined });
++    const reason = this.budgetExceeded ? (this.budgetExceededMetric === "turns" ? "turns exceeded" : "budget exceeded") : this.abort ? "stopped by operator" : undefined;
++    this.emitEv({ t: now(), kind: "run.end", runId: this.store.runId, ok, reason });
+     this.emit("done", ok);
+     return ok;
+   }
+ 
+   /** Blocks until the operator asks to re-run or quit after a failure. */
+   waitForDecision(): Promise<"rerun" | "quit"> {
++    if (this.budgetExceeded) return Promise.resolve("quit");
+     return new Promise((resolve) => { this.once("decision", resolve); });
+   }
+ 
+@@ -114,7 +122,23 @@ export class Runner extends EventEmitter {
+       addDirs: cfg.addDirs, rails: cfg.rails, approvals: this.approvals, evidenceDir: p.evidenceDir, resumeSessionId: this.opts.resume, pathToClaudeCodeExecutable: resolveClaudeBin(this.opts.pathToClaudeCodeExecutable), settingSources: cfg.settingSources,
+     });
+     this.session = session;
+-    session.on("event", (ev: RunEvent) => this.emitEv(ev));
++    session.on("event", (ev: RunEvent) => {
++      this.emitEv(ev);
++      if (ev.kind === "session.result" && this.guard) {
++        const signals = this.guard.observe({ planId: ev.planId, costUsd: ev.costUsd, turns: ev.turns });
++        for (const s of signals) {
++          if (s.type === "warn") {
++            this.emitEv({ t: now(), kind: "budget.warn", runId: this.store.runId, metric: s.metric, thresholdPct: s.thresholdPct!, spent: s.spent, cap: s.cap, message: s.message });
++          } else {
++            this.emitEv({ t: now(), kind: "budget.exceeded", runId: this.store.runId, metric: s.metric, spent: s.spent, cap: s.cap, message: s.message });
++            this.budgetExceeded = true;
++            this.budgetExceededMetric = s.metric;
++            this.abort = true;
++            void this.session?.interrupt();
++          }
++        }
++      }
++    });
+     session.on("approval", (req: ApprovalRequest) => this.emit("approval", req));
+     session.on("gateApproval", (g: GateApproval) => this.emit("gateApproval", g));
+     let result: { verdict: "pass" | "fail" | "halted"; reason?: string };
+diff --git a/src/engine/store.ts b/src/engine/store.ts
+index 8e88868..a4e5ad3 100644
+--- a/src/engine/store.ts
++++ b/src/engine/store.ts
+@@ -20,6 +20,10 @@ export class RunStore {
+   private gates: Record<string, GateRecord> = {};
+   private sessions: Record<string, string> = {};
+   private cost: Record<string, unknown> = {};
++  private planCost = new Map<string, number>();
++  private planTurns = new Map<string, number>();
++  private totalCostUsd = 0;
++  private totalTurns = 0;
+ 
+   constructor(readonly runsRoot: string, readonly runId: string) {
+     this.dir = join(runsRoot, runId);
+@@ -48,7 +52,21 @@ export class RunStore {
+         break;
+       }
+       case "session.init": { this.sessions[ev.planId] = ev.sessionId; writeFileSync(join(this.dir, "session.json"), JSON.stringify(this.sessions, null, 2)); break; }
+-      case "session.result": { this.cost[ev.planId] = { costUsd: ev.costUsd, durationMs: ev.durationMs, turns: ev.turns, usage: ev.usage, modelUsage: ev.modelUsage }; writeFileSync(join(this.dir, "cost.json"), JSON.stringify(this.cost, null, 2)); break; }
++      case "session.result": {
++        // Run-level totals: a plan's result reports its own session total,
++        // so on repeat results for the same plan only the delta counts.
++        const prevCost = this.planCost.get(ev.planId) ?? 0;
++        const prevTurns = this.planTurns.get(ev.planId) ?? 0;
++        this.totalCostUsd += ev.costUsd - prevCost;
++        this.totalTurns += ev.turns - prevTurns;
++        this.planCost.set(ev.planId, ev.costUsd);
++        this.planTurns.set(ev.planId, ev.turns);
++        this.cost[ev.planId] = { costUsd: ev.costUsd, durationMs: ev.durationMs, turns: ev.turns, usage: ev.usage, modelUsage: ev.modelUsage };
++        this.cost["totalCostUsd"] = this.totalCostUsd;
++        this.cost["totalTurns"] = this.totalTurns;
++        this.cost["updatedAt"] = ev.t;
++        writeFileSync(join(this.dir, "cost.json"), JSON.stringify(this.cost, null, 2)); break;
++      }
+     }
+   }
+ 
+diff --git a/src/state/reducer.ts b/src/state/reducer.ts
+index 2a72493..588fff3 100644
+--- a/src/state/reducer.ts
++++ b/src/state/reducer.ts
+@@ -15,6 +15,16 @@ export interface UIState {
+   toolCounts: Record<string, number>; latencies: number[];
+   diag: DiagRow[];
+   costUsd: number; usage: TokenUsage; turns: number; modelUsage: Record<string, { costUSD: number; inputTokens: number; outputTokens: number }>;
++  /** Cumulative spend/turns across all plans in the run. */
++  spentUsd: number; totalTurns: number;
++  /** Budget cap (unset = no cap configured). */
++  maxBudgetUsd?: number;
++  /** Turn cap (unset = no cap configured). */
++  maxTurns?: number;
++  /** Warn thresholds (percent) already emitted for cost. */
++  budgetWarned: number[];
++  /** Internal: last observed cost/turns per plan, to compute deltas. */
++  planCosts: Record<string, number>; planTurns: Record<string, number>;
+   pendingApproval?: { requestId: string; tool: string; input: unknown };
+   paused: boolean; probes: Record<string, { ok: boolean; detail: string; t: number }>;
+   hookCounts: { allow: number; deny: number; warn: number };
+@@ -25,7 +35,7 @@ export const MAX_DIAG = 400;
+ export const MAX_STREAM = 600;
+ 
+ export function initialState(): UIState {
+-  return { runId: "", label: "", model: "", cwd: "", mode: "plan", startedAt: Date.now(), plans: [], stream: [], tools: {}, toolOrder: [], toolCounts: {}, latencies: [], diag: [], costUsd: 0, usage: { input: 0, output: 0, cacheRead: 0, cacheCreate: 0 }, turns: 0, modelUsage: {}, paused: false, probes: {}, hookCounts: { allow: 0, deny: 0, warn: 0 } };
++  return { runId: "", label: "", model: "", cwd: "", mode: "plan", startedAt: Date.now(), plans: [], stream: [], tools: {}, toolOrder: [], toolCounts: {}, latencies: [], diag: [], costUsd: 0, usage: { input: 0, output: 0, cacheRead: 0, cacheCreate: 0 }, turns: 0, modelUsage: {}, spentUsd: 0, totalTurns: 0, budgetWarned: [], planCosts: {}, planTurns: {}, paused: false, probes: {}, hookCounts: { allow: 0, deny: 0, warn: 0 } };
+ }
+ 
+ export function summarizeInput(name: string, input: unknown): string {
+@@ -48,7 +58,7 @@ function diag(state: UIState, row: DiagRow) { state.diag.push(row); if (state.di
+ export function reduce(prev: UIState, ev: RunEvent): UIState {
+   const s: UIState = { ...prev };
+   switch (ev.kind) {
+-    case "run.start": Object.assign(s, { runId: ev.runId, label: ev.label, model: ev.model, baseUrl: ev.baseUrl, cwd: ev.cwd, mode: ev.mode, startedAt: ev.t }); break;
++    case "run.start": Object.assign(s, { runId: ev.runId, label: ev.label, model: ev.model, baseUrl: ev.baseUrl, cwd: ev.cwd, mode: ev.mode, startedAt: ev.t, maxBudgetUsd: ev.maxBudgetUsd, maxTurns: ev.maxTurns }); break;
+     case "run.end": s.endedAt = ev.t; s.ok = ev.ok; s.endReason = ev.reason; break;
+     case "plan.start": {
+       s.plans = s.plans.map((p) => p.id === ev.planId ? { ...p, verdict: "running", startedAt: ev.t } : p);
+@@ -59,7 +69,25 @@ export function reduce(prev: UIState, ev: RunEvent): UIState {
+     }
+     case "plan.end": s.plans = s.plans.map((p) => p.id === ev.planId ? { ...p, verdict: ev.verdict, endedAt: ev.t } : p); diag(s, { t: ev.t, source: "plan", level: ev.verdict === "pass" ? "info" : "error", text: `${ev.verdict === "pass" ? "✓" : "✗"} ${ev.planId} ${ev.verdict}${ev.reason ? " — " + ev.reason : ""}` }); break;
+     case "session.init": s.sessionId = ev.sessionId; s.model = ev.model || s.model; diag(s, { t: ev.t, source: "sdk", level: "info", text: `session ${ev.sessionId.slice(0, 8)} · ${ev.model} · ${ev.tools.length} tools · cwd ${ev.cwd}` }); break;
+-    case "session.result": s.costUsd = ev.costUsd; s.usage = ev.usage; s.turns = ev.turns; s.modelUsage = ev.modelUsage; diag(s, { t: ev.t, source: "sdk", level: "info", text: `result/${ev.subtype} · ${ev.turns} turns · $${ev.costUsd.toFixed(3)} · ${(ev.durationMs / 1000).toFixed(0)}s` }); break;
++    case "session.result": {
++      // session.result reports the session's cumulative cost/turns; accumulate run-level totals via per-plan deltas.
++      const prevCost = s.planCosts[ev.planId] ?? 0;
++      const prevTurns = s.planTurns[ev.planId] ?? 0;
++      s.planCosts = { ...s.planCosts, [ev.planId]: ev.costUsd };
++      s.planTurns = { ...s.planTurns, [ev.planId]: ev.turns };
++      s.spentUsd = s.spentUsd + (ev.costUsd - prevCost);
++      s.totalTurns = s.totalTurns + (ev.turns - prevTurns);
++      s.costUsd = ev.costUsd; s.usage = ev.usage; s.turns = ev.turns; s.modelUsage = ev.modelUsage;
++      diag(s, { t: ev.t, source: "sdk", level: "info", text: `result/${ev.subtype} · ${ev.turns} turns · $${ev.costUsd.toFixed(3)} · ${(ev.durationMs / 1000).toFixed(0)}s` });
++      break;
++    }
++    case "budget.warn":
++      s.budgetWarned = s.budgetWarned.includes(ev.thresholdPct) ? s.budgetWarned : [...s.budgetWarned, ev.thresholdPct];
++      diag(s, { t: ev.t, source: "budget", level: "warn", text: ev.message });
++      break;
++    case "budget.exceeded":
++      diag(s, { t: ev.t, source: "budget", level: "error", text: ev.message });
++      break;
+     case "assistant.delta": {
+       const last = s.stream[s.stream.length - 1];
+       if (last && last.kind === "text" && last.parentId === ev.parentToolUseId && !last.id.startsWith("final")) { s.stream = [...s.stream.slice(0, -1), { ...last, text: (last.text ?? "") + ev.text }]; }
+diff --git a/src/ui/panes.tsx b/src/ui/panes.tsx
+index e89bbcd..afd4a55 100644
+--- a/src/ui/panes.tsx
++++ b/src/ui/panes.tsx
+@@ -40,7 +40,15 @@ export function Header({ s, tick, animate, width }: { s: UIState; tick: number;
+       <Box>
+         <Text color={C.accent}>{progressBar(frac, barW)}</Text>
+         <Text color={C.muted}>  plan {plansDone}/{s.plans.length} · gates {gatesDone}/{gatesAll.length} · turn {s.turns} · </Text>
+-        <Text color={C.ok}>${s.costUsd.toFixed(2)}</Text>
++        {s.maxBudgetUsd ? (
++          (() => {
++            const pct = Math.round((s.spentUsd / s.maxBudgetUsd) * 100);
++            const color = pct >= 100 ? C.bad : s.budgetWarned.length > 0 ? C.warn : C.ok;
++            return <Text color={color}>${s.spentUsd.toFixed(2)} / ${s.maxBudgetUsd.toFixed(2)} ({pct}%)</Text>;
++          })()
++        ) : (
++          <Text color={C.ok}>${s.costUsd.toFixed(2)}</Text>
++        )}
+         <Text color={C.muted}> · {fmtTokens(s.usage.input + s.usage.cacheRead)} in / {fmtTokens(s.usage.output)} out · cache {cachePct}%</Text>
+         <Text color={C.dim}> · rails ✓{s.hookCounts.allow} ⚠{s.hookCounts.warn} ✗{s.hookCounts.deny}</Text>
+       </Box>
+diff --git a/tests/budget.test.ts b/tests/budget.test.ts
+new file mode 100644
+index 0000000..413d4e7
+--- /dev/null
++++ b/tests/budget.test.ts
+@@ -0,0 +1,213 @@
++import { describe, it, expect, vi, beforeEach } from "vitest";
++import { mkdtempSync, mkdirSync, writeFileSync, readFileSync } from "node:fs";
++import { tmpdir } from "node:os";
++import { join } from "node:path";
++import { BudgetGuard } from "../src/engine/budget.js";
++import { initialState, reduce } from "../src/state/reducer.js";
++import type { RunEvent } from "../src/engine/events.js";
++import type { VigilConfig } from "../src/config.js";
++import { ConfigSchema } from "../src/config.js";
++
++// ---------------------------------------------------------------------------
++// Stubbed PlanSession: emits a synthetic session.result and returns pass.
++// Each constructed session reports a configurable per-plan cost/turn total.
++// ---------------------------------------------------------------------------
++type SessionOpts = { planId: string };
++interface StubSession {
++  planId: string;
++  gateState: Map<string, string>;
++  interrupted: boolean;
++  on(ev: string, fn: (e: unknown) => void): unknown;
++  run(): Promise<{ verdict: "pass" | "fail" | "halted" }>;
++  interrupt(): Promise<void>;
++  close(): void;
++}
++
++const h = vi.hoisted(() => {
++  const instances: StubSession[] = [];
++  let nextReport: (planId: string, index: number) => { costUsd: number; turns: number } = () => ({ costUsd: 0, turns: 0 });
++  class StubSessionImpl {
++    planId: string;
++    gateState = new Map<string, string>();
++    listeners = new Map<string, Array<(e: unknown) => void>>();
++    interrupted = false;
++    constructor(opts: SessionOpts) { this.planId = opts.planId; instances.push(this as unknown as StubSession); }
++    on(ev: string, fn: (e: unknown) => void) { this.listeners.set(ev, [...(this.listeners.get(ev) ?? []), fn]); return this; }
++    emit(ev: string, payload: unknown) { for (const fn of this.listeners.get(ev) ?? []) fn(payload); }
++    async run() {
++      const idx = instances.indexOf(this as unknown as StubSession);
++      const { costUsd, turns } = nextReport(this.planId, idx);
++      this.emit("event", { t: Date.now(), kind: "session.result", planId: this.planId, subtype: "success", costUsd, durationMs: 10, turns, usage: { input: 0, output: 0, cacheRead: 0, cacheCreate: 0 }, modelUsage: {} });
++      return { verdict: "pass" as const };
++    }
++    async interrupt() { this.interrupted = true; }
++    close() { /* noop */ }
++  }
++  return { instances, setNextReport: (f: typeof nextReport) => { nextReport = f; }, StubSessionImpl };
++});
++
++vi.mock("../src/engine/session.js", () => ({ PlanSession: h.StubSessionImpl }));
++const instances = h.instances;
++
++import { Runner } from "../src/engine/runner.js";
++
++function cfg(over: Partial<VigilConfig> = {}): VigilConfig {
++  return ConfigSchema.parse({ probes: [], ...over });
++}
++
++function mkPlans(): string {
++  const root = mkdtempSync(join(tmpdir(), "vigil-budget-"));
++  for (const id of ["01-a", "02-b", "03-c"]) {
++    const dir = join(root, "phases", id);
++    mkdirSync(dir, { recursive: true });
++    writeFileSync(join(dir, `${id}-PLAN.md`), `# ${id}\n`);
++  }
++  return root;
++}
++
++async function drive(config: VigilConfig, report: (planId: string, i: number) => { costUsd: number; turns: number }) {
++  instances.length = 0;
++  h.setNextReport(report);
++  const target = mkPlans();
++  const runsRoot = mkdtempSync(join(tmpdir(), "vigil-runs-"));
++  const runner = new Runner({ config, mode: "plan", target, cwd: process.cwd(), approvals: "auto", runsRoot });
++  const events: RunEvent[] = [];
++  runner.on("event", (e: RunEvent) => events.push(e));
++  const ok = await runner.start();
++  return { runner, events, ok, runsRoot };
++}
++
++beforeEach(() => { instances.length = 0; });
++
++// ---------------------------------------------------------------------------
++// 1. Pure BudgetGuard: accumulation + warn thresholds fire exactly once
++// ---------------------------------------------------------------------------
++describe("BudgetGuard (pure)", () => {
++  it("accumulates cost across two plans and fires thresholds 75/90 exactly once each", () => {
++    const g = new BudgetGuard({ maxBudgetUsd: 1, maxTurns: 100, warnThresholds: [75, 90] });
++    expect(g.observe({ planId: "01", costUsd: 0.5, turns: 10 })).toEqual([]);
++    const s2 = g.observe({ planId: "02", costUsd: 0.3, turns: 10 }); // 80%
++    expect(s2).toHaveLength(1);
++    expect(s2[0]).toMatchObject({ type: "warn", metric: "cost", thresholdPct: 75, spent: 0.8 });
++    // repeat result for the same plan must NOT double-count
++    const dup = g.observe({ planId: "02", costUsd: 0.3, turns: 10 });
++    expect(dup).toEqual([]);
++    const s3 = g.observe({ planId: "03", costUsd: 0.2, turns: 10 }); // 100%
++    expect(s3).toEqual([{ type: "exceeded", metric: "cost", spent: 1, cap: 1, message: expect.stringContaining("budget exceeded") }]);
++    expect(g.isExceeded()).toBe(true);
++    expect(g.totals()).toEqual({ spentUsd: 1, spentTurns: 30 });
++  });
++
++  it("fires each threshold once even when a single result crosses several", () => {
++    const g = new BudgetGuard({ maxBudgetUsd: 10, maxTurns: 1000, warnThresholds: [75, 90] });
++    const s = g.observe({ planId: "01", costUsd: 8, turns: 1 }); // 80% → only 75
++    expect(s.map((x) => x.thresholdPct ?? x.type)).toEqual([75]);
++    const s2 = g.observe({ planId: "02", costUsd: 1, turns: 1 }); // 90%
++    expect(s2.map((x) => x.thresholdPct ?? x.type)).toEqual([90]);
++    const s3 = g.observe({ planId: "03", costUsd: 1, turns: 1 }); // 100%
++    expect(s3.map((x) => x.thresholdPct ?? x.type)).toEqual(["exceeded"]);
++  });
++
++  it("cost checks are inert when no maxBudgetUsd configured", () => {
++    const g = new BudgetGuard({ maxTurns: 100, warnThresholds: [75, 90] });
++    expect(g.observe({ planId: "01", costUsd: 999, turns: 1 })).toEqual([]);
++    expect(g.isExceeded()).toBe(false);
++  });
++
++  it("maxTurns enforced with the same warn-then-stop semantics", () => {
++    const g = new BudgetGuard({ maxBudgetUsd: 100, maxTurns: 10, warnThresholds: [75, 90] });
++    const s1 = g.observe({ planId: "01", costUsd: 0.01, turns: 8 }); // 80% of turns → warn 75
++    expect(s1).toEqual([expect.objectContaining({ type: "warn", metric: "turns", thresholdPct: 75 })]);
++    const s2 = g.observe({ planId: "02", costUsd: 0.01, turns: 3 }); // 11 turns → exceeded
++    expect(s2).toEqual([{ type: "exceeded", metric: "turns", spent: 11, cap: 10, message: expect.stringContaining("turn budget exceeded") }]);
++    expect(g.isExceeded()).toBe(true);
++  });
++});
++
++// ---------------------------------------------------------------------------
++// 2–4. Runner enforcement via stubbed PlanSession
++// ---------------------------------------------------------------------------
++describe("Runner budget enforcement", () => {
++  it("halts sequencing after budget.exceeded, sets run.end reason, budgetExceeded", async () => {
++    const { runner, events, runsRoot } = await drive(
++      cfg({ maxBudgetUsd: 1, budgetWarnThresholds: [75, 90] }),
++      (planId, i) => ({ costUsd: [0.4, 0.5, 0.2][i], turns: 1 }), // cum 0.4, 0.9, 1.1
++    );
++    const kinds = events.map((e) => e.kind);
++    expect(kinds).toContain("budget.warn");
++    expect(kinds).toContain("budget.exceeded");
++    // no plan.start beyond the third plan (cap hit during plan 3)
++    const starts = events.filter((e) => e.kind === "plan.start");
++    expect(starts).toHaveLength(3);
++    expect(runner.budgetExceeded).toBe(true);
++    const end = events.find((e) => e.kind === "run.end") as Extract<RunEvent, { kind: "run.end" }>;
++    expect(end.reason).toBe("budget exceeded");
++    // warn thresholds 75 and 90 fired exactly once each (cum 0.9 = 90%)
++    const warns = events.filter((e) => e.kind === "budget.warn") as Extract<RunEvent, { kind: "budget.warn" }>[];
++    expect(warns.map((w) => w.thresholdPct)).toEqual([75, 90]);
++    // cost.json run-level total persisted
++    const costJson = JSON.parse(readFileSync(join(runsRoot, runner.store.runId, "cost.json"), "utf8"));
++    expect(costJson.totalCostUsd).toBeCloseTo(1.1, 5);
++    expect(costJson.totalTurns).toBe(3);
++  });
++
++  it("no maxBudgetUsd → no budget events, all plans run", async () => {
++    const { runner, events } = await drive(
++      cfg({}),
++      (planId, i) => ({ costUsd: 5 * (i + 1), turns: 1 }),
++    );
++    expect(events.filter((e) => e.kind.startsWith("budget."))).toEqual([]);
++    expect(events.filter((e) => e.kind === "plan.start")).toHaveLength(3);
++    expect(runner.budgetExceeded).toBe(false);
++    expect((events.find((e) => e.kind === "run.end") as Extract<RunEvent, { kind: "run.end" }>).reason).toBeUndefined();
++  });
++
++  it("maxTurns enforced: warn then stop with reason 'turns exceeded'", async () => {
++    const { runner, events } = await drive(
++      cfg({ maxBudgetUsd: 100, maxTurns: 10, budgetWarnThresholds: [75, 90] }),
++      (_planId, i) => ({ costUsd: 0.01, turns: 4 }), // cum turns 4, 8, 12 of 10
++    );
++    expect(events.some((e) => e.kind === "budget.warn" && (e as { metric: string }).metric === "turns")).toBe(true);
++    const ex = events.find((e) => e.kind === "budget.exceeded") as Extract<RunEvent, { kind: "budget.exceeded" }>;
++    expect(ex.metric).toBe("turns");
++    expect(events.filter((e) => e.kind === "plan.start")).toHaveLength(3);
++    expect(runner.budgetExceeded).toBe(true);
++    const end = events.find((e) => e.kind === "run.end") as Extract<RunEvent, { kind: "run.end" }>;
++    expect(end.reason).toBe("turns exceeded");
++  });
++});
++
++// ---------------------------------------------------------------------------
++// 5. Reducer: cumulative spentUsd, budget.warn diag, header fields
++// ---------------------------------------------------------------------------
++describe("reducer budget state", () => {
++  const res = (planId: string, costUsd: number, turns: number): RunEvent =>
++    ({ t: 2000, kind: "session.result", planId, subtype: "success", costUsd, durationMs: 1, turns, usage: { input: 0, output: 0, cacheRead: 0, cacheCreate: 0 }, modelUsage: {} });
++
++  it("accumulates cumulative cost/turns across plans and repeated results", () => {
++    let s = initialState();
++    s = reduce(s, { t: 1000, kind: "run.start", runId: "r", mode: "plan", label: "x", model: "m", cwd: "/w", maxBudgetUsd: 2, maxTurns: 100 });
++    s = reduce(s, res("01", 0.5, 3));
++    s = reduce(s, res("02", 0.7, 4));
++    // repeat for 02 — no double count
++    s = reduce(s, res("02", 0.7, 4));
++    s = reduce(s, res("01", 0.6, 5)); // +0.1, +2
++    expect(s.spentUsd).toBeCloseTo(1.3, 8);
++    expect(s.totalTurns).toBe(9);
++    expect(s.maxBudgetUsd).toBe(2);
++    expect(s.maxTurns).toBe(100);
++    expect(s.costUsd).toBe(0.6); // per-session compat
++  });
++
++  it("budget.warn records a warn diag line and threshold; budget.exceeded an error line", () => {
++    let s = initialState();
++    s = reduce(s, { t: 1000, kind: "run.start", runId: "r", mode: "plan", label: "x", model: "m", cwd: "/w" });
++    s = reduce(s, { t: 2000, kind: "budget.warn", runId: "r", metric: "cost", thresholdPct: 75, spent: 1.5, cap: 2, message: "budget 75% — $1.50 of $2.00" });
++    s = reduce(s, { t: 2000, kind: "budget.warn", runId: "r", metric: "cost", thresholdPct: 75, spent: 1.5, cap: 2, message: "budget 75% — $1.50 of $2.00" });
++    s = reduce(s, { t: 3000, kind: "budget.exceeded", runId: "r", metric: "cost", spent: 2, cap: 2, message: "budget exceeded" });
++    expect(s.budgetWarned).toEqual([75]);
++    // both warn events log a diag line, but the threshold is deduped in state
++    expect(s.diag.filter((d) => d.level === "warn" && d.source === "budget")).toHaveLength(2);
++    expect(s.diag.some((d) => d.level === "error" && d.source === "budget" && d.text.includes("budget exceeded"))).toBe(true);
++  });
++});

@@ -76,7 +76,28 @@ const POST_STREAM_TIMEOUT_MS = 10_000;
  *  If no stream parts arrive within this period, the stream is aborted.
  *  Protects against providers that accept the request but never send data
  *  (observed with OpenAI Codex via chatgpt.com/backend-api/codex/responses). */
-const STREAM_INACTIVITY_TIMEOUT_MS = 60_000;
+/** D22: inactivity budget while waiting on the PROVIDER — the initial
+ *  response, or the next step's prefill.
+ *
+ *  A watchdog must be the OUTERMOST bound; this one was the tightest. At 60s
+ *  it sat *inside* the tool budgets it encloses (bash.ts DEFAULT 120s / MAX
+ *  600s, spawn-subagent 600s), so any legal tool call over 60s killed the
+ *  session deterministically — a coder running `npm run build` was killed by
+ *  design, independent of provider behaviour.
+ *
+ *  Measured inter-step waits reached 21-23s at ~52k prompt tokens and were
+ *  still climbing with context (r=0.539 over n=25 gaps), so 60s was also
+ *  killing healthy sessions mid-CODING at ~62k tokens. 180s keeps ~8x
+ *  headroom over the observed legitimate worst case while still bounding a
+ *  true hang. */
+const STREAM_INACTIVITY_TIMEOUT_MS = 180_000;
+
+/** D22: inactivity budget while a LOCAL TOOL is executing. No provider data
+ *  is expected during this window and tools carry their own timeouts, so the
+ *  stream watchdog must sit strictly OUTSIDE them — then the tool layer
+ *  reports the precise failure first, and this fires only if the tool layer
+ *  itself wedges. 660s = the 600s max tool budget plus dispatch overhead. */
+const TOOL_EXECUTION_INACTIVITY_TIMEOUT_MS = 660_000;
 
 // =============================================================================
 // Runner Options
@@ -475,17 +496,39 @@ async function executeStream(
   // The timer fires if no stream parts arrive within STREAM_INACTIVITY_TIMEOUT_MS,
   // aborting the stream and preventing indefinite worker hangs.
   let streamInactivityTimer: ReturnType<typeof setTimeout> | null = null;
+  // D22: outstanding local tool executions. While > 0 the stream is
+  // LEGITIMATELY silent (the SDK is running our tool), so the watchdog must
+  // use the tool budget rather than the provider budget.
+  let pendingToolCalls = 0;
+  // The budget that actually armed the timer, so the error reports the real
+  // bound instead of a constant that was never in force.
+  let firedBudgetMs = STREAM_INACTIVITY_TIMEOUT_MS;
   const resetStreamInactivityTimer = () => {
-    if (streamInactivityTimer) clearTimeout(streamInactivityTimer);
+    clearTimeout(streamInactivityTimer ?? undefined);
+    const budgetMs = pendingToolCalls > 0
+      ? TOOL_EXECUTION_INACTIVITY_TIMEOUT_MS
+      : STREAM_INACTIVITY_TIMEOUT_MS;
+    firedBudgetMs = budgetMs;
     streamInactivityTimer = setTimeout(() => {
       streamInactivityController.abort(STREAM_INACTIVITY_REASON);
-    }, STREAM_INACTIVITY_TIMEOUT_MS);
+    }, budgetMs);
   };
 
   resetStreamInactivityTimer(); // Arm for initial response
   try {
     for await (const part of result.fullStream) {
-      resetStreamInactivityTimer(); // Reset on each part
+      // Update tool-execution state BEFORE re-arming, so the new timer picks
+      // the budget for the window we are about to enter.
+      const partType = (part as FullStreamPart).type;
+      if (partType === 'tool-call') {
+        pendingToolCalls++;
+      } else if (partType === 'tool-result' || partType === 'tool-error') {
+        // Decrement on tool-error too: a failing tool must not strand the
+        // watchdog in the permissive 660s budget. Math.max guards against an
+        // unpaired result ever driving the counter negative.
+        pendingToolCalls = Math.max(0, pendingToolCalls - 1);
+      }
+      resetStreamInactivityTimer(); // Reset on each part (wait-state aware)
       streamHandler.processPart(part as FullStreamPart);
     }
   } catch (error: unknown) {
@@ -503,7 +546,11 @@ async function executeStream(
         usage: summary.usage,
         error: {
           code: 'stream_timeout',
-          message: `Stream inactivity timeout — no data received from provider for ${STREAM_INACTIVITY_TIMEOUT_MS / 1000}s`,
+          // Report the budget that actually fired. Naming the provider
+          // constant when the tool budget expired sends the next
+          // investigation after the wrong number — exactly the trap that
+          // made D22 read as a provider hang for three separate runs.
+          message: `Stream inactivity timeout — no data received from provider for ${firedBudgetMs / 1000}s`,
           retryable: true,
         },
         messages,
