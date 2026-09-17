@@ -13,10 +13,10 @@ import type { ViewName } from '../stores/app-store';
 const HINTS: Record<ViewName, string> = {
   board: 'j/k move · ⏎ focus · s start · x stop · H/L column · l logs',
   term: 'r respawn shell',
-  road: 'g generate · c convert→spec',
+  road: 'g generate (G force regen) · c convert→spec',
   chat: 'a ask · q qa mode · i ideate · x stop · 1-6 ideation type',
   tree: 'j/k select',
-  set: 'j/k select theme · ⏎ apply · a Anthropic acct · m Moonshot acct',
+  set: 'j/k theme (applies live) · a Anthropic acct · m Moonshot acct',
   agents: '1-6 sub-view · j/k select · ⏎ inspect · f filter · r resume',
   logs: 'j/k scroll · esc back',
 };

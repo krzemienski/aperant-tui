@@ -235,7 +235,7 @@ export function InsightsView({ theme: c, project, isActive }: Props) {
                 </Box>
               ))
             ) : (
-              <Text color={c.faint}>no findings for this type yet — i generates all five</Text>
+              <Text color={c.faint}>no findings for this type yet — i generates all {IDEATION_TYPES.length}</Text>
             )}
           </Box>
         )}
