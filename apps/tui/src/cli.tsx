@@ -54,6 +54,19 @@ if (!process.stdout.isTTY) {
   process.exit(2);
 }
 
+// D21: in a TUI the terminal IS the render target — anything written outside
+// Ink's frame corrupts the display. The AI SDK logs a multi-line warning for
+// every call made with a model id it does not recognise (any router/proxy id),
+// which scrolls the whole frame off-screen mid-session. Warnings are still
+// available to the app: real failures arrive as `error` stream events and are
+// rendered in-frame, and the durable record is the flight recorder at
+// $APERANT_USER_DATA/logs/agent-events.jsonl.
+// `as` is correct here: this is a documented AI SDK global (ai/dist/index.js:616
+// reads globalThis.AI_SDK_LOG_WARNINGS) that the ambient globalThis type does
+// not declare. Nothing is read back, so there is no shape to validate.
+const sdkGlobals = globalThis as typeof globalThis & { AI_SDK_LOG_WARNINGS?: boolean };
+sdkGlobals.AI_SDK_LOG_WARNINGS = false;
+
 const positional = args.filter((a) => !a.startsWith('-'));
 const projectPath = path.resolve(positional[0] ?? process.cwd());
 

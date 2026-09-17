@@ -1,4 +1,8 @@
 {
+ "CAPTURE-INVENTORY.md": {
+  "bytes": 6527,
+  "sha256": "7128b4f79354450a"
+ },
  "INSPECTION-LOG.md": {
   "bytes": 4905,
   "sha256": "ebeeecf326581a8e"
@@ -258,6 +262,18 @@
  "ar/step-31-ideation-6-code-quality.png.txt": {
   "bytes": 6821,
   "sha256": "7fe603b7e65d8c5f"
+ },
+ "ar/step-32-d21-clean-frame.png": {
+  "bytes": 111183,
+  "sha256": "f73241ef71faed40"
+ },
+ "ar/step-32-d21-clean-frame.png.html": {
+  "bytes": 15316,
+  "sha256": "2bfda594e4f3ab2c"
+ },
+ "ar/step-32-d21-clean-frame.png.txt": {
+  "bytes": 4740,
+  "sha256": "78c83cc6d70e47aa"
  },
  "pp/step-01-board.png": {
   "bytes": 484476,
