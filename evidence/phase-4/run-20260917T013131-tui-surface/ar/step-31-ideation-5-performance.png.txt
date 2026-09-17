@@ -1,0 +1,50 @@
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ awesome-researcher /Users/nick/awesome-researcher │ ⑂ feat/awesome-researcher                                                                          ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ IDEATION · 6 types                                                                                                                                                                               │ │
+│ │ [q] Q&A  [1-6] ideation types  · index absent /Users/nick/awesome-researcher/.auto-claude/project_index.json                                                                                     │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ 1 Code Improvements 2 UI/UX 3 Docs Gaps 4 Security 5 Performance 6 Code Quality                                                                                                                  │ │
+│ │ · Parallelize per-round search queries in SearchOrchestrator._search_category                                                                                                                    │ │
+│ │   Within each search round, queries are executed strictly sequentially (`for query in queries: await s                                                                                           │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Race README fetch candidates instead of sequential ref/filename probes                                                                                                                         │ │
+│ │   _fetch_readme_text tries refs (HEAD, main, master) x filenames (4 variants) strictly sequentially —                                                                                            │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Cache HTTP reachability probes for duplicate URLs across validation waves                                                                                                                      │ │
+│ │   Validator.check_reachable performs HEAD (with GET fallback and full redirect following) per candidat                                                                                           │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Memoize tokenization and per-candidate signals in QualityScorer                                                                                                                                │ │
+│ │   QualityScorer._category_signal, _domain_signal, and _spam_signal each call _tokens(title + descripti                                                                                           │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Replace O(all-events) replay polling in LogTail.follow with incremental cursor                                                                                                                 │ │
+│ │   LogTail.follow polls via self.replay() which iterates and re-yields every accumulated event each cyc                                                                                           │ │
+│ └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ CHAT  a ask · q qa mode · i ideate · x stop · 1-6 ideation type                                                                                                                         : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

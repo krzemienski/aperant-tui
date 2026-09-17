@@ -1,0 +1,39 @@
+P1 imports done
+P2 shell normalized
+P3 worker path set
+P4 isTTY=true
+P5 projectPath=/Users/nick/Desktop/vigil
+P6 render returned
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

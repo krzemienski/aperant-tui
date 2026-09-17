@@ -1,0 +1,50 @@
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ awesome-researcher /Users/nick/awesome-researcher │ ⑂ feat/awesome-researcher                                                                          ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ IDEATION · 6 types                                                                                                                                                                               │ │
+│ │ [q] Q&A  [1-6] ideation types  · index absent /Users/nick/awesome-researcher/.auto-claude/project_index.json                                                                                     │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ 1 Code Improvements 2 UI/UX 3 Docs Gaps 4 Security 5 Performance 6 Code Quality                                                                                                                  │ │
+│ │ · Replace CLI --api_key flag with env/stdin to avoid process-list and shell-history exposure                                                                                                     │ │
+│ │   main.py exposes `--api_key` (and `--agent-api-key ROLE=key`) argparse options. Values passed on the                                                                                            │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Extend secret-redaction regex coverage (Google, OpenAI v2, split-token bypass)                                                                                                                 │ │
+│ │   _SECRET_PATTERNS in utils/logging.py covers sk-ant-, generic sk- (>=20 chars), GitHub, Slack, AWS AK                                                                                           │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Reduce docker-compose credential mount blast radius                                                                                                                                            │ │
+│ │   docker-compose.yml mounts the host's entire ~/.claude directory (containing Claude Code OAuth creden                                                                                           │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Pin dependencies to exact versions and add automated vulnerability scanning                                                                                                                    │ │
+│ │   requirements.txt and pyproject.toml declare lower-bound constraints only (e.g. httpx>=0.27, claude-a                                                                                           │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Treat fetched README/search content as untrusted input to the final report                                                                                                                     │ │
+│ │   The pipeline fetches arbitrary remote markdown (github_raw_base), parses it (parsers/awesome_parser.                                                                                           │ │
+│ └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ CHAT  a ask · q qa mode · i ideate · x stop · 1-6 ideation type                                                                                                                         : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

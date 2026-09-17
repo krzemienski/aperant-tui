@@ -1,7 +1,7 @@
 {
  "VERDICT.md": {
-  "bytes": 9291,
-  "sha256": "5fb29378e14c996c"
+  "bytes": 12983,
+  "sha256": "ce35e5fe99e38a08"
  },
  "ar/step-01-board.png": {
   "bytes": 325957,
@@ -170,6 +170,90 @@
  "ar/step-26-d18-fixed-question-typed.png.txt": {
   "bytes": 4736,
   "sha256": "8759b2ab7cc4acd5"
+ },
+ "ar/step-30-ideation-running.png": {
+  "bytes": 100935,
+  "sha256": "57254b5dcf2faf69"
+ },
+ "ar/step-30-ideation-running.png.html": {
+  "bytes": 15287,
+  "sha256": "856c4ade55775ecd"
+ },
+ "ar/step-30-ideation-running.png.txt": {
+  "bytes": 4741,
+  "sha256": "a29b65fb6d3899e3"
+ },
+ "ar/step-31-ideation-1-code-improvements.png": {
+  "bytes": 249680,
+  "sha256": "e1697a73c4d5bfca"
+ },
+ "ar/step-31-ideation-1-code-improvements.png.html": {
+  "bytes": 24004,
+  "sha256": "5166a323fe5a8247"
+ },
+ "ar/step-31-ideation-1-code-improvements.png.txt": {
+  "bytes": 6821,
+  "sha256": "a28cd58534836f5c"
+ },
+ "ar/step-31-ideation-2-ui-ux.png": {
+  "bytes": 249417,
+  "sha256": "95abacea2ffb3368"
+ },
+ "ar/step-31-ideation-2-ui-ux.png.html": {
+  "bytes": 24007,
+  "sha256": "d25d6d13a199e19f"
+ },
+ "ar/step-31-ideation-2-ui-ux.png.txt": {
+  "bytes": 6821,
+  "sha256": "21b71768d981d7e1"
+ },
+ "ar/step-31-ideation-3-docs-gaps.png": {
+  "bytes": 266710,
+  "sha256": "2839aa0e059d282e"
+ },
+ "ar/step-31-ideation-3-docs-gaps.png.html": {
+  "bytes": 23985,
+  "sha256": "f0b737610b4b8793"
+ },
+ "ar/step-31-ideation-3-docs-gaps.png.txt": {
+  "bytes": 6823,
+  "sha256": "73f9da34ffadbf23"
+ },
+ "ar/step-31-ideation-4-security.png": {
+  "bytes": 271943,
+  "sha256": "9e33a492a4df0f7f"
+ },
+ "ar/step-31-ideation-4-security.png.html": {
+  "bytes": 23931,
+  "sha256": "c96a38d081956295"
+ },
+ "ar/step-31-ideation-4-security.png.txt": {
+  "bytes": 6821,
+  "sha256": "0bdfd215c9161e64"
+ },
+ "ar/step-31-ideation-5-performance.png": {
+  "bytes": 261055,
+  "sha256": "0dd853c4c58f6009"
+ },
+ "ar/step-31-ideation-5-performance.png.html": {
+  "bytes": 23934,
+  "sha256": "3e8b225e47fe431c"
+ },
+ "ar/step-31-ideation-5-performance.png.txt": {
+  "bytes": 6823,
+  "sha256": "1115ad8904374580"
+ },
+ "ar/step-31-ideation-6-code-quality.png": {
+  "bytes": 277887,
+  "sha256": "143334f5fcf3d049"
+ },
+ "ar/step-31-ideation-6-code-quality.png.html": {
+  "bytes": 23907,
+  "sha256": "82d84f03f69ff092"
+ },
+ "ar/step-31-ideation-6-code-quality.png.txt": {
+  "bytes": 6821,
+  "sha256": "7fe603b7e65d8c5f"
  },
  "pp/step-01-board.png": {
   "bytes": 484476,

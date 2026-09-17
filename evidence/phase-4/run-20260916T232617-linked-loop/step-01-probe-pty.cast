@@ -1,0 +1,2 @@
+{"version": 2, "width": 120, "height": 40, "timestamp": 1789607271, "env": {"TERM": "dumb", "COLORTERM": "truecolor"}, "title": "npx tsx probe-boot.tsx"}
+[25.096317, "o", "A: react+ink imported\r\nB: importing App (pulls vendored chain)\r\nC: App imported in 249ms\r\n\u001b[?25lD: render returned\r\nRENDER-PROBE-ALIVE\r\n\u001b[?25h\u001b[?25h"]

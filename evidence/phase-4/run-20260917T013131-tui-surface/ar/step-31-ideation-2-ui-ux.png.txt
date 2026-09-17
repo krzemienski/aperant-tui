@@ -1,0 +1,50 @@
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ awesome-researcher /Users/nick/awesome-researcher │ ⑂ feat/awesome-researcher                                                                          ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ IDEATION · 6 types                                                                                                                                                                               │ │
+│ │ [q] Q&A  [1-6] ideation types  · index absent /Users/nick/awesome-researcher/.auto-claude/project_index.json                                                                                     │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ 1 Code Improvements 2 UI/UX 3 Docs Gaps 4 Security 5 Performance 6 Code Quality                                                                                                                  │ │
+│ │ · Implement the '/' filter action on the Logs screen                                                                                                                                             │ │
+│ │   The '/' key is advertised in the footer and Help screen as 'Filter the current view', but action_fil                                                                                           │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Show screen-switch keys in the Footer and label screens 1-9/0                                                                                                                                  │ │
+│ │   Screen-switch bindings 1-9/0 have show=False, so the Footer only hints a subset of letter aliases (d                                                                                           │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Color-code the event log by level and truncate long lines                                                                                                                                      │ │
+│ │   EventLog is a plain RichLog written with highlight=False, markup=False, and _format_line produces an                                                                                           │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Fix Logs screen filter replay: filters are lost on screen switch                                                                                                                               │ │
+│ │   LogsScreen.replay_log dumps ALL history lines on switch because state.log_lines holds pre-formatted                                                                                            │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Add empty-state guidance to data screens (search, review, artifacts)                                                                                                                           │ │
+│ │   SearchMemoryScreen, ReviewScreen, and ArtifactsScreen render bare DataTables that stay empty until r                                                                                           │ │
+│ └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ CHAT  a ask · q qa mode · i ideate · x stop · 1-6 ideation type                                                                                                                         : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

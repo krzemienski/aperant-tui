@@ -54,10 +54,11 @@ exported in the parent, the board still renders (`wait` matched `BACKLOG` in 1.0
 | 11 | Observability views over a real run | **PASS** | `step-18-agents-{1..6}-*.png` — all six sub-views. `step-29-d19-trace-clean.png` shows `EVENT TRACE · all agents · 588 events`: `task:CODING_STARTED`, real `tool-call Bash` rows reading vigil's own `src/engine/rails.ts` and `tests/verdict-rails.test.ts`, and per-step token counts (21.2k / 12.0k / 15.1k / 15.9k). |
 | 12 | Roadmap generates with visible streaming | **PASS** | `pp/step-21-roadmap-generating.png` — progress advanced `discovery 30%` → `features 50%` → complete. Disk: `proofpunk-agent/.auto-claude/roadmap/roadmap.json` = 4 phases / 10 features about proofpunk-agent itself. |
 | 13 | Insights answers with a correct file reference | **PASS** | `ar/step-24-insights-answer.png` — answer: CLI entry point is `awesome_researcher/main.py`, mapping `awesome-researcher → awesome_researcher.main:cli_main`. **Verified on disk**: `main.py:1608 def cli_main`, `pyproject.toml` mapping byte-matches. |
+| 13b | Ideation returns real findings in ALL SIX categories | **PASS** | `i` driven live on awesome-researcher; all six `*_ideas.json` written to `.auto-claude/ideation/` (~90 s each, sequential), **5 findings each = 30 total**, every one codebase-specific (e.g. "Split monolithic main.py (1792 lines)" — the real line count; "Replace CLI `--api_key` flag with env/stdin"). All six render in the UI after D20: `ar/step-31-ideation-{1..6}-*.png`. Phase 4 recorded this as PARTIAL (1/6). |
 | 14 | Regression | **PASS** | `npx tsc --noEmit` exit 0; `CI=1 npx vitest run` → 9/9 passed. |
-| 15 | No secrets in evidence | **PASS** | Strict scan (`sk-[A-Za-z0-9_-]{16,}`, token literal) → 0 matches over all 181 artifacts. (A naive `sk-` substring scan false-positives on `"task-execution"`.) |
+| 15 | No secrets in evidence | **PASS** | Strict scan (`sk-[A-Za-z0-9_-]{16,}`, token literal) → 0 matches over all 202 artifacts. (A naive `sk-` substring scan false-positives on `"task-execution"`.) |
 
-Facet checklist: **screen** (59 PNGs) · **disk** (settings.json, roadmap.json,
+Facet checklist: **screen** (66 PNGs) · **disk** (settings.json, roadmap.json,
 `implementation_plan.json`, `agent-work-product.diff`, spec dirs, main.py) ·
 **logs** (`agent-events-d19-fixed.jsonl`, 588 trace events) — no missing facet.
 
@@ -71,6 +72,7 @@ Facet checklist: **screen** (59 PNGs) · **disk** (settings.json, roadmap.json,
 | D17 | Advertised keys with no handler (`n`, `m`, `z`, `/ filter`, `⇥ cycle panes`, `z zoom`, `x kill pane`, `a add feature`, `⏎ send`, `/ history search`, `d/m/p/D` on tree); help said `L` for task logs when the binding is `l`; settings hint named `a` as Moonshot when `a` is Anthropic and `m` is Moonshot; logs hint promised `↑↓` when only `j/k` are bound. | `HelpOverlay.tsx` + `StatusLine.tsx` corrected against the real keymaps. | Visible in `pp/step-11-theme-amber.png` (`l logs`, no `/ filter`) and `pp/step-06-set-accounts.png` (`a Anthropic acct · m Moonshot acct`). |
 | D18 | Typing a `?` into the insights ask box opened the **help overlay** instead of entering the character (and `:` would open the palette). Reproduced live: a typed question was swallowed mid-sentence. Ink's `useInput` has no consumption semantics, so the global keymap kept firing while a text input was focused. | Added `textInputActive` to the store; both global keymaps gate on it; `InsightsView` sets it while `asking` and clears it on blur/unmount. | `ar/step-26-d18-fixed-question-typed.png` — typing `what is the CLI entry point?` leaves the help overlay closed and the `?` lands in the input (asserted both ways). |
 | D19 | **Every agent run failed.** The planner died three times with `anthropic api key is missing`, which surfaced as the misleading `Implementation plan validation failed after 3 attempts: File not found: implementation_plan.json` — the planner never ran, so it never wrote one. Cause: the agent Worker thread re-resolves auth from `process.env` using the SDK's standard names, but the TUI's credentials live in `settings.json` and the operator supplies `ANTHROPIC_AUTH_TOKEN`; `ANTHROPIC_API_KEY` was never set. | `applyAccountEnv()` in `agent-start-service.ts` mirrors the provisioned account's key/baseUrl into the standard SDK env names before start. Never overwrites an explicit value; never logs a key. | Before: 3× `api key is missing`, 0 plans. After: **0** key errors, plan written to disk (4 phases / 9 subtasks), 588 trace events, and a real 4,147-byte source diff against vigil. |
+| D20 | The UI/UX ideation tab rendered `no findings for this type yet` even though the runner had written five real findings. The registry expected `ui_ux_improvements_ideas.json`, but the prompt that actually creates the file writes `ui_ux_ideas.json` (`apps/desktop/prompts/ideation_ui_ux.md:342`) while the type key stays `ui_ux_improvements`. Three labels also said "five types" for a six-type feature. | `IDEATION_TYPES` now carries a `files` list (most-specific first) and the loader accepts any known name; the labels derive from `IDEATION_TYPES.length`. | `ar/step-31-ideation-2-ui-ux.png` — five UI/UX findings render, header reads `IDEATION · 6 types`. All six tabs re-driven: 6/6 `RENDERS`, 0 `EMPTY`. |
 
 D16's first form was caught before shipping: `resolveModelId` rewrites a shorthand
 from `MODEL_ID_MAP` even with no env var set, so a "did it change?" test fires for
@@ -83,9 +85,12 @@ provider, and the no-override arm was re-run to prove the vendored default survi
 - **`cc/*` router models are OAuth-revoked upstream** (`401 OAuth access token has
   been revoked`, `503`). Live AI criteria were proven through `glm/glm-5` on the
   same gateway via the D16 override path. Not simulated.
-- **Vendored planner bug** (pre-existing, phase-4): `Implementation plan validation
-  failed after 3 attempts: File not found …/worktrees/tasks/…`. Visible in the
-  trace view; the agent start, stream, and observability facets are unaffected.
+- ~~Vendored planner bug: `Implementation plan validation failed after 3
+  attempts: File not found …/worktrees/tasks/…`~~ — **not a planner bug and no
+  longer a limitation.** That message was the downstream symptom of D19 (the
+  worker had no API key, so the planner never ran and never wrote the file).
+  Fixed; the planner now writes a real 4-phase plan and the coder produces a
+  real diff. See criterion 10b.
 - **`maxOutputTokens` compatibility warning** for unknown model ids is emitted by
   the AI SDK, not this app.
 

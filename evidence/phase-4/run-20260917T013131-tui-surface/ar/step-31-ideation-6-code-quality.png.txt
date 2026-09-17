@@ -1,0 +1,50 @@
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ awesome-researcher /Users/nick/awesome-researcher │ ⑂ feat/awesome-researcher                                                                          ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ IDEATION · 6 types                                                                                                                                                                               │ │
+│ │ [q] Q&A  [1-6] ideation types  · index absent /Users/nick/awesome-researcher/.auto-claude/project_index.json                                                                                     │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ 1 Code Improvements 2 UI/UX 3 Docs Gaps 4 Security 5 Performance 6 Code Quality                                                                                                                  │ │
+│ │ · Split monolithic main.py (1792 lines) into pipeline modules                                                                                                                                    │ │
+│ │   awesome_researcher/main.py is 1792 lines mixing CLI parsing, pipeline orchestration, checkpointing,                                                                                            │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Decompose config.py: env parsing, settings store, and Config model in one 909-line file                                                                                                        │ │
+│ │   config.py contains ~10 private _env_* parser helpers, a SettingsStore class with JSON persistence/va                                                                                           │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Duplicated atomic JSON read/write helpers in config.py and utils/helpers.py                                                                                                                    │ │
+│ │   config.py defines _atomic_write_json (line 26) and _read_json_raw (line 38) while utils/helpers.py a                                                                                           │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Refactor SearchOrchestrator._search_category (~177 lines) and _search_single_query (~110 lines)                                                                                                │ │
+│ │   In agents/search_orchestrator.py, _search_category (lines 328-504) and _search_single_query (lines 5                                                                                           │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Enforce configured linting/type-checking and reduce `Any` in public APIs                                                                                                                       │ │
+│ │   pyproject.toml configures ruff, black, and mypy, but there is no CI config or pre-commit hook visibl                                                                                           │ │
+│ └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ CHAT  a ask · q qa mode · i ideate · x stop · 1-6 ideation type                                                                                                                         : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

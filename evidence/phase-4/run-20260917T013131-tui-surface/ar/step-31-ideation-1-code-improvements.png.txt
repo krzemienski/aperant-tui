@@ -1,0 +1,50 @@
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ awesome-researcher /Users/nick/awesome-researcher │ ⑂ feat/awesome-researcher                                                                          ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ IDEATION · 6 types                                                                                                                                                                               │ │
+│ │ [q] Q&A  [1-6] ideation types  · index absent /Users/nick/awesome-researcher/.auto-claude/project_index.json                                                                                     │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ 1 Code Improvements 2 UI/UX 3 Docs Gaps 4 Security 5 Performance 6 Code Quality                                                                                                                  │ │
+│ │ · Standalone `report` CLI subcommand to regenerate report/timeline from a run dir                                                                                                                │ │
+│ │   Add a `awesome-researcher report <run_dir>` command that re-runs ReportGenerator().write() and Timel                                                                                           │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Per-agent cost ceilings in CostTracker                                                                                                                                                         │ │
+│ │   Extend CostTracker to support optional per-agent budget ceilings (e.g. cap validator agent spend sep                                                                                           │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Machine-readable JSON/CSV export of validated candidates                                                                                                                                       │ │
+│ │   Add a `candidates.json` / `candidates.csv` artifact next to the markdown report containing the valid                                                                                           │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Dedup engine near-duplicate scoring using existing similarity utils                                                                                                                            │ │
+│ │   Extend DeduplicationEngine.deduplicate beyond exact identity keys to drop near-duplicate candidates                                                                                            │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Run-comparison summary across runs/ directories                                                                                                                                                │ │
+│ │   Add a summary renderer that loads multiple TimelineData.from_run_dir folds and produces a comparison                                                                                           │ │
+│ └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ CHAT  a ask · q qa mode · i ideate · x stop · 1-6 ideation type                                                                                                                         : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

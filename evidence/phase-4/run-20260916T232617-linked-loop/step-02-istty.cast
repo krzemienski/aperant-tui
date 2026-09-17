@@ -1,0 +1,2 @@
+{"version": 2, "width": 120, "height": 40, "timestamp": 1789607476, "env": {"TERM": "dumb", "COLORTERM": "truecolor"}, "title": "npx tsx probe-istty.mjs"}
+[25.089638, "o", "isTTY=true cols=120\r\n"]

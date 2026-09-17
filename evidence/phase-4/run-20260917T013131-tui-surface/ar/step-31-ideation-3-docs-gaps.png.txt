@@ -1,0 +1,50 @@
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ awesome-researcher /Users/nick/awesome-researcher │ ⑂ feat/awesome-researcher                                                                          ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ IDEATION · 6 types                                                                                                                                                                               │ │
+│ │ [q] Q&A  [1-6] ideation types  · index absent /Users/nick/awesome-researcher/.auto-claude/project_index.json                                                                                     │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ 1 Code Improvements 2 UI/UX 3 Docs Gaps 4 Security 5 Performance 6 Code Quality                                                                                                                  │ │
+│ │ · Add end-to-end example walkthrough / examples directory                                                                                                                                        │ │
+│ │   No `examples/` directory or step-by-step tutorial exists. README shows CLI invocations but no worked                                                                                           │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Add TUI user guide documenting screens, keybindings, and commands                                                                                                                              │ │
+│ │   The TUI has 11 screens + 1 modal and 31 keybinding entries (per tui-gap-list.md audit), but there is                                                                                           │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Add contributing/development guide (CONTRIBUTING.md)                                                                                                                                           │ │
+│ │   No CONTRIBUTING.md exists. Dev workflow conventions — ruff/black/mypy gates, pytest phase layout, `v                                                                                           │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Centralize and cross-link configuration reference (env vars, settings.json, CLI flags)                                                                                                         │ │
+│ │   `config.py` is 909 lines with env vars (`AR_API_KEY`, `AR_AGENT_<ROLE>_*`), persisted `~/.config/awe                                                                                           │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Document SimHash/LSH near-duplicate tuning internals                                                                                                                                           │ │
+│ │   `awesome_researcher/utils/similarity.py` implements simhash64, Hamming similarity, and LSH banding (                                                                                           │ │
+│ └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ CHAT  a ask · q qa mode · i ideate · x stop · 1-6 ideation type                                                                                                                         : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

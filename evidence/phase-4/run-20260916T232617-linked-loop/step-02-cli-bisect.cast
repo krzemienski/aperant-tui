@@ -1,0 +1,4 @@
+{"version": 2, "width": 120, "height": 40, "timestamp": 1789607652, "env": {"TERM": "dumb", "COLORTERM": "truecolor"}, "title": "npx tsx probe-cli.tsx /Users/nick/Desktop/vigil"}
+[25.086839, "o", "P1 imports done\r\nP2 shell normalized\r\nP3 worker path set\r\nP4 isTTY=true\r\nP5 projectPath=/Users/nick/Desktop/vigil\r\n\u001b[?25lP6 render returned\r\n"]
+[25.102536, "m", "t25"]
+[45.223419, "m", "t45"]

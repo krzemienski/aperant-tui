@@ -1,0 +1,39 @@
+A: react+ink imported
+B: importing App (pulls vendored chain)
+C: App imported in 249ms
+D: render returned
+RENDER-PROBE-ALIVE
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

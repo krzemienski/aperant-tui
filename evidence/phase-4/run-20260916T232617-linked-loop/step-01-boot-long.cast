@@ -1,0 +1,4 @@
+{"version": 2, "width": 120, "height": 40, "timestamp": 1789601418, "env": {"TERM": "dumb", "COLORTERM": "truecolor"}, "title": "npm run dev -- /Users/nick/Desktop/vigil"}
+[60.079657, "o", "\r\n> aperant-tui-workspace@0.1.0 dev\r\n> npm run dev -w @aperant/tui /Users/nick/Desktop/vigil\r\n\r\n\r\n> @aperant/tui@0.1.0 dev\r\n> tsx src/cli.tsx /Users/nick/Desktop/vigil\r\n\r\n\u001b[?25l"]
+[60.094931, "m", "t60"]
+[120.218588, "m", "t120"]

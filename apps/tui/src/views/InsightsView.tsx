@@ -4,7 +4,7 @@
  * (ai/runners/ideation.runIdeation). Phase 4.
  *
  * Keys: `a` ask (opens the question input) · type + ⏎ submits · `x` abort ·
- * `i` run ideation (all five types) · `1..5` select ideation type view ·
+ * `i` run ideation (all six types) · `1..6` select ideation type view ·
  * `q` back to Q&A. Answers stream token-by-token; ideation writes real
  * JSON per type under .auto-claude/ideation/ and renders findings.
  */
@@ -45,12 +45,20 @@ interface IdeationFile { ideas?: IdeationIdea[]; [k: string]: unknown; }
 const IDEATION_TYPES = [
   // The vendored runner writes `<type>_ideas.json` with the findings under a
   // key named after the type (see ideation.ts runIdeation).
-  { key: 'code_improvements', label: 'Code Improvements', file: 'code_improvements_ideas.json' },
-  { key: 'ui_ux_improvements', label: 'UI/UX', file: 'ui_ux_improvements_ideas.json' },
-  { key: 'documentation_gaps', label: 'Docs Gaps', file: 'documentation_gaps_ideas.json' },
-  { key: 'security_hardening', label: 'Security', file: 'security_hardening_ideas.json' },
-  { key: 'performance_optimizations', label: 'Performance', file: 'performance_optimizations_ideas.json' },
-  { key: 'code_quality', label: 'Code Quality', file: 'code_quality_ideas.json' },
+  //
+  // D20: the filename is NOT always `<type>_ideas.json`. The prompt that
+  // actually creates the file is the source of truth, and
+  // apps/desktop/prompts/ideation_ui_ux.md:342 writes `ui_ux_ideas.json` while
+  // the type key stays `ui_ux_improvements`. The registry expected
+  // `ui_ux_improvements_ideas.json`, so the UI/UX tab rendered "no findings for
+  // this type yet" even after the runner had written five real findings.
+  // `files` lists every accepted name, most-specific first.
+  { key: 'code_improvements', label: 'Code Improvements', files: ['code_improvements_ideas.json'] },
+  { key: 'ui_ux_improvements', label: 'UI/UX', files: ['ui_ux_improvements_ideas.json', 'ui_ux_ideas.json'] },
+  { key: 'documentation_gaps', label: 'Docs Gaps', files: ['documentation_gaps_ideas.json'] },
+  { key: 'security_hardening', label: 'Security', files: ['security_hardening_ideas.json'] },
+  { key: 'performance_optimizations', label: 'Performance', files: ['performance_optimizations_ideas.json'] },
+  { key: 'code_quality', label: 'Code Quality', files: ['code_quality_ideas.json'] },
 ] as const;
 
 const MAX_ANSWER_LINES = 14;
@@ -121,7 +129,7 @@ export function InsightsView({ theme: c, project, isActive }: Props) {
         );
       }
       setIdeationStatus(null); setIdeationReload((k) => k + 1); setMode('ideation');
-      flash('ideation complete — five types');
+      flash(`ideation complete — ${IDEATION_TYPES.length} types`);
     } catch (e) {
       setIdeationStatus(`error: ${e instanceof Error ? e.message : String(e)}`);
     } finally { setBusy(false); abortRef.current = null; }
@@ -157,9 +165,14 @@ export function InsightsView({ theme: c, project, isActive }: Props) {
 
   const ideationFile = useMemo(() => {
     if (mode !== 'ideation') return null;
-    const f = path.join(project.path, '.auto-claude', 'ideation', IDEATION_TYPES[ideationSel].file);
-    if (!fs.existsSync(f)) return null;
-    try { return JSON.parse(fs.readFileSync(f, 'utf8')) as IdeationFile; } catch { return null; }
+    const dir = path.join(project.path, '.auto-claude', 'ideation');
+    // D20: accept every filename the prompts are known to emit for this type.
+    for (const name of IDEATION_TYPES[ideationSel].files) {
+      const f = path.join(dir, name);
+      if (!fs.existsSync(f)) continue;
+      try { return JSON.parse(fs.readFileSync(f, 'utf8')) as IdeationFile; } catch { return null; }
+    }
+    return null;
   }, [mode, ideationSel, ideationReload, project.path]);
   // findings live under a key named after the type; `ideas` is the legacy shape
   const ideationIdeas = useMemo(() => {
@@ -172,7 +185,7 @@ export function InsightsView({ theme: c, project, isActive }: Props) {
   const answerLines = (answer ?? '').split('\n');
 
   return (
-    <Panel title={mode === 'qa' ? 'INSIGHTS · codebase Q&A' : 'IDEATION · five types'} focused={isActive} theme={c} flexGrow={1}>
+    <Panel title={mode === 'qa' ? 'INSIGHTS · codebase Q&A' : `IDEATION · ${IDEATION_TYPES.length} types`} focused={isActive} theme={c} flexGrow={1}>
       <Box flexDirection="column" paddingY={0}>
         <Box gap={2}>
           <Text color={mode === 'qa' ? c.accent : c.faint}>[q] Q&A</Text>

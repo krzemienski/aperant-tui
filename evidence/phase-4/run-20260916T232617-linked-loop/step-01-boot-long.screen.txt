@@ -1,0 +1,39 @@
+
+> aperant-tui-workspace@0.1.0 dev
+> npm run dev -w @aperant/tui /Users/nick/Desktop/vigil
+
+
+> @aperant/tui@0.1.0 dev
+> tsx src/cli.tsx /Users/nick/Desktop/vigil
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
