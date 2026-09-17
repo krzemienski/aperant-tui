@@ -1,12 +1,11 @@
-limited to 4096. Set maxOutputTokens explicitly to override this limit.
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
 │APERANT │ awesome-researcher /Users/nick/awesome-researcher │ ⑂ feat/awesome-researcher                                                                          ◉ 0 running  ◆ 0 review  ● no profile│
 │  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
 │ ┌────────────────────────────────────────────────────────────────────┐ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
 │ │ THEME                                                              │ │ CONFIG                                                                                                                    │ │
 │ │        cyberpunk                                                   │ │ tui config        /Users/nick/.aperant/tui.json                                                                           │ │
-│ │ ❯      matrix  ACTIVE                                              │ │ desktop settings  /Users/nick/.aperant/settings.json                                                                      │ │
-│ │        amber                                                       │ │ provider          not configured                                                                                          │ │
+│ │        matrix                                                      │ │ desktop settings  /Users/nick/.aperant/settings.json                                                                      │ │
+│ │ ❯      amber  ACTIVE                                               │ │ provider          not configured                                                                                          │ │
 │ │        synth                                                       │ │ model             not configured                                                                                          │ │
 │ │        ice                                                         │ └───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
 │ │                                                                    │                                                                                                                               │
@@ -17,6 +16,7 @@ limited to 4096. Set maxOutputTokens explicitly to override this limit.
 │ └────────────────────────────────────────────────────────────────────┘ └───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
 │ SET  j/k select theme · ⏎ apply · a Anthropic acct · m Moonshot acct                                                                                                                    : cmd  ? help│
 └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
 
 
 

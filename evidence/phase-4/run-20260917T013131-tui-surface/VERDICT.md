@@ -42,7 +42,7 @@ exported in the parent, the board still renders (`wait` matched `BACKLOG` in 1.0
 |---|---|---|---|
 | 1 | TUI renders in a real terminal on macOS | **PASS** | `armB.png`; every PNG below. Root cause + fix above. |
 | 2 | Runs against ≥3 real codebases | **PASS** | `vigil/step-01-board.png` (3 tasks, `⑂ main`), `ar/step-01-board.png` (`⑂ feat/awesome-researcher`), `pp/step-01-board.png` (`⑂ master`) — each shows its real project name, real git branch, real task counts. |
-| 3 | Every tab renders | **PASS** | Tabs 1-7 captured per project: `step-01-board` … `step-07-agents`. Text anchors matched for all 5 probed tabs × 3 projects (15/15). |
+| 3 | Every tab renders, per project | **PASS** | Tabs 1-7 captured for each of the three projects: `{vigil,ar,pp}/step-01-board` … `step-07-agents`. Seven of these were initially wrong frames (a palette `Enter` left focus elsewhere, so the digit missed its tab) — found by eye during the inspection pass, then **re-driven against the correct project with the panel anchor asserted before the shutter** (`WORKTREES`, `THEME`, `AGENT`, `TASK LOGS`; retry ×3, never shoot an unverified frame) and replaced in place. No surface is discharged by another project's screenshot. Detail: `INSPECTION-LOG.md`. |
 | 4 | Logs view | **PASS** | `vigil/step-13-logs.png` — `TASK LOGS · 003-cont · 0 lines` reached via `l`. |
 | 5 | Overlays open AND close | **PASS** | `step-08-help*.png` (`KEYBINDINGS`), `step-09-palette*.png`. Help closes with `?` (verified `KEYBINDINGS` absent after). |
 | 6 | Keypress navigation | **PASS** | `vigil/step-12-nav-jj.png` — `j j` moved selection 001→002→003 (selection row read back each press). |

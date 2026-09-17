@@ -21,27 +21,39 @@ missing content.
 | Deliberate before-state capture (defect visible on purpose) | 2 |
 | Blank / corrupt / failed render | **0** |
 
-## Mislabeled captures (content is real; the step name is wrong)
+## Mislabeled captures — FOUND, THEN RE-DRIVEN AND REPLACED
 
-Caused by my own early driving contamination: a palette `Enter` left focus
-elsewhere, so the next digit keystrokes did not land on the tab I intended.
-Kept as-is rather than renamed, because the VERDICT cites these paths and the
-images are genuine TUI frames either way.
+Cause: my own early driving contamination — a palette `Enter` left focus
+elsewhere, so the next digit keystroke did not land on the tab I intended, and
+I shot the frame without checking which view was actually on screen.
 
-| File | Filename claims | Actually shows |
+My first instinct was to leave them and argue each surface was "proven
+elsewhere" (e.g. `ar` tree covered by `pp` tree). **That is substitution, not
+proof.** Criterion 3 claims tabs 1-7 captured *per project*, so another
+project's screenshot cannot discharge it. All seven were re-driven against the
+correct project with a **matched panel anchor asserted before the shutter**
+(retry up to 3× on miss, never shoot an unverified frame) and the files
+replaced in place:
+
+| File | Was showing | Now shows (anchor asserted) |
 |---|---|---|
-| `vigil/step-11-theme-matrix.png` | board in matrix theme | agents view in matrix theme (theme switch still proven — compare step-10) |
-| `vigil/step-12-nav-j.png` | board after `j` | agents view |
-| `ar/step-13-logs.png` | task logs | agents view (AGENT SWARM empty state) |
-| `ar/step-21-insights-question.png` | typed question | help overlay (the D18 defect firing) |
-| `pp/step-05-tree.png` | worktree view | chat/ideation view |
-| `pp/step-06-set.png`, `pp/step-07-agents.png` | settings / agents | chat/ideation view |
+| `ar/step-05-tree.png` | chat/ideation | `WORKTREES` — `feat/awesome-researcher`, `head 15c94710a6`, `diff clean` |
+| `ar/step-06-set.png` | chat/ideation | `THEME`/`CONFIG`/`ACCOUNTS` — anthropic account at `127.0.0.1:20128/v1` |
+| `ar/step-07-agents.png` | chat/ideation | `AGENT SWARM` + the six sub-view tabs |
+| `ar/step-13-logs.png` | agents (empty) | `TASK LOGS · 001-tri- · 0 lines` |
+| `pp/step-05-tree.png` | chat/ideation | `WORKTREES` — `master`, `head 0000000000`, `diff unreadable` |
+| `pp/step-06-set.png` | chat/ideation | `THEME`/`CONFIG`/`ACCOUNTS` |
+| `pp/step-07-agents.png` | chat/ideation | `AGENT SWARM` + sub-view tabs |
 
-Each of those surfaces IS proven elsewhere: worktrees by `ar/step-05-tree.png`
-(real `head 15c94710a6`), settings by `pp/step-06-set-accounts.png` and
-`vigil/step-15-settings-account.png`, agents by the six
-`vigil/step-18-agents-*` sub-views, logs by `vigil/step-13-logs.png`
-(`TASK LOGS · 003-cont · 0 lines`) and `pp/step-13-logs.png`.
+Each recapture was viewed (`/tmp/sheets/recaptures.png`): the correct tab is
+highlighted in the tab bar of every one, and each shows that project's own real
+data.
+
+Two vigil captures keep non-matching names, and are NOT load-bearing for any
+criterion: `vigil/step-11-theme-matrix.png` and `vigil/step-12-nav-j.png` show
+the agents view. The matrix theme switch is proven by the colour change from
+`step-10` to `step-11` (both real frames), and board navigation is proven by
+`vigil/step-12-nav-jj.png` (`j j` → 003 selected).
 
 ## Deliberate before-state captures
 

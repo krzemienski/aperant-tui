@@ -1,11 +1,11 @@
 {
  "INSPECTION-LOG.md": {
-  "bytes": 4165,
-  "sha256": "440356124496f31a"
+  "bytes": 4905,
+  "sha256": "ebeeecf326581a8e"
  },
  "VERDICT.md": {
-  "bytes": 12983,
-  "sha256": "4faa17c7da75392d"
+  "bytes": 13417,
+  "sha256": "e354a301d3ec9922"
  },
  "ar/step-01-board.png": {
   "bytes": 325957,
@@ -44,40 +44,40 @@
   "sha256": "0d97883986b2cefe"
  },
  "ar/step-05-tree.png": {
-  "bytes": 112531,
-  "sha256": "9e634918e30bfc42"
+  "bytes": 110218,
+  "sha256": "030e88d87d400673"
  },
  "ar/step-05-tree.png.html": {
-  "bytes": 17785,
-  "sha256": "695c6a8b2c883139"
+  "bytes": 17822,
+  "sha256": "571df4bff0872c79"
  },
  "ar/step-05-tree.png.txt": {
-  "bytes": 4834,
-  "sha256": "d02cb2fe2592033c"
+  "bytes": 4763,
+  "sha256": "42f3f7096907d693"
  },
  "ar/step-06-set.png": {
-  "bytes": 176224,
-  "sha256": "51bdb60f17df1e4a"
+  "bytes": 177027,
+  "sha256": "ba00553d7ab1a49a"
  },
  "ar/step-06-set.png.html": {
-  "bytes": 22664,
-  "sha256": "ca63086834c16cfb"
+  "bytes": 22712,
+  "sha256": "a49b8604cab96966"
  },
  "ar/step-06-set.png.txt": {
-  "bytes": 5969,
-  "sha256": "f8323a807a9c56e1"
+  "bytes": 5898,
+  "sha256": "fe4ce91c7bf8e066"
  },
  "ar/step-07-agents.png": {
-  "bytes": 138662,
-  "sha256": "4ad9e7761052f279"
+  "bytes": 133608,
+  "sha256": "046b1bc77382bf1e"
  },
  "ar/step-07-agents.png.html": {
-  "bytes": 15535,
-  "sha256": "4a326ef907685588"
+  "bytes": 15561,
+  "sha256": "d891d98591a34730"
  },
  "ar/step-07-agents.png.txt": {
-  "bytes": 4803,
-  "sha256": "3c9fc60939b2dc40"
+  "bytes": 4732,
+  "sha256": "8b00b6d5c5b916f8"
  },
  "ar/step-08-help.png": {
   "bytes": 139560,
@@ -104,16 +104,16 @@
   "sha256": "2ecf63183b27e506"
  },
  "ar/step-13-logs.png": {
-  "bytes": 138662,
-  "sha256": "4ad9e7761052f279"
+  "bytes": 76619,
+  "sha256": "c059f85670bee4d0"
  },
  "ar/step-13-logs.png.html": {
-  "bytes": 15535,
-  "sha256": "4a326ef907685588"
+  "bytes": 15076,
+  "sha256": "62f32d1216a46b8f"
  },
  "ar/step-13-logs.png.txt": {
-  "bytes": 4803,
-  "sha256": "3c9fc60939b2dc40"
+  "bytes": 4733,
+  "sha256": "4fefb9b362caffa4"
  },
  "ar/step-21-insights-question.png": {
   "bytes": 125215,
@@ -320,16 +320,16 @@
   "sha256": "d03613e4a5b6892b"
  },
  "pp/step-05-tree.png": {
-  "bytes": 125121,
-  "sha256": "7702c6e2f7a03408"
+  "bytes": 96703,
+  "sha256": "e8e0d9f3db381dde"
  },
  "pp/step-05-tree.png.html": {
-  "bytes": 16022,
-  "sha256": "27af64ce45ed5535"
+  "bytes": 17874,
+  "sha256": "e7a5cc80fda3cc2f"
  },
  "pp/step-05-tree.png.txt": {
-  "bytes": 4809,
-  "sha256": "2b326a26e9abc313"
+  "bytes": 4763,
+  "sha256": "c6e590e7d7afcbbe"
  },
  "pp/step-06-set-accounts.png": {
   "bytes": 173151,
@@ -340,28 +340,28 @@
   "sha256": "89a2362a3afa0e27"
  },
  "pp/step-06-set.png": {
-  "bytes": 125176,
-  "sha256": "58d11721c827d274"
+  "bytes": 171574,
+  "sha256": "b7a0eb2eae315df8"
  },
  "pp/step-06-set.png.html": {
-  "bytes": 16022,
-  "sha256": "9419d8ca79fff1ac"
+  "bytes": 22732,
+  "sha256": "f8ac62e48aa43297"
  },
  "pp/step-06-set.png.txt": {
-  "bytes": 4809,
-  "sha256": "2b326a26e9abc313"
+  "bytes": 5898,
+  "sha256": "16e404a06bb8be8b"
  },
  "pp/step-07-agents.png": {
-  "bytes": 125176,
-  "sha256": "58d11721c827d274"
+  "bytes": 127587,
+  "sha256": "421a95b67f63379e"
  },
  "pp/step-07-agents.png.html": {
-  "bytes": 16022,
-  "sha256": "9419d8ca79fff1ac"
+  "bytes": 15581,
+  "sha256": "9a60f858376333c6"
  },
  "pp/step-07-agents.png.txt": {
-  "bytes": 4809,
-  "sha256": "2b326a26e9abc313"
+  "bytes": 4732,
+  "sha256": "fcae6d9a8ea03546"
  },
  "pp/step-08-help.png": {
   "bytes": 135078,
