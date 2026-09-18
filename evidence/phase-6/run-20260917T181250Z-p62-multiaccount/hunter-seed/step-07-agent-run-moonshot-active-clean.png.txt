@@ -1,0 +1,52 @@
+
+[ClaudeProfileManager] Starting initialization...
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+[ClaudeProfileManager] Initialization complete
+[AgentManager] Resolved auth from provider queue: account=moonshot-mu5unnpz provider=moonshot model=kimi-k2-turbo-preview
+[WorktreeManager] Pruning stale worktree references...
+[WorktreeManager] Using existing worktree: 001-guided-quickstart-skill on branch auto-claude/001-guided-quickstart-skill
+[AgentManager] Task 001-guided-quickstart-skill will run in worktree: /Users/nick/dev/hunter-seed/.auto-claude/worktrees/tasks/001-guided-quickstart-skill
+[AgentManager] Task registered with OperationRegistry: {
+  taskId: '001-guided-quickstart-skill',
+  profileId: 'primary',
+  profileName: 'Primary',
+  type: 'task-execution'
+}
+┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────│─agent started: 001-guid─│┐
+│APERANT │ hunter-seed /Users/nick/dev/hunter-seed │ ⑂ main                                                                                                       ◉ 0 runnin└─────────────────────────┘│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃ TASKS                                                                                  ┃ │ DETAIL                                                                                                │ │
+│ ┃ ◆ HUMAN (2)                                                                            ┃ │ 001-guid [REVIEW]                                                                                     │ │
+│ ┃ ❯ 001-guid ▽ Guided quickstart skill: env checks, sandbox provisioning, first canary … ┃ │ Guided quickstart skill: env checks, sandbox provisioning, first canary run                           │ │
+│ ┃   002-symb ▽ Symbolized crash triage with rich sanitizer telemetry  50%                ┃ │ progress ███████░░░░░░░ 50%                                                                           │ │
+│ ┃                                                                                        ┃ │ subtasks 5/5 complete                                                                                 │ │
+│ ┃                                                                                        ┃ │ phase coding                                                                                          │ │
+│ ┃                                                                                        ┃ │ location main  spec 001-guided-quickstart-skill                                                       │ │
+│ ┃                                                                                        ┃ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ ┃                                                                                        ┃                                                                                                           │
+│ ┃                                                                                        ┃ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃                                                                                        ┃ │ AGENT STREAM                                                                                          │ │
+│ ┃                                                                                        ┃ │ 18:21:14 start 001-guid → vendored AgentManager…                                                      │ │
+│ ┃                                                                                        ┃ │ 18:21:14 started 001-guid: agent started — phase planning                                             │ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ hunter-seed /Users/nick/dev/hunter-seed │ ⑂ main                                                                                                       ◉ 0 running  ◆ 2 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃ TASKS                                                                                  ┃ │ DETAIL                                                                                                │ │
+│ ┃ ◆ HUMAN (2)                                                                            ┃ │ 001-guid [REVIEW]                                                                                     │ │
+│ ┃ ❯ 001-guid ▽ Guided quickstart skill: env checks, sandbox provisioning, first canary … ┃ │ Guided quickstart skill: env checks, sandbox provisioning, first canary run                           │ │
+│ ┃   002-symb ▽ Symbolized crash triage with rich sanitizer telemetry  50%                ┃ │ progress ███████░░░░░░░ 50%                                                                           │ │
+│ ┃                                                                                        ┃ │ subtasks 5/5 complete                                                                                 │ │
+│ ┃                                                                                        ┃ │ phase coding                                                                                          │ │
+│ ┃                                                                                        ┃ │ location main  spec 001-guided-quickstart-skill                                                       │ │
+│ ┃                                                                                        ┃ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ ┃                                                                                        ┃                                                                                                           │
+│ ┃                                                                                        ┃ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃                                                                                        ┃ │ AGENT STREAM                                                                                          │ │
+│ ┃                                                                                        ┃ │ 18:21:14 start 001-guid → vendored AgentManager…                                                      │ │
+│ ┃                                                                                        ┃ │ 18:21:14 started 001-guid: agent started — phase planning                                             │ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ BOARD  j/k move · ⏎ focus · s start · x stop · H/L column · l logs                                                                                                                      : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

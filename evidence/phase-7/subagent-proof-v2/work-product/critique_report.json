@@ -1,0 +1,63 @@
+{
+  "critique_completed": true,
+  "issues_found": [
+    {
+      "severity": "major",
+      "category": "completeness",
+      "description": "Proven and fallback prompts not quoted verbatim; implementer could not execute Phase 3 without guessing or re-deriving prompts from research.json",
+      "location": "Evidence Plan / implementation plan 3-1, 3-2, 3-3",
+      "fix_applied": "Added 'Prompts (verbatim; do not paraphrase)' section with all four prompts from research.json",
+      "verified": true
+    },
+    {
+      "severity": "major",
+      "category": "feasibility",
+      "description": "events.jsonl with AGENT_SPAWNED/AGENT_FINISHED required (step 5, ER2) but no production method specified; research flags app does not persist event log (C5 step-02 caveat)",
+      "location": "Evidence Plan step 5, ER2",
+      "fix_applied": "Added 'Events capture method' subsection: verify export path at HEAD in source-facts step; probe-side tee/instrumentation fallback; events must be same-session as frames; raised to OQ4",
+      "verified": true
+    },
+    {
+      "severity": "major",
+      "category": "consistency",
+      "description": "FR2 ('explained in narrative, not assumed away') vs Phase 5 trigger ('silent-failure gap found') left ambiguous whether an UNATTRIBUTED child means explain-and-ship or fix-and-re-earn",
+      "location": "FR2 vs FR7 / plan phase 5",
+      "fix_applied": "Added decisive FR7 trigger definition: fix required iff child UNATTRIBUTED while parent tool_use_id present in stream; SDK-side absence = narrative note + ship",
+      "verified": true
+    },
+    {
+      "severity": "low",
+      "category": "completeness",
+      "description": "No run-dir collision pre-check before init-run despite ER3",
+      "location": "Evidence Plan, ER3",
+      "fix_applied": "Added collision pre-check to Evidence Plan and ER3",
+      "verified": true
+    },
+    {
+      "severity": "low",
+      "category": "consistency",
+      "description": "Spec Evidence Plan (6 steps) omitted the fan-out and ERRORED steps that the implementation plan creates (step-06..step-08)",
+      "location": "Evidence Plan steps",
+      "fix_applied": "Expanded to steps 1-9 covering fan-out frame, fan-out events, conditional ERRORED frame",
+      "verified": true
+    },
+    {
+      "severity": "low",
+      "category": "alignment",
+      "description": "PR2 tightened from requirements' generic wording without marking the divergence",
+      "location": "PR2",
+      "fix_applied": "Annotated as deliberate refinement",
+      "verified": true
+    }
+  ],
+  "issues_fixed": true,
+  "no_issues_found": false,
+  "critique_summary": "Spec was honest and research-aligned (FR2 tier-3 wording correct, fallbacks pre-baked, no unmeasured claims as facts). Three majors fixed: missing verbatim prompts, unspecified events-export method (app does not persist event log), and ambiguous FR7 conditional-fix trigger vs FR2 narrative-explanation. Plus minor: collision pre-check, fan-out steps in evidence plan, PR2 divergence annotation.",
+  "confidence_level": "high",
+  "recommendations": [
+    "Resolve OQ4 (lifecycle-events export path) during the step-01 source-facts step before building the probe",
+    "Phase 5 re-earn run uses -r1 suffix; ensure fresh init-run creates that dir with its own .run-meta",
+    "implementation_plan.json still lacks the verbatim prompts in subtask descriptions; implementer should read spec.md 'Prompts' section"
+  ],
+  "created_at": "2026-09-18T00:00:00Z"
+}

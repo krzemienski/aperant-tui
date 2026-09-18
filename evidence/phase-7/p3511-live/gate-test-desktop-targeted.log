@@ -1,0 +1,24 @@
+
+ RUN  v2.1.9 /Users/nick/dev/aperant-tui/apps/desktop
+
+
+⎯⎯⎯⎯ Unhandled Rejection ⎯⎯⎯⎯⎯
+Failed to load PostCSS config: Failed to load PostCSS config (searchPath: /Users/nick/dev/aperant-tui/apps/desktop): [Error] Loading PostCSS Plugin failed: Cannot find module '@tailwindcss/postcss'
+Require stack:
+- /Users/nick/dev/aperant-tui/apps/desktop/postcss.config.cjs
+
+(@/Users/nick/dev/aperant-tui/apps/desktop/postcss.config.cjs)
+Error: Loading PostCSS Plugin failed: Cannot find module '@tailwindcss/postcss'
+Require stack:
+- /Users/nick/dev/aperant-tui/apps/desktop/postcss.config.cjs
+
+(@/Users/nick/dev/aperant-tui/apps/desktop/postcss.config.cjs)
+    at load (file:///Users/nick/dev/aperant-tui/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:33632:11)
+    at file:///Users/nick/dev/aperant-tui/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:33657:16
+    at Array.map (<anonymous>)
+    at plugins (file:///Users/nick/dev/aperant-tui/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:33656:8)
+    at processResult (file:///Users/nick/dev/aperant-tui/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:33726:14)
+    at file:///Users/nick/dev/aperant-tui/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:33856:14
+
+
+

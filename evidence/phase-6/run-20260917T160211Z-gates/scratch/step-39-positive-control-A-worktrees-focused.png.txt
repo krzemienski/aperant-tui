@@ -1,0 +1,16 @@
+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ aperant-gate-scratch /tmp/aperant-gate-scratch │ ⑂ main                                                                                                ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ ┌──────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃ WORKTREES                                                                                                   ┃ │ DIFF · main                                                                      │ │
+│ ┃ ❯ ⑂ main                                                                                                    ┃ │ head f11eb5beda  diff clean                                                      │ │
+│ ┃     /private/tmp/aperant-gate-scratch                                                                       ┃ │                                                                                  │ │
+│ ┃   ⑂ feature/conflict-branch                                                                                 ┃ │ (clean — no changes against HEAD)                                                │ │
+│ ┃     /private/tmp/aperant-gate-scratch/.auto-claude/worktrees/tasks/feature-conflict                         ┃ │                                                                                  │ │
+│ ┃   ⑂ feature/divergent                                                                                       ┃ │                                                                                  │ │
+│ ┃     /private/tmp/aperant-gate-scratch/.auto-claude/worktrees/tasks/feature-divergent                        ┃ │                                                                                  │ │
+│ ┃                                                                                                             ┃ │                                                                                  │ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ └──────────────────────────────────────────────────────────────────────────────────┘ │
+│ TREE  tab focus · j/k select/scroll · m merge · p PR · R AI-resolve                                                                                                                     : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

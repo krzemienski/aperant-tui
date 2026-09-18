@@ -1,0 +1,29 @@
+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ awesome-researcher /Users/nick/awesome-researcher │ ⑂ feat/awesome-researcher                                                                          ◉ 0 running  ◆ 1 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ │
+│ ┃ GENERATION                                                                                                                                                                                       ┃ │
+│ ┃ RUNNING · features 50% — Running features phase...                                                                                                                                               ┃ │
+│ ┃  ████████████░░░░░░░░░░░░ features                                                                                                                                                               ┃ │
+│ ┃ Running discovery phase...                                                                                                                                                                       ┃ │
+│ ┃ Discovery document written to `/Users/nick/awesome-researcher/.auto-claude/roadmap/roadmap_discovery                                                                                             ┃ │
+│ ┃ Summary: `awesome-researcher` — Python pipeline on Claude Agent SDK that autonomously discovers, ded                                                                                             ┃ │
+│ ┃ Phase discovery completed                                                                                                                                                                        ┃ │
+│ ┃ Running features phase...                                                                                                                                                                        ┃ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ │
+│ ┌───────────────────────────────────────────────────────────────────────────┐┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ PHASES                                                                    ││ DETAIL                                                                                                              │ │
+│ │ ❯ ○ PHASE P-1 Trust & Review Workflow                                     ││ Trust & Review Workflow                                                                                             │ │
+│ │   ░░░░░░░░░░░░░░░░░░ 0/3 features                                         ││  · Human-in-the-loop candidate review with selective approval [proposed · Must]                                     │ │
+│ │                                                                           ││    c → convert to task spec                                                                                         │ │
+│ │   ○ PHASE P-2 Continuous Operation                                        ││  · Automatic PR draft generation from approved candidates [proposed · Must]                                         │ │
+│ │   ░░░░░░░░░░░░░░░░░░ 0/3 features                                         ││    c → convert to task spec                                                                                         │ │
+│ │                                                                           ││  · Link-rot audit of existing list entries [proposed · Should]                                                      │ │
+│ │   ○ PHASE P-3 Scale & Intelligence                                        ││    c → convert to task spec                                                                                         │ │
+│ │   ░░░░░░░░░░░░░░░░░░ 0/3 features                                         ││                                                                                                                     │ │
+│ │                                                                           ││                                                                                                                     │ │
+│ └───────────────────────────────────────────────────────────────────────────┘└─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│  generating… x stop                                                                                                                                                                                  │
+│ ROAD  g generate (G force regen) · x stop · j/k phase · c convert→spec                                                                                                                  : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

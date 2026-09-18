@@ -1,0 +1,80 @@
+
+[ClaudeProfileManager] Starting initialization...
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+[ClaudeProfileManager] Initialization complete
+[AgentManager] Resolved auth from provider queue: account=anthropic-mu4v0hti provider=anthropic model=glm/glm-5
+[WorktreeManager] Pruning stale worktree references...
+[WorktreeManager] Fetching latest from origin/main...
+[WorktreeManager] Creating worktree from remote: origin/main
+[WorktreeManager] Created worktree: 002-symbolized-crash-triage-with-rich-sanitizer-teleme on branch auto-claude/002-symbolized-crash-triage-with-rich-sanitizer-teleme
+[WorktreeManager] Leaving branch local-only (auto-push disabled): auto-claude/002-symbolized-crash-triage-with-rich-sanitizer-teleme
+[WorktreeManager] Copying spec directory into worktree: .auto-claude/specs/002-symbolized-crash-triage-with-rich-sanitizer-teleme
+[AgentManager] Task 002-symbolized-crash-triage-with-rich-sanitizer-teleme will run in worktree: /Users/nick/dev/hunter-seed/.auto-claude/worktrees/tasks/002-symbolized-crash-triage-with-rich-sanitize
+r-teleme
+[AgentManager] Task registered with OperationRegistry: {
+  taskId: '002-symbolized-crash-triage-with-rich-sanitizer-teleme',
+  profileId: 'primary',
+  profileName: 'Primary',
+  type: 'task-execution'
+}
+┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────│─agent started: 002-symb─│┐
+│APERANT │ hunter-seed /Users/nick/dev/hunter-seed │ ⑂ main                                                                                                       ◉ 0 runnin└─────────────────────────┘│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃ TASKS                                                                                  ┃ │ DETAIL                                                                                                │ │
+│ ┃ ◆ BACKLOG (2)                                                                          ┃ │ 002-symb [BACKLOG]                                                                                    │ │
+│ ┃   001-guid ▽ Guided quickstart skill                                                   ┃ │ Symbolized crash triage with rich sanitizer telemetry                                                 │ │
+│ ┃ ❯ 002-symb ▽ Symbolized crash triage with rich sanitizer telemetry                     ┃ │ progress ░░░░░░░░░░░░░░ 0%                                                                            │ │
+│ ┃                                                                                        ┃ │ subtasks 0/0 complete                                                                                 │ │
+│ ┃                                                                                        ┃ │ phase -                                                                                               │ │
+│ ┃                                                                                        ┃ │ location main  spec 002-symbolized-crash-triage-with-rich-sanitizer-teleme                            │ │
+│ ┃                                                                                        ┃ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ ┃                                                                                        ┃                                                                                                           │
+│ ┃                                                                                        ┃ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃                                                                                        ┃ │ AGENT STREAM                                                                                          │ │
+│ ┃                                                                                        ┃ │ 15:40:14 start 002-symb → vendored AgentManager…                                                      │ │
+│ ┃                                                                                        ┃ │ 15:40:15 started 002-symb: agent started — phase planning                                             │ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ hunter-seed /Users/nick/dev/hunter-seed │ ⑂ main                                                                                                       ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│  1 swarm   2 graph   3 inspect   4 trace   5 tokens   6 waits  1 agent · esc then 1-7 to switch tabs                                                                                                 │
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ hunter-seed /Users/nick/dev/hunter-seed │ ⑂ main                                                                                                       ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│  1 swarm   2 graph   3 inspect   4 trace   5 tokens   6 waits  1 agent · esc then 1-7 to switch tabs                                                                                                 │
+│                                                                                                                                                                                                      │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ ┌───────────────────────────────────────────────────────────────────────────────────────────┐ │
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ hunter-seed /Users/nick/dev/hunter-seed │ ⑂ main                                                                                                       ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│  1 swarm   2 graph   3 inspect   4 trace   5 tokens   6 waits  1 agent · esc then 1-7 to switch tabs                                                                                                 │
+│                                                                                                                                                                                                      │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ ┌───────────────────────────────────────────────────────────────────────────────────────────┐ │
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ hunter-seed /Users/nick/dev/hunter-seed │ ⑂ main                                                                                                       ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│  1 swarm   2 graph   3 inspect   4 trace   5 tokens   6 waits  1 agent · esc then 1-7 to switch tabs                                                                                                 │
+│                                                                                                                                                                                                      │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ ┌───────────────────────────────────────────────────────────────────────────────────────────┐ │
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ hunter-seed /Users/nick/dev/hunter-seed │ ⑂ main                                                                                                       ◉ 0 running  ◆ 0 review  ● no profile│
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ hunter-seed /Users/nick/dev/hunter-seed │ ⑂ main                                                                                                       ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│  1 swarm   2 graph   3 inspect   4 trace   5 tokens   6 waits  1 agent · esc then 1-7 to switch tabs                                                                                                 │
+│                                                                                                                                                                                                      │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ ┌────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃ ORCHESTRATION GRAPH                                                                       ┃ │ PHASE PIPELINE · 002-symboliz                                                                      │ │
+│ ┃   ◈ planner 002-symbolized-c · idle · 0%                                                  ┃ │ ○ planning   0→20%                                                                                 │ │
+│ ┃                                                                                           ┃ │ ○ coding     20→80%                                                                                │ │
+│ ┃                                                                                           ┃ │ ○ qa_review  80→95%                                                                                │ │
+│ ┃                                                                                           ┃ │ ○ qa_fixing  80→95%                                                                                │ │
+│ ┃                                                                                           ┃ │ ○ complete   100%                                                                                  │ │
+│ ┃                                                                                           ┃ │                                                                                                    │ │
+│ ┃                                                                                           ┃ │ ⚠ regression guard active                                                                          │ │
+│ ┃                                                                                           ┃ │ PHASE_ORDER_INDEX blocks backward fallback moves;                                                  │ │
+│ ┃                                                                                           ┃ │ complete requires a structured emit, never text.                                                   │ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ └────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ AGENTS  1-6 sub-view · j/k select · ⏎ inspect · f filter · r resume                                                                                                                     : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

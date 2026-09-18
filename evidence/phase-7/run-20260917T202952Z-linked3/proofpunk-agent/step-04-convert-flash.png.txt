@@ -1,0 +1,33 @@
+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ proofpunk-agent /Users/nick/proofpunk-agent │ ⑂ master                                                                                                 ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ GENERATION                                                                                                                                                                                       │ │
+│ │ idle                                                                                                                                                                                             │ │
+│ │   - **Must**: X1 Transcript Export, X2 Evidence Hash Chain, X4 GitHub Actions Integration                                                                                                        │ │
+│ │   - **Should**: X3 Token Attribution, X5 Flaky Triage, X7 Signed Evidence, X10 PII Scrubbing                                                                                                     │ │
+│ │   - **Could**: X6 Auto-Rewind, X8 RBAC Store, X9 SQL Analytics                                                                                                                                   │ │
+│ │ - All features respect core invariants (no invented numbers, event-log projection, fail-closed paths                                                                                             │ │
+│ │ Note: `project_index.json` was missing at the given path; roadmap built from the discovery file alon                                                                                             │ │
+│ │ Phase features completed                                                                                                                                                                         │ │
+│ └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃ PHASES                                                                         ┃│ DETAIL                                                                                                         │ │
+│ ┃ ❯ ○ PHASE P13 Verification Depth                                               ┃│ Verification Depth                                                                                             │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/6 features                                              ┃│  ⇒ Policy File (--policy) [planned · must]                                                                     │ │
+│ ┃                                                                                ┃│    spec 005-policy-file-policy                                                                                 │ │
+│ ┃   ○ PHASE P14 Automation & CI Scale                                            ┃│  · Tool Allow/Deny Lists [planned · should]                                                                    │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/7 features                                              ┃│    c → convert to task spec                                                                                    │ │
+│ ┃                                                                                ┃│  · Runaway Loop Detector [planned · should]                                                                    │ │
+│ ┃   ○ PHASE P15 Collaboration & Trust                                            ┃│    c → convert to task spec                                                                                    │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/4 features                                              ┃│  · Full Session Transcript Export (Markdown/Plain) [planned · Must]                                            │ │
+│ ┃                                                                                ┃│    c → convert to task spec                                                                                    │ │
+│ ┃                                                                                ┃│  · Tamper-Evident Evidence Hash Chain [planned · Must]                                                         │ │
+│ ┃                                                                                ┃│    c → convert to task spec                                                                                    │ │
+│ ┃                                                                                ┃│  · Token-Level Cost Attribution [planned · Should]                                                             │ │
+│ ┃                                                                                ┃│    c → convert to task spec                                                                                    │ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛└────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│  g generate · G refresh · j/k phase · c convert→spec                                                                                                                                                 │
+│ ROAD  g generate (G force regen) · x stop · j/k phase · c convert→spec                                                                                                                  : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

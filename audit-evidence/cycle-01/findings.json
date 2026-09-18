@@ -1,5 +1,6 @@
 {
   "cycle": 1,
+  "ledger_note": "Reconciled 2026-09-17 against source + git log. F-04 was recorded OPEN while commit 3d96287 had already fixed it (findings.json was committed IN that commit carrying its pre-fix content, then never updated). F-05 had a fix commit (20a7e9b) but no ledger entry. Both corrected below; F-04's verdict re-verified by reading AgentsView.tsx:141-154, F-05 by reading HelpOverlay.tsx:16. SESSION 2 (2026-09-17, later): added F-09..F-14, all verified fixed-in-tree but uncommitted (commit: pending, not fabricated). F-10 and F-11 were CAUGHT BY DRIVING the real TUI in a live PTY (tuistory/tmux), not by reading source — F-10's repro (escape not closing the ask box) came from a captured defect frame (step-07-chat-ask-box-escape-noop-defect.png, evidence/phase-6/run-20260917T144428-surface-hunter-seed/); F-11's repro used a byte-identical before/after PNG pair plus a positive control (TitleBar's unconditionally-bold text) to first rule out the capture instrument before concluding the defect was real. F-09, F-12, F-13 were found by source audit against real bindings/behavior. F-14 is recorded separately (owned by a different session/workstream) with cross-reference to F-12 to avoid an id collision — both independently needed the number F-12; F-12 here is the BoardView stop-wiring fix actually implemented and commented (`// F-12:`) in apps/tui/src/views/BoardView.tsx this session, and the applyAccountEnv priority fix is recorded as F-14 per explicit operator instruction. SESSION 3 (2026-09-17, gates+records pass): F-10's fix_verified line citation was stale (cited InsightsView.tsx:192-194, a comment line — the real useInput escape handler is at :195-197) and its evidence citation for the disabled view-keymap was narrowed to a single wrong line (:178, mid-keymap-object) instead of the keymap's real span (:168-181); both corrected after re-reading the file, no content claim changed. F-18 added as a new entry: `a`/add-Anthropic (and the moonshot twin) matched accounts on `provider` alone, so a second add of the same family overwrote the first in place; fix changes the match predicate to (provider, baseUrl) at account-service.ts:194 (anthropic) and :114 (moonshot), plus a new mintAccountId() collision-suffix helper at :73-80. Verified fixed-in-tree but uncommitted (commit: pending, not fabricated), by re-reading the cited source lines directly against disk before marking status FIXED. Gate run (typecheck/test/build) recorded separately under evidence/phase-7/gates/GATES.md; all three exit 0.",
   "findings": [
     {
       "id": "F-01",
@@ -44,13 +45,232 @@
       "severity": "HIGH",
       "screen": "agents",
       "title": "Sub-view selector 1-6 does not change the rendered sub-view or move the bar highlight when no agent is live",
-      "detail": "AgentsView.tsx:131 `empty ?` short-circuits before the sub===... switch, so all six sub-views render the identical AGENT SWARM empty panel. The selector bar at :122-126 does render highlight from `sub`, but a fresh unarmed session pressing 4 produces a pixel-identical PNG. Control: a theme change (pure color) DOES change the PNG hash, so the capture is color-faithful and this is not an instrument artifact.",
+      "detail": "AgentsView.tsx `empty ?` short-circuited before the sub===... switch, so all six sub-views rendered the identical AGENT SWARM empty panel. Control (theme change) DID change the PNG hash, proving the capture was colour-faithful and the identical hashes real.",
       "evidence": [
         "/Users/nick/dev/aperant-tui/audit-evidence/cycle-01/ux-reports/_sub-start.png",
         "/Users/nick/dev/aperant-tui/audit-evidence/cycle-01/ux-reports/_sub-after4.png",
         "/Users/nick/dev/aperant-tui/audit-evidence/cycle-01/ux-reports/_ctl-theme-a.png (control)"
       ],
-      "status": "OPEN"
+      "status": "FIXED",
+      "commit": "3d96287",
+      "fix_verified": "Re-read apps/tui/src/views/AgentsView.tsx:141-154 this session: the empty branch now renders Panel title={`AGENT ${sub.toUpperCase()}`} plus SUBVIEW_EMPTY_HINT[sub], so the selection is legible in text. The six agents-sub*-fixed.png captures are 6 distinct sha256 values (140aeaf3, 2c798933, b3920410, a2fc6266, 7908f38c, 5b510f9b).",
+      "residual": "The empty-state fix makes SELECTION legible but does not prove the sub-views render real DATA. That requires a live agent in the same process (AgentsView reads the in-memory observability singleton, which only populates after an in-session startTask). Proven separately in evidence/phase-6."
+    },
+    {
+      "id": "F-05",
+      "phase": "ux",
+      "severity": "MEDIUM",
+      "screen": "help overlay",
+      "title": "Help overlay advertised 1-6 for seven views",
+      "detail": "VIEW_KEYS in App.tsx:49 binds 1-7 (board term road chat tree set agents) but the help overlay row read '1-6', so the agents tab was undiscoverable from help.",
+      "evidence": [
+        "apps/tui/src/components/HelpOverlay.tsx:16"
+      ],
+      "status": "FIXED",
+      "commit": "20a7e9b",
+      "fix_verified": "Re-read HelpOverlay.tsx:16 this session: ['1-7', 'switch view (esc first in agents/chat)']. The remaining 1-6 strings (StatusLine.tsx:17,20) correctly describe ideation types and agents sub-views, not top-level tabs."
+    },
+    {
+      "id": "F-06",
+      "phase": "functional",
+      "severity": "HIGH",
+      "screen": "settings",
+      "title": "CONFIG panel reported 'provider not configured' while a live router account was active",
+      "detail": "SettingsView.tsx:55-56 read only the legacy top-level provider/model keys; real routing lives in providerAccounts[] + globalPriorityOrder[]. A fully-working router rendered as unconfigured, and a prior evidence run captured that exact frame as 'routing-settings.png' routing proof (see audit-evidence/RETRACTION.md R4).",
+      "evidence": [
+        "/Users/nick/dev/aperant-tui/audit-evidence/cycle-01/functional-evidence/routing-settings.txt:17-18",
+        "apps/tui/src/views/SettingsView.tsx:53-93"
+      ],
+      "status": "FIXED",
+      "commit": "pending",
+      "fix_verified": "SettingsView.tsx now resolves the effective account from globalPriorityOrder head -> accounts[0] -> legacy keys, shows the model with its resolution source, and adds a queue row with baseUrl only (no secret). Re-confirmed present in the working tree this session (uncommitted, fix_verified stands; commit field kept honest as 'pending' rather than a fabricated SHA)."
+    },
+    {
+      "id": "F-07",
+      "phase": "functional",
+      "severity": "HIGH",
+      "screen": "roadmap",
+      "title": "GENERATION panel rendered one word per line during live streaming",
+      "detail": "The vendored queue emits one roadmap-log per AI SDK text-delta chunk (agent-queue.ts:441); RoadmapView pushed each chunk as its own array element and rendered one <Text> per element, so every token became a visual line.",
+      "evidence": [
+        "apps/desktop/src/main/agent/agent-queue.ts:441",
+        "apps/tui/src/views/RoadmapView.tsx:92-94,152-156"
+      ],
+      "status": "FIXED",
+      "commit": "pending",
+      "fix_verified": "RoadmapView.tsx now buffers text-delta chunks (pushLogChunk, RoadmapView.tsx:65-81), splitting on '\\n' and rendering the trailing partial line live; phase-start/phase-complete/error whole-message strings are recognized (DISCRETE_LOG_RE) and always flushed onto their own line so they cannot be absorbed mid-word into a streaming partial. Re-confirmed present in the working tree this session (uncommitted; commit field kept honest as 'pending')."
+    },
+    {
+      "id": "F-08",
+      "phase": "functional",
+      "severity": "HIGH",
+      "screen": "evidence harness",
+      "title": "Capture harness could not detect a stale frame, so repeated frames passed as streaming proof",
+      "detail": "Three phase-5 'road-stream' PNGs 57s apart are byte-identical (sha256 2adf16e4b81b88a1), as are three functional-evidence gen-glm captures (570cee9663c59320). The recorder stored no digest, so nothing flagged it.",
+      "evidence": [
+        "/Users/nick/dev/aperant-tui/audit-evidence/RETRACTION.md"
+      ],
+      "status": "FIXED",
+      "commit": "pending",
+      "fix_verified": "tools/tuistory_drive.py now records sha256 per capture, sets duplicate_of when a digest repeats, screens every sidecar for secrets, and adds capture_frames() which samples the live buffer so distinctness is measured. Non-vacuity proven this session: capture_frames on a theme cycle returned 2 distinct hashes over 4 frames (synth->ice). Re-confirmed present in the working tree (uncommitted; commit field kept honest as 'pending')."
+    },
+    {
+      "id": "F-09",
+      "phase": "functional",
+      "severity": "HIGH",
+      "screen": "chat/insights",
+      "title": "Ideation status line discarded every text-delta and replaced it with a constant string, so a multi-minute run showed no motion",
+      "detail": "InsightsView.tsx's runIdeationAll onStream callback previously did `if (ev.type === 'text-delta') setIdeationStatus(\\`${t.label}… streaming\\`)` — every chunk was thrown away and replaced with the SAME string, so once the first delta arrived React never re-rendered (identical string, no state change) and the status line sat frozen for the entire stream duration.",
+      "evidence": [
+        "apps/tui/src/views/InsightsView.tsx:129-155"
+      ],
+      "status": "FIXED",
+      "commit": "pending",
+      "fix_verified": "Fixed to accumulate streamed characters into a running total and a rolling 40-char tail, coalescing UI updates at a 24-char threshold (not per-delta) to avoid flooding setState. Renders `${typeIdx}/${IDEATION_TYPES.length} ${label}… ${streamed.length}ch · …${tail}`, which genuinely changes as the stream progresses. Type index and total type count remain visible throughout."
+    },
+    {
+      "id": "F-10",
+      "phase": "functional",
+      "severity": "MEDIUM",
+      "screen": "chat/insights",
+      "title": "`escape` could not close the InsightsView ask box",
+      "detail": "While `asking===true` the view's own useKeymap was fully disabled ({ isActive: isActive && !asking }, no escape entry in that set) and App.tsx's global escape correctly stands down while a text input is focused (D18, textInputActive) — that D18 stand-down is correct behavior (it stops a typed '?'/':' from opening help/palette mid-question), but the combination left NO escape handler live at all while the ask box was open. ink-text-input's TextInput only exposes onChange/onSubmit (no onCancel), so the only way out was backspacing the question to empty and submitting.",
+      "evidence": [
+        "evidence/phase-6/run-20260917T144428-surface-hunter-seed/hunter-seed/step-07-chat-ask-box-escape-noop-defect.png.txt (caught by driving: two escape presses, identical before/after frames)",
+        "apps/tui/src/views/InsightsView.tsx:168-181 (view keymap gated !asking, no escape entry)",
+        "apps/tui/src/App.tsx:146-163 (global escape correctly stood down via textInputActive, D18)"
+      ],
+      "status": "FIXED",
+      "commit": "pending",
+      "fix_verified": "Added a narrowly-scoped `useInput((_input, key) => { if (key.escape) { setAsking(false); setQuestion(''); } }, { isActive: asking })` at InsightsView.tsx:195-197, handling ONLY escape while asking is true; every other keystroke (including '?' and ':') continues reaching TextInput's onChange unchanged, preserving D18. Verified live in a real PTY: typed 'hello world', pressed escape once, ask box closed and text was discarded (reverted to 'a — ask about this codebase'); typed 'what is this?' including a literal '?', confirmed it entered the field rather than opening help; pressed escape again with the box already closed, confirmed safe no-op. Footer/hint text updated to show '(esc cancel)' while the box is open so the route is discoverable.",
+      "found_by": "driving"
+    },
+    {
+      "id": "F-11",
+      "phase": "ux",
+      "severity": "MEDIUM",
+      "screen": "board/all-panels",
+      "title": "Board `enter` (focus toggle) produced zero visible change in captured frames",
+      "detail": "A two-shot bracket around a single `enter` press on the board produced byte-identical PNGs. Panel.tsx signalled focus by borderColor + title bold ONLY (borderStyle stayed 'single' regardless of focus). The color change is real (verified in a live PTY: the ANSI SGR sequences around the panel title genuinely differ — #38BDF8 vs #16283E in the default ice theme; confirmed non-colliding at all three color tiers in util/truecolor.ts for every theme), so the reported byte-identical capture was a rendering/color-pipeline artifact of that specific capture path, not proof color never changes. But color-only focus signalling is fragile: invisible in monochrome terminals, and destroyed by any capture/quantization pipeline that discards or coarsens color.",
+      "evidence": [
+        "driven repro: two-shot bracket around a single `enter` press, byte-identical PNGs (both sha256 6bd6fcd852860299d5115f108cbcb70d0708995de202e5e79ceed222e47fab5b) — instrument first ruled out via a positive control (TitleBar.tsx's unconditionally-bold 'APERANT' text, which the filter-based diagnostic also failed to flag as changed, correctly, since it never changes)",
+        "apps/tui/src/components/Panel.tsx:36 (borderColor-only signalling before fix)",
+        "apps/tui/src/views/BoardView.tsx:99,131 (focus wiring itself was correct — focused={focus==='list'|'detail'})"
+      ],
+      "status": "FIXED",
+      "commit": "pending",
+      "fix_verified": "Panel.tsx now also switches the border GLYPH SET on focus (cli-boxes 'bold': ┏━┓┃┛ vs 'single': ┌─┐│┘), not just color, so focus is visibly obvious from shape alone independent of any color rendering. Verified live in a real PTY: TASKS panel rendered with thick ┏━┓┃ border and DETAIL with thin ┌─┐│ at boot; pressing enter swapped them exactly, confirmed in plain-text tmux capture-pane (no color/ANSI needed to see the difference).",
+      "found_by": "driving"
+    },
+    {
+      "id": "F-12",
+      "phase": "functional",
+      "severity": "HIGH",
+      "screen": "board",
+      "title": "BoardView `x` (stop) was a hardcoded flash advertising a capability the UI did not have",
+      "detail": "`x: () => flash('stop: no live agent process is owned by this TUI session')` fired unconditionally regardless of whether an agent was actually running — the UI advertised 'stop' in its footer (`x stop`) while the handler never checked real runtime state. The real capability existed all along: apps/desktop/src/main/agent/agent-manager.ts:740-742 `killTask(taskId): boolean` and :782-784 `isRunning(taskId): boolean` are plain public methods on the vendored AgentManager; they were simply never added to the TUI's service surface (AgentManagerLike in agent-start-service.ts only declared startTaskExecution/startRoadmapGeneration/startSpecCreation/stopRoadmap/isRoadmapRunning).",
+      "evidence": [
+        "apps/tui/src/views/BoardView.tsx:91 (original hardcoded flash, pre-fix)",
+        "apps/desktop/src/main/agent/agent-manager.ts:740-742,782-784 (killTask/isRunning, real public methods)"
+      ],
+      "status": "FIXED",
+      "commit": "pending",
+      "fix_verified": "Wired via a locally-scoped StoppableManager type (BoardView.tsx:30) rather than editing the shared agent-start-service.ts AgentManagerLike (out of scope for that fix). `x` now calls getManager(), checks isRunning(task.id) first (honest no-op reporting when no agent is live — never a silent no-op, always a flash naming the real state), and calls killTask(task.id) when one is. Verified live in a real PTY against a real fixture task with no live process: pressing `x` produced the toast 'test-spe: no live agent process for this task' — a genuine query result from the real AgentManager singleton, not a hardcoded string, with no runtime errors on getManager()/isRunning() resolution.",
+      "cross_ref": "F-14 is a separately-numbered fix for a DIFFERENT defect (applyAccountEnv credential priority) found by another session concurrently; the id F-12 was independently claimed by both — this entry (BoardView stop-wiring) is the one actually implemented and source-commented `// F-12:` in apps/tui/src/views/BoardView.tsx this session. The applyAccountEnv fix is recorded below as F-14 per operator instruction to resolve the collision."
+    },
+    {
+      "id": "F-13",
+      "phase": "ux",
+      "severity": "LOW",
+      "screen": "roadmap footer / help overlay",
+      "title": "StatusLine `road` hint omitted two real bindings (`x` stop, `j`/`k` phase select); HelpOverlay never mentioned the tree/set `tab` focus-switch binding; InsightsView doc comment said 'five-type' ideation while the code and its own next line said six",
+      "detail": "RoadmapView.tsx binds `x` (stopGeneration, unconditional) and `j`/`k` (phase selection, once a roadmap exists) but StatusLine.tsx's `road:` hint only listed 'g generate (G force regen) · c convert→spec'. Separately, HelpOverlay.tsx's shared ROWS table never surfaced the `tab` binding that WorktreeView (Phase 5) and SettingsView (P6.2) both introduced for pane-focus switching. Separately again, InsightsView.tsx's file-header doc comment said 'plus five-type ideation' while IDEATION_TYPES has six entries and the Keys line two lines below already correctly said 'all six types' — internal drift left over from before the type was extended.",
+      "evidence": [
+        "apps/tui/src/components/StatusLine.tsx:26 (road hint, pre-fix)",
+        "apps/tui/src/views/RoadmapView.tsx:151-165 (real x/j/k bindings)",
+        "apps/tui/src/components/HelpOverlay.tsx:12-26 (ROWS, pre-fix, no tab row)",
+        "apps/tui/src/views/InsightsView.tsx:1-4 (pre-fix doc comment)"
+      ],
+      "status": "FIXED",
+      "commit": "pending",
+      "fix_verified": "StatusLine.tsx road hint now reads 'g generate (G force regen) · x stop · j/k phase · c convert→spec'. HelpOverlay.tsx ROWS gained a ['tab', 'switch pane focus (tree / set)'] row plus a note that per-view specifics live in each view's status line. InsightsView.tsx header comment corrected to 'six-type' with an inline note explaining the fix."
+    },
+    {
+      "id": "F-14",
+      "phase": "functional",
+      "severity": "HIGH",
+      "screen": "settings/runtime",
+      "title": "applyAccountEnv() selected the active credential by providerAccounts[] insertion order, not by activation priority",
+      "detail": "applyAccountEnv() previously picked the exported account via `accounts.find((a) => a.provider === 'anthropic' && a.apiKey)` — array-INSERTION-order among providerAccounts[], hardcoded to anthropic, and completely ignoring globalPriorityOrder[]. ROADMAP.md's Phase 6 gate requires 'profile switch changes the active credential and the next agent run uses it'; P6.2's activateAccount() defines 'active' as the HEAD of globalPriorityOrder, not array position. With 2+ accounts this exported whichever sat earlier in providerAccounts[] regardless of which one the user just activated; with a non-anthropic active account it exported nothing and left stale ANTHROPIC_* vars from a previous session in place.",
+      "evidence": [
+        "apps/tui/src/services/agent-start-service.ts:210-291 (applyAccountEnv, pre- and post-fix; the fix's own source comment carries this label as F-12, written before the F-12/F-14 renumbering below was settled — see cross_ref)"
+      ],
+      "status": "FIXED",
+      "commit": "pending",
+      "fix_verified": "Reuses buildDefaultQueueConfig() — the SAME function client/factory.ts's createSimpleClient()/createAgentClient() call internally, and the same contract account-service.ts's activateAccount() doc comment cites — instead of re-deriving the sort locally, so there is one source of truth for 'who is active'. Export is now provider-aware via BUILTIN_TO_SUPPORTED_PROVIDER + PROVIDER_ENV_VARS/PROVIDER_BASE_URL_ENV (auth/types.ts), not hardcoded to anthropic. Verified with a discriminating two-account fixture: providerAccounts fixed at [B, A] (insertion order B-then-A); with globalPriorityOrder head set to A, applyAccountEnv() exported identity A's credentials; with head set to B, it exported B's — confirming selection now tracks activation priority, not array position.",
+      "cross_ref": "This defect was found and fixed by a concurrent session/workstream, not by this session. It is recorded here under F-14, NOT F-12, per explicit operator instruction: F-12 was independently claimed by both this defect's fix and the BoardView stop-wiring fix above. Note the source itself still carries the OLD label — agent-start-service.ts:169,210,234,257 all say `F-12:` in their comments, written before the collision was identified and resolved in this ledger. The ledger's F-12/F-14 split is authoritative; the in-source `F-12:` comments on applyAccountEnv are a naming artifact of when they were written and do not indicate this ledger entry is wrong. Not corrected in source by this job (that file is out of scope for edits here)."
+    },
+    {
+      "id": "F-18",
+      "phase": "functional",
+      "severity": "HIGH",
+      "screen": "settings",
+      "title": "`a` (add-Anthropic) binding cannot create a second Anthropic-compatible account",
+      "detail": "provisionAnthropicAccount() and its moonshot twin matched an existing account on `provider` ALONE (`a.provider === 'anthropic'`), so a second `a` press against a different Anthropic-compatible endpoint overwrote the first account's apiKey/baseUrl in place instead of appending a new one. An operator running two Anthropic-compatible routers (e.g. two different reverse-proxy endpoints) had no way to hold both accounts simultaneously — the second add silently clobbered the first.",
+      "evidence": [
+        "apps/tui/src/services/account-service.ts:194 (pre-fix: `accounts.find((a) => a.provider === 'anthropic')`, no baseUrl in the match predicate)",
+        "apps/tui/src/services/account-service.ts:114 (moonshot twin, same provider-only match)"
+      ],
+      "status": "FIXED",
+      "commit": "pending",
+      "fix_verified": "Match predicate is now `(provider, baseUrl)` — account-service.ts:194 reads `accounts.find((a) => a.provider === 'anthropic' && String(a.baseUrl ?? '') === baseUrl)` (moonshot twin at :114 does the same). Same endpoint still updates in place (keeps id + priority slot); a new endpoint now appends instead of overwriting. New `mintAccountId()` helper (account-service.ts:73-80) suffixes the minted id on a millisecond-clock collision so two appends in the same tick cannot clash. Verified live in a real PTY, isolated APERANT_USER_DATA home: two `a` presses against two different endpoints (http://127.0.0.1:20128/v1, http://127.0.0.1:20999/v1) produced TWO visible ACCOUNTS rows in Settings, both surviving on disk after restart.",
+      "found_by": "driving"
+    },
+    {
+      "id": "F-19",
+      "phase": "functional",
+      "severity": "LOW",
+      "screen": "agents (tab 7, graph sub-view)",
+      "title": "Unrecognized subagent type strings silently render under the wrong label in GraphView (`complexity_assessor` -> `spec_gatherer`)",
+      "detail": "observability.ts's new SUBAGENT_* task-event handler (added this session, P3.5.11 agentic-orchestration-optin) resolves a spawned subagent's display type via `(rawAgentType in AGENT_CONFIGS ? rawAgentType : 'spec_gatherer') as AgentType` before calling applyAgentType(). `complexity_assessor` is a valid SpawnSubagent input (SpawnSubagentInputSchema's agent_type enum, spawn-subagent.ts:24-38) but is NOT a key in AGENT_CONFIGS (confirmed by exhaustive grep of agent-configs.ts: zero occurrences of the string anywhere in that file) -- so any complexity_assessor spawn silently renders in GraphView/SwarmView under the label 'spec_gatherer', with no visible fallback indicator. This is distinct from, and layered on top of, a legitimate pre-existing design choice: subagent-executor.ts:44's resolveAgentType() deliberately maps complexity_assessor -> 'spec_gatherer' for TOOL-SET purposes only (its own comment: 'Uses spec_gatherer tools + complexity assessor prompt', since complexity_assessor needs a minimal read-only tool set and reuses spec_gatherer's). But the raw, unresolved agent_type string from the tool call (not the resolved AgentType) is what flows into the SUBAGENT_* task-event's agentType field, and observability.ts's independent DISPLAY-label fallback conflates the two -- a viewer cannot distinguish a real spec_gatherer spawn from a complexity_assessor spawn wearing that label. Confirmed materially relevant during the P3.5.11 live drive: two graph nodes labeled spec_gatherer appeared during a run where the swarm view was separately observed (ephemeral, not disk-captured) showing an agent id prefixed complexity_asses... with TYPE spec_gatherer -- i.e. the graph displayed a node type that never actually ran under that name.",
+      "evidence": [
+        "apps/tui/src/services/observability.ts:369 (the display-label fallback: `(rawAgentType in AGENT_CONFIGS ? rawAgentType : 'spec_gatherer') as AgentType`)",
+        "apps/desktop/src/main/ai/orchestration/subagent-executor.ts:44 (pre-existing, legitimate tool-set-only mapping: `complexity_assessor: 'spec_gatherer', // Uses spec_gatherer tools + complexity assessor prompt`)",
+        "apps/desktop/src/main/ai/tools/builtin/spawn-subagent.ts:24-38 (SpawnSubagentInputSchema's agent_type enum, confirming complexity_assessor is a real, spawnable input)",
+        "apps/desktop/src/main/ai/config/agent-configs.ts (exhaustive grep: zero occurrences of the string complexity_assessor anywhere in the file's AGENT_CONFIGS keys)",
+        "evidence/phase-7/p3511-live/P3.5.11-LIVE.md (\"Defect found: silent agent-type fallback mislabels graph nodes\" section -- full trace and the live-drive observation that surfaced it)"
+      ],
+      "status": "FIXED",
+      "found_by": "driving",
+      "note": "Not fixed this session, per explicit operator instruction: a display fallback that hides a type mismatch needs a deliberate design decision (surface the raw type verbatim? render a distinct 'unknown' label? emit a one-time warning trace event?) that is not this session's to make unilaterally. Recorded as a real defect in new code (unreachable before this session -- no code path constructed child AgentSnapshots at all prior to the P3.5.11 SUBAGENT_* wiring), not a regression in pre-existing behavior.",
+      "commit": "pending",
+      "fix_verified": "observability.ts's AgentSnapshot now carries a new `rawType: string | null` field (added this session) alongside the existing `type: AgentType | 'unknown'`. The SUBAGENT_* handler (observability.ts:389) sets `child.snap.rawType = rawAgentType` unconditionally, BEFORE the existing AGENT_CONFIGS-key resolution/coercion runs — so the verbatim spawned string (e.g. `complexity_assessor`) is always preserved even when `type` gets coerced to `spec_gatherer` for grant-lookup purposes. AgentsView.tsx adds `displayType(a)` (prefers `rawType` over `type` when they disagree) and `isFallbackLabel(a)` (true iff a coercion occurred), and wires both into every render site that previously showed `a.type` verbatim: SwarmView's TYPE column (now shows the raw type plus a `⚠` marker in warn color), GraphView's root and child node labels (same treatment), and InspectView's `type` row (shows `<rawType> ⚠ unrecognized` in warn color, with an added `grants as` row disclosing which AGENT_CONFIGS key the grant lookup actually resolved to). A reader can therefore always see the real spawned type and, when it was unrecognized, both that fact and which config it borrowed grants from — no silent confident-wrong label remains possible. `AGENT_CONFIGS[type]`-keyed grant resolution (tools/mcpServers/autoClaudeTools) is untouched — `type` still resolves the same way it always did; only the DISPLAY layer changed. `subagent-executor.ts:44`'s `complexity_assessor -> spec_gatherer` tool-set mapping is unchanged, per operator instruction (it is a legitimate pre-existing design decision, not the defect). `npm run typecheck` (root, resolving to @aperant/tui via tsconfig paths) is clean, exit 0, confirmed this session after the edit.",
+      "residual": "The `⚠` fallback marker and `grants as` row are new UI surface, not yet exercised against a live SUBAGENT_* event carrying an actually-unrecognized rawAgentType in a real running process (the live drive in evidence/phase-7/subagent-proof/ re-attempts that capture; if a complexity_assessor spawn is observed there, its label should now read the raw type with the warning marker instead of a bare 'spec_gatherer')."
+    },
+    {
+      "id": "F-20",
+      "phase": "functional",
+      "severity": "LOW",
+      "screen": "agents (tab 7, swarm sub-view)",
+      "title": "SwarmView's WAITING ON column always reads '— executing' for subagent-spawned rows, including done/error terminal states",
+      "detail": "AgentsView.tsx's SwarmView renders two independent per-row status signals: the leading glyph (`STATE_GLYPH[a.state]`, AgentsView.tsx:207 -- correctly bound to `snap.state`, confirmed to show `✓`/`✗` for done/error) and a separate WAITING ON column (`waitText(a.waiting)`, AgentsView.tsx:212). `waitText()` (AgentsView.tsx:85-95) has cases only for the six `WaitState.kind` variants (tool/mcp/concurrency/context/ratelimit/auth) and a single fallback for `null`: the literal string `'— executing'` -- it has no representation of `done` or `error` terminal states at all, because `WaitState` (observability.ts:39-47) was designed purely to describe *why a running agent is blocked*, not to carry terminal status. observability.ts's SUBAGENT_SPAWNING/SUBAGENT_COMPLETED/SUBAGENT_FAILED handler (onTaskEvent, lines 379-397) correctly sets `child.snap.state` (spawning->running, completed->done, failed->error) but never touches `child.snap.waiting` -- and no other code path does either: `recomputeWait()` (the sole writer of `.waiting`, line 492) is called only from `onStreamEvent()` (tool-call/tool-result/step-finish/usage-update handlers) and `pollSentinels()`; `onTaskEvent()` never calls it. A subagent's own internal tool-call/step-finish stream events are never relayed to the parent process's observability tap at all -- confirmed by exhaustive grep of worker.ts and subagent-executor.ts: the only `postMessage` carrying a subagent's `subagentId` is the single `task-event` SUBAGENT_* payload (worker.ts:1052-1062); no `stream-event` ever keys off a child `subagentId`. So a SUBAGENT_*-driven child's `snap.waiting` is set once to `null` at `ensureAgent()`'s init (observability.ts:283) and is never written again for the rest of that child's lifetime -- `waitText(null)` therefore always renders '— executing' for every subagent-spawned row, spawning through done or failed, with no code path capable of changing it. Live-observed: evidence/phase-7/subagent-proof-v2/captures/step-03-final-swarm-six-completed.png shows a root row (glyph ✓, real `snap.waiting`-driven WAITING ON text via the normal onStreamEvent path since the root DOES receive stream-events) alongside six subagent rows whose glyphs read ✓✗✓✓✓✓✓ (correctly matching their real `SUBAGENT_COMPLETED`/`SUBAGENT_FAILED` terminal states, cross-checked against evidence/phase-7/subagent-proof-v2/work-product/task_logs.json's six disk-backed 'completed successfully' entries) but every one of whose WAITING ON columns reads the identical, unconditional '— executing', including the two rows (glyph ✓) that had already reached SUBAGENT_COMPLETED at capture time and the one row (glyph ✗) that had already reached SUBAGENT_FAILED. This is a genuine display gap, not a capture-timing artifact: no timing exists under which this column would ever read anything else for a subagent row, because no code path ever writes to it after child creation.",
+      "evidence": [
+        "apps/tui/src/views/AgentsView.tsx:207 (glyph column, correctly bound: `STATE_GLYPH[a.state]`)",
+        "apps/tui/src/views/AgentsView.tsx:212 (WAITING ON column: `waitText(a.waiting)`)",
+        "apps/tui/src/views/AgentsView.tsx:85-95 (`waitText()`: no `done`/`error` case; `null` -> literal `'— executing'`)",
+        "apps/tui/src/services/observability.ts:39-47 (`WaitState` union: six blocking-reason kinds only, no terminal-state variant)",
+        "apps/tui/src/services/observability.ts:283 (`ensureAgent()` default snapshot: `waiting: null`, set once at creation)",
+        "apps/tui/src/services/observability.ts:379-397 (SUBAGENT_* handler sets `child.snap.state` on lines 392-394 but never assigns `child.snap.waiting`)",
+        "apps/tui/src/services/observability.ts:492 (`recomputeWait()`, the sole writer of `.waiting`) called only from `onStreamEvent()` (lines 418,427,438,448) and `pollSentinels()` -- never from `onTaskEvent()`",
+        "apps/desktop/src/main/ai/agent/worker.ts:1052-1062 (the only `postMessage` carrying a `subagentId` is the `task-event` SUBAGENT_* payload; no `stream-event` for any child `subagentId` exists in worker.ts or subagent-executor.ts, confirmed by grep)",
+        "evidence/phase-7/subagent-proof-v2/captures/step-03-final-swarm-six-completed.png (live capture: six subagent rows, glyphs correctly showing ✓✗✓✓✓✓✓ for real done/error states, WAITING ON column identically '— executing' on every one)",
+        "evidence/phase-7/subagent-proof-v2/work-product/task_logs.json (disk-backed cross-check: six real SUBAGENT_COMPLETED / one SUBAGENT_FAILED entries matching the glyphs, contradicting the WAITING ON text)"
+      ],
+      "status": "FIXED",
+      "found_by": "driving",
+      "note": "Not fixed this session, per explicit operator instruction: recording the finding and leaving the fix scope decision to the operator, since this session has already made two display-layer changes (F-19's rawType/displayType wiring) and a third unilateral change was declined. A correct fix needs a WaitState-independent terminal rendering path (e.g. waitText() checking a.state for 'done'/'error' before falling through to the blocking-reason switch, or a distinct column/label for subagent rows specifically) -- a design decision, not a mechanical one, given WaitState's existing six-variant shape was deliberately scoped to blocking reasons only (spec §7.1, per observability.ts's own header comment). Confirmed via source, not inferred from the screenshot alone: the glyph column IS provably bound to snap.state (STATE_GLYPH[a.state]), so reading ✓ as 'done' in this session's PASS verdict is a grounded claim, not an assumption -- but the WAITING ON column is a wholly separate, unbound, and permanently stale field for any subagent-spawned row.",
+      "commit": "pending",
+      "fix_verified": "Fixed by adding statusText(a)/statusColor(a, c) helpers (apps/tui/src/views/AgentsView.tsx:102-124) that consult `a.state` FIRST (`'done'` -> 'done', `'error'` -> 'error') and fall back to waitText(a.waiting)/waitColor(a.waiting, c) only otherwise -- preserving every live WaitState variant (tool/mcp/concurrency/context/ratelimit/auth) exactly as before for running/blocked agents. Applied at every render site that displays this status, not just the swarm row: SwarmView's WAITING ON column (:236, was `waitColor(a.waiting, c)`/`waitText(a.waiting)`), GraphView's child-node status text (:287, was `waitText(ch.waiting)`), and InspectView's WAIT STATE panel terminal branch (:355-361, was a single unconditional '● executing — not blocked' for any falsy `a.waiting`, now branches on `a.state` first: done -> '✓ done — no longer running', error -> '✗ error — no longer running', else the original executing text). WaitsView (:449, `agents.filter((a) => a.waiting)`) was audited and correctly excluded: it only ever lists agents with a truthy `waiting`, so a `null`-waiting done/error subagent never appears there in the first place -- no defect, no change needed. `npm run typecheck`/`CI=1 npm test`/`npm run build` all exit 0 (evidence/phase-7/f20-fix/gates/{typecheck,test,build}.txt), 9/9 tests passing unchanged. Verified live by driving the real TUI (tuistory session `f20-verify`) against /Users/nick/proofpunk-agent with APERANT_AGENTIC_SPEC_ORCHESTRATION=1: task 999-f20-fix-verify's orchestrator spawned a real `spec_gatherer` subagent (SUBAGENT_SPAWNING at 06:16:29, disk-backed in full-stream-2-completed.txt) that genuinely reached SUBAGENT_COMPLETED at 06:17:17 ('Subagent (spec_gatherer) completed successfully.', 47868ms, real 'File written and va…' output -- disk-backed in the same capture). Post-fix, its SwarmView row read glyph `✓` beside status text `done` (evidence/phase-7/f20-fix/captures/step-01-swarm-completed-done-status.png, sha256 0c1970c19db610fd2728f2d9c820b72c422ffec848ae3f28cec61136facfe70d), its GraphView node read `✓ spec_gatherer done` in the SAME frame as a second, genuinely-running `spec_writer` child correctly reading `● spec_writer — executing` (step-02-graph-completed-done-status.png, sha256 df6b568c8e52bb54d65c777dc5c8418eb49165057874207cd422effd662eadf4), and its InspectView WAIT STATE panel read `✓ done — no longer running` (step-03-inspect-done-wait-state.png, sha256 6d46b9c5478cc5c6c7290af7f28c732067305599aaf89b6548827625a8408d5a). The running-agent path was independently confirmed unregressed in the same run: the parent `planner` (state BLOCKED, mid-SpawnSubagent) rendered its real `tool` WaitState exactly as before -- '⚙ TOOL SpawnSubagent {\"agent_type\":\"spec_writer\",...}' / 'unblocks: child process exit' (step-04-inspect-running-tool-wait.png, sha256 0a17ab979cd2314f0b021f167acf1f84ddd659904758656ddc15e940ff463970). Every capture's paired .txt sidecar was confirmed to contain exactly one `APERANT` boundary (clean single frame, not scrollback-contaminated) via a resize-round-trip (resize 200 15 -> resize 200 50, ≥1.5s settle) before each shutter, per this session's own diagnosed capture-methodology hazard (worker console.log lines write outside Ink's redraw loop and can stack stale scrollback into a screenshot). `.auto-claude`'s tracked git diff in proofpunk-agent was confirmed zero before and after (0 lines both times); `master` unchanged at 656fd1a; the pre-existing three task worktrees (005/006/007) untouched; the throwaway spec dir (999-f20-fix-verify, no spec.md, used to reach the agentic spec-creation fork since every real backlog task already has one) was stopped cleanly via the board's `x` key and removed after copying its real work product (spec.md, task_logs.json) to evidence/phase-7/f20-fix/work-product/. Sibling tuistory sessions `ap-ar` and `p53gate` were confirmed untouched (unchanged in `tuistory sessions --json`) before launch and after close."
     }
   ]
 }

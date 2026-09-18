@@ -1,0 +1,18 @@
+
+> aperant-tui-workspace@0.1.0 build
+> npm run build -w @aperant/tui
+
+
+> @aperant/tui@0.1.0 build
+> node ../../tools/build-worker.mjs && node ../../tools/build-cli.mjs
+
+worker bundle: /Users/nick/dev/aperant-tui/apps/tui/dist/agent-worker.cjs (4.52 MB)
+cli bundle: /Users/nick/dev/aperant-tui/apps/tui/dist/cli.mjs (6.34 MB)
+
+  dist/agent-worker.cjs  4.5mb ⚠️
+
+⚡ Done in 72ms
+
+  dist/cli.mjs  6.3mb ⚠️
+
+⚡ Done in 95ms

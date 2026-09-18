@@ -1,0 +1,3 @@
+AI resolved 1 file(s) — NOT committed: review in the diff pane, then `git add` / `git commit` yourself
+
+(full text captured across two independent methods: 1) tuistory capture-frames with 2000ms interval spanning the full streaming duration on the initial 3-attempt run, frame 1 of 12; 2) tuistory capture-frames with 300ms interval on the timing-probe run, frames 9-14 (~2.7s-4.2s after R), which then guided a precisely-timed live `screenshot` capture landing inside the same toast window -- see step-06-f16v-toast-live.png)

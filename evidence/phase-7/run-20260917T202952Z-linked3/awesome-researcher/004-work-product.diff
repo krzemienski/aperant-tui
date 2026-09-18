@@ -1,0 +1,383 @@
+diff --git a/awesome_researcher/parsers/markdown_parser.py b/awesome_researcher/parsers/markdown_parser.py
+index a3fc838..a3d4ed4 100644
+--- a/awesome_researcher/parsers/markdown_parser.py
++++ b/awesome_researcher/parsers/markdown_parser.py
+@@ -8,8 +8,9 @@ structure is shallow and the libraries (mistune/markdown) are not installed.
+ What we KEEP: http(s) resource links that sit under a category heading.
+ What we DROP: badge images ``![alt](src)`` and link-wrapped badges
+ ``[![alt](src)](href)``, the Table of Contents (in-page ``#anchor`` links),
+-back-to-top links, italic category-description prose, and any HTML/inline-prose
+-links. No-description links are retained with ``description=None`` — never
++back-to-top links, and italic category-description prose. Inline-HTML
++resource links (``<a href="http...">``) are additionally recovered via an
++optional BeautifulSoup fallback. No-description links are retained with ``description=None`` — never
+ dropped.
+ """
+ 
+@@ -143,6 +144,48 @@ def _clean_title(title: str) -> str:
+     return t
+ 
+ 
++def _extract_html_links(line: str) -> list[tuple[str, str, str | None]]:
++    """Extract resource links from a line containing inline HTML.
++
++    Uses BeautifulSoup (``html.parser``) lazily so environments without bs4
++    degrade to the regex-only behavior. Returns ``(title, url, description)``
++    tuples for each ``<a href="http(s)://...">`` anchor found. The anchor text
++    becomes the title; a trailing text node after a separator (``-``, ``—``,
++    ``:``) becomes the description when present.
++    """
++
++    try:
++        from bs4 import BeautifulSoup  # lazy: optional dependency
++    except ImportError:
++        return []
++
++    links: list[tuple[str, str, str | None]] = []
++    try:
++        soup = BeautifulSoup(line, "html.parser")
++    except Exception:
++        return []
++
++    for anchor in soup.find_all("a", href=True):
++        url = (anchor.get("href") or "").strip()
++        if not _is_resource_url(url):
++            continue
++        title = _clean_title(anchor.get_text())
++        description: str | None = None
++        # Text after the anchor on the same line may hold a description
++        # (" - Description" / " — Description" / ": Description").
++        tail = ""
++        node = anchor.next_sibling
++        while node is not None:
++            if getattr(node, "name", None) is None:
++                tail += str(node)
++            node = node.next_sibling
++        m = re.match(r"\s*[-—:]\s*(.*\S)", tail)
++        if m:
++            description = m.group(1).strip()
++        links.append((title or url, url, description))
++    return links
++
++
+ def parse_markdown(text: str) -> ParsedList:
+     """Parse Awesome-list markdown into a :class:`ParsedList`.
+ 
+@@ -190,6 +233,21 @@ def parse_markdown(text: str) -> ParsedList:
+ 
+         item = _ITEM_RE.match(line)
+         if not item:
++            # Fallback: a line with inline HTML (e.g. ``<a href="...">T</a>``)
++            # that the markdown regex misses. bs4 extracts resource links; the
++            # line index still points at the original source line so the
++            # SourcePatcher round trip stays byte-exact.
++            if "<a " in line:
++                for html_title, html_url, html_desc in _extract_html_links(line):
++                    current.items.append(
++                        ParsedItem(
++                            title=html_title,
++                            url=html_url,
++                            description=html_desc,
++                            raw_line=line.strip(),
++                        )
++                    )
++                    current.last_item_line = lineno
+             continue
+ 
+         url = item.group("url").strip()
+diff --git a/tests/test_phase3_parsers.py b/tests/test_phase3_parsers.py
+index 917e728..1ae7fd4 100644
+--- a/tests/test_phase3_parsers.py
++++ b/tests/test_phase3_parsers.py
+@@ -255,3 +255,167 @@ def test_source_patcher_unknown_category_becomes_appended_section():
+     assert "## Nonexistent Category" in result.markdown
+     # Original content still fully present.
+     assert "A curated list of awesome things." in result.markdown
++
++# -- subtask 1-3: extended spec-coverage tests ---------------------------------
++
++# (a) Deeply nested headings: H2 > H3 > H4.
++DEEP_NESTED = """\
++## Libraries
++
++### Web Frameworks
++
++#### Routers
++
++- [chi](https://github.com/go-chi/chi) - Lightweight router.
++
++#### Middleware
++
++- [negroni](https://github.com/urfave/negroni) - Idiomatic middleware.
++
++### Databases
++
++- [pg](https://github.com/go-pg/pg) - PostgreSQL ORM.
++
++## Tools
++
++- [gofmt](https://pkg.go.dev/cmd/gofmt) - Formatter.
++"""
++
++def test_deep_nested_headings_parent_and_is_leaf():
++    parsed = parse_markdown(DEEP_NESTED)
++    by_name = {c.name: c for c in parsed.categories}
++
++    libs = by_name["Libraries"]
++    assert libs.level == 2 and libs.parent is None and libs.is_leaf is False
++
++    web = by_name["Web Frameworks"]
++    assert web.level == 3 and web.parent == "Libraries" and web.is_leaf is False
++
++    routers = by_name["Routers"]
++    assert routers.level == 4 and routers.parent == "Web Frameworks"
++    assert routers.is_leaf is True
++    assert [it.title for it in routers.items] == ["chi"]
++
++    mw = by_name["Middleware"]
++    assert mw.level == 4 and mw.parent == "Web Frameworks" and mw.is_leaf is True
++    assert [it.title for it in mw.items] == ["negroni"]
++
++    dbs = by_name["Databases"]
++    assert dbs.level == 3 and dbs.parent == "Libraries" and dbs.is_leaf is True
++    # A later same-level H3 does not keep Web Frameworks a leaf.
++    assert web.is_leaf is False
++    assert by_name["Tools"].is_leaf is True
++
++# (b) Every separator style plus emphasis-wrapped titles.
++SEPARATORS = """\
++## Mixed
++
++- [Dash](https://example.com/dash) - Hyphen description.
++- [Em](https://example.com/em) — Em dash description.
++- [Colon](https://example.com/colon): Colon description.
++- [**Bold**](https://example.com/bold) - Bold title.
++- [*Ital*](https://example.com/ital) — Italic title.
++- [`Code`](https://example.com/code) - Code title.
++"""
++
++def test_all_separator_styles_and_emphasis_titles():
++    parsed = parse_markdown(SEPARATORS)
++    cat = _find(parsed, "Mixed")
++    assert cat is not None
++    by_title = {it.title: it for it in cat.items}
++    assert set(by_title) == {"Dash", "Em", "Colon", "Bold", "Ital", "Code"}
++    assert by_title["Dash"].description == "Hyphen description."
++    assert by_title["Em"].description == "Em dash description."
++    assert by_title["Colon"].description == "Colon description."
++    # Emphasis markers stripped from titles, descriptions captured for each.
++    assert by_title["Bold"].description == "Bold title."
++    assert by_title["Ital"].description == "Italic title."
++    assert by_title["Code"].description == "Code title."
++
++# (c) Non-link content must be excluded yet never shift line indices.
++NON_LINK = """\
++# Awesome Go
++
++Curator prose paragraph, not an item.
++
++## Contents
++
++- [DB](#db)
++
++## DB
++
++_Some italic prose describing the category._
++
++- [![CI](https://img.shields.io/ci)](https://ci.example.com) - Badge bullet.
++- [pq](https://github.com/lib/pq) - Postgres driver.
++  - Nested sub-bullet with [a link](https://example.com/sub) under the item.
++  - More sub-prose.
++
++**[⬆ Back to top](#contents)**
++
++## Tail
++
++Plain paragraph only, no links.
++"""
++
++def test_non_link_content_excluded_and_indices_unshifted():
++    parsed = parse_markdown(NON_LINK)
++    db = _find(parsed, "DB")
++    assert db is not None
++    # Only the real resource; no badge, no anchor, no back-to-top, no sub-bullet.
++    assert [it.url for it in db.items] == ["https://github.com/lib/pq"]
++
++    lines = NON_LINK.splitlines()
++    # heading_line points at the actual "## DB" source line.
++    assert db.heading_line == lines.index("## DB")
++    # last_item_line points at the pq line — not the badge or sub-bullets.
++    pq_line = next(i for i, ln in enumerate(lines) if "pq](" in ln)
++    assert db.last_item_line == pq_line
++
++    # Tail prose did not become an item and did not shift anything.
++    tail = _find(parsed, "Tail")
++    assert tail is not None and tail.items == []
++    assert tail.heading_line == lines.index("## Tail")
++    assert tail.last_item_line == -1
++
++    # Zero-insert patch is still byte-exact with all this noise present.
++    from awesome_researcher.renderers.list_renderer import SourcePatcher
++
++    assert SourcePatcher().patch(parsed, []).markdown == NON_LINK
++
++# (d) Inline-HTML resource links land under the enclosing heading.
++HTML_LINKS = """\
++## Resources
++
++- [Normal](https://example.com/normal) - Markdown link.
++
++<center><a href="https://example.com/html">HTML Link</a> - Html description.</center>
++
++### Deeper
++
++<a href="https://example.com/deep">Deep HTML</a>
++
++<a href="#anchor">Not a resource</a>
++"""
++
++def test_html_links_extracted_under_correct_category():
++    parsed = parse_markdown(HTML_LINKS)
++    res = _find(parsed, "Resources")
++    deep = _find(parsed, "Deeper")
++    assert res is not None and deep is not None
++
++    urls = {it.url: it for it in res.items}
++    assert "https://example.com/html" in urls
++    html_item = urls["https://example.com/html"]
++    assert html_item.title == "HTML Link"
++    assert html_item.description == "Html description."
++    # The plain markdown link is unaffected by the HTML fallback.
++    assert "https://example.com/normal" in urls
++
++    deep_urls = [it.url for it in deep.items]
++    assert deep_urls == ["https://example.com/deep"]
++    assert deep.items[0].title == "Deep HTML"
++    # The #anchor HTML link is not a resource and must not appear anywhere.
++    for c in parsed.categories:
++        for it in c.items:
++            assert it.url != "#anchor"
+diff --git a/tests/test_phase3_roundtrip_fixtures.py b/tests/test_phase3_roundtrip_fixtures.py
+new file mode 100644
+index 0000000..d6a4573
+--- /dev/null
++++ b/tests/test_phase3_roundtrip_fixtures.py
+@@ -0,0 +1,118 @@
++"""Byte-exact round-trip tests against real Awesome-list fixtures.
++
++For each committed fixture README, parsing with :func:`parse_markdown` and
++re-patching with :class:`SourcePatcher` must reproduce the source byte for
++byte when nothing is inserted, and a single insert must change only the
++inserted lines (verified via :mod:`difflib`). Offline, real data — no network,
++no mocks.
++"""
++
++from __future__ import annotations
++
++import difflib
++from pathlib import Path
++
++import pytest
++
++from awesome_researcher.parsers.markdown_parser import parse_markdown
++from awesome_researcher.renderers.list_renderer import ResourceInsert, SourcePatcher
++
++FIXTURES_DIR = Path(__file__).parent / "fixtures"
++
++FIXTURES = [
++    "awesome-go.README.md",
++    "awesome-python.README.md",
++    "awesome-machine-learning.README.md",
++]
++
++
++def _load(name: str) -> str:
++    path = FIXTURES_DIR / name
++    assert path.exists(), f"missing fixture: {path}"
++    return path.read_text(encoding="utf-8")
++
++
++def _leaf_category_with_items(parsed):
++    """Pick a real leaf category with items whose name is unique in the file.
++
++    SourcePatcher matches categories by normalized name (last duplicate wins),
++    so the anchor assertions are only meaningful for uniquely-named categories.
++    """
++    names = {}
++    for cat in parsed.categories:
++        key = cat.name.strip().lower()
++        names[key] = names.get(key, 0) + 1
++    for cat in parsed.categories:
++        if (
++            cat.is_leaf
++            and cat.items
++            and cat.last_item_line >= 0
++            and names[cat.name.strip().lower()] == 1
++        ):
++            return cat
++    return None
++
++
++@pytest.mark.parametrize("name", FIXTURES)
++def test_zero_insert_round_trip_is_byte_identical(name):
++    source = _load(name)
++    parsed = parse_markdown(source)
++    result = SourcePatcher().patch(parsed, inserts=[])
++    assert result.inserted == []
++    assert result.unmatched == []
++    assert result.markdown == source
++
++
++@pytest.mark.parametrize("name", FIXTURES)
++def test_fixture_yields_nontrivial_parse(name):
++    parsed = parse_markdown(_load(name))
++    assert len(parsed.categories) + parsed.item_count() > 50
++    assert parsed.item_count() > 0
++    assert any(cat.is_leaf and cat.items for cat in parsed.categories)
++
++
++@pytest.mark.parametrize("name", FIXTURES)
++def test_single_insert_changes_only_added_lines(name):
++    source = _load(name)
++    parsed = parse_markdown(source)
++    cat = _leaf_category_with_items(parsed)
++    assert cat is not None, "fixture has no leaf category with items"
++
++    insert = ResourceInsert(
++        title="Round-Tip Probe",
++        url="https://example.com/round-tip-probe",
++        description="Inserted by the round-trip test.",
++        category=cat.name,
++    )
++    result = SourcePatcher().patch(parsed, inserts=[insert])
++    assert len(result.inserted) == 1
++    assert result.unmatched == []
++
++    diff = list(
++        difflib.unified_diff(
++            source.splitlines(keepends=True),
++            result.markdown.splitlines(keepends=True),
++            n=0,
++        )
++    )
++    added = [l[1:] for l in diff if l.startswith("+") and not l.startswith("+++")]
++    removed = [l[1:] for l in diff if l.startswith("-") and not l.startswith("---")]
++    # Only additions: every original line survives untouched. The new bullet
++    # must reuse the category's local marker/indent (fixtures use both - and *).
++    assert removed == []
++    rec = result.inserted[0]
++    anchor = parsed.source_lines[cat.last_item_line]
++    stripped = anchor.lstrip()
++    indent = anchor[: len(anchor) - len(stripped)]
++    marker = stripped[:1] if stripped[:1] in "-*+" else "-"
++    expected = (f"{indent}{marker} [Round-Tip Probe](https://example.com/round-tip-probe)"
++                " - Inserted by the round-trip test.\n")
++    assert added == [expected]
++    assert rec.text == expected.rstrip("\n")
++    # The insert landed immediately after the category's last item line.
++    assert rec.after_line == cat.last_item_line
++    assert rec.matched_category == cat.name
++    # Removing the inserted line restores the source exactly.
++    patched_lines = result.markdown.splitlines(keepends=True)
++    restored = patched_lines[: rec.after_line + 1] + patched_lines[rec.after_line + 2 :]
++    assert "".join(restored) == source

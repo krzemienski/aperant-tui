@@ -1,0 +1,26 @@
+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ hunter-seed /Users/nick/dev/hunter-seed │ ⑂ main                                                                                                       ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ IDEATION · 6 types                                                                                                                                                                               │ │
+│ │ [q] Q&A  [1-6] ideation types  · index absent /Users/nick/dev/hunter-seed/.auto-claude/project_index.json                                                                                        │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ 1 Code Improvements 2 UI/UX 3 Docs Gaps 4 Security 5 Performance 6 Code Quality                                                                                                                  │ │
+│ │ · Split 1400-line harness/cli.py into subcommand modules and pipeline orchestration                                                                                                              │ │
+│ │   harness/cli.py is 1424 lines mixing argparse setup, signal/container cleanup, run orchestration (_ru                                                                                           │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Extract repeated auth/model preflight into a shared helper                                                                                                                                     │ │
+│ │   The four-line auth preflight block (resolve_auth_env → NO_AUTH_MSG, model-required check, _warn_bedr                                                                                           │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Extract shared JSONL read/append utilities                                                                                                                                                     │ │
+│ │   harness/cli.py contains four near-identical 'open jsonl, parse lines, skip malformed' loops (_read_f                                                                                           │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · No linting/type-checking configuration in the project                                                                                                                                          │ │
+│ │   The repo has no ruff/flake8/pylint config, no mypy settings, and no pre-commit hooks — pyproject.tom                                                                                           │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Committed git worktree under .auto-claude/worktrees duplicates the entire source tree                                                                                                          │ │
+│ │   The directory .auto-claude/worktrees/tasks/001-guided-quickstart-skill/ contains byte-identical copi                                                                                           │ │
+│ └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ CHAT  a ask · q qa mode · i ideate · x stop · 1-6 ideation type                                                                                                                         : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

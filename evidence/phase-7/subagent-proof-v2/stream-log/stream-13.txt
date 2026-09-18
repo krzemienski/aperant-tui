@@ -1,0 +1,36 @@
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ proofpunk-agent /Users/nick/proofpunk-agent │ ⑂ master                                                                                                 ◉ 0 running  ◆ 1 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│  1 swarm   2 graph   3 inspect   4 trace   5 tokens   6 waits  6 agents · esc then 1-7 to switch tabs                                                                                                │
+│                                                                                                                                                                                                      │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ │
+│ ┃ EVENT TRACE · all agents · 3562 events                                                                                                                                                           ┃ │
+│ ┃   TIME      AGENT         EVENT          TOOL                DUR     PAYLOAD                                                                                                                     ┃ │
+│ ┃ 05:40:57.058 999-subagent thinking-delta—                  —                                                                                                                                     ┃ │
+│ ┃ 05:40:57.058 999-subagent thinking-delta—                  —                                                                                                                                     ┃ │
+│ ┃ 05:40:57.058 999-subagent thinking-delta—                  —                                                                                                                                     ┃ │
+│ ┃ 05:40:57.058 999-subagent thinking-delta—                  —                                                                                                                                     ┃ │
+│ ┃ 05:40:57.059 999-subagent thinking-delta—                  —                                                                                                                                     ┃ │
+│ ┃ 05:40:57.059 999-subagent thinking-delta—                  —                                                                                                                                     ┃ │
+│ ┃ 05:40:57.059 999-subagent thinking-delta—                  —                                                                                                                                     ┃ │
+│ ┃ 05:40:57.059 999-subagent thinking-delta—                  —                                                                                                                                     ┃ │
+│ ┃ 05:40:57.059 999-subagent thinking-delta—                  —                                                                                                                                     ┃ │
+│ ┃ 05:40:57.059 999-subagent thinking-delta—                  —                                                                                                                                     ┃ │
+│ ┃ 05:40:57.059 999-subagent thinking-delta—                  —                                                                                                                                     ┃ │
+│ ┃ 05:40:57.059 999-subagent text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 05:40:57.059 999-subagent text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 05:40:57.060 999-subagent text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 05:40:57.060 999-subagent text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 05:40:57.060 999-subagent text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 05:40:57.060 999-subagent text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 05:40:57.060 999-subagent text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 05:40:57.060 999-subagent text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 05:40:57.060 999-subagent text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 05:40:57.061 999-subagent text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 05:40:57.061 999-subagent text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 05:40:57.061 999-subagent text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 05:40:57.061 999-subagent text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ f toggles agent filter · ring buffer 10k · outlier >3000ms highlighted                                                                                                                           ┃ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ │
+│ AGENTS  1-6 sub-view · j/k select · ⏎ inspect · f filter · r resume                                                                                                                     : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

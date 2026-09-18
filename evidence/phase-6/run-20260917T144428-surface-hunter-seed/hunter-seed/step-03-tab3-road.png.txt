@@ -1,0 +1,22 @@
+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ hunter-seed /Users/nick/dev/hunter-seed │ ⑂ main                                                                                                       ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┌─────────────────────────────────────────────────────────────────────────────────┐┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ PHASES                                                                          ││ DETAIL                                                                                                        │ │
+│ │ ❯ ○ PHASE P1 Trust & Signal Quality                                             ││ Trust & Signal Quality                                                                                        │ │
+│ │   ░░░░░░░░░░░░░░░░░░ 0/3 features                                               ││  · Symbolized crash triage with rich sanitizer telemetry [planned · Must]                                     │ │
+│ │                                                                                 ││    c → convert to task spec                                                                                   │ │
+│ │   ○ PHASE P2 Language & Target Portability                                      ││  · Patch regression and differential test harness [planned · Must]                                            │ │
+│ │   ░░░░░░░░░░░░░░░░░░ 0/3 features                                               ││    c → convert to task spec                                                                                   │ │
+│ │                                                                                 ││  · False-positive feedback loop [planned · Should]                                                            │ │
+│ │   ○ PHASE P3 Operational Integration                                            ││    c → convert to task spec                                                                                   │ │
+│ │   ░░░░░░░░░░░░░░░░░░ 0/3 features                                               ││                                                                                                               │ │
+│ │                                                                                 ││                                                                                                               │ │
+│ │   ○ PHASE P4 Scale & Ecosystem                                                  ││                                                                                                               │ │
+│ │   ░░░░░░░░░░░░░░░░░░ 0/4 features                                               ││                                                                                                               │ │
+│ │                                                                                 ││                                                                                                               │ │
+│ └─────────────────────────────────────────────────────────────────────────────────┘└───────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│  g generate · G refresh · j/k phase · c convert→spec                                                                                                                                                 │
+│ ROAD  g generate (G force regen) · c convert→spec                                                                                                                                       : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

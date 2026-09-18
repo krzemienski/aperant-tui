@@ -1,0 +1,30 @@
+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ proofpunk-agent /Users/nick/proofpunk-agent │ ⑂ master                                                                                                 ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ GENERATION                                                                                                                                                                                       │ │
+│ │ idle                                                                                                                                                                                             │ │
+│ │ Contents:                                                                                                                                                                                        │ │
+│ │ - **3 phases / 9 new features** (R1–R9), all complementing the 39 existing features via explicit dep                                                                                             │ │
+│ │ - **P2 Trust Hardening (Must-heavy)**: evidence diff & lineage, hook dry-run simulator, secret scan                                                                                              │ │
+│ │ - **P3 Team Collaboration**: review sign-off workflow, org metrics rollups, Slack/webhook alerts                                                                                                 │ │
+│ │ - **P4 Extensibility & Scale**: streaming event bridge, composer autocomplete, retention/pruning pol                                                                                             │ │
+│ │ - **3 milestones** (v1.2 → v2.0) with exit criteria, MoSCoW priorities, acceptance criteria honoring                                                                                             │ │
+│ │ Phase features completed                                                                                                                                                                         │ │
+│ └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓┌─────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃ PHASES                                                                                            ┃│ DETAIL                                                                                      │ │
+│ ┃ ❯ ○ PHASE P2-trust-hardening Trust Hardening                                                      ┃│ Trust Hardening                                                                             │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/3 features                                                                 ┃│  · Evidence Run Diff & Lineage [planned · Must]                                             │ │
+│ ┃                                                                                                   ┃│    c → convert to task spec                                                                 │ │
+│ ┃   ○ PHASE P3-team-collaboration Team Collaboration                                                ┃│  · Hook Dry-Run Simulator [planned · Must]                                                  │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/3 features                                                                 ┃│    c → convert to task spec                                                                 │ │
+│ ┃                                                                                                   ┃│  · Secret Scan Findings Report [planned · Should]                                           │ │
+│ ┃   ○ PHASE P4-extensibility-scale Extensibility & Scale                                            ┃│    c → convert to task spec                                                                 │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/3 features                                                                 ┃│                                                                                             │ │
+│ ┃                                                                                                   ┃│                                                                                             │ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛└─────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│  g generate · G refresh · j/k phase · c convert→spec                                                                                                                                                 │
+│ ROAD  g generate (G force regen) · x stop · j/k phase · c convert→spec                                                                                                                  : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

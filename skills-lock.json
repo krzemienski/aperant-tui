@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "tuistory": {
+      "source": "remorses/tuistory",
+      "sourceType": "github",
+      "skillPath": "skills/tuistory/SKILL.md",
+      "computedHash": "7df8aefb48ec83743320fe02916e3c9d3f733c1f0b98bdad0245b20bada20ff0"
+    }
+  }
+}

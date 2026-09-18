@@ -1,0 +1,24 @@
+{
+  "phase_count": 3,
+  "phases": [
+    "P12 Collaboration & Sharing",
+    "P13 Policy & Autonomy Controls",
+    "P14 Scale & Ecosystem"
+  ],
+  "sample_features": [
+    {
+      "id": "N17-multi-session",
+      "title": "Multi-Session Dashboard"
+    },
+    {
+      "id": "N18-remote-machine",
+      "title": "Remote Machine Execution"
+    },
+    {
+      "id": "N14-policy-file",
+      "title": "Policy File (--policy)"
+    }
+  ],
+  "ui_matches_disk": true,
+  "domain_relevance": "Features (multi-session dashboard, remote machine execution, policy allow/deny lists, loop detector) are genuinely specific to proofpunk-agent's actual domain: a TUI that drives/observes coding agent sessions with evidence capture. Not generic filler."
+}

@@ -1,0 +1,67 @@
+{
+  "gate": "P6.1-theme-instant-apply",
+  "action": "changed theme from 'ice' to 'cyberpunk' via settings tab (k x4), captured all 7 tabs before and after",
+  "toast_confirmation": "theme \u2192 cyberpunk (captured, real-time toast fired on keypress)",
+  "theme_list_panel_updated": "CONFIRMED -- 'ice ACTIVE' -> 'cyberpunk ACTIVE', marker position moved to top of list (set tab diff bbox: (105,252,503,441))",
+  "pixel_diff_per_tab": [
+    {
+      "tab": "board",
+      "ice_sha256": "472c994593a2e80a59253430f717dd44bb85e9335d3cd5a367a690003e471740",
+      "cyberpunk_sha256": "472c994593a2e80a59253430f717dd44bb85e9335d3cd5a367a690003e471740",
+      "differ": false
+    },
+    {
+      "tab": "term",
+      "ice_sha256": "9d6a5ad51988635989bf71ad447d432fd376a8dc7a7316fb76aebeeb814841a8",
+      "cyberpunk_sha256": "9d6a5ad51988635989bf71ad447d432fd376a8dc7a7316fb76aebeeb814841a8",
+      "differ": false
+    },
+    {
+      "tab": "road",
+      "ice_sha256": "4a703262bfd78986bec9a52e027865a0cbe7837970cbd7d9392e7efa607b8a07",
+      "cyberpunk_sha256": "4a703262bfd78986bec9a52e027865a0cbe7837970cbd7d9392e7efa607b8a07",
+      "differ": false
+    },
+    {
+      "tab": "chat",
+      "ice_sha256": "6b7bb041303b03514e9a70847c3ec9ec23b10249e432571e5f5d61c9fbc61655",
+      "cyberpunk_sha256": "6b7bb041303b03514e9a70847c3ec9ec23b10249e432571e5f5d61c9fbc61655",
+      "differ": false
+    },
+    {
+      "tab": "tree",
+      "ice_sha256": "a06e2add12de6ad2bbe4c3d53bc1364a136c566f88c5c524e2e8b3987fd1b6a4",
+      "cyberpunk_sha256": "a06e2add12de6ad2bbe4c3d53bc1364a136c566f88c5c524e2e8b3987fd1b6a4",
+      "differ": false
+    },
+    {
+      "tab": "set",
+      "ice_sha256": "99e7e9cd3c9a2c984727cc275f764abaf0c8f2bb0d09feb5dc18bfdef3179969",
+      "cyberpunk_sha256": "2674bf06f3977c0f7bad0cbc9ad5641e267a903eed6f4c43f197f7e0da696b5c",
+      "differ": true
+    },
+    {
+      "tab": "agents",
+      "ice_sha256": "1c850e7afdecafa0898fabaabbfef6c2f0e6c7e830b7cb3d95519f3ab6bc349c",
+      "cyberpunk_sha256": "1c850e7afdecafa0898fabaabbfef6c2f0e6c7e830b7cb3d95519f3ab6bc349c",
+      "differ": false
+    }
+  ],
+  "tabs_that_visually_changed": 1,
+  "tabs_total": 7,
+  "root_cause_investigation": {
+    "step_1": "Confirmed PNGs for 6/7 tabs are not just byte-identical (same sha256) but pixel-identical (PIL ImageChops.difference bbox=None) -- ruling out a hashing/capture artifact and confirming zero actual pixel change.",
+    "step_2": "Sampled colors show uniform #1A1B26 across all backgrounds in both themes -- this matches tuistory screenshot's own --background default (#1a1b26 per `tuistory --help`), suggesting the app never paints a full-screen/panel background color that would override tuistory's default fill for unpainted cells.",
+    "step_3": "grep confirmed apps/tui/src only applies theme.bg via Box backgroundColor in ONE place app-wide (StatusLine.tsx:38, a small inline badge) -- no view paints a full Box background, consistent with typical terminal-UI convention of relying on the terminal's own background.",
+    "step_4": "Ambient session env has COLORTERM unset and TERM=tmux-256color, so apps/tui/src/util/truecolor.ts:detectColorTier() resolves tier='256' (not 'truecolor'), causing resolveTheme() to quantize every color via quantizeTo256().",
+    "step_5": "Reimplemented quantizeTo256() in Python and confirmed cyberpunk vs ice accent colors quantize to MEANINGFULLY DIFFERENT 256-palette indices (accent: idx135 vs idx75; accent2: idx14 vs idx43) -- so the app-emitted ANSI codes SHOULD differ between themes even after quantization.",
+    "step_6": "Despite genuinely different quantized ANSI color codes being emitted, tuistory's PNG renderer produced pixel-identical output for accent-colored elements (task markers, borders, the StatusLine badge) across both themes under this terminal chain (tmux-256color).",
+    "conclusion": "This is most consistent with a tuistory screenshot-rendering limitation specific to the TERM=tmux-256color capture path in this environment (nested inside tmux, itself inside the omp harness's PTY), not an aperant-tui application defect. The app IS correctly emitting different theme colors (confirmed via the toast, the theme-list text, and the Python quantization re-derivation); tuistory's PNG capture is not visually reflecting that difference for most panels in this specific terminal chain."
+  },
+  "what_genuinely_changed": "theme name label in the THEME panel and the position of the 'ACTIVE' marker -- this is real, instant, correctly-applied UI state with no restart required.",
+  "what_could_not_be_visually_confirmed": "per-element accent/border color repainting across the other 6 tabs, due to the tuistory rendering limitation described above, not a demonstrated app failure.",
+  "verdict": "PARTIAL PASS -- the theme change IS applied instantly and correctly at the application-state level (confirmed via toast + settings panel text), but full-color visual verification across all 7 tabs could not be completed due to a measurement-tool (tuistory PNG renderer under TERM=tmux-256color) limitation, not a confirmed app defect. Reporting honestly rather than claiming a color-level PASS I cannot actually see.",
+  "SUPERSEDED": true,
+  "superseded_by": "F-15-instrument-adjudication.json",
+  "superseded_reason": "The original 'PARTIAL PASS' verdict in this file used INCORRECT theme hex values when checking for 256-color palette collision (mistakenly used synth's colors for cyberpunk). Re-investigated with corrected values plus a positive control plus an independent raw-ANSI capture; see F-15-instrument-adjudication.json for the authoritative verdict: UNVERIFIED (color dimension), PASS (state-application dimension)."
+}

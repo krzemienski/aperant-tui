@@ -53,6 +53,25 @@ function bar(pct: number, w = 8): string {
   return '█'.repeat(filled) + '░'.repeat(w - filled);
 }
 
+/**
+ * F-19 fix: `AgentSnapshot.type` is the *resolved* AGENT_CONFIGS key used
+ * for grant lookups — for a subagent spawn whose raw type isn't a real
+ * AGENT_CONFIGS key (e.g. `complexity_assessor`), observability.ts
+ * silently coerces that to an unrelated label (`spec_gatherer`) so grant
+ * resolution has something to key off of. A viewer must never see that
+ * confident-but-wrong label with no indication a fallback occurred, so
+ * every display site renders the verbatim `rawType` when it disagrees
+ * with the resolved `type`, instead of `type` alone.
+ */
+function displayType(a: AgentSnapshot): string {
+  return a.rawType && a.rawType !== a.type ? a.rawType : a.type;
+}
+
+/** True when the resolved `type` is standing in for an unrecognized raw spawn. */
+function isFallbackLabel(a: AgentSnapshot): boolean {
+  return a.rawType !== null && a.rawType !== a.type;
+}
+
 function fmtK(n: number): string {
   return n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n);
 }
@@ -78,6 +97,30 @@ function waitText(w: WaitState | null): string {
 function waitColor(w: WaitState | null, c: Theme): string {
   if (!w) return c.faint;
   return { tool: c.info, mcp: c.accent2, concurrency: c.dim, context: c.warn, ratelimit: c.err, auth: c.err }[w.kind];
+}
+
+/**
+ * F-20 fix: `waiting` describes *what* an agent is currently blocked on,
+ * not its lifecycle state. A subagent's `waiting` is set to `null` once at
+ * `ensureAgent()` init and never written again after it (SUBAGENT_COMPLETED /
+ * SUBAGENT_FAILED only touch `state` — see observability.ts's SUBAGENT_*
+ * handler), so `waitText(null)`'s "— executing" fallback was rendering for
+ * agents that had genuinely finished. Consult `state` first; only fall back
+ * to `waitText(waiting)` while the agent is actually running (or blocked/
+ * paused, where `recomputeWait` always writes a real `WaitState` alongside
+ * the state transition) — this preserves every live wait-state variant
+ * exactly as before.
+ */
+function statusText(a: AgentSnapshot): string {
+  if (a.state === 'done') return 'done';
+  if (a.state === 'error') return 'error';
+  return waitText(a.waiting);
+}
+
+function statusColor(a: AgentSnapshot, c: Theme): string {
+  if (a.state === 'done') return c.ok;
+  if (a.state === 'error') return c.err;
+  return waitColor(a.waiting, c);
 }
 
 export function AgentsView({ theme: c, project, isActive }: { theme: Theme; project: Project; isActive: boolean }) {
@@ -187,10 +230,10 @@ function SwarmView({ c, agents, sel }: { c: Theme; agents: AgentSnapshot[]; sel:
               <Text color={on ? c.accent : c.faint}>{on ? '❯' : ' '}</Text>
               <Text color={on ? c.accent : stateColor(a.state, c)}>{STATE_GLYPH[a.state] ?? '○'}</Text>
               <Box width={18}><Text color={on ? c.text : c.dim} wrap="truncate-end">{'│ '.repeat(a.depth)}{a.id.slice(0, 16)}</Text></Box>
-              <Box width={18}><Text color={c.dim} wrap="truncate-end">{a.type}</Text></Box>
+              <Box width={18}><Text color={isFallbackLabel(a) ? c.warn : c.dim} wrap="truncate-end">{displayType(a)}{isFallbackLabel(a) ? ' ⚠' : ''}</Text></Box>
               <Box width={10}><Text color={c.dim}>{a.stepsExecuted}<Text color={c.faint}>/{a.maxSteps}</Text></Text></Box>
               <Box width={8}><Text color={pct > 90 ? c.err : pct > 70 ? c.warn : c.ok}>{bar(pct, 5)} {pct}%</Text></Box>
-              <Text color={waitColor(a.waiting, c)} wrap="truncate-end">{waitText(a.waiting)}</Text>
+              <Text color={statusColor(a, c)} wrap="truncate-end">{statusText(a)}</Text>
             </Box>
           );
         })}
@@ -238,10 +281,10 @@ function GraphView({ c, agents }: { c: Theme; agents: AgentSnapshot[] }) {
       <Panel title="ORCHESTRATION GRAPH" focused theme={c} flexGrow={1}>
         {roots.map((r) => (
           <Box key={r.id} flexDirection="column">
-            <Text color={stateColor(r.state, c)}>  ◈ {r.type} <Text color={c.faint}>{r.id.slice(0, 16)} · {r.phase} · {overallProgress(r.phase, 0)}%</Text></Text>
+            <Text color={stateColor(r.state, c)}>  ◈ {displayType(r)}{isFallbackLabel(r) ? ' ⚠' : ''} <Text color={c.faint}>{r.id.slice(0, 16)} · {r.phase} · {overallProgress(r.phase, 0)}%</Text></Text>
             {(byParent.get(r.id) ?? []).map((ch, i, arr) => (
               <Text key={ch.id} color={stateColor(ch.state, c)}>
-                {'  '}{i === arr.length - 1 ? '└─' : '├─'}{STATE_GLYPH[ch.state]} {ch.type} <Text color={c.faint}>{waitText(ch.waiting)}</Text>
+                {'  '}{i === arr.length - 1 ? '└─' : '├─'}{STATE_GLYPH[ch.state]} <Text color={isFallbackLabel(ch) ? c.warn : undefined}>{displayType(ch)}{isFallbackLabel(ch) ? ' ⚠' : ''}</Text> <Text color={c.faint}>{statusText(ch)}</Text>
               </Text>
             ))}
             <Text> </Text>
@@ -283,7 +326,10 @@ function InspectView({ c, a }: { c: Theme; a: AgentSnapshot }) {
     <Box gap={1} flexGrow={1}>
       <Box flexDirection="column" gap={1} flexGrow={1}>
         <Panel title={`AGENT · ${a.id.slice(0, 20)}`} focused theme={c}>
-          <Row c={c} k="type" v={a.type} col={c.accent} />
+          <Row c={c} k="type" v={`${displayType(a)}${isFallbackLabel(a) ? ' ⚠ unrecognized' : ''}`} col={isFallbackLabel(a) ? c.warn : c.accent} />
+          {isFallbackLabel(a) && (
+            <Row c={c} k="grants as" v={`${a.type} (nearest known AGENT_CONFIGS key)`} col={c.faint} />
+          )}
           <Row c={c} k="state" v={a.state.toUpperCase()} col={stateColor(a.state, c)} />
           <Row c={c} k="phase" v={<>{a.phase} <Text color={a.phaseSource === 'structured' ? c.accent : c.warn}>{a.phaseSource === 'structured' ? '▪ structured' : '~ inferred'}</Text></>} />
           {a.subtaskId && <Row c={c} k="subtask" v={a.subtaskId} col={c.info} />}
@@ -306,7 +352,13 @@ function InspectView({ c, a }: { c: Theme; a: AgentSnapshot }) {
               {a.waiting.kind === 'tool' && <Text color={c.faint}>unblocks: child process exit</Text>}
               {a.waiting.kind === 'mcp' && <Text color={c.faint}>unblocks: MCP server response or timeout</Text>}
             </>
-          ) : <Text color={c.ok}>● executing — not blocked</Text>}
+          ) : a.state === 'done' ? (
+            <Text color={c.ok}>✓ done — no longer running</Text>
+          ) : a.state === 'error' ? (
+            <Text color={c.err}>✗ error — no longer running</Text>
+          ) : (
+            <Text color={c.ok}>● executing — not blocked</Text>
+          )}
         </Panel>
         <Panel title="TOKEN / CONTEXT" theme={c} flexGrow={1}>
           <Text color={pct > 90 ? c.err : pct > 70 ? c.warn : c.ok}>{bar(pct, 30)}</Text>

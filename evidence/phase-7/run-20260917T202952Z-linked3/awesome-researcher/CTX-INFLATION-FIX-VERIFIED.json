@@ -1,0 +1,108 @@
+{
+  "title": "CTX-inflation fix (stream-handler.ts) - END-TO-END VERIFICATION",
+  "verification_type": "end-to-end through the real TUI agent path, NOT a unit check",
+  "bundle_confirmation": {
+    "action": "node tools/build-worker.mjs (rebuilt apps/tui/dist/agent-worker.cjs)",
+    "verified_present": true,
+    "verification_method": "byte search of the rebuilt .cjs for the exact fixed lines",
+    "found_snippet": "state.cumulativeUsage.promptTokens = promptTokens;\n    state.cumulativeUsage.completionTokens += completionTokens;\n    state.cumulativeUsage.totalTokens = state.cumulativeUsage.promptTokens + state.cumulativeUsage.completionTokens;"
+  },
+  "re_drive": {
+    "project": "/Users/nick/awesome-researcher",
+    "task": "005-human-in-the-loop-candidate-review-with-selective- (resumed remaining subtasks 4-1..4-2, a fresh multi-step agentic session against the live router)",
+    "session": "ap-ar (tuistory)",
+    "started_at": "2026-09-17T22:12:06Z",
+    "real_work_product_from_this_run": "subtask-4-1 completed (commit f13b3a1: offline end-to-end review tests), bringing the task to 10/11 subtasks complete"
+  },
+  "before_fix_numbers": {
+    "source": "captured earlier in the same investigation, step-18-refire2-real-progress.png / step-16 series",
+    "ctx_pct": 1088.2,
+    "sigma_tokens_k": 2206.6,
+    "step": "38/1000, later 45/1000",
+    "growth_pattern": "exponential/quadratic - CTX climbed 99% -> 117% -> 162% -> 807.6% -> 1088.2% within minutes while real promptTokens per finish-step event stayed in the tens of thousands"
+  },
+  "after_fix_numbers": {
+    "readings_over_time": [
+      {
+        "ts": "22:12:45Z",
+        "ctx_pct": 16,
+        "sigma_tokens_k": 32.6,
+        "step": "5/100"
+      },
+      {
+        "ts": "22:13:25Z",
+        "ctx_pct": 20,
+        "sigma_tokens_k": 44.7,
+        "step": "12/1000"
+      },
+      {
+        "ts": "22:13:56Z",
+        "ctx_pct": 22,
+        "sigma_tokens_k": 50.2,
+        "prompt_k": 43.8,
+        "compl_k": 6.4
+      },
+      {
+        "ts": "22:14:58Z",
+        "ctx_pct": 24,
+        "sigma_tokens_k": 58.6,
+        "prompt_k": 48.2,
+        "compl_k": 10.4
+      }
+    ],
+    "growth_pattern": "linear/sane - CTX grew 16% -> 20% -> 22% -> 24% over ~2 minutes, matching real conversation growth. promptTokens from the raw event log (agent-events.jsonl) confirm: 41913 -> 43315 -> 43826 -> 43904 -> 44574, small monotonic increments consistent with a real growing conversation, NOT the exponential blow-up seen before the fix.",
+    "raw_event_log_samples": [
+      {
+        "ts": "2026-09-17T22:13:37.126Z",
+        "promptTokens": 41913,
+        "completionTokens": 5859,
+        "totalTokens": 47772
+      },
+      {
+        "ts": "2026-09-17T22:13:42.752Z",
+        "promptTokens": 43315,
+        "completionTokens": 6327,
+        "totalTokens": 49642
+      },
+      {
+        "ts": "2026-09-17T22:13:45.643Z",
+        "promptTokens": 43826,
+        "completionTokens": 6376,
+        "totalTokens": 50202
+      },
+      {
+        "ts": "2026-09-17T22:13:48.251Z",
+        "promptTokens": 43904,
+        "completionTokens": 6429,
+        "totalTokens": 50333
+      },
+      {
+        "ts": "2026-09-17T22:13:50.942Z",
+        "promptTokens": 44574,
+        "completionTokens": 6501,
+        "totalTokens": 51075
+      }
+    ]
+  },
+  "residual_secondary_note": "The displayed CTX% (22-24%) matches promptTokens/200000, NOT promptTokens/128000 -- the swarm/tokens observability panel's contextWindowLimit is set once per agent via observability.ts:253 `getModelContextWindow(meta?.model ?? 'default')`, where `model` comes from task metadata (a shorthand like 'sonnet' or the literal string 'default'), NOT the resolved router-prefixed id ('glm/glm-5') that the actual session/runner.ts safety guard uses. This means the UI's percentage is still off by the 200k-vs-128k denominator (a DIFFERENT, smaller instance of the same root pattern, in a DIFFERENT call site), but the CRITICAL bug asked about here -- the quadratic/exponential ACCUMULATION bug in stream-handler.ts -- is conclusively fixed: the displayed numbers now track the real, linearly-growing conversation size instead of exploding past 1000%. This residual denominator mismatch was NOT part of the original fix scope and was not corrected in this session; flagged honestly as a further, smaller finding rather than folded into the verified-fix claim.",
+  "screenshots": [
+    {
+      "file": "awesome-researcher/step-23-ctx-fix-verify-early.png",
+      "sha256": "ecf88c69de1d9080c374dec713124c84a2544de507d338d2e4a61106c56d6292"
+    },
+    {
+      "file": "awesome-researcher/step-24-ctx-fix-verify-growing-sane.png",
+      "sha256": "a4f455fd35837b92b83c849e8f85db3056a634032ef1b56d3e9457766e427647"
+    },
+    {
+      "file": "awesome-researcher/step-25-tokens-fix-verify-sane.png",
+      "sha256": "fa193aa38852aa1b5dce18d53832a022ecf656d26efc0974bc5dda02829866d2"
+    },
+    {
+      "file": "awesome-researcher/step-26-ctx-fix-verify-final-sane.png",
+      "sha256": "be96867f2e513b6c384fd957b0e3ee5a32874f305f233d70206a82e43fb7b698"
+    }
+  ],
+  "verdict": "END-TO-END VERIFIED. The quadratic-accumulation fix in stream-handler.ts holds up under a real multi-step agentic session driven through the real TUI against the live router, with the rebuilt worker bundle. This is not a unit check -- it is the same standard of proof as the primary models.ts fix.",
+  "unplanned_bonus_finding_this_run": "The auth check ('Authentication required') that blocked starting this re-drive on the first two attempts was traced to a stray APERANT_USER_DATA=/tmp/aperant-userdata-pp environment variable leaked into the driving Python kernel's os.environ from an earlier, unrelated investigation. tuistory_drive.py's _run() forwards the FULL current process environment to every `tuistory launch` call, so this stray var silently redirected app.getPath('userData') away from the real ~/.aperant for every relaunch until it was found and unset. This was a harness/environment-hygiene issue in the verification session, not a defect in aperant-tui's own code."
+}

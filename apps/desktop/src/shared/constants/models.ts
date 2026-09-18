@@ -604,6 +604,15 @@ export function resolveModelEquivalent(
  * Look up the context window size for a model shorthand or full model ID.
  * Searches ALL_AVAILABLE_MODELS by value first, then searches
  * DEFAULT_MODEL_EQUIVALENCES for full model IDs (e.g., 'claude-opus-4-6').
+ * Also strips a leading `provider/` prefix (e.g. a router-style id like
+ * 'glm/glm-5' coming through ANTHROPIC_DEFAULT_*_MODEL / APERANT_MODEL when
+ * ANTHROPIC_BASE_URL points at a local router) and retries — without this,
+ * every router-prefixed model id silently falls through to the 200k
+ * fallback below, disabling the 70%/90% compaction guard in
+ * session/runner.ts for models with a smaller real window (verified: a
+ * live run against 'glm/glm-5', whose real window is 128,000, hit
+ * 318,158 prompt tokens — 159.1% of the 200k fallback — before any
+ * compaction warning or hard abort fired).
  * Falls back to 200,000 (conservative default) if not found.
  */
 export function getModelContextWindow(modelIdOrShorthand: string): number {
@@ -611,6 +620,18 @@ export function getModelContextWindow(modelIdOrShorthand: string): number {
   const directMatch = ALL_AVAILABLE_MODELS.find((m) => m.value === modelIdOrShorthand);
   if (directMatch?.capabilities?.contextWindow) {
     return directMatch.capabilities.contextWindow;
+  }
+
+  // [APERANT-PATCH token-accounting-fix]: Router-prefixed id (e.g. 'glm/glm-5') — retry the direct lookup against
+  // the part after the first '/'. Only applies when there IS a '/', so bare
+  // shorthands and full Claude ids (no slash) are unaffected.
+  const slashIdx = modelIdOrShorthand.indexOf('/');
+  if (slashIdx !== -1) {
+    const unprefixed = modelIdOrShorthand.slice(slashIdx + 1);
+    const unprefixedMatch = ALL_AVAILABLE_MODELS.find((m) => m.value === unprefixed);
+    if (unprefixedMatch?.capabilities?.contextWindow) {
+      return unprefixedMatch.capabilities.contextWindow;
+    }
   }
 
   // Search equivalences for full model IDs (e.g., 'claude-opus-4-6' → find 'opus' entry)

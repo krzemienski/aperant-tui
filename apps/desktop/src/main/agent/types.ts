@@ -87,6 +87,13 @@ export interface SpecCreationMetadata {
   // Workspace mode - whether to use worktree isolation
   useWorktree?: boolean; // If false, use --direct mode (no worktree isolation)
   useLocalBranch?: boolean; // If true, use local branch directly instead of preferring origin/branch
+  // [APERANT-PATCH agentic-orchestration-optin] (2026-09-17): opt-in flag,
+  // threaded through to SerializableSessionConfig.useAgenticOrchestration
+  // (ai/agent/types.ts:79) in startSpecCreation() below. Additive: absent
+  // on every existing caller, so the strict `=== true` check at the
+  // construction site defaults to false and today's hardcoded
+  // runSpecOrchestrator() pipeline is unchanged unless a caller opts in.
+  useAgenticOrchestration?: boolean;
 }
 
 export interface IdeationProgressData {

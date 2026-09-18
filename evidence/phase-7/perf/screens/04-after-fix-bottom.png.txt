@@ -1,0 +1,50 @@
+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ ap-perf-200 /tmp/ap-perf-200 │ ⑂ develop                                                                                                             ◉ 23 running  ◆ 64 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃ TASKS                                                                                  ┃ │ DETAIL                                                                                                │ │
+│ ┃ ❯ 200-fix- ▽ Fix theme tokens (task 200)  50%                                          ┃ │ 200-fix- [BACKLOG]                                                                                    │ │
+│ ┃ ◆ QUEUE (15)                                                                           ┃ │ Fix theme tokens (task 200)                                                                           │ │
+│ ┃   001-refa ◆ Refactor provider registry (task 1)  50%                                  ┃ │ progress ███████░░░░░░░ 50%                                                                           │ │
+│ ┃   009-cons ▲ Consolidate provider registry (task 9)  50%                               ┃ │ subtasks 2/5 complete                                                                                 │ │
+│ ┃   025-exte ◆ Extend terminal renderer (task 25)  50%                                   ┃ │ phase idle                                                                                            │ │
+│ ┃   033-deco ▲ Decouple terminal renderer (task 33)  50%                                 ┃ │ location main  spec 200-fix-theme-tokens-200                                                          │ │
+│ ┃   057-add- ▲ Add task queue (task 57)  50%                                             ┃ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ ┃   073-refa ◆ Refactor board view (task 73)  50%                                        ┃                                                                                                           │
+│ ┃   081-cons ▲ Consolidate board view (task 81)  50%                                     ┃ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃   097-exte ◆ Extend settings panel (task 97)  50%                                      ┃ │ AGENT STREAM                                                                                          │ │
+│ ┃   105-deco ▲ Decouple settings panel (task 105)  50%                                   ┃ │ no recorded runs for this task                                                                        │ │
+│ ┃   121-vali ◆ Validate agent manager (task 121)  50%                                    ┃ │                                                                                                       │ │
+│ ┃   129-add- ▲ Add worktree service (task 129)  50%                                      ┃ │                                                                                                       │ │
+│ ┃   145-refa ◆ Refactor roadmap runner (task 145)  50%                                   ┃ │                                                                                                       │ │
+│ ┃   153-cons ▲ Consolidate roadmap runner (task 153)  50%                                ┃ │                                                                                                       │ │
+│ ┃   177-deco ▲ Decouple logs pane (task 177)  50%                                        ┃ │                                                                                                       │ │
+│ ┃   193-vali ◆ Validate status bar (task 193)  50%                                       ┃ │                                                                                                       │ │
+│ ┃ ◆ BUILDING (23)                                                                        ┃ │                                                                                                       │ │
+│ ┃   002-fix- ▽ Fix provider registry (task 2)  50%                                       ┃ │                                                                                                       │ │
+│ ┃   010-patc ◆ Patch provider registry (task 10)  50%                                    ┃ │                                                                                                       │ │
+│ ┃   018-migr ▲ Migrate terminal renderer (task 18)  50%                                  ┃ │                                                                                                       │ │
+│ ┃   026-rewr ▽ Rewrite terminal renderer (task 26)  50%                                  ┃ │                                                                                                       │ │
+│ ┃   042-hard ▲ Harden auth resolver (task 42)  50%                                       ┃ │                                                                                                       │ │
+│ ┃   050-inst ▽ Instrument auth resolver (task 50)  50%                                   ┃ │                                                                                                       │ │
+│ ┃   058-remo ◆ Remove task queue (task 58)  50%                                          ┃ │                                                                                                       │ │
+│ ┃   066-docu ▲ Document task queue (task 66)  50%                                        ┃ │                                                                                                       │ │
+│ ┃   074-fix- ▽ Fix board view (task 74)  50%                                             ┃ │                                                                                                       │ │
+│ ┃   082-patc ◆ Patch board view (task 82)  50%                                           ┃ │                                                                                                       │ │
+│ ┃   090-migr ▲ Migrate settings panel (task 90)  50%                                     ┃ │                                                                                                       │ │
+│ ┃   098-rewr ▽ Rewrite settings panel (task 98)  50%                                     ┃ │                                                                                                       │ │
+│ ┃   106-simp ◆ Simplify settings panel (task 106)  50%                                   ┃ │                                                                                                       │ │
+│ ┃   114-hard ▲ Harden agent manager (task 114)  50%                                      ┃ │                                                                                                       │ │
+│ ┃   122-inst ▽ Instrument agent manager (task 122)  50%                                  ┃ │                                                                                                       │ │
+│ ┃   130-remo ◆ Remove worktree service (task 130)  50%                                   ┃ │                                                                                                       │ │
+│ ┃   138-docu ▲ Document worktree service (task 138)  50%                                 ┃ │                                                                                                       │ │
+│ ┃   146-fix- ▽ Fix roadmap runner (task 146)  50%                                        ┃ │                                                                                                       │ │
+│ ┃   162-migr ▲ Migrate logs pane (task 162)  50%                                         ┃ │                                                                                                       │ │
+│ ┃   170-rewr ▽ Rewrite logs pane (task 170)  50%                                         ┃ │                                                                                                       │ │
+│ ┃   178-simp ◆ Simplify logs pane (task 178)  50%                                        ┃ │                                                                                                       │ │
+│ ┃   186-hard ▲ Harden status bar (task 186)  50%                                         ┃ │                                                                                                       │ │
+│ ┃   194-inst ▽ Instrument status bar (task 194)  50%                                     ┃ │                                                                                                       │ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ BOARD  j/k move · ⏎ focus · s start · x stop · H/L column · l logs                                                                                                                      : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

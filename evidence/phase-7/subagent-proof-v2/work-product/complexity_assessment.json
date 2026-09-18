@@ -1,0 +1,9 @@
+{
+  "complexity": "complex",
+  "confidence": 0.75,
+  "reasoning": "Task drives live SDK sessions, requires depth>=2 / concurrent-child tree rendering proof across bridge/sdk.py spawn gate, reducers/tree.py, and screens/session.py, with possible silent-failure code fixes. Headless Textual driving and SDK subagent lifecycle event shapes need research; prior v1 false-positive (empty artifacts) justifies self-critique of the spec before implementation.",
+  "needs_research": true,
+  "needs_self_critique": true,
+  "assessed_at": "2026-09-18",
+  "method": "Delegated to complexity_assessor subagent after orchestrator discovery (project index, code reading of bridge/sdk.py + state/reducers/tree.py, evidence-run inspection, RELEASE.md gate state)."
+}

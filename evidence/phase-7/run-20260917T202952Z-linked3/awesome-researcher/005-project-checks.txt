@@ -1,0 +1,93 @@
+=== awesome-researcher OWN project checks against the 005 work product ===
+
+Worktree: /Users/nick/awesome-researcher/.auto-claude/worktrees/tasks/005-human-in-the-loop-candidate-review-with-selective-
+Baseline commit (pre-run): e756dec (fix(logging): recreate log dir if wiped mid-run)
+Final commit (post-run):   1970850 (Complete subtask-2-3 - regenerate PR body on attach replay)
+
+Source of truth for the check command: pyproject.toml [tool.pytest.ini_options]
+  testpaths = ["tests"]
+  markers: e2e (live SDK+network, excluded), functional (Termwright/Docker, excluded)
+This exact marker-deselection is the project's OWN documented test-invocation contract
+(also matches the agent's own build-progress.txt note: "Verification Strategy: medium
+risk - unit + offline-integration tests, no security scan, no staging").
+
+Command run (exact, executed from inside the worktree):
+  python3 -m pytest tests/ -q -m "not e2e and not functional"
+
+Exit code (captured directly via $? immediately after the command, no pipeline/tee
+involved that could mask it): 0
+
+Full pytest output:
+...............................s........................................ [ 34%]
+........................................................................ [ 69%]
+................................................................         [100%]
+207 passed, 1 skipped, 2 deselected in 1.09s
+
+
+Decisive summary line: "207 passed, 1 skipped, 2 deselected in 1.09s"
+
+Baseline comparison (from the agent's own build-progress.txt, Session 1, BEFORE any
+subtask work): "Env verified: pytest 9.0.2, textual 8.1.1, 201 offline tests collect
+cleanly." And per-subtask verification notes recorded "full offline suite 200 passed
+1 skipped = baseline" after subtask-1-1 and subtask-1-2.
+
+Result: 207 passed (vs. 200 baseline) + 1 skipped (unchanged) = 7 NEW tests added by
+the agent's own work (consistent with new functionality in core/review.py,
+renderers/pr_body.py, tui/state.py folding logic), with ZERO regressions against the
+pre-existing 200-test offline baseline.
+
+VERDICT: PASS. The agent's work product is not just "files changed" - it holds up
+under the project's own test suite, with the suite's pass count growing exactly in
+proportion to the new functionality added, and no existing test broken.
+
+pytest environment: system python3 (/usr/local/bin/python3), pytest 9.0.2
+  (/Users/nick/Library/Python/3.11/bin/pytest), matching the version the agent itself
+  verified in Session 1 planning.
+
+
+=================================================================
+=== FINAL-STATE RE-RUN (task 005 driven to 11/11 subtasks) ===
+=================================================================
+
+This run was appended AFTER the task was driven to full completion
+(11/11 subtasks, QA_PASSED, BUILD_COMPLETE, exit code 0) as part of
+closing out the linked-workflow verification. The ORIGINAL 207-passed
+record above is preserved unmodified; this is the FINAL state.
+
+Worktree: /Users/nick/awesome-researcher/.auto-claude/worktrees/tasks/005-human-in-the-loop-candidate-review-with-selective-
+Final commit: 5283cc8 (Complete subtask-4-2 - docs for review workflow and full suite pass)
+Subtasks: 11/11 completed (implementation_plan.json, all phases: phase-1-core-review,
+  phase-2-pipeline, phase-3-tui, phase-4-integration)
+Task-events observed live in the TUI: QA_PASSED, BUILD_COMPLETE (both real, from the
+  vendored AgentManager event stream, tab 7 / agents view / swarm sub-view)
+
+Command run (identical to the original check, same project-documented invocation):
+  python3 -m pytest tests/ -q -m "not e2e and not functional"
+
+Exit code (captured directly via $? immediately after the command): 0
+
+Full pytest output:
+......................................................s................. [ 31%]
+........................................................................ [ 62%]
+........................................................................ [ 93%]
+...............                                                          [100%]
+230 passed, 1 skipped, 2 deselected in 1.15s
+
+
+Decisive summary line: "230 passed, 1 skipped, 2 deselected in 1.15s"
+
+Progression across this evidence set:
+  - Documented baseline (before any subtask work, per agent's own build-progress.txt): 200 passed, 1 skipped
+  - After 6 subtasks (mid-run check, first 005-project-checks.txt record above): 207 passed, 1 skipped (+7 tests)
+  - After all 11 subtasks (this final-state re-run): 230 passed, 1 skipped (+30 tests vs original baseline, +23 vs the mid-run check)
+
+Zero regressions at every checkpoint. The additional 23 tests between the mid-run
+check and this final run are directly attributable to subtask-4-1 ("offline
+end-to-end review tests" -- commit f13b3a1) and subtask-4-2 ("docs for review
+workflow and full suite pass" -- commit 5283cc8), both of which explicitly add
+test coverage per their commit messages.
+
+VERDICT: PASS. The task's FINAL, fully-completed work product (11/11 subtasks)
+holds up under the project's own test suite with growing coverage and zero
+regressions from the documented pre-work baseline through every intermediate
+checkpoint to completion.

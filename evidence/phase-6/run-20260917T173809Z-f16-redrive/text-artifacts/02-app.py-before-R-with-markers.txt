@@ -1,0 +1,9 @@
+def hello():
+<<<<<<< HEAD
+    return "hello from MAIN's own conflicting edit"
+=======
+    return "hello from the CONFLICT branch"
+>>>>>>> feature/conflict-branch
+
+
+CONSTANT = 1

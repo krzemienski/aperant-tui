@@ -1,0 +1,13 @@
+{
+  "criterion": "P3.5.5 \u2014 wait detection: context",
+  "verdict": "PASS",
+  "measured_peak_ctx_pct": 159.1,
+  "prior_best_observed_pct": 21,
+  "evidence": {
+    "waits_subview_screenshot": "evidence/phase-7/run-20260917T202952Z-linked3/awesome-researcher/step-11-waits-ctx-blocking.png",
+    "swarm_subview_screenshot": "evidence/phase-7/run-20260917T202952Z-linked3/awesome-researcher/step-10-agent-coding-failed.png",
+    "event_log_source": "~/.aperant/logs/agent-events.jsonl",
+    "event_log_task_id": "005-human-in-the-loop-candidate-review-with-selective-"
+  },
+  "notes": "UI genuinely surfaces a per-agent context-wait row when CTX exceeds 100%. 'BLOCKING ANALYSIS \u00b7 1 blocked' with a '[CTX] CTX 159.1% - compaction imminent' entry is shown in the waits (6) sub-view and mirrored in the swarm (1) sub-view's CTX column ('CTX 159.1% - compactio...' / 159%). This reading came from a REAL run (planner session 3, final usage-update: promptTokens=318158, totalTokens=319730, cacheReadTokens=277824 at 2026-09-17T20:47:13.462Z) not a synthetic/injected value."
+}

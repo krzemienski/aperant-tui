@@ -1,0 +1,2122 @@
+diff --git a/README.md b/README.md
+index 2ea88db..e841271 100644
+--- a/README.md
++++ b/README.md
+@@ -70,7 +70,7 @@ proofpunk-agent [-h] [--project PATH] [--model MODEL]
+                 [--no-plugin] [--evidence-slug SLUG] [--version]
+                 [--proofpunk-path DIR]
+                 [--color-tier {truecolor,256,16}] [--theme NAME]
+-                [--max-budget USD] [--check]
++                [--max-budget USD] [--policy FILE] [--check]
+                 [PROMPT]
+ ```
+ 
+@@ -89,6 +89,7 @@ proofpunk-agent [-h] [--project PATH] [--model MODEL]
+ | `--color-tier` | `truecolor\|256\|16` | Force a color tier instead of using the detected console capability. Routed through `PROOFPUNK_AGENT_COLOR_TIER` so there is one precedence chain, not two. |
+ | `--theme` | `NAME` | Start on a named palette instead of `neon-tokyo`. |
+ | `--max-budget` | `USD` | Session budget ceiling in USD. Default `50`. Must be a finite number greater than zero. |
++| `--policy` | `FILE` | Session policy file (JSON or YAML) constraining `max_turns`, `max_tool_calls`, `write_paths`, and `required_hook_verdicts`. **Fail-closed**: an unknown key or a value of the wrong shape is rejected at load — never a partial load — and a missing or invalid file exits `2` with a structured JSON error (`{"error":"policy","path":...,"field":...,"reason":...}`) on stderr, before any session or UI starts. The empty document `{}` is valid (no constraints). Breaches deny at the permission gate, refuse at submission, and are recorded as `POLICY_VIOLATION` events; a Gate Report is written at shutdown into the run named by `PROOFPUNK_AGENT_GATE_DIR`. |
+ | `--check` | — | Resolve the plugin root, report it, and exit without starting the UI. |
+ 
+ ### Environment variables
+@@ -101,6 +102,7 @@ proofpunk-agent [-h] [--project PATH] [--model MODEL]
+ | `PROOFPUNK_AGENT_EVIDENCE_DIR` | `screens/evidence.py:141` | Run directory that Screen 4's `g` (grab) captures into. |
+ | `PROOFPUNK_AGENT_EXPORT_DIR` | `screens/tools.py:606` | Target for Screen 2's `x` ledger export. |
+ | `PROOFPUNK_AGENT_PERF_DIR` | `screens/performance.py:698` | Target for Screen 5's `b` metrics snapshot. |
++| `PROOFPUNK_AGENT_GATE_DIR` | `app.py:1571` | Target run directory for the Gate Report (`gate-report-<UTC>.json`) written at shutdown when `--policy` is active. |
+ 
+ Every one of those write targets **refuses rather than improvises**: an unset
+ variable is an error notification, there is no cwd fallback, no `mkdir`, and the
+diff --git a/proofpunk_agent/__main__.py b/proofpunk_agent/__main__.py
+index 82e584c..a1010bc 100644
+--- a/proofpunk_agent/__main__.py
++++ b/proofpunk_agent/__main__.py
+@@ -235,6 +235,51 @@ def _project_dir(raw: str) -> str:
+     return str(path.resolve())
+ 
+ 
++def _policy_file(raw: str) -> str:
++    """Policy file must already exist (reject at parse time, like --project).
++
++    Existence is the ONLY check here: content, shape, and vocabulary are
++    ``load_policy``'s job in ``main``, so an invalid DOCUMENT surfaces as the
++    structured JSON error rather than argparse prose. A missing file is
++    itself the acceptance criterion's "missing policy file" case and must
++    abort the invocation (exit 2) before any session or UI starts. The
++    expanduser'd path is returned unresolved -- ``load_policy`` owns path
++    semantics, and the lexical form is what the operator typed, which is
++    what a structured error should name.
++    """
++    path = Path(raw).expanduser()
++    if not path.is_file():
++        raise argparse.ArgumentTypeError(f"policy file does not exist: {raw!r}")
++    return str(path)
++
++
++def _policy_summary(policy) -> str:
++    """One line describing the loaded constraints, for ``--check`` output.
++
++    Absent constraints are omitted rather than rendered as ``None``: the
++    line exists to tell the operator what a session will be held to. A
++    document with nothing set spells that out as ``(no constraints)``
++    rather than printing nothing -- an empty line is indistinguishable
++    from a lookup that never ran.
++    """
++    parts: list[str] = []
++    if policy.max_turns is not None:
++        parts.append(f"max_turns={policy.max_turns}")
++    if policy.max_tool_calls is not None:
++        parts.append(f"max_tool_calls={policy.max_tool_calls}")
++    if policy.write_paths:
++        parts.append("write_paths=" + ",".join(policy.write_paths))
++    if policy.required_hook_verdicts:
++        parts.append(
++            "required_hook_verdicts="
++            + ",".join(
++                f"{event}={verdict}"
++                for event, verdict in sorted(policy.required_hook_verdicts.items())
++            )
++        )
++    return " ".join(parts) if parts else "(no constraints)"
++
++
+ def build_parser() -> argparse.ArgumentParser:
+     parser = argparse.ArgumentParser(
+         prog="proofpunk-agent",
+@@ -303,6 +348,15 @@ def build_parser() -> argparse.ArgumentParser:
+         metavar="USD",
+         help="session budget ceiling in USD (default: 50, pinned at VG-P0)",
+     )
++    parser.add_argument(
++        "--policy",
++        type=_policy_file,
++        metavar="FILE",
++        help="session policy file (JSON or YAML) constraining max_turns, "
++        "max_tool_calls, write_paths, and required_hook_verdicts; fail-closed "
++        "-- an invalid or missing file exits 2 with a structured JSON error "
++        "before the session starts",
++    )
+     parser.add_argument(
+         "--check",
+         action="store_true",
+@@ -325,6 +379,26 @@ def main(argv: list[str] | None = None) -> int:
+         )
+         return 2
+ 
++    # --policy loads fail-closed BEFORE anything heavier runs: an invalid
++    # document must exit before any session or UI starts (acceptance
++    # criterion 1), and the --check block below needs the loaded Policy to
++    # report constraints. Imported lazily for the same reason `.app` is: a
++    # launch without the flag pays no yaml import, keeping the flagless
++    # startup path byte-identical (and its measured timings unperturbed).
++    policy = None
++    if args.policy:
++        from .policy import PolicyError, load_policy
++
++        try:
++            policy = load_policy(args.policy)
++        except PolicyError as exc:
++            # PolicyError.to_json() is the single definition of the wire
++            # shape {'error':'policy','path':...,'field':...,'reason':...};
++            # printing it here rather than reassembling the dict keeps the
++            # structured error defined once.
++            print(json.dumps(exc.to_json()), file=sys.stderr)
++            return 2
++
+     if args.no_plugin:
+         # An explicit, VALID mode -- not a resolution failure. Screen 4 renders a
+         # disabled state explaining the dependency (§7 Screen 4 rule 7); there is
+@@ -337,9 +411,15 @@ def main(argv: list[str] | None = None) -> int:
+         if root.ok:
+             print(f"plugin root: {root.path}")
+             print(f"source:      {root.source}")
++            if policy is not None:
++                print(f"policy:      {policy.source}")
++                print(f"constraints: {_policy_summary(policy)}")
+             return 0
+         if args.no_plugin:
+             print("plugin root: DISABLED (--no-plugin)")
++            if policy is not None:
++                print(f"policy:      {policy.source}")
++                print(f"constraints: {_policy_summary(policy)}")
+             return 0
+         print(f"plugin root: UNRESOLVED ({root.source})", file=sys.stderr)
+         print(f"reason:      {root.reason}", file=sys.stderr)
+@@ -357,6 +437,7 @@ def main(argv: list[str] | None = None) -> int:
+         start_theme=args.theme,
+         max_budget=args.max_budget,
+         evidence_slug=args.evidence_slug,
++        policy=policy,
+         # Handed over explicitly rather than imported by app.py: under
+         # `python -m proofpunk_agent` this file IS `__main__`, so an import
+         # of `proofpunk_agent.__main__` would load a second copy and re-stamp
+diff --git a/proofpunk_agent/app.py b/proofpunk_agent/app.py
+index 1377c9f..d337dbf 100644
+--- a/proofpunk_agent/app.py
++++ b/proofpunk_agent/app.py
+@@ -38,6 +38,9 @@ from textual.containers import Container, Horizontal, Vertical
+ from textual.widgets import ContentSwitcher, Footer, Static
+ 
+ from . import __version__
++from .gate_report import write_gate_report
++from .policy import Policy, check_hook_verdict, check_write
++from .state.reducers.policy import EMPTY_POLICY_STATE, reduce_policy, violation_event
+ from .theme import NEON_TOKYO, ThemeSet, detect_tier, load_themes
+ from .screens.session import SessionScreen
+ from .screens.hooks import HooksScreen
+@@ -320,6 +323,7 @@ class ProofpunkAgentApp(App):
+         start_theme: str | None = None,
+         max_budget: float = 50.0,
+         evidence_slug: str | None = None,
++        policy: Policy | None = None,
+         process_entry: float | None = None,
+     ) -> None:
+         super().__init__()
+@@ -331,6 +335,13 @@ class ProofpunkAgentApp(App):
+         self.resume_id = resume
+         self.max_budget = max_budget
+         self.evidence_slug = evidence_slug
++        # Loaded and validated by the CLI BEFORE construction (fail-closed,
++        # exit 2 on any load error), so a Policy here is always a VALID one
++        # or None. Stored only for now; enforcement lands with the permission
++        # gate and the submission path. None -- the no-flag path -- must
++        # short-circuit every future check, keeping flagless behavior
++        # byte-identical.
++        self.policy = policy
+         # Declared in __init__, not on_mount: on_unmount can fire before
+         # on_mount completes (a boot-time failure, or a driver killing the
+         # PTY mid-mount), and teardown must never raise AttributeError.
+@@ -341,6 +352,19 @@ class ProofpunkAgentApp(App):
+         #: the SDK's CLI child survives a cancelled stop() (measured --
+         #: step-06-orphan-child-probe.log), so it is NOT reaped by GC.
+         self._teardown_degraded = False
++        #: Authoritative policy accounting (turns used, tool calls used,
++        #: recorded violations), folded by ``_pump_events`` from the same
++        #: event stream the screens render. The shell -- not a screen --
++        #: holds it because the submission gate (``_send``) and the Gate
++        #: Report read these counters between events, and a screen's copy
++        #: would be one more thing that can drift from the log. Declared
++        #: here for the same reason as the fields above: the app can be
++        #: torn down before the pump ever runs, and teardown must never
++        #: raise AttributeError. Deliberately NOT reset when a bridge is
++        #: rebuilt after teardown: ``turns_used``/``tool_calls_used`` are
++        #: session-cumulative (the SDK's ``num_turns`` is), and the
++        #: violation history is append-only.
++        self._policy_state = EMPTY_POLICY_STATE
+ 
+         #: Performance Budget sampling state (§7 Screen 5 rule 2). Declared
+         #: here for the same reason as the fields above: the pump can be
+@@ -452,6 +476,20 @@ class ProofpunkAgentApp(App):
+         # leave the most common boot path permanently unmeasured.
+         self.call_after_refresh(self._record_startup)
+         self._instrument_render()
++        # Hand the loaded session policy to Screen 5's policy block BEFORE
++        # anything can flow through the pump: the block renders declared
++        # caps beside usage, so a policy arriving after the first event
++        # would show usage accrue against nothing. NoMatches-guarded the
++        # same way _fan_out guards its lookups -- a missing screen must
++        # never take a boot down, and policy display degrades to the
++        # screen's own "(no policy loaded)" marker either way.
++        if self.policy is not None:
++            from textual.css.query import NoMatches
++
++            try:
++                self.query_one("#performance", PerformanceScreen).set_policy(self.policy)
++            except NoMatches:
++                pass
+         self.call_after_refresh(self._start_evidence)
+         # §8.1: the app owns the single SdkBridge instance (declared in
+         # __init__). It is started lazily on the first submitted message
+@@ -528,6 +566,13 @@ class ProofpunkAgentApp(App):
+             # --effort had the same gap: accepted by the CLI, shown in help,
+             # and never sent.
+             effort=self.effort or None,
++            # The policy's turn cap becomes the SDK's own hard cap, so the
++            # ceiling is enforced where the turns actually happen -- not
++            # merely audited afterwards. None (no policy, or a policy
++            # without max_turns) keeps the SDK default. ``max_turns`` is a
++            # real field on ClaudeAgentOptions (SDK 0.2.144), unlike
++            # --max-budget's history of being parsed and dropped.
++            max_turns=(self.policy.max_turns if self.policy else None),
+             plugins=(
+                 [{"type": "local", "path": str(self.plugin_root.path)}]
+                 if getattr(self.plugin_root, "path", None)
+@@ -579,11 +624,67 @@ class ProofpunkAgentApp(App):
+             tools.apply_event(event)
+             evidence.apply_event(event)
+             performance.apply_event(event)
++            # The shell folds the same event through the policy reducer so
++            # it holds the authoritative counters itself -- the submission
++            # gate and the Gate Report read them between events, and they
++            # must never depend on a screen's private copy. Same stamped
++            # event the screens saw; an injected POLICY_VIOLATION rides
++            # this same path once the pump pulls it off the bridge queue,
++            # so the violation is counted exactly once, here.
++            self._policy_state = reduce_policy(self._policy_state, event)
+             kind = event.kind.name
+             if kind == "PERMISSION_REQUESTED":
+                 self._prompt_permission(event)
+             elif kind in ("RESULT", "ERROR"):
+                 self._refresh_chrome()
++            # SDK-side turn cap, audited. max_turns was handed to the SDK
++            # in _ensure_bridge, so the SDK enforces it on its own; this
++            # records that it FIRED, as a violation fact in the same
++            # pipeline the gate report reads. Dedupe guard: only when the
++            # policy actually declares max_turns -- a session ending at
++            # the SDK's default turn behavior is not a policy fact, and
++            # recording it would be the false-breach class the report
++            # exists to avoid.
++            if (
++                kind == "RESULT"
++                and self.policy is not None
++                and self.policy.max_turns is not None
++                and (event.data or {}).get("terminal_reason") == "max_turns"
++                and self._bridge is not None
++            ):
++                self._bridge.inject(
++                    violation_event(
++                        "max_turns",
++                        "SDK stopped the turn: max_turns reached",
++                        self._bridge.session_id or "",
++                    )
++                )
++            # Required hook verdicts: the policy names hook event types
++            # whose decision must be a specific value; a HOOK_EVENT that
++            # disagrees (including one with no decision at all) is a
++            # breach. Checked in the pump, not the bridge, so the audit
++            # consumes the same projected event every screen sees and the
++            # bridge stays free of policy knowledge.
++            if (
++                kind == "HOOK_EVENT"
++                and self.policy is not None
++                and self.policy.required_hook_verdicts
++                and self._bridge is not None
++            ):
++                hook_data = event.data or {}
++                hook_type = hook_data.get("event_type")
++                if isinstance(hook_type, str):
++                    mismatch = check_hook_verdict(
++                        self.policy, hook_type, hook_data.get("decision")
++                    )
++                    if mismatch is not None:
++                        self._bridge.inject(
++                            violation_event(
++                                "required_hook_verdict",
++                                mismatch.reason,
++                                event.subject,
++                            )
++                        )
+             # apply_event only MUTATES widget state; Textual paints later,
+             # off this coroutine. Stopping the clock here would measure
+             # reducer duration and label it event->paint -- certifying a
+@@ -917,6 +1018,31 @@ class ProofpunkAgentApp(App):
+             or "unknown tool"
+         )
+         tool_input = data.get("tool_input")
++
++        # Session-policy gate, BEFORE the modal (fail-closed). Write scope
++        # and the tool-call cap are judged by the shell, not the operator:
++        # a policy file exists precisely so these two decisions are not
++        # questions. A violation denies in THIS handler turn -- the SDK's
++        # can_use_tool call is blocked on a future that resolve_permission
++        # settles synchronously here -- so the CLI can never proceed past a
++        # gated call while a human decision is pending. The breach enters
++        # the pipeline through bridge.inject (never a direct screen call)
++        # so the log, the screens, and the Gate Report all see it exactly
++        # once, in order with SDK events.
++        if self.policy is not None:
++            violation = check_write(self.policy, str(tool_name), tool_input)
++            if violation is not None:
++                self._deny_by_policy(event, "write_paths", violation.reason)
++                return
++            cap = self.policy.max_tool_calls
++            if cap is not None and self._policy_state.tool_calls_used + 1 > cap:
++                self._deny_by_policy(
++                    event,
++                    "max_tool_calls",
++                    f"tool call {self._policy_state.tool_calls_used + 1} would "
++                    f"exceed max_tool_calls {cap}",
++                )
++                return
+         if isinstance(tool_input, dict) and tool_input:
+             # Render the actual arguments, truncated per-value so one huge
+             # field cannot push the rest off screen.
+@@ -946,12 +1072,60 @@ class ProofpunkAgentApp(App):
+             answered,
+         )
+ 
++    def _deny_by_policy(self, event, rule: str, detail: str) -> None:
++        """Record a policy breach and auto-deny the gated tool call.
++
++        The notification and the injected ``POLICY_VIOLATION`` carry the
++        same rule and detail verbatim -- no paraphrase between what the
++        operator sees and what the log records, so the two can be
++        reconciled after the fact. ``resolve_permission`` settles the
++        SDK's blocked ``can_use_tool`` future in the same handler turn
++        that observed the violation (fail-closed ordering: the CLI never
++        proceeds past a gated call). Both go through the bridge: inject
++        orders the violation with SDK events on the one queue the pump
++        drains, and a bridge torn down mid-flight means neither has a
++        listener left -- nothing to deny, nothing to record.
++        """
++        from claude_agent_sdk import PermissionResultDeny
++
++        self.notify(f"session policy: {detail}", severity="error", timeout=10)
++        if self._bridge is not None:
++            self._bridge.inject(violation_event(rule, detail, event.subject))
++            self._bridge.resolve_permission(
++                event.subject,
++                PermissionResultDeny(message="denied by session policy"),
++            )
++
+     def _start_turn(self, text: str) -> None:
+         self.run_worker(self._send(text), exclusive=False)
+ 
+     async def _send(self, text: str) -> None:
+         from .bridge.sdk import SendMessage
+ 
++        # Turn-cap submission gate (fail-closed, BEFORE the bridge is
++        # touched). The SDK already received max_turns via
++        # ClaudeAgentOptions (see _ensure_bridge), so this gate exists for
++        # the case the operator keeps typing after the cap: the submission
++        # is refused here rather than handed to a session that will either
++        # bill a turn the policy forbids or die mid-turn at the SDK's own
++        # cap. ``turns_used`` is the shell's authoritative counter (folded
++        # in _pump_events), not a screen's copy that could drift.
++        if (
++            self.policy is not None
++            and self.policy.max_turns is not None
++            and self._policy_state.turns_used >= self.policy.max_turns
++        ):
++            cap = self.policy.max_turns
++            detail = (
++                f"turns_used {self._policy_state.turns_used} reached "
++                f"max_turns {cap}; refusing submission"
++            )
++            self.notify(f"session policy: {detail}", severity="error", timeout=10)
++            if self._bridge is not None:
++                self._bridge.inject(
++                    violation_event("max_turns", detail, self._bridge.session_id or "")
++                )
++            return
+         try:
+             bridge = await self._ensure_bridge()
+             await bridge.submit(SendMessage(text))
+@@ -1394,7 +1568,92 @@ class ProofpunkAgentApp(App):
+             _answer,
+         )
+ 
++    def write_gate_report_now(self) -> Path | None:
++        """Write the Gate Report into the evidence run the DRIVER named.
++
++        Same containment discipline as ``action_capture_evidence_screenshot``
++        and ``PerformanceScreen.action_export_snapshot``, applied to
++        ``PROOFPUNK_AGENT_GATE_DIR``: refuse rather than improvise. No cwd
++        fallback, no mkdir, realpath == lexical, the target must already be
++        a helper-created ``e2e-evidence/run-*`` containing ``.run-meta``,
++        and an existing ``gate-report-*.json`` is never overwritten. Every
++        refusal is a notification, not an exception, because the one
++        guaranteed caller is ``_shutdown`` -- a refused export must not
++        block quitting.
++
++        No policy loaded is also a refusal: the Gate Report exists to
++        record compliance with a DECLARED policy, and a report cut from
++        no policy would carry all-null constraints and verdict ``NOT_RUN``
++        -- bytes that assert nothing while looking like an artifact. The
++        flagless path stays byte-identical: it writes nothing anywhere.
++
++        Returns the written path, or ``None`` on any refusal, so a driver
++        can assert on the outcome without scraping notifications.
++        """
++        import os
++        import sys
++        import time
++        from pathlib import Path
++
++        if self.policy is None:
++            self.notify("gate report: no policy loaded; nothing to report")
++            return None
++
++        raw_dir = os.environ.get("PROOFPUNK_AGENT_GATE_DIR", "").strip()
++        if not raw_dir:
++            self.notify("gate report: set PROOFPUNK_AGENT_GATE_DIR", severity="error")
++            return None
++
++        target = Path(raw_dir)
++        if not target.is_dir():
++            self.notify(f"gate report: {target} does not exist", severity="error")
++            return None
++        if target.resolve() != Path(os.path.abspath(target)):
++            self.notify("gate report: GATE_DIR has a symlink component", severity="error")
++            return None
++        if not target.name.startswith("run-") or target.parent.name != "e2e-evidence":
++            self.notify(
++                f"gate report: target must be e2e-evidence/run-*, got {target}",
++                severity="error",
++            )
++            return None
++        if not (target / ".run-meta").is_file():
++            self.notify(
++                f"gate report: {target} has no .run-meta (not a helper-created run)",
++                severity="error",
++            )
++            return None
++
++        name = f"gate-report-{time.strftime('%Y%m%dT%H%M%SZ', time.gmtime())}.json"
++        if (target / name).exists():
++            self.notify(
++                f"gate report: {name} already exists; refusing to overwrite",
++                severity="error",
++            )
++            return None
++
++        written = write_gate_report(target / name, self.policy, self._policy_state)
++        # stderr as well as the notification: the guaranteed caller is
++        # _shutdown, and the notification dies with the UI a moment later.
++        # The path on stderr survives the app exiting.
++        print(f"proofpunk-agent: gate report: {written}", file=sys.stderr)
++        self.notify(f"gate report: wrote {written}")
++        return written
++
+     async def _shutdown(self) -> None:
++        # Gate Report FIRST, while the app is still alive enough to notify
++        # and before a teardown that can consume up to 10s: the report is
++        # the session's compliance record and its write is instant. The
++        # containment refusals notify-only inside write_gate_report_now;
++        # this guard catches the unexpected (an OSError from the write
++        # itself) so no export failure can ever strand the operator in a
++        # UI that will not quit -- the same failure tolerance
++        # _teardown_bridge applies to its own teardown path.
++        try:
++            self.write_gate_report_now()
++        except Exception as exc:
++            with contextlib.suppress(Exception):
++                self.notify(f"gate report: {exc}", severity="error", timeout=8)
+         await self._teardown_bridge()
+         self.exit()
+ 
+diff --git a/proofpunk_agent/bridge/sdk.py b/proofpunk_agent/bridge/sdk.py
+index 7624ea6..12f68c0 100644
+--- a/proofpunk_agent/bridge/sdk.py
++++ b/proofpunk_agent/bridge/sdk.py
+@@ -484,6 +484,25 @@ class SdkBridge:
+         while True:
+             yield await self._events.get()
+ 
++    def inject(self, event: Event) -> None:
++        """Push a shell-produced event onto the same queue projected SDK
++        events ride.
++
++        ``inject`` is for events whose source is the SHELL itself, not the
++        SDK stream -- currently the ``POLICY_VIOLATION`` events the policy
++        enforcement paths construct (``state/reducers/policy.py``
++        ``violation_event``). Such an event must appear in the SAME
++        distribution every screen and reducer consumes: a screen-direct
++        delivery would order it outside the pump, leave the recorded log
++        without the breach, and split "what happened" into two channels --
++        exactly the failure shape this codebase documents. Routed through
++        ``_push`` so queue_depth stamping applies like any other event.
++
++        This does NOT touch the SDK client: it is a local queue insert,
++        never a message send, and never a ``can_use_tool`` resolution.
++        """
++        self._push(event)
++
+     async def submit(self, command: Command) -> None:
+         """Enqueue a typed command for the command-drain task."""
+         await self._commands.put(command)
+diff --git a/proofpunk_agent/gate_report.py b/proofpunk_agent/gate_report.py
+new file mode 100644
+index 0000000..e3e6862
+--- /dev/null
++++ b/proofpunk_agent/gate_report.py
+@@ -0,0 +1,121 @@
++"""Gate Report -- the policy-compliance artifact a session leaves behind.
++
++The Gate Report is the durable half of the ``--policy`` feature. Enforcement
++lives in ``app.py`` (the permission gate, the submission gate, the event
++pump) and every breach becomes a ``POLICY_VIOLATION`` event in the shared
++pipeline; THIS module is only the exporter that projects the folded
++``PolicyState`` -- the shell's authoritative counters -- into one JSON
++document an operator or a validator can read after the UI is gone.
++
++There is no pre-existing gate-report writer in this codebase to extend, so
++this module defines the artifact. Two disciplines from the rest of the
++product shape it:
++
++  * Never a false green. ``verdict`` is one of ``VIOLATIONS`` / ``CLEAN`` /
++    ``NOT_RUN`` -- never ``PASS`` on a session that was never measured.
++    ``PolicyState`` starts at zero counters and zero violations, and a
++    report cut from that state proves nothing: zero breaches over zero
++    turns is an empty set, not compliance. ``CLEAN`` is only claimed when
++    the fold actually observed activity (``turns_used > 0`` or
++    ``tool_calls_used > 0``); otherwise the report says ``NOT_RUN``. This
++    is the same branch order ``PerformanceScreen``'s ``_verdict`` applies
++    to an unsampled metric, for the same reason: a default-True boolean
++    rendered as a check is a false green.
++
++  * The report says what the log says. Constraints are copied verbatim
++    from the ``Policy`` (which the CLI validated fail-closed before the
++    session started); usage and violations are copied verbatim from the
++    ``PolicyState`` the shell folded from the event stream. Nothing here
++    re-counts, re-judges, or deduplicates -- a second implementation of
++    any of that could disagree with the reducer, and the report is
++    evidence, not opinion.
++
++Export target selection is deliberately NOT here. ``app.py``'s
++``write_gate_report_now`` owns the containment checks (env var, existing
++``e2e-evidence/run-*`` directory, ``.run-meta``, no overwrite) for the
++same reason ``PerformanceScreen.export_snapshot`` refuses to pick its own
++run: a writer that selects its own destination reintroduces the
++mtime-tie ambiguity ``fresh_evidence.py`` warns about.
++"""
++
++from __future__ import annotations
++
++import time
++from pathlib import Path
++
++from proofpunk_agent.policy import Policy
++from proofpunk_agent.state.reducers.policy import PolicyState
++
++__all__ = ["gate_report_payload", "write_gate_report"]
++
++
++def gate_report_payload(
++    policy: Policy, policy_state: PolicyState, captured_at: str | None = None
++) -> dict:
++    """Build the Gate Report payload from a loaded policy and its fold.
++
++    ``captured_at`` defaults to a UTC ISO-8601 stamp read HERE, once -- a
++    plain data-assembly function may read a clock for the artifact's cover
++    stamp the way ``metrics_snapshot`` does; it is display metadata, never
++    attribution (the per-violation ``at`` values come verbatim from the
++    events that recorded them).
++    """
++    violations = [
++        {
++            "seq": v.seq,
++            "at": v.at,
++            "rule": v.rule,
++            "detail": v.detail,
++            "subject": v.subject,
++        }
++        for v in policy_state.violations
++    ]
++    if violations:
++        verdict = "VIOLATIONS"
++    elif policy_state.turns_used > 0 or policy_state.tool_calls_used > 0:
++        verdict = "CLEAN"
++    else:
++        verdict = "NOT_RUN"
++    return {
++        "captured_at": captured_at
++        or time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
++        "policy": {
++            "source": policy.source,
++            "max_turns": policy.max_turns,
++            "max_tool_calls": policy.max_tool_calls,
++            "write_paths": list(policy.write_paths),
++            "required_hook_verdicts": dict(policy.required_hook_verdicts),
++        },
++        "turns_used": policy_state.turns_used,
++        "tool_calls_used": policy_state.tool_calls_used,
++        "violations": violations,
++        "verdict": verdict,
++    }
++
++
++def write_gate_report(
++    path: str | Path, policy: Policy, policy_state: PolicyState
++) -> Path:
++    """Write ``gate_report_payload`` as JSON to a CALLER-SUPPLIED path.
++
++    Same fallback discipline as ``PerformanceScreen.export_snapshot``:
++    ``validation.capture.write_json`` is preferred (its redaction is the
++    evidence path's), and if that helper is unavailable -- it belongs to a
++    validation harness, not a runtime dependency of the product -- a plain
++    sorted-keys JSON write happens rather than failing the export. Either
++    way the payload is identical; only the redaction pass differs.
++    """
++    target = Path(path)
++    payload = gate_report_payload(policy, policy_state)
++    try:
++        from validation.capture import write_json  # type: ignore
++
++        return write_json(target, payload)
++    except Exception:
++        import json
++
++        target.parent.mkdir(parents=True, exist_ok=True)
++        target.write_text(
++            json.dumps(payload, indent=2, sort_keys=True, default=str) + "\n"
++        )
++        return target
+diff --git a/proofpunk_agent/policy.py b/proofpunk_agent/policy.py
+new file mode 100644
+index 0000000..a6a02f4
+--- /dev/null
++++ b/proofpunk_agent/policy.py
+@@ -0,0 +1,390 @@
++"""Session policy file (--policy): declarative constraints, fail-closed.
++
++A policy is a small JSON or YAML document an operator hands the CLI BEFORE a
++session starts, constraining it four ways:
++
++    max_turns              hard cap on assistant turns
++    max_tool_calls         hard cap on tool invocations
++    write_paths            allowlist of directory prefixes; write-class
++                           tools must stay inside one of them
++    required_hook_verdicts hook event type (e.g. ``PreToolUse:Write``)
++                           mapped to a required decision among
++                           allow/warn/block
++
++The load-time discipline mirrors ``__main__.py``'s plugin-root resolution:
++fail-closed, no fallthrough. An unreadable file, an unparseable document, a
++non-mapping root, an unknown top-level key, or a value of the wrong shape is
++a ``PolicyError`` -- never a warning, never a best-effort partial load. A
++policy that silently dropped the constraint it could not understand would be
++a cap that does not cap, exactly the defect class (``--max-budget`` parsed
++and never sent) this product documents elsewhere; rejecting unknown keys
++outright also keeps a future policy vocabulary honest -- a typo in
++``max_turns`` surfaces at launch, not as an uncapped session.
++
++Two rules that are easy to get wrong, both enforced here:
++
++  * The EMPTY document ``{}`` is a VALID policy -- no constraints. Absent
++    keys mean "unconstrained"; explicit ``null`` does NOT (it is present and
++    not an int, so it is rejected). "I impose nothing" and "I failed to say"
++    are different operator intents, and only the former is a document.
++
++  * Enforcement-time checks fail closed too. A write-class tool whose input
++    carries no extractable file path is a VIOLATION, not a pass: when
++    ``write_paths`` scopes writes, "cannot tell where it writes" must not
++    degrade into "assume it is fine".
++
++Everything in this module is pure data plumbing: parse, validate, and pure
++predicate helpers returning either ``None`` (allowed) or a structured
++``PolicyError`` describing the violation. Runtime enforcement lives in
++``app.py``; nothing here touches the SDK, the bridge, or the UI.
++"""
++
++from __future__ import annotations
++
++import json
++from dataclasses import dataclass, field
++from pathlib import Path
++from typing import Mapping
++
++import yaml
++
++__all__ = [
++    "Policy",
++    "PolicyError",
++    "WRITE_TOOLS",
++    "HOOK_VERDICTS",
++    "load_policy",
++    "check_write",
++    "check_hook_verdict",
++]
++
++#: Tool classes whose effect is modifying files. Everything else (read-only
++#: tools, shell, search) is out of write-path scope by name: the allowlist
++#: gates what these tools may touch, not what other tools may do.
++WRITE_TOOLS = frozenset({"Write", "Edit", "NotebookEdit"})
++
++#: The closed vocabulary of hook decisions a ``required_hook_verdicts``
++#: value may demand (``PermissionResultAllow`` / ``...Warn`` / ``...Deny``
++#: as three strings).
++HOOK_VERDICTS = frozenset({"allow", "warn", "block"})
++
++#: The complete top-level vocabulary. Unknown keys are REJECTED, not
++#: ignored -- see the module docstring's fail-closed rationale.
++_POLICY_KEYS = frozenset(
++    {"max_turns", "max_tool_calls", "write_paths", "required_hook_verdicts"}
++)
++
++
++class PolicyError(Exception):
++    """A policy load failure or enforcement violation, as structured data.
++
++    ``path`` is the policy file for load-time errors, or the offending
++    target (``check_write``) / policy source (``check_hook_verdict``) for
++    enforcement-time ones; ``field`` names the policy key involved;
++    ``reason`` is human-readable. ``to_json()`` renders the exact shape the
++    CLI prints for a structured ``--policy`` error, so the wire format is
++    defined once, here, rather than reassembled at each print site.
++    """
++
++    def __init__(self, path: str, field: str, reason: str) -> None:
++        super().__init__(reason)
++        self.path = path
++        self.field = field
++        self.reason = reason
++
++    def to_json(self) -> dict:
++        return {"error": "policy", "path": self.path, "field": self.field, "reason": self.reason}
++
++    def __str__(self) -> str:
++        where = f"field {self.field!r} " if self.field else ""
++        return f"policy error: {where}{self.reason} (path: {self.path})"
++
++
++@dataclass(frozen=True)
++class Policy:
++    """Validated session constraints; immutable once loaded.
++
++    Every field is "absent = unconstrained" (``None`` / empty tuple / empty
++    mapping), so an enforcement site can short-circuit on falsiness without
++    a second flag -- and a session launched without ``--policy`` (where no
++    ``Policy`` exists at all) is behaviorally identical to one launched
++    with ``{}``. ``source`` records where the document came from (the
++    operator-passed path), carried for error attribution; it constrains
++    nothing.
++    """
++
++    max_turns: int | None = None
++    max_tool_calls: int | None = None
++    #: Directory prefixes (absolute strings; ``expanduser`` already applied
++    #: at load). A write is in scope iff its resolved target lies under --
++    #: or equals -- one of these.
++    write_paths: tuple[str, ...] = ()
++    #: Hook event type -> required decision. Keys absent from the document
++    #: impose nothing; keys present are audited by ``check_hook_verdict``.
++    required_hook_verdicts: Mapping[str, str] = field(default_factory=dict)
++    source: str = ""
++
++
++def _reject(path: str, field_name: str, reason: str) -> PolicyError:
++    return PolicyError(path=path, field=field_name, reason=reason)
++
++
++def _load_mapping(path: Path, text: str) -> Mapping:
++    """Parse ``text`` into a mapping, dispatching on suffix.
++
++    ``.json`` parses as JSON, ``.yaml``/``.yml`` as YAML. An extensionless
++    file is sniffed: JSON first (strict), then YAML -- JSON being (almost)
++    a YAML subset, JSON-first only affects which parse names the error when
++    the document is neither. Any OTHER suffix is rejected outright: a
++    ``.policy.txt`` that happened to parse would be a format nobody
++    declared, which is the quiet-substitution failure fail-closed exists
++    to prevent. A parse success that is not a mapping (YAML root list,
++    bare scalar) is likewise rejected -- a list of constraints has no
++    defined meaning.
++    """
++    suffix = path.suffix.lower()
++    parsed: object = None
++    if suffix == ".json":
++        try:
++            parsed = json.loads(text)
++        except ValueError as exc:
++            raise _reject(str(path), "", f"malformed JSON: {exc}") from None
++    elif suffix in (".yaml", ".yml"):
++        parsed = _safe_yaml(path, text)
++    elif suffix == "":
++        try:
++            parsed = json.loads(text)
++        except ValueError:
++            parsed = _safe_yaml(path, text)
++    else:
++        raise _reject(
++            str(path),
++            "",
++            f"unsupported policy file suffix {suffix!r} "
++            "(expected .json, .yaml, or .yml)",
++        )
++
++    if not isinstance(parsed, Mapping):
++        raise _reject(
++            str(path), "", f"policy root must be a mapping, got {type(parsed).__name__}"
++        )
++    return parsed
++
++
++def _safe_yaml(path: Path, text: str) -> object:
++    """``yaml.safe_load`` with a structured failure (never a raw traceback)."""
++    try:
++        return yaml.safe_load(text)
++    except yaml.YAMLError as exc:
++        raise _reject(str(path), "", f"malformed YAML: {exc}") from None
++
++
++def _validate_positive_int(path: str, key: str, value: object) -> int:
++    """``max_turns``/``max_tool_calls`` must be ints > 0.
++
++    ``type(value) is int`` rather than ``isinstance``: ``True`` IS an int
++    in Python, and JSON ``true`` parsed into a turn cap would otherwise
++    sail through as the cap ``1`` -- a silent constraint rewrite. Zero and
++    negatives are meaningless caps (a session allowed to do nothing is
++    expressed by not launching it), so they are rejected, not clamped.
++    """
++    if type(value) is not int:
++        raise _reject(str(path), key, f"{key} must be an int, got {type(value).__name__}")
++    if value <= 0:
++        raise _reject(str(path), key, f"{key} must be > 0, got {value}")
++    return value
++
++
++def _validate_write_paths(path: str, value: object) -> tuple[str, ...]:
++    """write_paths -> tuple of absolute-ish strings, expanduser applied.
++
++    Entries must be non-empty strings. Each is ``expanduser``-ed then
++    ``resolve()``-d to a string AT LOAD TIME -- anchored once, at the
++    operator's launch context, rather than re-resolved at every check
++    against whatever the process cwd happens to be mid-session. Relative
++    entries are therefore accepted but pinned to their load-time absolute
++    meaning; duplicates are preserved as written (harmless: containment is
++    an any-match over the tuple).
++    """
++    if not isinstance(value, (list, tuple)):
++        raise _reject(
++            str(path), "write_paths", f"write_paths must be a list, got {type(value).__name__}"
++        )
++    resolved: list[str] = []
++    for i, entry in enumerate(value):
++        if not isinstance(entry, str) or not entry.strip():
++            raise _reject(
++                str(path),
++                f"write_paths[{i}]",
++                f"write_paths entries must be non-empty strings, got {entry!r}",
++            )
++        resolved.append(str(Path(entry).expanduser().resolve()))
++    return tuple(resolved)
++
++
++def _validate_hook_verdicts(path: str, value: object) -> Mapping[str, str]:
++    """required_hook_verdicts -> mapping of event type -> allow/warn/block.
++
++    Keys must be non-empty strings (an empty event type could never match
++    an observed hook, so it would be a constraint that silently constrains
++    nothing). Values are checked against the closed ``HOOK_VERDICTS``
++    vocabulary -- an unknown verdict name would otherwise be a requirement
++    no hook decision could ever satisfy, or worse, one nothing bothers to
++    audit. Returns a plain dict copy: the document is read exactly once,
++    and nothing downstream can reach back into the file's parse tree.
++    """
++    if not isinstance(value, Mapping):
++        raise _reject(
++            str(path),
++            "required_hook_verdicts",
++            f"required_hook_verdicts must be a mapping, got {type(value).__name__}",
++        )
++    out: dict[str, str] = {}
++    for key, verdict in value.items():
++        if not isinstance(key, str) or not key:
++            raise _reject(
++                str(path),
++                "required_hook_verdicts",
++                f"keys must be non-empty hook event types, got {key!r}",
++            )
++        if verdict not in HOOK_VERDICTS:
++            raise _reject(
++                str(path),
++                f"required_hook_verdicts[{key}]",
++                f"verdict must be one of allow/warn/block, got {verdict!r}",
++            )
++        out[key] = verdict
++    return out
++
++
++def load_policy(path: str | Path) -> Policy:
++    """Load and validate a policy document; raise ``PolicyError`` otherwise.
++
++    Never returns a partial Policy: any single failure rejects the whole
++    document (no fallthrough), matching ``__main__.py``'s discipline that a
++    broken explicit choice aborts rather than sliding to an implicit one.
++    """
++    p = Path(path).expanduser()
++    if not p.is_file():
++        raise _reject(str(p), "", "policy file does not exist or is not a regular file")
++    try:
++        text = p.read_text(encoding="utf-8")
++    except OSError as exc:
++        raise _reject(str(p), "", f"policy file unreadable: {exc}") from None
++
++    root = _load_mapping(p, text)
++
++    for key in root:
++        if key not in _POLICY_KEYS:
++            raise _reject(
++                str(p),
++                str(key),
++                f"unknown top-level key {key!r} (fail-closed: policy vocabulary is "
++                f"{sorted(_POLICY_KEYS)})",
++            )
++
++    max_turns = (
++        _validate_positive_int(str(p), "max_turns", root["max_turns"])
++        if "max_turns" in root
++        else None
++    )
++    max_tool_calls = (
++        _validate_positive_int(str(p), "max_tool_calls", root["max_tool_calls"])
++        if "max_tool_calls" in root
++        else None
++    )
++    write_paths = (
++        _validate_write_paths(str(p), root["write_paths"])
++        if "write_paths" in root
++        else ()
++    )
++    hook_verdicts = (
++        _validate_hook_verdicts(str(p), root["required_hook_verdicts"])
++        if "required_hook_verdicts" in root
++        else {}
++    )
++
++    return Policy(
++        max_turns=max_turns,
++        max_tool_calls=max_tool_calls,
++        write_paths=write_paths,
++        required_hook_verdicts=hook_verdicts,
++        source=str(p),
++    )
++
++
++def _extract_write_target(tool_input: object) -> str | None:
++    """The path a write-class tool names, or None when none is extractable.
++
++    ``Write``/``Edit`` carry ``file_path``; ``NotebookEdit`` carries
++    ``notebook_path``. Both are consulted so the extraction does not encode
++    which tool is calling; anything that is not a non-empty string (absent
++    key, null, wrong type) extracts nothing -- and the caller treats that
++    as a violation, not a pass.
++    """
++    if not isinstance(tool_input, Mapping):
++        return None
++    for key in ("file_path", "notebook_path"):
++        value = tool_input.get(key)
++        if isinstance(value, str) and value:
++            return value
++    return None
++
++
++def check_write(policy: Policy, tool_name: str, tool_input: object) -> PolicyError | None:
++    """Pure write-scope predicate: None when allowed, else the violation.
++
++    Unconstrained policies (empty ``write_paths``) and non-write-class
++    tools pass unconditionally. For a scoped write, the target is resolved
++    the same way the allowlist was at load (``expanduser`` then
++    ``resolve``) and must lie under -- or equal -- some entry.
++    ``is_relative_to`` does prefix semantics correctly where naive string
++    ``startswith`` would not (``/tmp/evil`` does not lie under ``/tmp/e``
++    despite the string prefix). A write-class tool with NO extractable
++    path is a violation: fail-closed, per the module docstring.
++    """
++    if tool_name not in WRITE_TOOLS or not policy.write_paths:
++        return None
++
++    raw = _extract_write_target(tool_input)
++    if raw is None:
++        return _reject(
++            policy.source,
++            "write_paths",
++            f"{tool_name} carries no extractable file path; "
++            "cannot verify write scope (fail-closed)",
++        )
++
++    target = Path(raw).expanduser().resolve()
++    for prefix in policy.write_paths:
++        if target.is_relative_to(Path(prefix)):
++            return None
++    return _reject(
++        str(target),
++        "write_paths",
++        f"{tool_name} target lies outside every write_paths entry "
++        f"({', '.join(policy.write_paths)})",
++    )
++
++
++def check_hook_verdict(
++    policy: Policy, event_type: str, decision: object
++) -> PolicyError | None:
++    """Compare an observed hook decision against the policy's requirement.
++
++    Event types the policy does not mention impose nothing. A mentioned
++    type whose observed ``decision`` differs from the required verdict --
++    including a missing/None decision, which equals no verdict at all --
++    is a violation. Kept as a pure function so the pump can call it per
++    HOOK_EVENT and the loader tests can call it directly.
++    """
++    required = policy.required_hook_verdicts.get(event_type)
++    if required is None:
++        return None
++    if decision == required:
++        return None
++    return _reject(
++        policy.source,
++        "required_hook_verdicts",
++        f"{event_type} decision={decision}, required={required}",
++    )
+diff --git a/proofpunk_agent/screens/performance.py b/proofpunk_agent/screens/performance.py
+index e854ccb..5073d0d 100644
+--- a/proofpunk_agent/screens/performance.py
++++ b/proofpunk_agent/screens/performance.py
+@@ -98,6 +98,20 @@ one (the reducer's own docstring records why emitting from inside the fold
+ would be impure feedback). Breaches are recorded in the exported snapshot
+ and surfaced here; routing a real log event is the shell's to own.
+ 
++Session policy block
++----------------------
++
++The policy rows render the DECLARED constraints (from the `Policy` the
++shell loaded via `set_policy`) beside LIVE usage (from this widget's own
++`reduce_policy` fold over the same events). The screen never recounts
++turns or tool calls itself, for the same single-implementation reason the
++budget rows fold through `reduce_metrics`: a second counter here could
++disagree with the shell's authoritative `_policy_state`, and the row the
++operator reads while deciding whether to trust the session would be the
++disagreeing one. No policy loaded renders an explicit `(no policy
++loaded)` -- never a block of zeros that would read as "all constraints
++satisfied".
++
+ Export (`b`): the caller names the target, never this widget
+ --------------------------------------------------------------
+ Run selection belongs to the orchestrator. `fresh_evidence.py`'s own usage
+@@ -133,6 +147,7 @@ from textual.binding import Binding
+ from textual.containers import Vertical, VerticalScroll
+ from textual.widgets import Sparkline, Static
+ 
++from proofpunk_agent.policy import Policy
+ from proofpunk_agent.state.events import Event, EventKind
+ from proofpunk_agent.state.reducers.metrics import (
+     BUDGET_SPECS,
+@@ -144,6 +159,7 @@ from proofpunk_agent.state.reducers.metrics import (
+     MetricsState,
+     reduce_metrics,
+ )
++from proofpunk_agent.state.reducers.policy import EMPTY_POLICY_STATE, reduce_policy
+ 
+ __all__ = ["PerformanceScreen"]
+ 
+@@ -183,7 +199,15 @@ _TAIL_FLAG_RATIO = 1.5
+ #: breaks drivers, so they are defined once, here.
+ _HEADER = "PERFORMANCE BUDGET"
+ _LOAD_HEADER = "LOAD PROFILE"
++_POLICY_HEADER = "POLICY"
+ _EMPTY_BUDGET_LINES: tuple[str, ...] = ("(no samples)",)
++#: The no-policy marker: an explicit statement, never a zeroed block that
++#: would read as "all constraints satisfied" (module docstring "Session
++#: policy block").
++_NO_POLICY_LINES: tuple[str, ...] = ("(no policy loaded)",)
++#: Left column width of the policy rows, matching the spec'd example
++#: alignment (`max_tool_calls` + one space is the longest label).
++_POLICY_LABEL_WIDTH = 17
+ 
+ 
+ def _rss_kb(pid: int | None = None) -> int | None:
+@@ -314,6 +338,15 @@ class PerformanceScreen(Static):
+         height: 1;
+     }
+ 
++    PerformanceScreen #perf-policy {
++        /* Same border treatment as #perf-load -- a section divider, not a
++           new visual element; the policy block deliberately introduces no
++           styling vocabulary of its own. */
++        height: auto;
++        border-top: solid $primary-muted;
++        padding-top: 1;
++    }
++
+     PerformanceScreen #perf-load {
+         height: auto;
+         border-top: solid $primary-muted;
+@@ -343,6 +376,16 @@ class PerformanceScreen(Static):
+         super().__init__(*args, **kwargs)
+         self._state: MetricsState = EMPTY_METRICS_STATE
+         self._has_events: bool = False
++        #: The loaded session policy, or None when the app launched without
++        #: --policy. Handed over by the shell via set_policy() BEFORE events
++        #: flow (app.on_mount); the constraints are rendered verbatim from
++        #: it, never re-derived from anything the screen observed.
++        self._policy: Policy | None = None
++        #: Usage counters and the violation list, folded from the same
++        #: events the metrics fold consumes. This is the screen's READ copy
++        #: for rendering; the shell's own _policy_state remains the
++        #: authoritative one the submission gate and the Gate Report use.
++        self._policy_state = EMPTY_POLICY_STATE
+         #: Sparkline history, display-only (see _SPARK_POINTS).
+         self._spark: dict[MetricName, list[float]] = {
+             name: [] for name in self._SPARK_METRICS
+@@ -380,6 +423,10 @@ class PerformanceScreen(Static):
+                         id=f"perf-spark-label-{name.name.lower()}",
+                     )
+                     yield Sparkline([], id=f"perf-spark-{name.name.lower()}")
++            # markup=False: write_paths and hook event types are operator
++            # data -- a path or type containing '[' would be eaten by Rich
++            # markup and silently change the rendered constraint.
++            yield Static(id="perf-policy", markup=False)
+             yield Static(id="perf-load", markup=False)
+ 
+     def on_mount(self) -> None:
+@@ -401,11 +448,76 @@ class PerformanceScreen(Static):
+         self._has_events = True
+         self._accumulate_throughput(event)
+         self._fold(event)
++        # The policy fold rides the same ingress as the metrics fold so
++        # both stay projections of the identical event sequence -- a usage
++        # row computed from a different stream than the screen renders
++        # would be unauditable by construction.
++        self._policy_state = reduce_policy(self._policy_state, event)
+         if self.is_mounted:
+             self._refresh_widgets()
+ 
+     # ---- public read API (for a driver, per assignment) --------------
+ 
++    def set_policy(self, policy: Policy | None) -> None:
++        """Hand the loaded session policy to this screen.
++
++        Called by the shell at mount (``app.on_mount``), before the pump
++        can deliver anything. Safe before this widget has composed: the
++        state is stored unconditionally and only the refresh is
++        mount-guarded -- the same before-mount contract ``apply_event``
++        holds. Accepts None explicitly so a caller can clear a policy
++        without inventing a second "unset" mechanism.
++        """
++        self._policy = policy
++        if self.is_mounted:
++            self._refresh_widgets()
++
++    def policy_lines(self) -> list[str]:
++        """Rendered policy rows for a driver to assert on.
++
++        No policy loaded returns the explicit marker line -- see module
++        docstring "Session policy block": an empty block or a block of
++        zeros would read as constraints present and satisfied, which is
++        the false green this screen exists not to produce. With a policy,
++        usage numbers come from ``self._policy_state`` (the fold), never
++        recomputed here, and the caps come verbatim from the ``Policy``.
++        """
++        if self._policy is None:
++            return list(_NO_POLICY_LINES)
++        policy = self._policy
++        state = self._policy_state
++
++        def row(label: str, value: str) -> str:
++            return f"{label:<{_POLICY_LABEL_WIDTH}}{value}"
++
++        # A declared-but-absent cap renders the used count plus "(no cap)"
++        # rather than "N/0" -- 0 is a rejected cap value at load time, and
++        # a denominator of nothing is not a denominator.
++        turns = (
++            f"{state.turns_used}/{policy.max_turns}"
++            if policy.max_turns is not None
++            else f"{state.turns_used} (no cap)"
++        )
++        calls = (
++            f"{state.tool_calls_used}/{policy.max_tool_calls}"
++            if policy.max_tool_calls is not None
++            else f"{state.tool_calls_used} (no cap)"
++        )
++        writes = ", ".join(policy.write_paths) if policy.write_paths else "(unrestricted)"
++        verdicts = (
++            ", ".join(f"{k}<={v}" for k, v in policy.required_hook_verdicts.items())
++            if policy.required_hook_verdicts
++            else "(none)"
++        )
++        return [
++            _POLICY_HEADER,
++            row("max_turns", turns),
++            row("max_tool_calls", calls),
++            row("write_paths", writes),
++            row("hook verdicts", verdicts),
++            row("violations", str(len(state.violations))),
++        ]
++
+     def budget_lines(self) -> list[str]:
+         """Rendered budget rows -- one per metric, in `BUDGET_SPECS` order --
+         for a driver to assert on without depending on widget internals.
+@@ -682,6 +794,9 @@ class PerformanceScreen(Static):
+             spark = self.query_one(f"#perf-spark-{name.name.lower()}", Sparkline)
+             spark.data = list(self._spark[name])
+ 
++        policy = self.query_one("#perf-policy", Static)
++        policy.update("\n".join(self.policy_lines()))
++
+         load = self.query_one("#perf-load", Static)
+         load.update("\n".join([_LOAD_HEADER, *self.load_lines()]))
+ 
+diff --git a/proofpunk_agent/state/events.py b/proofpunk_agent/state/events.py
+index 9d0a7f6..a6399b5 100644
+--- a/proofpunk_agent/state/events.py
++++ b/proofpunk_agent/state/events.py
+@@ -26,7 +26,12 @@ __all__ = [
+ 
+ 
+ class EventKind(str, Enum):
+-    """Event vocabulary. str-valued so a log serializes without a custom encoder."""
++    """Event vocabulary. str-valued so a log serializes without a custom encoder.
++
++    ``POLICY_VIOLATION`` is produced by the shell, never the SDK: a session-
++    policy breach must enter the same append-only log as every other event so
++    the Gate Report is replayable from the log alone.
++    """
+ 
+     SESSION_INIT = "session_init"
+     AGENT_SPAWNED = "agent_spawned"
+@@ -40,6 +45,7 @@ class EventKind(str, Enum):
+     TASK_UPDATED = "task_updated"
+     RESULT = "result"
+     ERROR = "error"
++    POLICY_VIOLATION = "policy_violation"
+ 
+ 
+ class AttributionTier(int, Enum):
+diff --git a/proofpunk_agent/state/reducers/policy.py b/proofpunk_agent/state/reducers/policy.py
+new file mode 100644
+index 0000000..e820c01
+--- /dev/null
++++ b/proofpunk_agent/state/reducers/policy.py
+@@ -0,0 +1,243 @@
++"""Session-policy reducer -- constraint accounting for the Gate Report.
++
++The shell may load a declarative ``--policy`` file (``proofpunk_agent.policy``)
++constraining a session: a turn cap, a tool-call cap, a write-path allowlist,
++and required hook verdicts. Enforcement lives in the app shell (the
++permission gate, the submission gate, the event pump); THIS reducer does no
++enforcement at all. It only projects the event log into the counters and
++the violation list the Performance screen renders and the Gate Report
++exports, so that "the session breached its policy" is a fact read off the
++recorded log, not a side-channel memory of the shell that happens to still
++be alive.
++
++Replay determinism (VG-P2 discipline)
++--------------------------------------
++This reducer is a pure function of ``(state, event)``. It never reads a
++clock, never calls the global ``random`` module, never mutates an argument,
++and never raises: the same log replayed through the same reducers must
++produce byte-identical state, and that property is only provable if every
++input comes from the events themselves. Consequences, applied below:
++
++- Every value this reducer consumes (``num_turns``, ``terminal_reason``,
++  ``rule``, ``detail``) is read from ``event.data`` with a type check, and
++  a malformed value degrades to "not recorded this event" rather than
++  raising -- a reducer that crashes on one bad event would make the whole
++  replay unrunnable, and a replay gap is exactly the silent-failure class
++  this product exists to catch.
++- The one clock read in this module, ``_now_iso``, lives inside
++  ``violation_event`` -- a FACTORY used by producers (the app shell)
++  BEFORE the event enters the log, never inside the fold. This is the same
++  split ``bridge/sdk.py`` uses with its own ``_now_iso``: producers stamp,
++  reducers fold. ``Event.at`` is "wall-clock for display only" per
++  ``events.py``; a producer-stamped timestamp carried through the fold
++  violates nothing.
++- ``seq`` is assigned by ``EventLog.append``, never chosen here; a
++  ``PolicyViolation`` recorded by this reducer carries the event's own
++  ``seq``/``at`` verbatim, so the Gate Report can point back at the exact
++  log entry that recorded the breach.
++
++Counter semantics
++-----------------
++``turns_used`` is a monotonic MAX of ``RESULT`` payloads' ``num_turns``,
++not a sum: ``ResultMessage.num_turns`` is the SDK's session-cumulative
++turn count (verified in ``bridge/sdk.py``'s ``_project_result``), so
++summing consecutive ``RESULT`` events would double-count every turn after
++the first. ``max`` over an append-ordered log is also stable under replay
++by construction. A missing, non-``int``, or zero ``num_turns`` leaves the
++counter unchanged (``0 or turns_used`` -- the SDK reports turns starting
++at 1; a 0 would add no information anyway).
++
++``session_ended``/``session_end_reason`` latch on
++``terminal_reason == "max_turns"`` and are never cleared by a later
++``RESULT``: the fold over an append-only log is history, and a session
++that hit the SDK-side cap cannot un-hit it. Only that one terminal reason
++is recorded here; other terminal reasons are the conversation screen's
++domain, not the policy report's.
++
++``tool_calls_used`` counts ``TOOL_STARTED`` events only. ``TOOL_FINISHED``
++is deliberately not folded: the cap the policy file declares is on calls
++the model issued, and a ``TOOL_STARTED`` without a matching ``TOOL_FINISHED``
++(a killed shell, a truncated log) was still a call the permission gate had
++to judge.
++
++``PolicyViolation`` rows are appended verbatim from ``POLICY_VIOLATION``
++events (rule/detail from ``data``, seq/at/subject from the event). The
++reducer does not judge severity or deduplicate: two recorded breaches are
++two rows, and the Gate Report says what the log says.
++"""
++
++from __future__ import annotations
++
++from dataclasses import dataclass, replace
++from datetime import datetime, timezone
++from typing import Any, Mapping
++
++from proofpunk_agent.state.events import Event, EventKind
++
++__all__ = [
++    "PolicyViolation",
++    "PolicyState",
++    "EMPTY_POLICY_STATE",
++    "reduce_policy",
++    "violation_event",
++]
++
++#: The one ``terminal_reason`` this reducer latches on (see module
++#: docstring "Counter semantics"): the SDK stopped the session because the
++#: turn cap was reached -- the policy-relevant terminal cause.
++_MAX_TURNS_REASON = "max_turns"
++
++
++@dataclass(frozen=True)
++class PolicyViolation:
++    """One recorded session-policy breach (one Gate Report row).
++
++    ``seq`` and ``at`` are the ``POLICY_VIOLATION`` event's own log
++    position and stamp, carried verbatim so a report row can point back at
++    the log entry that recorded it. ``subject`` is whatever the producer
++    bound the breach to (a ``tool_use_id`` for write-scope and
++    tool-call-cap denials, the session id for turn-cap refusals, the hook
++    event id for verdict mismatches); ``""`` means the breach was
++    session-global.
++    """
++
++    seq: int
++    at: str
++    rule: str
++    detail: str
++    subject: str = ""
++
++
++@dataclass(frozen=True)
++class PolicyState:
++    """Policy accounting slice: usage counters plus the violation list.
++
++    ``turns_used``/``tool_calls_used`` are the denominators the
++    Performance screen renders next to each declared cap (``4/10``); the
++    shell's submission gate reads the same fields live. ``violations`` is
++    append-ordered by log position. All fields default to "nothing
++    happened yet", so ``EMPTY_POLICY_STATE`` is the identity of the fold.
++    """
++
++    turns_used: int = 0
++    tool_calls_used: int = 0
++    violations: tuple[PolicyViolation, ...] = ()
++    #: Latched when the SDK reported ``terminal_reason == "max_turns"``;
++    #: never cleared by later events (append-only history).
++    session_ended: bool = False
++    session_end_reason: str | None = None
++
++
++EMPTY_POLICY_STATE = PolicyState()
++
++
++def _string_of(data: Mapping[str, Any], key: str) -> str:
++    """Read ``data[key]`` as a display string. Only a genuine ``str``
++    value is accepted -- anything else (absent, ``None``, a number, a
++    dict) records as ``""`` rather than being stringified or raising; the
++    reducer never fabricates content the producer did not send."""
++    value = data.get(key)
++    return value if isinstance(value, str) else ""
++
++
++def _handle_result(state: PolicyState, event: Event) -> PolicyState:
++    """Fold a ``RESULT``: monotonic ``num_turns`` max plus the max_turns
++    latch (see module docstring "Counter semantics")."""
++    data = event.data
++
++    turns_used = state.turns_used
++    reported = data.get("num_turns")
++    # ``type(...) is int`` (not isinstance) so a stray ``True`` is not
++    # accepted as 1 -- the same bool-must-not-pass convention the policy
++    # loader applies. ``reported or turns_used`` for the 0/None cases.
++    if type(reported) is int and reported > turns_used:
++        turns_used = reported
++
++    session_ended = state.session_ended
++    session_end_reason = state.session_end_reason
++    if _string_of(data, "terminal_reason") == _MAX_TURNS_REASON:
++        session_ended = True
++        session_end_reason = _MAX_TURNS_REASON
++
++    return replace(
++        state,
++        turns_used=turns_used,
++        session_ended=session_ended,
++        session_end_reason=session_end_reason,
++    )
++
++
++def _handle_tool_started(state: PolicyState, event: Event) -> PolicyState:
++    """One ``TOOL_STARTED`` is one call against the declared tool-call
++    cap, whether or not a ``TOOL_FINISHED`` ever follows."""
++    return replace(state, tool_calls_used=state.tool_calls_used + 1)
++
++
++def _handle_policy_violation(state: PolicyState, event: Event) -> PolicyState:
++    """Append one ``PolicyViolation`` verbatim from the event (rule/detail
++    from ``data``; seq/at/subject from the event itself). No dedupe, no
++    severity ranking -- the report says what the log says."""
++    violation = PolicyViolation(
++        seq=event.seq,
++        at=event.at,
++        rule=_string_of(event.data, "rule"),
++        detail=_string_of(event.data, "detail"),
++        subject=event.subject,
++    )
++    return replace(state, violations=state.violations + (violation,))
++
++
++_HANDLERS = {
++    EventKind.RESULT: _handle_result,
++    EventKind.TOOL_STARTED: _handle_tool_started,
++    EventKind.POLICY_VIOLATION: _handle_policy_violation,
++}
++
++
++def reduce_policy(state: PolicyState, event: Event) -> PolicyState:
++    """Pure ``(state, event) -> state`` fold for policy accounting.
++
++    Every ``EventKind`` not in ``_HANDLERS`` is totally ignored -- this
++    function never raises on an unrecognized kind and never mutates its
++    arguments (``PolicyState`` is frozen; every handler returns a new
++    instance via ``replace``).
++    """
++    handler = _HANDLERS.get(event.kind)
++    if handler is None:
++        return state
++    return handler(state, event)
++
++
++# ---------------------------------------------------------------------------
++# Producer-side factory (NOT part of the fold -- see module docstring)
++# ---------------------------------------------------------------------------
++
++
++def _now_iso() -> str:
++    """Wall-clock ISO-8601 for ``Event.at``. Display only -- never used
++    for attribution (events.py docstring). Same contract as the bridge's
++    ``_now_iso``; duplicated here rather than imported so the state
++    package does not depend on the bridge (events flow bridge -> state,
++    never the reverse)."""
++    return datetime.now(timezone.utc).isoformat()
++
++
++def violation_event(rule: str, detail: str, subject: str = "") -> Event:
++    """Construct a shell-produced ``POLICY_VIOLATION`` ``Event`` for the
++    enforcement paths to inject into the pipeline (write-scope deny,
++    tool-call cap, turn cap, hook-verdict mismatch).
++
++    This is a producer-side constructor, not a reducer step: it reads a
++    clock (``_now_iso``) precisely because it runs BEFORE the event
++    enters the append-only log, exactly like every event the bridge
++    constructs. ``seq`` stays at its default; the log assigns it on
++    append. ``tier`` stays ``UNATTRIBUTED`` -- a policy breach is a fact
++    about the session the shell observed, not an SDK attribution this
++    producer could honestly claim.
++    """
++    return Event(
++        kind=EventKind.POLICY_VIOLATION,
++        at=_now_iso(),
++        subject=subject,
++        data={"rule": rule, "detail": detail},
++    )
+diff --git a/pyproject.toml b/pyproject.toml
+index 8ed0de3..d4d2a52 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -34,6 +34,8 @@ dependencies = [
+     # Pinned at VG-P0 bind time; see PHASE0.md "SDK pin".
+     "claude-agent-sdk==0.2.144",
+     "textual==8.1.1",
++    # Declared for --policy YAML support (policy.py safe_load only).
++    "pyyaml==6.0.2",
+ ]
+ 
+ [project.scripts]
+diff --git a/validation/e2e/policy_gate.py b/validation/e2e/policy_gate.py
+new file mode 100644
+index 0000000..ed9f43b
+--- /dev/null
++++ b/validation/e2e/policy_gate.py
+@@ -0,0 +1,590 @@
++"""Session-policy gate driver -- all three --policy acceptance criteria.
++
++One script, three sections, one reproducible command for QA (the assignment
++for this feature asks for exactly that). Each section maps to one acceptance
++criterion and prints exactly one PASS line when it holds; any failed
++assertion prints a FAIL line naming the criterion before the script exits
++non-zero. The script is itself the artifact QA runs, so it never leaves
++scratch state behind: tempdirs and the gate-report run dir are removed in
++``finally`` blocks, and ``PROOFPUNK_AGENT_GATE_DIR`` is restored.
++
++Sections and their criteria:
++
++  1. FAIL-CLOSED (criterion 1 -- invalid/missing policy exits with a
++     structured error, code 2, before any session or UI starts). Launches
++     the real CLI as a subprocess -- ``python3 -m proofpunk_agent
++     --no-plugin --policy ... --check`` -- for the missing-file case and
++     three invalid documents (malformed JSON, unknown key, bad verdict),
++     then a valid document to prove ``--check`` still exits 0 WITH the
++     policy lines. One deliberate nuance, recorded here because the wire
++     contract has two halves by design (subtask-2-1): a MISSING file is
++     rejected at PARSE time by the argparse type-checker -- exit 2 with
++     argparse's ``policy file does not exist`` message -- while an invalid
++     DOCUMENT is rejected by ``load_policy`` -- exit 2 with a single JSON
++     line ``{"error": "policy", ...}`` on stderr. Both exit 2 before any
++     session or UI starts; only the second is JSON. This driver asserts
++     each half as implemented rather than papering over the split.
++
++  2. LOG + GATE REPORT (criterion 2 -- every enforcement path emits a
++     POLICY_VIOLATION event visible in the pump distribution and recorded
++     in the gate report payload). Drives the REAL app shell headlessly via
++     Textual's ``run_test`` pilot with a SYNTHETIC bridge standing in at
++     the SDK boundary: the shell's own ``_pump_events`` pulls a
++     PERMISSION_REQUESTED for a ``Write`` outside ``write_paths`` off the
++     bridge queue, the permission gate must auto-deny it in the same
++     handler turn (fail-closed ordering) and inject the POLICY_VIOLATION
++     back onto the SAME queue, the pump must fold it into the shell's
++     ``_policy_state``, ``gate_report_payload`` must carry it, and the
++     Screen 5 accessor must show it. The synthetic bridge is what makes
++     this runnable without credentials or a CLI child: it is a driver for
++     the SHELL's enforcement plumbing, not a claim about the SDK. The
++     subtask allows ``run_test`` or direct-component driving and asks that
++     the chosen path be recorded; this script prints which one it took.
++     The section closes with the gate report EXPORT through the real
++     containment path (``write_gate_report_now`` under
++     ``PROOFPUNK_AGENT_GATE_DIR``): a contained run dir writes a parseable
++     report, the same-second second call refuses (never overwrite), and an
++     unset env var refuses -- criterion 5's live behavior.
++
++  3. HUD/SCREEN (criterion 3 -- the performance screen renders the loaded
++     constraints and live usage, '(no policy loaded)' when the flag is
++     absent). One headless app WITH a policy: ``policy_lines()`` shows
++     every declared constraint with zeroed usage, a fed ``TOOL_STARTED``
++     ticks the usage row (``apply_event`` is the only ingress), and the
++     ``#perf-policy`` Static actually renders the block. One headless app
++     WITHOUT a policy: the explicit ``(no policy loaded)`` marker in both
++     the accessor and the rendered Static, and ``budget_lines()``
++     unchanged at its documented empty state -- the flagless path must
++     look exactly like the pre-feature screen.
++
++No ``pytest`` (there is none in this repo); plain asserts with messages,
++``try``/``except`` per section, a real process exit code at the end.
++"""
++
++from __future__ import annotations
++
++import asyncio
++import json
++import os
++import shutil
++import subprocess
++import sys
++import tempfile
++import time
++from pathlib import Path
++
++# Direct execution (``python3 validation/e2e/policy_gate.py``) has no
++# package context, so relative imports are unavailable. Anchor the repo
++# root -- three parents up from this file (e2e/ -> validation/ -> root) --
++# exactly as the PTY scenario drivers resolve it, so ``proofpunk_agent``
++# and ``validation.capture`` (imported lazily by the gate report writer)
++# resolve identically here and under ``python -m``.
++_REPO_ROOT = Path(__file__).resolve().parents[2]
++if str(_REPO_ROOT) not in sys.path:
++    sys.path.insert(0, str(_REPO_ROOT))
++
++from claude_agent_sdk import PermissionResultAllow  # noqa: E402
++from textual.widgets import Static  # noqa: E402
++
++from proofpunk_agent.app import ProofpunkAgentApp  # noqa: E402
++from proofpunk_agent.gate_report import gate_report_payload  # noqa: E402
++from proofpunk_agent.policy import load_policy  # noqa: E402
++from proofpunk_agent.screens.performance import PerformanceScreen  # noqa: E402
++from proofpunk_agent.state.events import Event, EventKind  # noqa: E402
++
++__all__ = ["main"]
++
++
++# ---------------------------------------------------------------------------
++# Section scaffolding
++# ---------------------------------------------------------------------------
++
++
++def _report(name: str, ok: bool, detail: str) -> bool:
++    """Print one bracketed section line; returns ``ok`` unchanged so a
++    section body can end with ``return _report(...)``."""
++    print(f"[{'PASS' if ok else 'FAIL'}] {name}: {detail}")
++    return ok
++
++
++async def _poll(deadline_s: float, probe) -> None:
++    """Await ``probe()`` truthiness with a deadline -- the observe-before-
++    act rule the PTY drivers apply via ``wait_for``; never a bare
++    sleep-then-assert (the 2Hz Screen 5 tick means a fixed sleep that
++    happens to be long enough today is a timing bug tomorrow)."""
++    deadline = time.monotonic() + deadline_s
++    while time.monotonic() < deadline:
++        if probe():
++            return
++        await asyncio.sleep(0.05)
++    # One final probe so the failure is the assertion's, not the poll's.
++    if probe():
++        return
++    raise TimeoutError(f"condition not met within {deadline_s}s")
++
++
++def _run_cli(policy_arg: str) -> subprocess.CompletedProcess:
++    """Launch the real CLI exactly as an operator would for a --check."""
++    return subprocess.run(
++        [
++            sys.executable,
++            "-m",
++            "proofpunk_agent",
++            "--no-plugin",
++            "--policy",
++            policy_arg,
++            "--check",
++        ],
++        capture_output=True,
++        text=True,
++        timeout=60,
++        cwd=str(_REPO_ROOT),
++        env={**os.environ, "PYTHONPATH": str(_REPO_ROOT)},
++    )
++
++
++def _structured_error(proc: subprocess.CompletedProcess) -> dict:
++    """Assert the load-time failure contract: exit 2 plus ONE JSON line on
++    stderr whose ``error`` discriminator is ``policy``."""
++    assert proc.returncode == 2, (
++        f"expected exit 2, got {proc.returncode}; stderr={proc.stderr!r}"
++    )
++    try:
++        return json.loads(proc.stderr)
++    except ValueError as exc:
++        raise AssertionError(
++            f"stderr is not JSON-parseable ({exc}): {proc.stderr!r}"
++        ) from None
++
++
++# ---------------------------------------------------------------------------
++# Section 1 -- fail-closed CLI matrix (acceptance criterion 1)
++# ---------------------------------------------------------------------------
++
++
++def _section_fail_closed() -> bool:
++    tmp = Path(tempfile.mkdtemp(prefix="pp-policy-gate-s1-"))
++    try:
++        # (a) MISSING file: rejected at parse time by the argparse
++        # type-checker (subtask-2-1's design) -- exit 2, argparse's own
++        # message on stderr, and no --check output at all because main()
++        # never ran. That last part is the criterion's "before any session
++        # or UI starts" made observable.
++        missing = tmp / "absent.json"
++        proc = _run_cli(str(missing))
++        assert proc.returncode == 2, (
++            f"missing file: expected exit 2, got {proc.returncode}; "
++            f"stderr={proc.stderr!r}"
++        )
++        assert "policy file does not exist" in proc.stderr, (
++            f"missing file: argparse rejection not on stderr: {proc.stderr!r}"
++        )
++        assert "plugin root" not in proc.stdout, (
++            f"missing file: --check output ran anyway: {proc.stdout!r}"
++        )
++
++        # (b) MALFORMED JSON document.
++        bad_json = tmp / "malformed.json"
++        bad_json.write_text("{ not json", encoding="utf-8")
++        doc = _structured_error(_run_cli(str(bad_json)))
++        assert doc.get("error") == "policy", f"discriminator wrong: {doc!r}"
++        assert "malformed" in doc.get("reason", ""), f"reason wrong: {doc!r}"
++
++        # (c) UNKNOWN top-level key -- fail-closed vocabulary, not ignore.
++        unknown = tmp / "unknown-key.json"
++        unknown.write_text(json.dumps({"max_tuns": 3}), encoding="utf-8")
++        doc = _structured_error(_run_cli(str(unknown)))
++        assert doc.get("error") == "policy", f"discriminator wrong: {doc!r}"
++        assert doc.get("field") == "max_tuns", f"field wrong: {doc!r}"
++
++        # (d) BAD verdict value outside the allow/warn/block vocabulary.
++        verdict = tmp / "bad-verdict.json"
++        verdict.write_text(
++            json.dumps({"required_hook_verdicts": {"PreToolUse:Write": "maybe"}}),
++            encoding="utf-8",
++        )
++        doc = _structured_error(_run_cli(str(verdict)))
++        assert doc.get("error") == "policy", f"discriminator wrong: {doc!r}"
++        assert "verdict" in doc.get("field", ""), f"field wrong: {doc!r}"
++
++        # (e) VALID document: --check exits 0 and REPORTS the policy (the
++        # flag's happy path is visible, not silent).
++        valid = tmp / "valid.json"
++        valid.write_text(
++            json.dumps(
++                {
++                    "max_turns": 4,
++                    "max_tool_calls": 9,
++                    "write_paths": ["/tmp/pp-write-scope-probe"],
++                    "required_hook_verdicts": {"PreToolUse:Write": "block"},
++                }
++            ),
++            encoding="utf-8",
++        )
++        proc = _run_cli(str(valid))
++        assert proc.returncode == 0, (
++            f"valid policy: expected exit 0, got {proc.returncode}; "
++            f"stderr={proc.stderr!r}"
++        )
++        assert f"policy:      {valid}" in proc.stdout, (
++            f"valid policy: policy line missing: {proc.stdout!r}"
++        )
++        assert "constraints: max_turns=4 max_tool_calls=9" in proc.stdout, (
++            f"valid policy: constraints summary missing: {proc.stdout!r}"
++        )
++    except Exception as exc:
++        return _report(
++            "fail-closed CLI matrix",
++            False,
++            f"acceptance criterion 1 (invalid/missing policy exits 2, "
++            f"structured error, before any UI): {exc}",
++        )
++    finally:
++        shutil.rmtree(tmp, ignore_errors=True)
++    return _report(
++        "fail-closed CLI matrix",
++        True,
++        "missing file exit 2 (argparse); malformed/unknown-key/bad-verdict "
++        "exit 2 with JSON error=='policy'; valid --check exit 0 with the "
++        "policy line (criterion 1)",
++    )
++
++
++# ---------------------------------------------------------------------------
++# Section 2 -- enforcement -> log -> gate report (criterion 2)
++# ---------------------------------------------------------------------------
++
++
++class _SyntheticBridge:
++    """Queue-only stand-in for ``SdkBridge`` at the SDK boundary.
++
++    The assignment's alternative path ("drive the components directly")
++    allows the SDK boundary to be synthetic so this driver needs no
++    credentials and spawns no CLI child. What MUST stay real is everything
++    downstream of the queue: ``_pump_events`` fans the events out to the
++    live screens, folds the policy state, and routes
++    PERMISSION_REQUESTED into the real permission gate, whose deny path
++    injects the POLICY_VIOLATION back onto THIS queue -- so the breach
++    provably rides the same distribution everything else reads.
++
++    ``stop`` exists because app teardown (``on_unmount`` ->
++    ``_teardown_bridge``) awaits it; ``resolve_permission`` records the
++    verdict instead of settling an SDK future.
++    """
++
++    session_id = "synthetic-policy-gate"
++
++    def __init__(self) -> None:
++        self._queue: asyncio.Queue = asyncio.Queue()
++        self.injected: list[Event] = []
++        self.resolutions: list[tuple[str, str]] = []
++
++    async def events(self):
++        while True:
++            yield await self._queue.get()
++
++    def push(self, event: Event) -> None:
++        self._queue.put_nowait(event)
++
++    def inject(self, event: Event) -> None:
++        self.injected.append(event)
++        self._queue.put_nowait(event)
++
++    def resolve_permission(self, tool_use_id: str, result) -> bool:
++        behavior = "allow" if isinstance(result, PermissionResultAllow) else "deny"
++        self.resolutions.append((tool_use_id, behavior))
++        return True
++
++    async def stop(self) -> None:
++        return None
++
++
++async def _section_log_and_gate_report() -> bool:
++    # The drive path choice the subtask asks to record in the output.
++    print("drive path: run_test (Textual headless pilot, synthetic bridge)")
++    scratch = Path(tempfile.mkdtemp(prefix="pp-policy-gate-s2-"))
++    run_dir: Path | None = None
++    old_gate_dir = os.environ.get("PROOFPUNK_AGENT_GATE_DIR")
++    try:
++        allowed = scratch / "allowed"
++        allowed.mkdir()
++        outside_target = scratch / "outside" / "x.txt"
++        policy_path = scratch / "policy.json"
++        # A REAL load_policy, not a hand-built Policy: the loader resolves
++        # write_paths at load time (macOS resolve() rewrites /var and /tmp
++        # prefixes), and check_write resolves the target the same way --
++        # hand-constructing the Policy would bypass that anchoring.
++        policy_path.write_text(
++            json.dumps(
++                {
++                    "max_turns": 10,
++                    "max_tool_calls": 5,
++                    "write_paths": [str(allowed)],
++                    "required_hook_verdicts": {"PreToolUse:Write": "block"},
++                }
++            ),
++            encoding="utf-8",
++        )
++        policy = load_policy(policy_path)
++
++        app = ProofpunkAgentApp(policy=policy)
++        async with app.run_test(size=(120, 40)) as pilot:
++            # Install the synthetic bridge exactly as _ensure_bridge would
++            # (minus the SDK connect): pump task over bridge.events().
++            bridge = _SyntheticBridge()
++            app._bridge = bridge
++            app._pump = asyncio.create_task(app._pump_events(bridge))
++
++            # The out-of-scope Write request, plus a TOOL_STARTED and a
++            # RESULT so the counters fold beside the denial. The injected
++            # violation lands on the queue AFTER these (the deny happens
++            # while the pump is inside the PERMISSION_REQUESTED iteration),
++            # so the final state is the poll target below, never a fixed
++            # sleep.
++            bridge.push(
++                Event(
++                    kind=EventKind.PERMISSION_REQUESTED,
++                    at="2026-09-17T00:00:00Z",
++                    subject="toolu_policy_probe",
++                    data={
++                        "tool_name": "Write",
++                        "tool_input": {"file_path": str(outside_target)},
++                    },
++                )
++            )
++            bridge.push(
++                Event(
++                    kind=EventKind.TOOL_STARTED,
++                    at="2026-09-17T00:00:01Z",
++                    subject="toolu_policy_probe",
++                    data={"tool_name": "Write"},
++                )
++            )
++            bridge.push(
++                Event(
++                    kind=EventKind.RESULT,
++                    at="2026-09-17T00:00:02Z",
++                    data={"num_turns": 2},
++                )
++            )
++
++            state = await _wait_for_state(app)
++
++            # (a) Fail-closed denial: resolved deny in the same handler
++            # turn, one POLICY_VIOLATION injected into the shared queue,
++            # and no permission modal (the operator was never asked a
++            # question the policy had already answered).
++            assert bridge.resolutions == [("toolu_policy_probe", "deny")], (
++                f"expected one policy deny, got {bridge.resolutions!r}"
++            )
++            assert len(bridge.injected) == 1, (
++                f"expected exactly one injected violation, got "
++                f"{[e.kind for e in bridge.injected]!r}"
++            )
++            violation = bridge.injected[0]
++            assert violation.kind is EventKind.POLICY_VIOLATION, (
++                f"injected event is {violation.kind!r}, not POLICY_VIOLATION"
++            )
++            assert violation.data.get("rule") == "write_paths", (
++                f"violation rule is {violation.data.get('rule')!r}"
++            )
++            assert type(app.screen).__name__ != "PermissionModal", (
++                "permission modal was pushed for a policy-denied call"
++            )
++
++            # (b) The shell's fold counted it (this is the state the
++            # submission gate and the Gate Report read, not a screen copy).
++            assert state.tool_calls_used == 1, f"tool_calls_used={state.tool_calls_used}"
++            assert state.turns_used == 2, f"turns_used={state.turns_used}"
++            assert len(state.violations) == 1, (
++                f"violations={state.violations!r}"
++            )
++            row = state.violations[0]
++            assert row.rule == "write_paths" and row.subject == "toolu_policy_probe", (
++                f"violation row {row!r}"
++            )
++
++            # (c) The gate report payload carries it; verdict is honest.
++            payload = gate_report_payload(policy, state)
++            assert payload["verdict"] == "VIOLATIONS", payload["verdict"]
++            assert payload["turns_used"] == 2 and payload["tool_calls_used"] == 1
++            assert payload["violations"] and payload["violations"][0]["rule"] == "write_paths"
++            assert payload["policy"]["max_turns"] == 10
++            assert payload["policy"]["write_paths"] == list(policy.write_paths)
++
++            # (d) Screen 5's driver API shows constraint + violation count.
++            perf = app.query_one("#performance", PerformanceScreen)
++            lines = perf.policy_lines()
++            assert lines[0] == "POLICY", f"header line {lines[0]!r}"
++            assert any(l.strip().startswith("max_turns") and l.strip().endswith("2/10") for l in lines), lines
++            assert any(l.strip().startswith("max_tool_calls") and l.strip().endswith("1/5") for l in lines), lines
++            assert any(l.strip().startswith("write_paths") and policy.write_paths[0] in l for l in lines), lines
++            assert any("PreToolUse:Write<=block" in l for l in lines), lines
++            assert any(l.strip().startswith("violations") and l.strip().endswith("1") for l in lines), lines
++
++            # Gate report EXPORT through the real containment path. The run
++            # dir lives under the repo's own e2e-evidence (NOT a tempfile:
++            # macOS /tmp fails the realpath==lexical check by design) and
++            # carries the .run-meta marker the product demands.
++            evidence_root = _REPO_ROOT / "e2e-evidence"
++            assert evidence_root.is_dir(), f"missing {evidence_root}"
++            run_dir = evidence_root / f"run-policy-gate-{int(time.time())}-{os.getpid()}"
++            run_dir.mkdir(parents=True)
++            (run_dir / ".run-meta").write_text(
++                "driver: validation/e2e/policy_gate.py\n", encoding="utf-8"
++            )
++            os.environ["PROOFPUNK_AGENT_GATE_DIR"] = str(run_dir)
++
++            written = app.write_gate_report_now()
++            assert written is not None and written.is_file(), (
++                "contained gate report was not written"
++            )
++            on_disk = json.loads(written.read_text(encoding="utf-8"))
++            assert on_disk["verdict"] == "VIOLATIONS", on_disk.get("verdict")
++            assert any(v["rule"] == "write_paths" for v in on_disk["violations"]), on_disk
++            # Same-second second call: refused, never an overwrite. The
++            # two calls are back-to-back so the filename (second
++            # resolution) is identical by construction.
++            again = app.write_gate_report_now()
++            assert again is None, f"second same-second write returned {again!r}"
++            # Unset env: refusal, and nothing appears anywhere else.
++            del os.environ["PROOFPUNK_AGENT_GATE_DIR"]
++            assert app.write_gate_report_now() is None, "unset GATE_DIR wrote anyway"
++            await pilot.pause()
++    except Exception as exc:
++        return _report(
++            "log + gate report drive",
++            False,
++            f"acceptance criterion 2 (POLICY_VIOLATION visible in the pump "
++            f"and recorded in the gate report; criterion 5 export "
++            f"containment): {exc}",
++        )
++    finally:
++        if old_gate_dir is None:
++            os.environ.pop("PROOFPUNK_AGENT_GATE_DIR", None)
++        else:
++            os.environ["PROOFPUNK_AGENT_GATE_DIR"] = old_gate_dir
++        if run_dir is not None:
++            shutil.rmtree(run_dir, ignore_errors=True)
++        shutil.rmtree(scratch, ignore_errors=True)
++    return _report(
++        "log + gate report drive",
++        True,
++        "out-of-scope Write denied in-turn; POLICY_VIOLATION folded "
++        "(turns 2/10, calls 1/5, violations 1); payload verdict VIOLATIONS; "
++        "contained export wrote + refused overwrite + refused unset env "
++        "(criteria 2 and 5)",
++    )
++
++
++async def _wait_for_state(app: ProofpunkAgentApp):
++    """Poll the shell's own fold until the denial + counters all landed."""
++    await _poll(
++        10.0,
++        lambda: (
++            len(app._policy_state.violations) == 1
++            and app._policy_state.tool_calls_used == 1
++            and app._policy_state.turns_used == 2
++        ),
++    )
++    return app._policy_state
++
++
++# ---------------------------------------------------------------------------
++# Section 3 -- HUD / Screen 5 policy block (acceptance criterion 3)
++# ---------------------------------------------------------------------------
++
++
++async def _section_screen() -> bool:
++    tmp = Path(tempfile.mkdtemp(prefix="pp-policy-gate-s3-"))
++    try:
++        # (a) WITH a policy: constraints rendered, usage ticks via
++        # apply_event -- the screen's only ingress.
++        policy_path = tmp / "policy.json"
++        policy_path.write_text(
++            json.dumps({"max_turns": 4, "max_tool_calls": 50}), encoding="utf-8"
++        )
++        policy = load_policy(policy_path)
++        app = ProofpunkAgentApp(policy=policy)
++        async with app.run_test(size=(120, 40)):
++            perf = app.query_one("#performance", PerformanceScreen)
++            lines = perf.policy_lines()
++            assert lines[0] == "POLICY", lines
++            assert any(l.strip().startswith("max_turns") and l.strip().endswith("0/4") for l in lines), lines
++            assert any(l.strip().startswith("max_tool_calls") and l.strip().endswith("0/50") for l in lines), lines
++            assert any(l.strip().startswith("write_paths") and "(unrestricted)" in l for l in lines), lines
++            assert any(l.strip().startswith("hook verdicts") and "(none)" in l for l in lines), lines
++            assert any(l.strip().startswith("violations") and l.strip().endswith("0") for l in lines), lines
++
++            # apply_event is the sole ingress: one TOOL_STARTED must tick
++            # the usage row without any other wiring.
++            perf.apply_event(
++                Event(kind=EventKind.TOOL_STARTED, subject="toolu_s3", data={})
++            )
++            lines = perf.policy_lines()
++            assert any(l.strip().startswith("max_tool_calls") and l.strip().endswith("1/50") for l in lines), lines
++
++            # The rendered Static (not just the accessor) shows the block.
++            # #perf-policy paints on the screen's 2Hz tick, so poll.
++            static = app.query_one("#perf-policy", Static)
++            await _poll(5.0, lambda: "POLICY" in str(static.render()))
++            assert "0/4" in str(static.render()), str(static.render())
++
++        # (b) WITHOUT a policy (the flagless path): explicit marker, and
++        # the pre-feature budget behavior untouched.
++        bare = ProofpunkAgentApp()
++        async with bare.run_test(size=(120, 40)):
++            perf = bare.query_one("#performance", PerformanceScreen)
++            assert perf.policy_lines() == ["(no policy loaded)"], perf.policy_lines()
++            assert perf.budget_lines() == ["(no samples)"], perf.budget_lines()
++            static = bare.query_one("#perf-policy", Static)
++            await _poll(5.0, lambda: "(no policy loaded)" in str(static.render()))
++    except Exception as exc:
++        return _report(
++            "HUD/screen policy block",
++            False,
++            f"acceptance criterion 3 (constraints and live usage rendered; "
++            f"'(no policy loaded)' without the flag; budget lines "
++            f"unchanged): {exc}",
++        )
++    finally:
++        shutil.rmtree(tmp, ignore_errors=True)
++    return _report(
++        "HUD/screen policy block",
++        True,
++        "with policy: POLICY block, caps, apply_event usage tick, rendered "
++        "#perf-policy; without: '(no policy loaded)' and budget_lines "
++        "'(no samples)' unchanged (criterion 3)",
++    )
++
++
++# ---------------------------------------------------------------------------
++# Entry point
++# ---------------------------------------------------------------------------
++
++
++def main() -> int:
++    print("policy gate driver: 3 sections (fail-closed CLI, log+gate report, HUD)")
++    results: list[bool] = []
++
++    results.append(_section_fail_closed())
++    try:
++        results.append(asyncio.run(_section_log_and_gate_report()))
++    except Exception as exc:  # a section never crashes the driver
++        results.append(
++            _report("log + gate report drive", False, f"unhandled: {exc!r}")
++        )
++    try:
++        results.append(asyncio.run(_section_screen()))
++    except Exception as exc:
++        results.append(
++            _report("HUD/screen policy block", False, f"unhandled: {exc!r}")
++        )
++
++    passed = sum(1 for r in results if r)
++    print(f"\n{len(results)} sections: {passed} PASS, {len(results) - passed} FAIL")
++    return 0 if passed == len(results) else 1
++
++
++if __name__ == "__main__":
++    raise SystemExit(main())

@@ -1,0 +1,48 @@
+{
+  "trigger": "G (force regenerate roadmap, refresh=true) pressed on Roadmap tab (3) \u2014 TWICE across this run",
+  "reason_g_lowercase_would_noop": "runDiscoveryPhase() (roadmap.ts:110-112) and runFeaturesPhase() (roadmap.ts:229-231) both short-circuit with success:true and NO LLM call whenever their output file already exists and refresh=false. The project already had roadmap.json + roadmap_discovery.json on disk, so lowercase 'g' (refresh:false, RoadmapView.tsx keymap 'g: () => generate(false)') returns instantly with a flash 'roadmap generated' and zero streaming. 'G' (refresh:true, keymap 'G: () => generate(true)') was required to force real regeneration.",
+  "run_1_manual_poll": {
+    "method": "manual td.current_frame() polling (not capture-frames, to avoid re-firing G each sample)",
+    "batch_a": {
+      "count": 10,
+      "interval_s": 1.5,
+      "distinct_hashes": 2
+    },
+    "batch_b": {
+      "count": 12,
+      "interval_s": 2.5,
+      "distinct_hashes": 4
+    },
+    "phase_transitions_observed": [
+      "idle -> RUNNING discovery 30% -> RUNNING features 50% -> idle (complete, 'Contents:' summary)"
+    ],
+    "roadmap_json_effect": "39 features -> 48 features (9 new: R1-R9); phases P2-trust-hardening, P3-team-collaboration, P4-extensibility-scale added; old P12/P13/P14 features preserved (mergeFeatures)"
+  },
+  "run_2_capture_frames_tool": {
+    "method": "tuistory capture-frames -s ap-pp G --count 8 --interval 3000 (documented CLI tool)",
+    "count": 8,
+    "interval_ms": 3000,
+    "distinct_hashes": 2,
+    "note": "generation outlived the 24s sampling window (stalled visibly at 'features 50%'); supplementary manual polling (14 more samples over ~36s) caught it complete"
+  },
+  "run_2_supplementary_poll": {
+    "batch_a": {
+      "count": 8,
+      "interval_s": 2.0,
+      "distinct_hashes": 1,
+      "note": "all mid-features-50%"
+    },
+    "batch_b": {
+      "count": 6,
+      "interval_s": 4.0,
+      "distinct_hashes": 1,
+      "note": "landed post-completion (idle)"
+    },
+    "roadmap_json_effect": "48 features -> 58 features (10 more new features); new phase P15 appeared"
+  },
+  "combined_verdict": {
+    "total_distinct_frame_hashes_across_all_samples": "5 (run 1) + up to 2 (run 2 capture-frames tool)",
+    "streaming_proven": true,
+    "proof_basis": "distinct rendered frames showing phase/progress text changing (idle -> discovery X% -> features Y% -> idle+summary), AND independently, roadmap.json mtime + feature-count deltas on disk after each G press confirm two separate real LLM-driven regenerations completed"
+  }
+}

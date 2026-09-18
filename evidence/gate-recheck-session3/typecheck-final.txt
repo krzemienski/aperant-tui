@@ -1,0 +1,16 @@
+$ npm run typecheck
+> aperant-tui-workspace@0.1.0 typecheck
+> npm run typecheck -w @aperant/tui
+
+> @aperant/tui@0.1.0 typecheck
+> tsc --noEmit
+
+(no output — zero errors)
+TYPECHECK_EXIT=0
+
+Run against the complete change set including:
+- apps/desktop/src/main/ai/runners/merge-resolver.ts (F-16, streamText)
+- apps/tui/src/services/agent-start-service.ts (F-12 priority-order + F-17 plan sync on exit)
+- apps/tui/src/views/SettingsView.tsx + apps/tui/src/services/account-service.ts (P6.2)
+- apps/tui/src/views/WorktreeView.tsx + apps/tui/src/services/worktree-actions.ts (Phase 5)
+- VENDORED-PATCHES.md

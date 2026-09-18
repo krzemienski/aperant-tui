@@ -11,3 +11,13 @@ apps/tui/dist/
 
 # Python bytecode from tools/ (tuistory driver)
 __pycache__/
+
+# local agent/session runtime state — not deliverables
+.omc/
+.omp/
+.claude/
+banks/
+
+# generated build/scan artifacts
+*.tsbuildinfo
+repomix-output.xml

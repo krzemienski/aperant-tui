@@ -1,0 +1,20 @@
+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ proofpunk-agent /Users/nick/proofpunk-agent │ ⑂ master                                                                                                 ◉ 0 running  ◆ 1 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃ TASKS                                                                                  ┃ │ DETAIL                                                                                                │ │
+│ ┃ ◆ BACKLOG (5)                                                                          ┃ │ 006-tool [BACKLOG]                                                                                    │ │
+│ ┃   001-scre ▽ Screens 2-5 beyond the P1 shell placeholder                               ┃ │ Tool Allow/Deny Lists                                                                                 │ │
+│ ┃   002-prom ▽ Promote n/w from roadmap-honesty stubs to real bindings                   ┃ │ progress ░░░░░░░░░░░░░░ 0%                                                                            │ │
+│ ┃   003-term ▽ Terminal floor 100x28 blocking-resize overlay coverage                    ┃ │ subtasks 0/0 complete                                                                                 │ │
+│ ┃   004-evid ▽ Evidence Run Diff & Lineage                                               ┃ │ phase -                                                                                               │ │
+│ ┃ ❯ 006-tool ▽ Tool Allow/Deny Lists                                                     ┃ │ location main  spec 006-tool-allow-deny-lists                                                         │ │
+│ ┃ ◆ HUMAN (1)                                                                            ┃ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ ┃   005-poli ▽ Policy File (--policy): declarative YAML/JSON session constraints, fail-… ┃                                                                                                           │
+│ ┃                                                                                        ┃ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃                                                                                        ┃ │ AGENT STREAM                                                                                          │ │
+│ ┃                                                                                        ┃ │ no recorded runs for this task                                                                        │ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ BOARD  j/k move · ⏎ focus · s start · x stop · H/L column · l logs                                                                                                                      : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

@@ -1,0 +1,16 @@
+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ hunter-seed /Users/nick/dev/hunter-seed │ ⑂ main                                                                                                       ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│  1 swarm   2 graph   3 inspect   4 trace   5 tokens   6 waits  no live agents — start one from the board with s                                                                                      │
+│                                                                                                                                                                                                      │
+│ ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ AGENT SWARM                                                                                                                                                                                      │ │
+│ │ No agent has started in this TUI session.                                                                                                                                                        │ │
+│ │ Start one from the board (s on a task) — this surface taps the real AgentManager                                                                                                                 │ │
+│ │ event stream, spec-dir sentinel files, and the vendored AGENT_CONFIGS registry.                                                                                                                  │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ this view will list every live agent, its type, steps and what it is waiting on.                                                                                                                 │ │
+│ └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ AGENTS  1-6 sub-view · j/k select · ⏎ inspect · f filter · r resume                                                                                                                     : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

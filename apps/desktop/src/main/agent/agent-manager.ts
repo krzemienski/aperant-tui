@@ -424,6 +424,13 @@ export class AgentManager extends EventEmitter {
       baseURL: resolved.auth?.baseURL,
       configDir: resolved.configDir,
       oauthTokenFilePath: resolved.auth?.oauthTokenFilePath,
+      // [APERANT-PATCH agentic-orchestration-optin] (2026-09-17): strict
+      // equality — defaults to false for every existing caller since no
+      // current call site sets metadata.useAgenticOrchestration. Additive:
+      // routes to worker.ts:434's existing (pre-existing, unmodified)
+      // if-check, which itself already defaults to the non-agentic
+      // runSpecOrchestrator() path when the field is falsy/undefined.
+      useAgenticOrchestration: metadata?.useAgenticOrchestration === true,
       mcpOptions: {
         context7Enabled: true,
         memoryEnabled: !!process.env.GRAPHITI_MCP_URL,

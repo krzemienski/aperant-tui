@@ -1,0 +1,8 @@
+{
+  "complexity": "complex",
+  "confidence": 0.85,
+  "reasoning": "Live SDK drive with non-deterministic model behavior (must coax subagent spawns, ideally nested), real-PTY automation of a Textual TUI, per-project evidence-archive conventions, and unresolved empirical unknowns (attribution tier labels in live frames, achievable nesting depth, spawn-tool name on host). No code-level research needed beyond the repo itself, but the spec must encode fallback/abandon criteria for uncooperative model behavior.",
+  "needs_research": false,
+  "needs_self_critique": true,
+  "assessment_method": "orchestrator self-assessment (complexity_assessor subagent failed twice with invalid JSON output; repository inspected directly instead)"
+}

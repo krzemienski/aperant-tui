@@ -1,0 +1,8 @@
+{
+  "question": "Which file and function defines the CLI entry point for the headless pipeline command?",
+  "cited_file": "awesome_researcher/main.py",
+  "cited_line": 1608,
+  "answer_verbatim": "Headless pipeline entry point: `cli_main()` in `awesome_researcher/main.py` (line 1608), a Click command...",
+  "verified_on_disk": true,
+  "verification_method": "Grep tool confirmed awesome_researcher/main.py:1608 == 'def cli_main(**kwargs: Any) -> None:' exactly"
+}

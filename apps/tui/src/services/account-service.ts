@@ -30,13 +30,16 @@ export type ProvisionResult =
   | { ok: true; accountId: string; baseUrl: string; updated: boolean }
   | { ok: false; reason: string };
 
+export type ActivateResult =
+  | { ok: true; accountId: string; alreadyActive: boolean }
+  | { ok: false; reason: string };
+
 export interface AccountView {
   id: string;
   provider: string;
   name: string;
   baseUrl?: string;
   hasKey: boolean;
-  keyPreview?: string; // first 7 chars + '…' — never the full key
 }
 
 const MOONSHOT_DEFAULT_BASE_URL = 'https://api.moonshot.ai/v1';
@@ -60,6 +63,20 @@ function writeSettingsAtomic(settingsPath: string, settings: Record<string, unkn
   const tmp = `${settingsPath}.tmp-${process.pid}`;
   writeFileSync(tmp, JSON.stringify(settings, null, 2), 'utf-8');
   renameSync(tmp, settingsPath);
+}
+
+/**
+ * Ids are minted from the clock, so two adds inside one millisecond would
+ * collide — harmless while appends were unreachable, a real id clash now
+ * that they are. Suffix on collision instead of handing back a duplicate id.
+ */
+function mintAccountId(accounts: Array<Record<string, unknown>>, provider: string, now: number): string {
+  const base = `${provider}-${now.toString(36)}`;
+  if (!accounts.some((a) => String(a.id) === base)) return base;
+  for (let n = 2; ; n += 1) {
+    const candidate = `${base}-${n}`;
+    if (!accounts.some((a) => String(a.id) === candidate)) return candidate;
+  }
 }
 
 /**
@@ -89,7 +106,12 @@ export function provisionMoonshotAccount(input: MoonshotProvisionInput = {}): Pr
 
   const accounts = Array.isArray(settings.providerAccounts) ? (settings.providerAccounts as Array<Record<string, unknown>>) : [];
   const now = Date.now();
-  const existing = accounts.find((a) => a.provider === 'moonshot');
+  // F-18: identity is (provider, baseUrl), not provider alone. Matching on
+  // provider alone made the second add of a family overwrite the first in
+  // place, so an operator running two routers of the same family had no way
+  // to hold both. Same endpoint still updates in place (keeping its id and
+  // its slot in globalPriorityOrder); only a new endpoint appends.
+  const existing = accounts.find((a) => a.provider === 'moonshot' && String(a.baseUrl ?? '') === baseUrl);
 
   let accountId: string;
   let updated = false;
@@ -101,7 +123,7 @@ export function provisionMoonshotAccount(input: MoonshotProvisionInput = {}): Pr
     accountId = String(existing.id);
     updated = true;
   } else {
-    accountId = `moonshot-${now.toString(36)}`;
+    accountId = mintAccountId(accounts, 'moonshot', now);
     accounts.push({
       id: accountId,
       provider: 'moonshot',
@@ -166,7 +188,10 @@ export function provisionAnthropicAccount(
     ? (settings.providerAccounts as Array<Record<string, unknown>>)
     : [];
   const now = Date.now();
-  const existing = accounts.find((a) => a.provider === 'anthropic');
+  // F-18: see the moonshot twin above — identity is (provider, baseUrl).
+  // An operator with one Anthropic-compatible router who adds a second must
+  // end up with two accounts, not one clobbered account.
+  const existing = accounts.find((a) => a.provider === 'anthropic' && String(a.baseUrl ?? '') === baseUrl);
 
   let accountId: string;
   let updated = false;
@@ -177,7 +202,7 @@ export function provisionAnthropicAccount(
     accountId = String(existing.id);
     updated = true;
   } else {
-    accountId = `anthropic-${now.toString(36)}`;
+    accountId = mintAccountId(accounts, 'anthropic', now);
     accounts.push({
       id: accountId,
       provider: 'anthropic',
@@ -214,14 +239,66 @@ export function listProviderAccounts(): AccountView[] {
     ? (read.settings.providerAccounts as Array<Record<string, unknown>>)
     : [];
   return accounts.map((a) => {
-    const key = typeof a.apiKey === 'string' ? a.apiKey : '';
+    // P6.2: never surface even a prefix of the key — a boolean is the only
+    // credential-existence signal this view model exposes.
     return {
       id: String(a.id ?? ''),
       provider: String(a.provider ?? '?'),
       name: String(a.name ?? ''),
       baseUrl: typeof a.baseUrl === 'string' ? a.baseUrl : undefined,
-      hasKey: key.length > 0,
-      keyPreview: key ? `${key.slice(0, 7)}…` : undefined,
+      hasKey: typeof a.apiKey === 'string' && a.apiKey.length > 0,
     };
   });
+}
+
+/**
+ * P6.2: "active account" is defined as whichever provisioned account sits
+ * at the HEAD of `globalPriorityOrder` in settings.json — this is the exact
+ * contract the vendored queue resolver honors (see
+ * apps/desktop/src/main/ai/auth/resolver.ts:buildDefaultQueueConfig — it
+ * sorts `providerAccounts` by index-in-`globalPriorityOrder`, treating
+ * absence as `Infinity` so unlisted accounts sort last, and hands the
+ * sorted queue to `resolveAuthFromQueue`, which tries accounts in that
+ * order). Activating an account therefore means rewriting
+ * `globalPriorityOrder` so that account's id is first — nothing else about
+ * the account (its key, its baseUrl) changes.
+ *
+ * Reuses the same atomic tmp-file+rename write as provisionAnthropicAccount
+ * / provisionMoonshotAccount so a crash mid-write can never corrupt
+ * settings.json.
+ */
+export function activateAccount(accountId: string): ActivateResult {
+  if (!accountId) {
+    return { ok: false, reason: 'no account id given' };
+  }
+
+  const settingsPath = getSettingsPath();
+  const read = readSettingsRaw(settingsPath);
+  if (!read.ok) return { ok: false, reason: read.reason };
+  const settings = read.settings;
+
+  const accounts = Array.isArray(settings.providerAccounts)
+    ? (settings.providerAccounts as Array<Record<string, unknown>>)
+    : [];
+  const target = accounts.find((a) => String(a.id ?? '') === accountId);
+  if (!target) {
+    return { ok: false, reason: `no provider account with id "${accountId}"` };
+  }
+
+  const order = Array.isArray(settings.globalPriorityOrder)
+    ? (settings.globalPriorityOrder as unknown[]).map(String)
+    : [];
+  const alreadyActive = order.length > 0 && order[0] === accountId;
+  if (alreadyActive) {
+    return { ok: true, accountId, alreadyActive: true };
+  }
+
+  settings.globalPriorityOrder = [accountId, ...order.filter((id) => id !== accountId)];
+
+  try {
+    writeSettingsAtomic(settingsPath, settings);
+  } catch (err) {
+    return { ok: false, reason: `failed to write settings.json: ${err instanceof Error ? err.message : String(err)}` };
+  }
+  return { ok: true, accountId, alreadyActive: false };
 }

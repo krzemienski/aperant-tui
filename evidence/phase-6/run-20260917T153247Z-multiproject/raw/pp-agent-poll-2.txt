@@ -1,0 +1,28 @@
+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ proofpunk-agent /Users/nick/proofpunk-agent │ ⑂ master                                                                                                 ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ │
+│ ┃ GENERATION                                                                                                                                                                                       ┃ │
+│ ┃ RUNNING · features 50% — Running features phase...                                                                                                                                               ┃ │
+│ ┃  ████████████░░░░░░░░░░░░ features                                                                                                                                                               ┃ │
+│ ┃ Running discovery phase...                                                                                                                                                                       ┃ │
+│ ┃ Discovery document written to `/Users/nick/proofpunk-agent/.auto-claude/roadmap/roadmap_discovery.js                                                                                             ┃ │
+│ ┃ Phase discovery completed                                                                                                                                                                        ┃ │
+│ ┃ Running features phase...                                                                                                                                                                        ┃ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ │
+│ ┌────────────────────────────────────────────────────────────────────────────────────────────────────┐┌────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ PHASES                                                                                             ││ DETAIL                                                                                     │ │
+│ │   ○ PHASE P2-observability Deeper Observability & Interaction                                      ││ Analytics & Multi-Run Insight                                                              │ │
+│ │   ░░░░░░░░░░░░░░░░░░ 0/3 features                                                                  ││  · Cost Attribution by Subagent [planned · Should]                                         │ │
+│ │                                                                                                    ││    c → convert to task spec                                                                │ │
+│ │   ○ PHASE P3-automation Automation & CI                                                            ││  · Cross-Run Trends Dashboard [planned · Could]                                            │ │
+│ │   ░░░░░░░░░░░░░░░░░░ 0/4 features                                                                  ││    c → convert to task spec                                                                │ │
+│ │                                                                                                    ││  · Global Search & Command Palette [planned · Should]                                      │ │
+│ │ ❯ ○ PHASE P4-analytics Analytics & Multi-Run Insight                                               ││    c → convert to task spec                                                                │ │
+│ │   ░░░░░░░░░░░░░░░░░░ 0/3 features                                                                  ││                                                                                            │ │
+│ │                                                                                                    ││                                                                                            │ │
+│ └────────────────────────────────────────────────────────────────────────────────────────────────────┘└────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│  generating… x stop                                                                                                                                                                                  │
+│ ROAD  g generate (G force regen) · c convert→spec                                                                                                                                       : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

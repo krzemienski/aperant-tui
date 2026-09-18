@@ -1,0 +1,34 @@
+[
+ {
+  "seq": 3,
+  "file": "f18-tui/step-03-settings-one-account-persisted.png",
+  "name": "settings-one-account-persisted",
+  "anchor": "/20128/",
+  "keys_sent": "6",
+  "caption": "After restart: router-A account persisted from disk",
+  "ok": true,
+  "anchor_matched": true,
+  "bytes": 151262,
+  "ts": "16:29:17",
+  "err": null,
+  "sha256": "8ee36d8c97e54b2f39d1484a899e8ae541bbf2c95cf5d3b9a5b8d065761904ca",
+  "duplicate_of": null,
+  "secret_hits": []
+ },
+ {
+  "seq": 4,
+  "file": "f18-tui/step-04-account-2-appended.png",
+  "name": "account-2-appended",
+  "anchor": "/20999/",
+  "keys_sent": "a",
+  "caption": "Second add (router B @20999) APPENDS \u2014 router A row still present",
+  "ok": true,
+  "anchor_matched": true,
+  "bytes": 176828,
+  "ts": "16:29:20",
+  "err": null,
+  "sha256": "29fea6d8c9577b46f4e29db94c87c6478b8a0b22bb22522fc780b2106597df1c",
+  "duplicate_of": null,
+  "secret_hits": []
+ }
+]

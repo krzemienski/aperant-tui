@@ -1,0 +1,77 @@
+{
+  "gate": "F-16-redrive-ai-conflict-resolution",
+  "source_fix_confirmed": {
+    "file": "apps/desktop/src/main/ai/runners/merge-resolver.ts",
+    "marker": "[APERANT-PATCH merge-resolver-stream] (2026-09-17)",
+    "change": "streamText() + fullStream text-delta accumulation, replacing generateText() (non-streaming doGenerate path)"
+  },
+  "attempts": [
+    {
+      "n": 1,
+      "before": "def hello():\n<<<<<<< HEAD\n    return \"hello from MAIN's own conflicting edit\"\n=======\n    return \"hello from the CONFLICT branch\"\n>>>>>>> feature/conflict-branch\n\n\nCONSTANT = 1",
+      "after": "def hello():\n    return \"hello from the CONFLICT branch\"\n\n\nCONSTANT = 1",
+      "markers_gone": true,
+      "coherent": true,
+      "side_chosen": "feature/conflict-branch (theirs)",
+      "constant_preserved": true,
+      "still_UU": true,
+      "auto_committed": false,
+      "invalid_json_response_error": false
+    },
+    {
+      "n": 2,
+      "before": "def hello():\n<<<<<<< HEAD\n    return \"hello from MAIN's own conflicting edit\"\n=======\n    return \"hello from the CONFLICT branch\"\n>>>>>>> feature/conflict-branch\n\n\nCONSTANT = 1",
+      "after": "def hello():\n    return \"hello from MAIN's own conflicting edit\"\n\n\nCONSTANT = 1",
+      "markers_gone": true,
+      "coherent": true,
+      "side_chosen": "main (ours)",
+      "constant_preserved": true,
+      "still_UU": true,
+      "auto_committed": false,
+      "invalid_json_response_error": false,
+      "note": "LLM non-determinism picked the other side this time -- both outcomes are individually coherent, marker-free, single-side resolutions. Neither is 'garbage' or a silent drop of both sides."
+    },
+    {
+      "n": 3,
+      "before": "def hello():\n<<<<<<< HEAD\n    return \"hello from MAIN's own conflicting edit\"\n=======\n    return \"hello from the CONFLICT branch\"\n>>>>>>> feature/conflict-branch\n\n\nCONSTANT = 1",
+      "after": "def hello():\n    return \"hello from the CONFLICT branch\"\n\n\nCONSTANT = 1",
+      "markers_gone": true,
+      "coherent": true,
+      "side_chosen": "feature/conflict-branch (theirs)",
+      "constant_preserved": true,
+      "still_UU": true,
+      "auto_committed": false,
+      "invalid_json_response_error": false,
+      "TOAST_MESSAGE_CAPTURED_VERBATIM": "AI resolved 1 file(s) \u2014 NOT committed: review in the diff pane, then `git add` / `git commit` yourself",
+      "toast_capture_method": "tuistory capture-frames R --count 12 --interval 2000 (spanned the full ~12-20s streaming call)"
+    }
+  ],
+  "invalid_json_response_ever_reproduced": false,
+  "all_3_attempts_succeeded": true,
+  "success_rate_this_session": "3/3",
+  "auto_commit_never_observed": true,
+  "verdict": "PASS \u2014 the F-16 fix works. All 3 independent attempts (fresh conflict recreated each time via merge --abort + re-merge) succeeded: conflict markers genuinely removed from disk, resolved content coherent (single side chosen cleanly, unrelated CONSTANT=1 line preserved untouched), never auto-committed (git status remained UU throughout), and the exact success toast was captured verbatim on attempt 3. Zero recurrences of 'Invalid JSON response' across 3 attempts, compared to 3/3 failures with that exact error before the fix.",
+  "EVIDENCE_CORRECTION_2026-09-17": {
+    "issue_found_by_auditor": "steps 2, 3, 4 in captures.json shared sha256 bced57f9... (duplicate_of correctly set on 3 and 4), but captions on 3 and 4 asserted a visible before/after resolution the pixels do not show -- same failure pattern as the prior R1/R3 retraction.",
+    "root_cause_of_identical_frames": "BY DESIGN, not a defect. Reproduced directly: manually wrote resolved content to app.py without `git add` and confirmed `git diff --name-only --diff-filter=U` (exactly what WorktreeView's getConflictedFiles() runs) STILL lists app.py as conflicted -- git's 'conflicted' state is an INDEX property (unresolved stage 1/2/3 entries), not a working-tree-content property. resolveConflictsWithAI() deliberately never `git add`s the resolved file (the human-review-before-commit safety contract), so the conflict banner and the DIFF panel's underlying `conflicted` array never change after a successful resolve. Separately, the DIFF panel itself renders `git diff HEAD` INSIDE THE SELECTED WORKTREE'S OWN DIRECTORY (feature-conflict/), which is a different filesystem location from where the conflict actually lives (the main repo) -- so it was always going to read clean, unrelated to the conflict resolution.",
+    "captions_corrected": {
+      "step_3": "now states screen content is UNCHANGED from step-02 (by design, explained), points to text-artifacts/03 and /04 for the real evidence",
+      "step_4": "same correction, points to text-artifacts/05 and /06"
+    },
+    "new_on_disk_text_artifacts": [
+      "text-artifacts/01-git-status-before-R.txt (UU app.py)",
+      "text-artifacts/02-app.py-before-R-with-markers.txt (real <<<<<<< / ======= / >>>>>>> markers)",
+      "text-artifacts/03-git-status-after-R.txt (still UU app.py -- not auto-committed)",
+      "text-artifacts/04-app.py-after-R-markers-absent.txt (markers genuinely gone, coherent content)",
+      "text-artifacts/05-git-status-toast-run.txt (independent 3rd run, still UU)",
+      "text-artifacts/06-app.py-toast-run-resolved.txt (independent 3rd run, markers gone)",
+      "text-artifacts/07-toast-verbatim-text.txt (exact toast message + capture methodology)"
+    ],
+    "genuinely_distinct_post_R_frame_found": {
+      "file": "scratch/step-06-f16v-toast-live.png",
+      "sha256": "609fc642e63ea11d8a03ad0d823edfb8a675b3690220d120671d5cfdc264ceab",
+      "method": "Located the toast's precise timing window (frames 9-14 of a 300ms-interval capture-frames run, ~2.7-4.2s after R) via a text-based timing probe, then fired a live `screenshot --immediate` timed to land inside that window. Confirmed via visual inspection: the toast banner 'AI resolved 1 file(s) -- NOT committed: review in the diff pane, then `git add` / `git c...' is clearly visible in the frame's top-right border. Hash confirmed distinct from all other captures (no match)."
+    },
+    "duplicate_of_fields": "preserved and correctly still point to step-02 on steps 3, 4, 6, and 7 (the two NEW captures made during this verification pass that landed the same steady-state screen also correctly registered as duplicates)"
+  }
+}

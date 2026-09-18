@@ -1,0 +1,13 @@
+{
+  "method": "capture-frames (6 frames, 900ms interval) + snapshot polling (16 polls, 2-3s interval)",
+  "total_samples": 22,
+  "distinct_samples": 5,
+  "states_observed": [
+    "idle(pre-regen, old content)",
+    "RUNNING discovery 30%",
+    "RUNNING features 50% (early)",
+    "RUNNING features 50% (mid, same progress% different scroll)",
+    "idle(post-regen, new content P12-P14)"
+  ],
+  "note": "capture-frames CLI truncates stdout at exactly 65536 bytes when piped via subprocess.run - worked around by redirecting to file. Frames within a single capture-frames burst can be identical when sampled faster than the LLM call latency (features phase took >20s); combining with wider-interval snapshot polling captured the full idle->running->idle transition."
+}

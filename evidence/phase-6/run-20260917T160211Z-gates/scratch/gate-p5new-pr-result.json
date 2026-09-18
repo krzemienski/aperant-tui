@@ -1,0 +1,18 @@
+{
+  "gate": "P5.new-pr-creation",
+  "gh_availability": "gh 2.101.0 installed and authenticated as real user krzemienski (verified: gh auth status)",
+  "scratch_repo_remote": "none configured (verified: git remote -v returned empty)",
+  "action": "selected feature/conflict-branch worktree, pressed p",
+  "observed_behavior": {
+    "message": "push failed: fatal: 'origin' does not appear to be a git repository",
+    "gh_pr_create_reached": false,
+    "reasoning": "createWorktreePR() correctly detected gh is available (did not show 'gh CLI not found'), attempted the required git push --set-upstream origin <branch> step first, which failed cleanly because the scratch repo has no origin remote -- exactly as designed, since PR creation requires a pushed branch."
+  },
+  "safety_verification": {
+    "no_remote_created": true,
+    "no_pr_created_anywhere": true,
+    "no_real_repo_touched": true
+  },
+  "verdict_pr_appears_on_github": "UNVERIFIED -- correct verdict because the precondition (a remote to push to) genuinely cannot be met without either creating a real disposable GitHub repo (out of scope/unsafe per instructions) or fabricating one, which was declined",
+  "verdict_honest_behavior": "PASS -- the app never silently succeeded, never fabricated a PR URL, and surfaced the exact real git error"
+}

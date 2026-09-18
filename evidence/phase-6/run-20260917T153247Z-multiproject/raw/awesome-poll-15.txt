@@ -1,0 +1,29 @@
+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ awesome-researcher /Users/nick/awesome-researcher │ ⑂ feat/awesome-researcher                                                                          ◉ 0 running  ◆ 1 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ GENERATION                                                                                                                                                                                       │ │
+│ │ idle                                                                                                                                                                                             │ │
+│ │ Roadmap written to `/Users/nick/awesome-researcher/.auto-claude/roadmap/roadmap.json`.                                                                                                           │ │
+│ │ - 3 phases: Trust & Review (P-1), Continuous Operation (P-2), Scale & Intelligence (P-3)                                                                                                         │ │
+│ │ - 9 new features (F-101…F-303), MoSCoW prioritized, no duplication of F-001–F-013                                                                                                                │ │
+│ │ - Key themes: human-in-the-loop review + auto-PR, link-rot audit, scheduled/incremental runs, feedba                                                                                             │ │
+│ │ - Dependencies mapped (e.g., F-102 → F-101; F-202 → F-201; F-303 → F-203); exit-code contract and bu                                                                                             │ │
+│ │ Phase features completed                                                                                                                                                                         │ │
+│ └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃ PHASES                                                                    ┃│ DETAIL                                                                                                              │ │
+│ ┃ ❯ ○ PHASE P-1 Trust & Review Workflow                                     ┃│ Trust & Review Workflow                                                                                             │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/3 features                                         ┃│  · Human-in-the-loop candidate review with selective approval [proposed · Must]                                     │ │
+│ ┃                                                                           ┃│    c → convert to task spec                                                                                         │ │
+│ ┃   ○ PHASE P-2 Continuous Operation                                        ┃│  · Automatic PR draft generation from approved candidates [proposed · Must]                                         │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/3 features                                         ┃│    c → convert to task spec                                                                                         │ │
+│ ┃                                                                           ┃│  · Link-rot audit of existing list entries [proposed · Should]                                                      │ │
+│ ┃   ○ PHASE P-3 Scale & Intelligence                                        ┃│    c → convert to task spec                                                                                         │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/3 features                                         ┃│                                                                                                                     │ │
+│ ┃                                                                           ┃│                                                                                                                     │ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛└─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│  g generate · G refresh · j/k phase · c convert→spec                                                                                                                                                 │
+│ ROAD  g generate (G force regen) · x stop · j/k phase · c convert→spec                                                                                                                  : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

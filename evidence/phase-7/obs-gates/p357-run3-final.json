@@ -1,0 +1,26 @@
+{
+  "model": "glm/glm-4.7",
+  "results": [
+    {
+      "callIndex": 1,
+      "status": 200,
+      "durationMs": 1549,
+      "usage": null,
+      "rawBodySnippet": "{\"id\":\"msg_20260918050856cd4a110395c344ba\",\"type\":\"message\",\"role\":\"assistant\",\"model\":\"glm-4.7\",\"content\":[{\"type\":\"text\",\"text\":\"1\"}],\"stop_reason\":\"end_turn\",\"stop_sequence\":null,\"usage\":{\"input_tokens\":64,\"output_tokens\":3,\"cache_read_input_tokens\":2304,\"server_tool_use\":{\"web_search_requests\":0},\"service_tier\":\"standard\"}}data: [DONE]\n\n"
+    },
+    {
+      "callIndex": 2,
+      "status": 200,
+      "durationMs": 1303,
+      "usage": null,
+      "rawBodySnippet": "{\"id\":\"msg_20260918050858507d424088ce4cd6\",\"type\":\"message\",\"role\":\"assistant\",\"model\":\"glm-4.7\",\"content\":[{\"type\":\"thinking\",\"thinking\":\"2\",\"signature\":\"f58ef151689549e6a56da678\"},{\"type\":\"text\",\"text\":\"2\"}],\"stop_reason\":\"end_turn\",\"stop_sequence\":null,\"usage\":{\"input_tokens\":64,\"output_tokens\":4,\"cache_read_input_tokens\":2304,\"server_tool_use\":{\"web_search_requests\":0},\"service_tier\":\"standard"
+    },
+    {
+      "callIndex": 3,
+      "status": 200,
+      "durationMs": 1237,
+      "usage": null,
+      "rawBodySnippet": "{\"id\":\"msg_20260918050859b706a4c5fce04862\",\"type\":\"message\",\"role\":\"assistant\",\"model\":\"glm-4.7\",\"content\":[{\"type\":\"thinking\",\"thinking\":\"3\",\"signature\":\"f347e9e276124d8d9519d686\"},{\"type\":\"text\",\"text\":\"3\"}],\"stop_reason\":\"end_turn\",\"stop_sequence\":null,\"usage\":{\"input_tokens\":64,\"output_tokens\":4,\"cache_read_input_tokens\":2304,\"server_tool_use\":{\"web_search_requests\":0},\"service_tier\":\"standard"
+    }
+  ]
+}

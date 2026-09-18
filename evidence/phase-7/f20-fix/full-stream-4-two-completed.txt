@@ -1,0 +1,36 @@
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ proofpunk-agent /Users/nick/proofpunk-agent │ ⑂ master                                                                                                 ◉ 0 running  ◆ 1 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│  1 swarm   2 graph   3 inspect   4 trace   5 tokens   6 waits  4 agents · esc then 1-7 to switch tabs                                                                                                │
+│                                                                                                                                                                                                      │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ │
+│ ┃ EVENT TRACE · all agents · 6664 events                                                                                                                                                           ┃ │
+│ ┃   TIME      AGENT         EVENT          TOOL                DUR     PAYLOAD                                                                                                                     ┃ │
+│ ┃ 06:19:54.966 999-f20-fix- text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 06:19:54.966 999-f20-fix- text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 06:19:54.966 999-f20-fix- text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 06:19:54.966 999-f20-fix- text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 06:19:54.966 999-f20-fix- text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 06:19:54.967 999-f20-fix- text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 06:19:54.967 999-f20-fix- text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 06:19:54.967 999-f20-fix- text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 06:19:54.967 999-f20-fix- text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 06:19:54.968 999-f20-fix- text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 06:19:54.968 999-f20-fix- text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 06:19:54.968 999-f20-fix- text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 06:19:54.968 999-f20-fix- text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 06:19:54.968 999-f20-fix- text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 06:19:54.968 999-f20-fix- text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 06:19:54.969 999-f20-fix- text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 06:19:54.969 999-f20-fix- text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 06:19:54.969 999-f20-fix- text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 06:19:54.969 999-f20-fix- text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 06:19:54.969 999-f20-fix- text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 06:19:54.969 999-f20-fix- text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 06:20:13.604 999-f20-fix- tool-call     SpawnSubagent      —       {"agent_type":"spec_critic","task":"Critique spec.md + implementation_plan.js…                                                ┃ │
+│ ┃ 06:20:13.605 spec_critic- task:SUBAGENT_SPAWNING—                  —       spec_critic                                                                                                           ┃ │
+│ ┃ 06:20:13.605 999-f20-fix- task:SUBAGENT_SPAWNING—                  —       {"type":"SUBAGENT_SPAWNING","subagentId":"spec_critic-1789712413605-io9132","agentType":"spec_critic","parentId":"99… ┃ │
+│ ┃ f toggles agent filter · ring buffer 10k · outlier >3000ms highlighted                                                                                                                           ┃ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ │
+│ AGENTS  1-6 sub-view · j/k select · ⏎ inspect · f filter · r resume                                                                                                                     : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

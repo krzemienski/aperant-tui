@@ -1,0 +1,30 @@
+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ proofpunk-agent /Users/nick/proofpunk-agent │ ⑂ master                                                                                                 ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ GENERATION                                                                                                                                                                                       │ │
+│ │ idle                                                                                                                                                                                             │ │
+│ │ Summary:                                                                                                                                                                                         │ │
+│ │ - 10 new features (N1–N10), no duplicates of the 19 existing                                                                                                                                     │ │
+│ │ - 3 phases: P2 Observability (N1–N3), P3 Automation & CI (N4, N5, N7, N10), P4 Analytics (N6, N8, N9                                                                                             │ │
+│ │ - MoSCoW: 3 Must (inspector, evidence watch, headless driver, perf harness — 4 Must total), 4 Should                                                                                             │ │
+│ │ - Dependencies map new features onto F5/F7/F8/F13/F17/F18 etc.                                                                                                                                   │ │
+│ │ - All features honor honesty doctrine: no invented values, real fresh_evidence.py routing, explicit                                                                                              │ │
+│ │ Phase features completed                                                                                                                                                                         │ │
+│ └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓┌────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃ PHASES                                                                                             ┃│ DETAIL                                                                                     │ │
+│ ┃   ○ PHASE P2-observability Deeper Observability & Interaction                                      ┃│ Analytics & Multi-Run Insight                                                              │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/3 features                                                                  ┃│  · Cost Attribution by Subagent [planned · Should]                                         │ │
+│ ┃                                                                                                    ┃│    c → convert to task spec                                                                │ │
+│ ┃   ○ PHASE P3-automation Automation & CI                                                            ┃│  · Cross-Run Trends Dashboard [planned · Could]                                            │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/4 features                                                                  ┃│    c → convert to task spec                                                                │ │
+│ ┃                                                                                                    ┃│  · Global Search & Command Palette [planned · Should]                                      │ │
+│ ┃ ❯ ○ PHASE P4-analytics Analytics & Multi-Run Insight                                               ┃│    c → convert to task spec                                                                │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/3 features                                                                  ┃│                                                                                            │ │
+│ ┃                                                                                                    ┃│                                                                                            │ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛└────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│  g generate · G refresh · j/k phase · c convert→spec                                                                                                                                                 │
+│ ROAD  g generate (G force regen) · c convert→spec                                                                                                                                       : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

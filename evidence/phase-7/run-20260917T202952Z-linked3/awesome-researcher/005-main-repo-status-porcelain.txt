@@ -1,0 +1,6 @@
+?? .planning/
+?? docs/journal/2026-09-11-tui-finish-phase0-audit.md
+?? e2e-evidence/
+?? prompts/
+?? tests/test_phase3_roundtrip_fixtures.py
+?? tui-gap-list.md

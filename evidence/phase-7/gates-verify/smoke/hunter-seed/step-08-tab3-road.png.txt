@@ -1,0 +1,31 @@
+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ hunter-seed /Users/nick/dev/hunter-seed │ ⑂ main                                                                                                       ◉ 0 running  ◆ 2 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃ PHASES                                                                           ┃│ DETAIL                                                                                                       │ │
+│ ┃ ❯ ○ PHASE P1 Usability & Onboarding Hardening                                    ┃│ Usability & Onboarding Hardening                                                                             │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/10 features                                               ┃│  ⇒ Symbolized crash triage with rich sanitizer telemetry [planned · Must]                                    │ │
+│ ┃                                                                                  ┃│    spec 002-symbolized-crash-triage-with-rich-sanitizer-teleme                                               │ │
+│ ┃   ○ PHASE P2 Detection Depth & Accuracy                                          ┃│  · Patch regression and differential test harness [planned · Must]                                           │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/10 features                                               ┃│    c → convert to task spec                                                                                  │ │
+│ ┃                                                                                  ┃│  · False-positive feedback loop [planned · Should]                                                           │ │
+│ ┃   ○ PHASE P3 Scale & Operations                                                  ┃│    c → convert to task spec                                                                                  │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/10 features                                               ┃│  · Adaptive rate-limit and retry orchestration [planned · Must]                                              │ │
+│ ┃                                                                                  ┃│    c → convert to task spec                                                                                  │ │
+│ ┃   ○ PHASE P4 Ecosystem & Extensibility                                           ┃│  · Structured run state store and resumable pipeline [planned · Must]                                        │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/7 features                                                ┃│    c → convert to task spec                                                                                  │ │
+│ ┃                                                                                  ┃│  · Subagent model routing and tiered prompting [planned · Should]                                            │ │
+│ ┃                                                                                  ┃│    c → convert to task spec                                                                                  │ │
+│ ┃                                                                                  ┃│  · Auto-configuration advisor for custom codebases [planned · must]                                          │ │
+│ ┃                                                                                  ┃│    c → convert to task spec                                                                                  │ │
+│ ┃                                                                                  ┃│  · End-to-end demo mode with prebuilt container images [planned · must]                                      │ │
+│ ┃                                                                                  ┃│    c → convert to task spec                                                                                  │ │
+│ ┃                                                                                  ┃│  · Human-in-the-loop checkpoint and approval gates [planned · must]                                          │ │
+│ ┃                                                                                  ┃│    c → convert to task spec                                                                                  │ │
+│ ┃                                                                                  ┃│  · Diagnostics and self-healing run troubleshooting [planned · should]                                       │ │
+│ ┃                                                                                  ┃│    c → convert to task spec                                                                                  │ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛└──────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│  g generate · G refresh · j/k phase · c convert→spec                                                                                                                                                 │
+│ ROAD  g generate (G force regen) · x stop · j/k phase · c convert→spec                                                                                                                  : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

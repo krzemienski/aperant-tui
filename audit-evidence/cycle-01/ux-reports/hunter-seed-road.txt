@@ -1,0 +1,58 @@
+
+
+> aperant-tui-workspace@0.1.0 dev
+> npm run dev -w @aperant/tui --project /Users/nick/dev/hunter-seed
+
+
+> @aperant/tui@0.1.0 dev
+> tsx src/cli.tsx /Users/nick/dev/hunter-seed
+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ hunter-seed /Users/nick/dev/hunter-seed │ ⑂ main                                                                                   ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                            │
+│ ┌────────────────────────────────────────────────────────────────────────────────┐┌────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ PHASES                                                                         ││ DETAIL                                                                                     │ │
+│ │ ❯ ○ PHASE phase-1 Foundation & Onboarding                                      ││ Foundation & Onboarding                                                                    │ │
+│ │   ░░░░░░░░░░░░░░░░░░ 0/4 features                                              ││  ⇒ Guided quickstart skill [planned · must]                                                │ │
+│ │                                                                                ││    spec 001-guided-quickstart-skill                                                        │ │
+│ │   ○ PHASE phase-2 Verification Quality & Triage                                ││  · One-command gVisor sandbox provisioning [planned · must]                                │ │
+│ │   ░░░░░░░░░░░░░░░░░░ 0/4 features                                              ││    c → convert to task spec                                                                │ │
+│ │                                                                                ││  · Canary target suite expansion [planned · must]                                          │ │
+│ │   ○ PHASE phase-3 Patch Loop & Reporting                                       ││    c → convert to task spec                                                                │ │
+│ │   ░░░░░░░░░░░░░░░░░░ 0/2 features                                              ││  · Threat modeling skill [planned · should]                                                │ │
+│ │                                                                                ││    c → convert to task spec                                                                │ │
+│ │   ○ PHASE phase-4 Detection & Response Track                                   ││                                                                                            │ │
+│ │   ░░░░░░░░░░░░░░░░░░ 0/1 features                                              ││                                                                                            │ │
+│ │                                                                                ││                                                                                            │ │
+│ │   ○ PHASE phase-5 Portability & Customization                                  ││                                                                                            │ │
+│ │   ░░░░░░░░░░░░░░░░░░ 0/3 features                                              ││                                                                                            │ │
+│ │                                                                                ││                                                                                            │ │
+│ └────────────────────────────────────────────────────────────────────────────────┘└────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│  g generate · G refresh · j/k phase · c convert→spec                                                                                                                             │
+│ ROAD  g generate (G force regen) · c convert→spec                                                                                                                   : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

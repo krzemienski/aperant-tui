@@ -1,0 +1,46 @@
+{
+  "task": "Phase 7 observability acceptance criteria closure (P3.5.3, P3.5.5, P3.5.7, P3.5.11, P3.5.13)",
+  "generatedAt": "2026-09-17",
+  "criteria": [
+    {
+      "id": "P3.5.3",
+      "title": "Wait detection - concurrency",
+      "verdict": "UNVERIFIABLE-BY-DESIGN",
+      "decisiveFinding": "kind:'concurrency' declared in WaitState union (observability.ts:34) but never constructed anywhere (0 grep matches for a construction site). executeParallel() is dead code (only its own tests import it). Production coding path uses sequential iterateSubtasks(). agent-start-service.ts:550 hardcodes {parallel:false, workers:1}, and startTaskExecution() never reads options.parallel/options.workers.",
+      "resultFile": "P3.5.3-RESULT.json"
+    },
+    {
+      "id": "P3.5.5",
+      "title": "Wait detection - context",
+      "verdict": "PASS",
+      "decisiveFinding": "Sibling artifact step-11-waits-ctx-blocking.png (verified genuine PNG, visually inspected) shows real WAITS sub-view rendering 'BLOCKING ANALYSIS - 1 blocked' / 'CTX 159.1% - compaction imminent' from a real driven run. Independently corroborated by this task's own drive (002-ctx-test-big, glm/glm-4.7) reaching 97.4% then 182.1% context usage in the live InspectView.",
+      "resultFile": "P3.5.5-RESULT.json"
+    },
+    {
+      "id": "P3.5.7",
+      "title": "Cache hit accounting",
+      "verdict": "PASS",
+      "decisiveFinding": "glm/glm-4.7 via the local router returns cache_read_input_tokens: 2304, reproduced across 3 independent process runs (9 total calls). Full field-mapping chain confirmed correct by source inspection from raw provider response through @ai-sdk/anthropic, the ai package's usage normalization, stream-handler.ts, observability.ts, to AgentsView.tsx's cache-hit % calculation. A live driven session against this model rendered a populated 100% cache-hit figure in the TOKENS sub-view.",
+      "resultFile": "P3.5.7-RESULT.json"
+    },
+    {
+      "id": "P3.5.11",
+      "title": "Graph topology - subagent nodes",
+      "verdict": "UNVERIFIED",
+      "decisiveFinding": "SpawnSubagent tool-call traffic requires useAgenticOrchestration:true, which is never set to true anywhere in the codebase (2 total grep hits: the type declaration and the if-check). Both real task-start entry points (startTaskExecution, startSpecCreation) route to hardcoded TypeScript phase-pipeline orchestrators where the orchestrator LLM never gets an opportunity to call SpawnSubagent.",
+      "resultFile": "P3.5.11-RESULT.json"
+    },
+    {
+      "id": "P3.5.13",
+      "title": "Throughput - 16ms coalescing under real event volume",
+      "verdict": "PASS",
+      "decisiveFinding": "Real events driven through the actual observability.ts attachToManager()/onStreamEvent/recomputeWait path at ~148-150 events/sec (3 consistent runs, all >= the 100/sec requirement). Snapshot emission count (~304-305) vs event count (~760) yields a ~2.5x coalescing ratio, confirming the 16ms coalescing genuinely collapses events. Zero event-loop stalls over 50ms in any run.",
+      "resultFile": "P3.5.13-RESULT.json"
+    }
+  ],
+  "summary": {
+    "PASS": 3,
+    "UNVERIFIED": 1,
+    "UNVERIFIABLE_BY_DESIGN": 1
+  }
+}

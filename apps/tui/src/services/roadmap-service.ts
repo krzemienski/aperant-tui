@@ -12,7 +12,7 @@
  * `roadmap-error`) exactly as the desktop IPC layer consumed it.
  */
 import type { Project } from '@shared/types';
-import { getManager, type AgentManagerLike } from './agent-start-service';
+import { getManager, applyAccountEnv, type AgentManagerLike } from './agent-start-service';
 
 export interface RoadmapProgress {
   phase: string;
@@ -43,6 +43,9 @@ export async function subscribeRoadmap(
 
 /** Start a real roadmap generation for the project. */
 export async function startGeneration(project: Project, opts: { refresh?: boolean; model?: string } = {}): Promise<void> {
+  // D-C: mirror the provisioned account into the standard SDK env names
+  // before the manager resolves auth — see agent-start-service.applyAccountEnv.
+  applyAccountEnv();
   const am = await getManager();
   am.startRoadmapGeneration(project.id, project.path, opts.refresh ?? false, false, false,
     opts.model ? { model: opts.model, thinkingLevel: 'medium' } : undefined);

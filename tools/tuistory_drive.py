@@ -19,6 +19,8 @@ from __future__ import annotations
 
 import json
 import os
+import hashlib
+import re
 import subprocess
 import time
 from pathlib import Path
@@ -177,6 +179,11 @@ def shot(session: str, out_path: str, anchor: str | None = None,
         if not matched:
             return {"ok": False, "reason": f"anchor {anchor!r} never appeared",
                     "png": None, "anchor": anchor}
+    # The tuistory daemon is a long-lived process with its OWN cwd, so a
+    # relative -o path resolves against the daemon, not the caller: the
+    # shutter then fails with ENOENT and the record lands ok:false with no
+    # PNG and no hash. Resolve before handing the path over.
+    out_path = str(Path(out_path).resolve())
     Path(out_path).parent.mkdir(parents=True, exist_ok=True)
     rc, out = _run(
         ["screenshot", "-s", session, "-o", out_path, "--pixel-ratio", "2"],
@@ -195,6 +202,59 @@ def shot(session: str, out_path: str, anchor: str | None = None,
         "anchor_matched": matched,
         "err": None if ok else out[-200:],
     }
+
+
+def sha256_of(path: str) -> str:
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+# Secrets must never enter evidence. The token is supplied via env and is the
+# only high-entropy value in play; we also screen generic key shapes so a
+# provider change cannot silently start leaking.
+_SECRET_PATTERNS = [
+    re.compile(r"sk-[A-Za-z0-9_\-]{12,}"),
+    re.compile(r"\bBearer\s+[A-Za-z0-9._\-]{12,}"),
+]
+
+
+def scan_secrets(text: str) -> list[str]:
+    """Return redacted descriptors of any secret-shaped material found."""
+    hits: list[str] = []
+    tok = os.environ.get(SECRET_ENV, "")
+    if tok and len(tok) >= 8:
+        if tok in text:
+            hits.append(f"{SECRET_ENV} full value")
+        if tok[:12] in text:
+            hits.append(f"{SECRET_ENV} 12-char prefix")
+    for pat in _SECRET_PATTERNS:
+        for m in pat.findall(text):
+            hits.append(f"pattern {pat.pattern} -> {m[:6]}...<redacted len={len(m)}>")
+    return hits
+
+
+def capture_frames(session: str, key: str, count: int = 6,
+                   interval_ms: int = 700) -> list[str]:
+    """Fire `key` then grab N rapid text snapshots of the live buffer.
+
+    This is the ONLY honest way to evidence streaming. A sequence of
+    `screenshot` calls can return the same unchanged frame N times and the
+    filenames alone then imply motion that never happened (see
+    audit-evidence/RETRACTION.md R1/R3 — three 'stream' PNGs 57s apart were
+    byte-identical). tuistory's capture-frames samples the buffer itself, so
+    distinctness is measurable rather than assumed.
+    """
+    rc, out = _run(
+        ["capture-frames", "-s", session, key,
+         "--count", str(count), "--interval", str(interval_ms)],
+        timeout=180,
+    )
+    if rc != 0:
+        return []
+    try:
+        data = json.loads(out[out.index("["):out.rindex("]") + 1])
+    except (ValueError, json.JSONDecodeError):
+        return []
+    return [f if isinstance(f, str) else json.dumps(f) for f in data]
 
 
 class Recorder:
@@ -218,7 +278,32 @@ class Recorder:
             "bytes": res.get("bytes", 0), "ts": time.strftime("%H:%M:%S"),
             "err": res.get("err"),
         }
+        rec = self._post(rec, res)
         self.records.append(rec)
+        return rec
+
+    def _post(self, rec: dict, res: dict) -> dict:
+        """Hash the frame and screen it for secrets.
+
+        `sha256` makes stale frames detectable after the fact: two records
+        claiming different states but sharing a digest are the same frame, and
+        a PASS resting on them is void. `duplicate_of` names the earlier record
+        so the contradiction is visible in captures.json, not just derivable.
+        """
+        if not res.get("ok"):
+            return rec
+        png = str(self.run_dir / rec["file"])
+        digest = sha256_of(png)
+        rec["sha256"] = digest
+        prior = next((r for r in self.records
+                      if r.get("sha256") == digest and r["seq"] != rec["seq"]), None)
+        rec["duplicate_of"] = prior["file"] if prior else None
+        sidecar = Path(png + ".txt")
+        leaks = scan_secrets(sidecar.read_text()) if sidecar.exists() else []
+        rec["secret_hits"] = leaks
+        if leaks:
+            rec["ok"] = False
+            rec["err"] = f"SECRET LEAK in sidecar: {leaks}"
         return rec
 
     def save(self) -> str:

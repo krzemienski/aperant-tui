@@ -1,0 +1,59 @@
+{
+  "title": "CTX denominator fix (observability.ts) - END-TO-END VERIFICATION",
+  "verification_type": "end-to-end through the real TUI agent path, live driving, NOT a unit check (though a unit check was also run first)",
+  "change_made": {
+    "file": "apps/tui/src/services/observability.ts",
+    "what": "Added a 'log' event handler (ObservabilityService.onLog) wired in attachToManager(). It parses the exact line worker.ts:394 already emits at session start -- 'Starting agent session: type=X, model=Y' -- via a regex, extracts Y (the REAL provider-resolved model id, e.g. 'glm/glm-5'), and on match updates both a.snap.model and a.snap.contextWindowLimit (via the already-fixed getModelContextWindow). The 'default' fallback (200000) is preserved for any agent whose session-start log never matches (e.g. spec_orchestrator sessions that don't route through the exact worker.ts:394 call site, or startup before the first log arrives).",
+    "how_the_resolved_id_was_traced_not_guessed": "AgentManager.startTaskExecution resolves auth via resolveAuthFromProviderQueue(modelId, preferredProvider) -> resolved.modelId, which is placed into SerializableSessionConfig.modelId (agent-manager.ts:575) -> becomes session.modelId in the worker thread -> worker.ts:394 `postLog(`Starting agent session: type=${session.agentType}, model=${session.modelId}`)` is the ONLY place this exact resolved id is emitted as an observable event from the worker back to the TUI process. Confirmed via the real captured event log earlier in this investigation: the line 'Starting agent session: type=build_orchestrator, model=glm/glm-5' was already present verbatim."
+  },
+  "unit_proof": {
+    "method": "real code path via npx tsx (run from apps/tui so path aliases resolve), instantiating the actual ObservabilityService class and calling onProgress then onLog directly",
+    "before_log_event": {
+      "model": "default",
+      "contextWindowLimit": 200000
+    },
+    "after_log_event": {
+      "model": "glm/glm-5",
+      "contextWindowLimit": 128000
+    }
+  },
+  "worker_bundle_rebuild": {
+    "performed": true,
+    "note": "The fix lives in observability.ts, which runs in the TUI's own live-tsx main process, NOT the pre-built agent-worker.cjs bundle -- confirmed by byte-searching the rebuilt bundle and finding 'SESSION_START_RE' absent, as expected. The rebuild was done anyway for consistency but was not required for THIS fix to take effect on a fresh session."
+  },
+  "live_end_to_end_verification": {
+    "project": "/Users/nick/awesome-researcher",
+    "task_driven": "003-list-health-audit-mode (a fresh, previously-unstarted task, chosen because 005 had already completed 11/11 subtasks and QA_PASSED/BUILD_COMPLETE by the time this verification began)",
+    "session": "ap-ar (tuistory), fresh close+relaunch before driving",
+    "comparable_token_count_used": "the user's suggested reference point was ~48.2k prompt tokens -> ~38% expected; this run reached 44.2-44.5k prompt tokens -> 34-35% observed, which is the correct value AT THAT TOKEN COUNT (44500/128000=34.77%, not the 48200/128000=37.66% reference which was from a DIFFERENT run/token count)",
+    "readings": [
+      {
+        "source": "swarm sub-view",
+        "ctx_pct_displayed": 34,
+        "sigma_tokens_k": 44.2,
+        "computed_128k_pct": 34.53,
+        "computed_200k_pct": 22.1
+      },
+      {
+        "source": "tokens sub-view",
+        "ctx_pct_displayed": 35,
+        "prompt_k": 44.5,
+        "computed_128k_pct": 34.77,
+        "computed_200k_pct": 22.25
+      }
+    ],
+    "arithmetic_shown": "44500 / 128000 = 0.34766 = 34.77% -> rounds to 35% (MATCHES displayed value). 44500 / 200000 = 0.2225 = 22.25% -> rounds to 22% (would NOT match; this is what the pre-fix code would have shown).",
+    "conclusion": "The displayed percentage is unambiguously computed against the REAL 128000-token GLM-5 window, not the old 200000-token fallback. If the old bug were still present, this exact prompt-token count would show 22%, not 34-35%."
+  },
+  "screenshots": [
+    {
+      "file": "awesome-researcher/step-29-ctx-denominator-fix-verify.png",
+      "sha256": "57ef23f6859d89e1fb4981cc34eb2075e039b2ae36786121b1295694e04a6aad"
+    },
+    {
+      "file": "awesome-researcher/step-30-ctx-denominator-tokens-verify.png",
+      "sha256": "1fd040d90d8a583d4fe7af9d1dff528af7d465fb1c0ba5660da20def5f0a45c4"
+    }
+  ],
+  "verdict": "END-TO-END VERIFIED. The CTX% denominator now correctly divides by the real, provider-resolved model's context window (128000 for glm/glm-5) rather than the 200000 catalog-miss fallback, confirmed by exact arithmetic matching the live-displayed percentage."
+}

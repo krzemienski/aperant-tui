@@ -1,0 +1,58 @@
+
+
+> aperant-tui-workspace@0.1.0 dev
+> npm run dev -w @aperant/tui --project /Users/nick/dev/hunter-seed
+
+
+> @aperant/tui@0.1.0 dev
+> tsx src/cli.tsx /Users/nick/dev/hunter-seed
+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ hunter-seed /Users/nick/dev/hunter-seed │ ⑂ main                                                                                   ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                            │
+│ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ ┌────────────────────────────────────────────────────────────┐ │
+│ │ WORKTREES                                                                                                     │ │ STATUS · main                                              │ │
+│ │ ❯ ⑂ main                                                                                                      │ │ head bb718fd22a                                            │ │
+│ │     /Users/nick/dev/hunter-seed                                                                               │ │ diff clean                                                 │ │
+│ │   ⑂ feat/hunter-v1-build                                                                                      │ │ unified diff + merge arrive in Phase 5                     │ │
+│ │     /Users/nick/dev/hunter-seed-wt-hunter-v1-build                                                            │ │                                                            │ │
+│ │   ⑂ auto-claude/001-guided-quickstart-skill                                                                   │ │                                                            │ │
+│ │     /Users/nick/dev/hunter-seed/.auto-claude/worktrees/tasks/001-guided-quickstart-skill                      │ │                                                            │ │
+│ │                                                                                                               │ │                                                            │ │
+│ └───────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ └────────────────────────────────────────────────────────────┘ │
+│ TREE  j/k select                                                                                                                                                    : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,7 +1,11 @@
 {
  "awesome-researcher/0001-auto-claude-Complete-subtask-1-1-bs4-HTML-link-extra.patch": {
-  "bytes": 4311,
-  "sha256": "f27514aee5e89f0f"
+  "bytes": 944,
+  "sha256": "9942d1e7bf397904",
+  "superseded_bytes": 4311,
+  "superseded_sha256": "f27514aee5e89f0f",
+  "redacted_at": "2026-09-17",
+  "redaction_note": "REDACTION-NOTE.md"
  },
  "awesome-researcher/captures.json": {
   "bytes": 10681,
@@ -280,8 +284,12 @@
   "sha256": "abe2f843510bbef7"
  },
  "awesome-researcher/work-product.diff": {
-  "bytes": 3745,
-  "sha256": "0bebfd90ae6be0de"
+  "bytes": 378,
+  "sha256": "f60f460de0abf6fd",
+  "superseded_bytes": 3745,
+  "superseded_sha256": "0bebfd90ae6be0de",
+  "redacted_at": "2026-09-17",
+  "redaction_note": "REDACTION-NOTE.md"
  },
  "awesome-researcher/work-product.log": {
   "bytes": 115,
@@ -894,5 +902,12 @@
  "vigil/work-product.log": {
   "bytes": 847,
   "sha256": "353df96688db5c77"
+ },
+ "awesome-researcher/agent-events.jsonl": {
+  "bytes": 2280689,
+  "sha256": "cf475531137489b4",
+  "note": "This file was not present in the original MANIFEST.json (a pre-existing gap unrelated to redaction -- the flight-recorder log was written after the manifest generation pass, not omitted by the redaction). Added here so the manifest covers it. This is the POST-REDACTION content; the file contained 63 verbatim-source payloads before redaction (see REDACTION-NOTE.md). No original pre-redaction hash was ever recorded for this file, so no superseded_sha256 field applies.",
+  "redacted_at": "2026-09-17",
+  "redaction_note": "REDACTION-NOTE.md"
  }
 }

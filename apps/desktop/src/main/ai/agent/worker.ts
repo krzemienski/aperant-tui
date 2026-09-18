@@ -1040,8 +1040,28 @@ async function runAgenticSpecOrchestrator(
     },
     loadPrompt: async (promptName: string) => assemblePrompt(promptName, session),
     abortSignal: abortController.signal,
-    onSubagentEvent: (agentType: string, event: string) => {
+    // [APERANT-PATCH agentic-orchestration-optin] (2026-09-17): post a
+    // structured task-event (not just a free-text log line) so the TUI's
+    // observability tap (apps/tui/src/services/observability.ts
+    // onTaskEvent) can construct a distinct child AgentSnapshot with
+    // parentId = config.taskId — making the spawned subagent a real node
+    // in the GraphView topology (spec P3.5.11) instead of only trace/wait
+    // traffic under the parent's own id. Additive: the free-text postLog
+    // line is preserved alongside so existing log-based observers are
+    // unaffected.
+    onSubagentEvent: (agentType: string, event: string, subagentId: string) => {
       postLog(`Subagent ${agentType}: ${event}`);
+      postMessage({
+        type: 'task-event',
+        taskId: config.taskId,
+        data: {
+          type: `SUBAGENT_${event.toUpperCase()}`,
+          subagentId,
+          agentType,
+          parentId: config.taskId,
+        },
+        projectId: config.projectId,
+      });
     },
   });
 

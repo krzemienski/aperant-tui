@@ -1,0 +1,22 @@
+# SOURCE-VERIFICATION — six modified files, checked against disk
+
+All six claims below were verified by direct `read`/`grep` against the current working tree at HEAD `20a7e9b949866c37c94f13e73546e5b82793af54` (dirty tree; see GATES-FINAL.md for full status). **No mismatches found.**
+
+| # | File | Claimed change | Found at line(s) | Matches? | Actual line text |
+|---|---|---|---|---|---|
+| 1a | `apps/tui/src/services/account-service.ts` | Moonshot account match predicate is `(provider, baseUrl)`, not provider-alone | 114 | yes | `const existing = accounts.find((a) => a.provider === 'moonshot' && String(a.baseUrl ?? '') === baseUrl);` |
+| 1b | `apps/tui/src/services/account-service.ts` | Anthropic account match predicate is `(provider, baseUrl)`, not provider-alone | 194 | yes | `const existing = accounts.find((a) => a.provider === 'anthropic' && String(a.baseUrl ?? '') === baseUrl);` |
+| 1c | `apps/tui/src/services/account-service.ts` | `mintAccountId()` helper exists | 73–80 | yes | `function mintAccountId(accounts: Array<Record<string, unknown>>, provider: string, now: number): string { const base = \`${provider}-${now.toString(36)}\`; if (!accounts.some((a) => String(a.id) === base)) return base; ... }` |
+| 2 | `apps/tui/src/views/InsightsView.tsx` | `useInput` scoped `{ isActive: asking }` handling `key.escape` | 195–197 | yes | `useInput((_input, key) => { if (key.escape) { setAsking(false); setQuestion(''); } }, { isActive: asking });` |
+| 3 | `apps/desktop/src/shared/constants/models.ts` | `getModelContextWindow()` strips leading `provider/` prefix, guarded by `slashIdx !== -1`, retries; 200_000 fallback intact | 618, 628–630, 650 | yes | `export function getModelContextWindow(modelIdOrShorthand: string): number {` ... `const slashIdx = modelIdOrShorthand.indexOf('/');` / `if (slashIdx !== -1) {` / `const unprefixed = modelIdOrShorthand.slice(slashIdx + 1);` ... `return 200_000;` |
+| 4 | `apps/desktop/src/main/ai/session/stream-handler.ts` | `cumulativeUsage.promptTokens` is ASSIGNED (`=`), `completionTokens` still uses `+=` | 279–281 | yes | `state.cumulativeUsage.promptTokens = promptTokens;` / `state.cumulativeUsage.completionTokens += completionTokens;` / `state.cumulativeUsage.totalTokens = state.cumulativeUsage.promptTokens + state.cumulativeUsage.completionTokens;` |
+| 5 | `apps/tui/src/services/observability.ts` | `onLog()` handler + `SESSION_START_RE` refreshing `model`/`contextWindowLimit` from resolved id; wired into `attachToManager` | 173–185 (wiring), 304–321 (handler) | yes | wiring: `on('log', (taskId, message: string) => this.onLog(taskId, String(message)));` inside `attachToManager(am: {...})`. Handler: `private static readonly SESSION_START_RE = /^Starting agent session: type=\S+, model=(\S+)$/;` ... `private onLog(taskId: string, message: string): void { const match = ObservabilityService.SESSION_START_RE.exec(message); if (!match) return; const resolvedModelId = match[1]; ... a.snap.model = resolvedModelId; a.snap.contextWindowLimit = getModelContextWindow(resolvedModelId); this.dirty = true; }` |
+| 6a | `apps/tui/src/views/BoardView.tsx` | viewport-windowed rendering: `boardRows`, `viewportRows`, `scrollRef`, `visibleRows` | 153, 170, 175, 183 | yes | `const boardRows = useMemo<BoardRow[]>(() => {...}` / `const viewportRows = Math.max(5, (stdout?.rows ?? 50) - BOARD_CHROME_ROWS);` / `const scrollRef = useRef(0);` / `const visibleRows = boardRows.slice(scrollRef.current, scrollRef.current + viewportRows);` |
+| 6b | `apps/tui/src/views/BoardView.tsx` | header counts still read TRUE `items.length` (not windowed subset) | 156 | yes | `out.push({ kind: 'header', status, count: items.length });` — pushed once per full group before windowing/slicing occurs |
+| 7 | `apps/tui/src/components/TitleBar.tsx` | `React.memo` applied | 45 | yes | `export const TitleBar = React.memo(TitleBarImpl);` |
+| 8 | `apps/tui/src/components/TabBar.tsx` | `React.memo` applied | 29 | yes | `export const TabBar = React.memo(TabBarImpl);` |
+| 9 | `apps/tui/src/components/StatusLine.tsx` | `React.memo` applied | 50 | yes | `export const StatusLine = React.memo(StatusLineImpl);` |
+
+## Verdict
+
+**Zero mismatches.** All nine sub-claims across the six modified files (and the three `React.memo` components) resolve exactly as described, at line numbers matching or within 1–2 lines of the approximate numbers given in the task. No fabricated or drifted claims found.

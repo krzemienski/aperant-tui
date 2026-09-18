@@ -1,0 +1,38 @@
+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ proofpunk-agent /Users/nick/proofpunk-agent │ ⑂ master                                                                                                 ◉ 0 running  ◆ 1 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│  1 swarm   2 graph   3 inspect   4 trace   5 tokens   6 waits  3 agents · esc then 1-7 to switch tabs                                                                                                │
+│                                                                                                                                                                                                      │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ ┌───────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃ AGENT · 999-f20-fix-verify                                                                 ┃ │ TOOL GRANTS (from AGENT_CONFIGS)                                                                  │ │
+│ ┃ type         planner                                                                       ┃ │ BUILTIN                                                                                           │ │
+│ ┃ state        BLOCKED                                                                       ┃ │ Read  Glob  Grep  Write  Edit  Bash  WebFetch  WebSearch                                          │ │
+│ ┃ phase        idle ~ inferred                                                               ┃ │ MCP SERVERS                                                                                       │ │
+│ ┃ model        glm/glm-5 · thinking:high                                                     ┃ │ context7  memory  auto-claude                                                                     │ │
+│ ┃ steps        32/1000                                                                       ┃ │ AUTO-CLAUDE MCP                                                                                   │ │
+│ ┃ session      #1 · continuations 0/5                                                        ┃ │ mcp__auto-claude__get_build_progress  mcp__auto-claude__get_session_context                       │ │
+│ ┃ elapsed      8m 42s                                                                        ┃ │ mcp__auto-claude__record_discovery                                                                │ │
+│ ┃ last         Starting AI agent session...                                                  ┃ │                                                                                                   │ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ │ grants resolved from AGENT_CONFIGS[planner]                                                       │ │
+│                                                                                                │ writes contained to allowedWritePaths                                                             │ │
+│ ┌────────────────────────────────────────────────────────────────────────────────────────────┐ │                                                                                                   │ │
+│ │ WAIT STATE                                                                                 │ │                                                                                                   │ │
+│ │ ⚙ TOOL 55s                                                                                 │ │                                                                                                   │ │
+│ │ ⚙ TOOL SpawnSubagent {"agent_type":"spec_writer","task":"Write spec.md and implementation_…│ │                                                                                                   │ │
+│ │ unblocks: child process exit                                                               │ │                                                                                                   │ │
+│ └────────────────────────────────────────────────────────────────────────────────────────────┘ │                                                                                                   │ │
+│                                                                                                │                                                                                                   │ │
+│ ┌────────────────────────────────────────────────────────────────────────────────────────────┐ │                                                                                                   │ │
+│ │ TOKEN / CONTEXT                                                                            │ │                                                                                                   │ │
+│ │ █████████████████░░░░░░░░░░░░░                                                             │ │                                                                                                   │ │
+│ │ 72.9k / 128.0k · 56.9%                                                                     │ │                                                                                                   │ │
+│ │ warn @70% · continuation @90% · hard abort @95%                                            │ │                                                                                                   │ │
+│ │ prompt       72.9k                                                                         │ │                                                                                                   │ │
+│ │ completion   9.6k                                                                          │ │                                                                                                   │ │
+│ │ thinking     0                                                                             │ │                                                                                                   │ │
+│ │ cache hit    ██████████ 100%                                                               │ │                                                                                                   │ │
+│ │ total        82.5k                                                                         │ │                                                                                                   │ │
+│ └────────────────────────────────────────────────────────────────────────────────────────────┘ └───────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ AGENTS  1-6 sub-view · j/k select · ⏎ inspect · f filter · r resume                                                                                                                     : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

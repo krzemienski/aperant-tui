@@ -1,0 +1,639 @@
+{
+  "spec_id": "999-subagent-proof-v2",
+  "created_at": "2026-09-18T05:32:09.090Z",
+  "updated_at": "2026-09-18T05:43:34.728Z",
+  "phases": {
+    "planning": {
+      "phase": "planning",
+      "status": "completed",
+      "started_at": "2026-09-18T05:32:09.843Z",
+      "completed_at": "2026-09-18T05:43:34.727Z",
+      "entries": [
+        {
+          "timestamp": "2026-09-18T05:32:09.843Z",
+          "type": "phase_start",
+          "content": "Agentic spec orchestration",
+          "phase": "planning"
+        },
+        {
+          "timestamp": "2026-09-18T05:32:17.565Z",
+          "type": "text",
+          "content": "Task name \"999-subagent-proof-v2\" suggests a pipeline proof test. Checking project and prior v1 spec for context.",
+          "phase": "planning"
+        },
+        {
+          "timestamp": "2026-09-18T05:32:17.565Z",
+          "type": "tool_start",
+          "content": "[Bash] ls -la /Users/nick/proofpunk-agent/ && ls -la /Users/nick/proofpunk-agent/.auto-claude/specs/ 2>/dev/null",
+          "phase": "planning",
+          "tool_name": "Bash",
+          "tool_input": "ls -la /Users/nick/proofpunk-agent/ && ls -la /Users/nick/proofpunk-agent/.auto-claude/specs/ 2>/dev/null"
+        },
+        {
+          "timestamp": "2026-09-18T05:32:17.567Z",
+          "type": "tool_start",
+          "content": "[Glob] **/*",
+          "phase": "planning",
+          "tool_name": "Glob",
+          "tool_input": "**/*"
+        },
+        {
+          "timestamp": "2026-09-18T05:32:17.627Z",
+          "type": "tool_end",
+          "content": "[Glob] Done",
+          "phase": "planning",
+          "tool_name": "Glob",
+          "detail": "/Users/nick/proofpunk-agent/.auto-claude/specs/999-subagent-proof-v2/task_logs.json\n/Users/nick/proofpunk-agent/.auto-claude/specs/999-subagent-proof-v2/project_index.json\n/Users/nick/proofpunk-agent/.auto-claude/specs/999-subagent-proof-v2/task_metadata.json\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/006-tool-allow-deny-lists/README.md\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/006-tool-allow-deny-lists/proofpunk_agent/__pycache__/__main__.cpython-311.pyc\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/006-tool-allow-deny-lists/proofpunk_agent/__main__.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/app.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/state/reducers/watchdog.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/widgets/__pycache__/loop_alert_modal.cpython-311.pyc\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/widgets/loop_alert_modal.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/__pycache__/app.cpython-311.pyc\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/__pycache__/__main__.cpython-311.pyc\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/__main__.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/__pycache__/policy.cpython-311.pyc\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/policy.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/validation/e2e/__pycache__/scenario_session.cpython-311.pyc\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/validation/e2e/__pycache__/__init__.cpython-311.pyc\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/validation/__pycache__/__init__.cpython-311.pyc\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/widgets/__pycache__/permission_modal.cpython-311.pyc\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/widgets/__pycache__/__init__.cpython-311.pyc\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/screens/__pycache__/performance.cpython-311.pyc\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/bridge/__pycache__/digest.cpython-311.pyc\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/bridge/__pycache__/evidence.cpython-311.pyc\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/screens/__pycache__/evidence.cpython-311.pyc\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/screens/__pycache__/tools.cpython-311.pyc\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/screens/__pycache__/hooks.cpython-311.pyc\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/screens/__pycache__/session.cpython-311.pyc\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/screens/__pycache__/__init__.cpython-311.pyc\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/__pycache__/theme.cpython-311.pyc\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/state/reducers/__pycache__/watchdog.cpython-311.pyc\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/state/reducers/__pycache__/metrics.cpython-311.pyc\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/state/reducers/__pycache__/hooks.cpython-311.pyc\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/state/reducers/__pycache__/ledger.cpython-311.pyc\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/state/__pycache__/events.cpython-311.pyc\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/state/reducers/__pycache__/tree.cpython-311.pyc\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/state/reducers/__pycache__/__init__.cpython-311.pyc\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/__pycache__/__init__.cpython-311.pyc\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/validation/plans/terminal-matrix.md\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/validation/plans/screen5-performance.md\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/validation/plans/screen4-evidence.md\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/validation/plans/screen23-evidence.md\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/validation/plans/lane-contracts-p7-p9.md\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/validation/perf/driver.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/validation/perf/c4_c5_closeout.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/validation/perf/__init__.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/validation/e2e/terminal_matrix.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/validation/e2e/screen23_preflight.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/validation/e2e/screen23_live.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/validation/e2e/screen23_capture_preflight.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/validation/e2e/screen23_block_probe.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/validation/e2e/scenario_tools.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/validation/e2e/scenario_session.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/validation/e2e/scenario_hooks.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/validation/e2e/scenario_evidence.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/validation/e2e/pty_backend.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/validation/e2e/keyboard_traversal.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/validation/e2e/fuzz_resize.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/validation/e2e/fuzz_paste.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/validation/e2e/fuzz_keys.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/validation/e2e/_fuzz_common.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/validation/e2e/_evidence_lifecycle.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/validation/e2e/__init__.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/validation/capture.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/validation/__init__.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/pyproject.toml\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/widgets/quit_modal.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/widgets/permission_modal.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/widgets/output_modal.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/widgets/__init__.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/theme.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/state/reducers/tree.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/state/reducers/metrics.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/state/reducers/ledger.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/state/reducers/hooks.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/state/reducers/__init__.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/state/events.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/screens/tools.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/screens/session.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/screens/performance.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/screens/hooks.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/screens/evidence.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/screens/__init__.py\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop\n\n... [truncated]",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-09-18T05:32:17.630Z",
+          "type": "tool_end",
+          "content": "[Bash] Done",
+          "phase": "planning",
+          "tool_name": "Bash",
+          "detail": "total 312\ndrwxr-xr-x@  26 nick  staff    832 Sep 17 16:26 .\ndrwxr-xr-x@ 797 nick  staff  25504 Sep 18 01:25 ..\ndrwxr-xr-x@   5 nick  staff    160 Sep 17 18:03 .auto-claude\ndrwxr-xr-x@  29 nick  staff    928 Sep 17 16:57 .debug\ndrwxr-xr-x@  16 nick  staff    512 Sep 18 01:31 .git\n-rw-r--r--@   1 nick  staff    156 Sep 17 07:25 .gitignore\ndrwxr-xr-x@   5 nick  staff    160 Sep 17 06:13 .omc\ndrwxr-xr-x@   3 nick  staff     96 Sep 17 16:31 .planning\ndrwxr-xr-x@   4 nick  staff    128 Sep  1 21:01 build\ndrwxr-xr-x@ 118 nick  staff   3776 Sep 17 18:20 e2e-evidence\n-rw-r--r--@   1 nick  staff   1068 Sep 17 05:45 LICENSE\n-rw-r--r--@   1 nick  staff   7047 Sep  1 20:04 P0-REFREEZE-2-ROW9.md\n-rw-r--r--@   1 nick  staff   4024 Sep  8 12:46 P3-REFREEZE-REQUEST-DIGEST.md\n-rw-r--r--@   1 nick  staff  10298 Sep 17 01:27 PHASE0-REFREEZE-2026-09-17.md\n-rw-r--r--@   1 nick  staff   9702 Sep 17 01:16 PHASE0.md\ndrwxr-xr-x@  11 nick  staff    352 Sep 17 07:47 proofpunk_agent\ndrwxr-xr-x@   8 nick  staff    256 Sep  1 22:14 proofpunk_agent.egg-info\n-rw-r--r--@   1 nick  staff   3310 Sep 17 05:47 pyproject.toml\n-rw-r--r--@   1 nick  staff  17014 Sep 17 13:54 README.md\n-rw-r--r--@   1 nick  staff  46157 Sep 18 00:03 RELEASE.md\ndrwxr-xr-x@   8 nick  staff    256 Sep 17 01:44 validation\n-rw-r--r--@   1 nick  staff   5542 Sep  1 21:00 VG-P0-VERDICT.md\n-rw-r--r--@   1 nick  staff   5924 Sep  1 22:25 VG-P1-VERDICT.md\n-rw-r--r--@   1 nick  staff   5280 Sep  8 12:40 VG-P2-VERDICT.md\n-rw-r--r--@   1 nick  staff   7175 Sep  8 19:58 VG-P3-VERDICT.md\n-rw-r--r--@   1 nick  staff   5428 Sep  8 21:33 VG-P5-VERDICT.md\ntotal 0\ndrwxr-xr-x@ 10 nick  staff  320 Sep 18 01:31 .\ndrwxr-xr-x@  5 nick  staff  160 Sep 17 18:03 ..\ndrwxr-xr-x@  5 nick  staff  160 Sep 16 21:31 001-screens-2-5-beyond-the-p1-shell-placeholder\ndrwxr-xr-x@  5 nick  staff  160 Sep 16 21:31 002-promote-n-w-from-roadmap-honesty-stubs-to-real-bindings\ndrwxr-xr-x@  5 nick  staff  160 Sep 16 21:31 003-terminal-floor-100x28-blocking-resize-overlay-coverage\ndrwxr-xr-x@  5 nick  staff  160 Sep 17 17:47 004-evidence-run-diff-lineage\ndrwxr-xr-x@  6 nick  staff  192 Sep 17 18:54 005-policy-file-policy\ndrwxr-xr-x@  5 nick  staff  160 Sep 17 19:09 006-tool-allow-deny-lists\ndrwxr-xr-x@  5 nick  staff  160 Sep 17 23:45 007-runaway-loop-detector\ndrwxr-xr-x@  5 nick  staff  160 Sep 18 01:32 999-subagent-proof-v2\n",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-09-18T05:32:20.637Z",
+          "type": "tool_start",
+          "content": "[Read] /Users/nick/proofpunk-agent/.auto-claude/specs/999-subagent-proof-v2/task_metadata.json",
+          "phase": "planning",
+          "tool_name": "Read",
+          "tool_input": "/Users/nick/proofpunk-agent/.auto-claude/specs/999-subagent-proof-v2/task_metadata.json"
+        },
+        {
+          "timestamp": "2026-09-18T05:32:20.640Z",
+          "type": "tool_start",
+          "content": "[Read] /Users/nick/proofpunk-agent/.auto-claude/specs/999-subagent-proof-v2/project_index.json",
+          "phase": "planning",
+          "tool_name": "Read",
+          "tool_input": "/Users/nick/proofpunk-agent/.auto-claude/specs/999-subagent-proof-v2/project_index.json"
+        },
+        {
+          "timestamp": "2026-09-18T05:32:20.640Z",
+          "type": "tool_end",
+          "content": "[Read] Done",
+          "phase": "planning",
+          "tool_name": "Read",
+          "detail": "1\t{\n2\t  \"sourceType\": \"roadmap\",\n3\t  \"featureId\": \"999-subagent-proof-v2\",\n4\t  \"category\": \"feature\"\n5\t}\n6\t",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-09-18T05:32:20.641Z",
+          "type": "tool_end",
+          "content": "[Read] Done",
+          "phase": "planning",
+          "tool_name": "Read",
+          "detail": " 1\t{\n 2\t  \"project_root\": \"/Users/nick/proofpunk-agent\",\n 3\t  \"project_type\": \"single\",\n 4\t  \"services\": {\n 5\t    \"main\": {\n 6\t      \"name\": \"main\",\n 7\t      \"path\": \"/Users/nick/proofpunk-agent\",\n 8\t      \"language\": \"Python\",\n 9\t      \"type\": \"backend\",\n10\t      \"package_manager\": \"pip\"\n11\t    }\n12\t  },\n13\t  \"infrastructure\": {},\n14\t  \"conventions\": {}\n15\t}",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-09-18T05:32:24.828Z",
+          "type": "tool_start",
+          "content": "[Grep] subagent-proof",
+          "phase": "planning",
+          "tool_name": "Grep",
+          "tool_input": "subagent-proof"
+        },
+        {
+          "timestamp": "2026-09-18T05:32:25.116Z",
+          "type": "tool_start",
+          "content": "[Bash] ls /Users/nick/proofpunk-agent/proofpunk_agent/ /Users/nick/proofpunk-agent/.planning/ 2>/dev/null",
+          "phase": "planning",
+          "tool_name": "Bash",
+          "tool_input": "ls /Users/nick/proofpunk-agent/proofpunk_agent/ /Users/nick/proofpunk-agent/.planning/ 2>/dev/null"
+        },
+        {
+          "timestamp": "2026-09-18T05:32:25.125Z",
+          "type": "tool_end",
+          "content": "[Bash] Done",
+          "phase": "planning",
+          "tool_name": "Bash",
+          "detail": "/Users/nick/proofpunk-agent/.planning/:\nexecution-ledger.json\n\n/Users/nick/proofpunk-agent/proofpunk_agent/:\n__init__.py\n__main__.py\n__pycache__\napp.py\nbridge\nscreens\nstate\ntheme.py\nwidgets\n",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-09-18T05:32:25.161Z",
+          "type": "tool_end",
+          "content": "[Grep] Done",
+          "phase": "planning",
+          "tool_name": "Grep",
+          "detail": "No matches found",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-09-18T05:32:30.273Z",
+          "type": "tool_start",
+          "content": "[Grep] 999",
+          "phase": "planning",
+          "tool_name": "Grep",
+          "tool_input": "999"
+        },
+        {
+          "timestamp": "2026-09-18T05:32:30.279Z",
+          "type": "tool_start",
+          "content": "[Bash] ls /Users/nick/proofpunk-agent/proofpunk_agent/state/ /Users/nick/proofpunk-agent/proofpunk_agent/bridge/ 2>/dev/null && head -50 /Users/nick/proofpunk-agent/README.md",
+          "phase": "planning",
+          "tool_name": "Bash",
+          "tool_input": "ls /Users/nick/proofpunk-agent/proofpunk_agent/state/ /Users/nick/proofpunk-agent/proofpunk_agent/bridge/ 2>/dev/null && head -50 /Users/nick/proofpunk-agent/README.md"
+        },
+        {
+          "timestamp": "2026-09-18T05:32:30.284Z",
+          "type": "tool_end",
+          "content": "[Grep] Done",
+          "phase": "planning",
+          "tool_name": "Grep",
+          "detail": "No matches found",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-09-18T05:32:30.290Z",
+          "type": "tool_end",
+          "content": "[Bash] Done",
+          "phase": "planning",
+          "tool_name": "Bash",
+          "detail": "/Users/nick/proofpunk-agent/proofpunk_agent/bridge/:\n__pycache__\ndigest.py\nevidence.py\nsdk.py\n\n/Users/nick/proofpunk-agent/proofpunk_agent/state/:\n__pycache__\nevents.py\nreducers\n# proofpunk-agent\n\nA terminal mission-control UI for Claude Agent SDK sessions.\n\n`proofpunk-agent` drives a Claude Agent SDK session from a full-screen terminal\ninterface and shows you what the session is actually doing while it does it: the\nagent tree as subagents fan out, assistant text as it streams, every tool call\nwith its arguments and cost, every hook decision the Proofpunk plugin makes, the\nevidence run as it exists on disk, and a live performance budget.\n\nIt is a *viewer with a keyboard*, not a wrapper that hides the SDK. Every screen\nrenders from one append-only event log projected out of the SDK stream; no widget\nreads an SDK object directly, and no screen invents a number it did not measure.\nWhere a value is unavailable the UI renders `--` rather than a plausible\nplaceholder.\n\n---\n\n## Requirements\n\n- Python **3.10+** (developed and measured on 3.11.6)\n- A terminal at least **100 x 28** — below that the app renders a blocking\n  resize notice instead of a squeezed layout (`app.py:51-52`, `ResizeNotice`)\n- A working Claude CLI installation, reachable by the SDK\n- Optional but strongly recommended: a Proofpunk plugin checkout at **5.0.0 or\n  newer** (see [Plugin root](#plugin-root))\n\nPinned dependencies (`pyproject.toml:17-21`):\n\n```\nclaude-agent-sdk==0.2.144\ntextual==8.1.1\n```\n\n## Install\n\nFrom a checkout:\n\n```sh\ngit clone https://github.com/krzemienski/proofpunk-agent\ncd proofpunk-agent\npython3 -m pip install -e .\n```\n\nThat installs the `proofpunk-agent` console script\n(`pyproject.toml:23-24`). The module form works identically and is what the\nvalidation harness uses:\n\n```sh\npython3 -m proofpunk_agent --help\n",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-09-18T05:32:36.923Z",
+          "type": "tool_start",
+          "content": "[Grep] subagent|spawn",
+          "phase": "planning",
+          "tool_name": "Grep",
+          "tool_input": "subagent|spawn"
+        },
+        {
+          "timestamp": "2026-09-18T05:32:36.992Z",
+          "type": "tool_start",
+          "content": "[Bash] cat /Users/nick/proofpunk-agent/.planning/execution-ledger.json | head -80",
+          "phase": "planning",
+          "tool_name": "Bash",
+          "tool_input": "cat /Users/nick/proofpunk-agent/.planning/execution-ledger.json | head -80"
+        },
+        {
+          "timestamp": "2026-09-18T05:32:37.000Z",
+          "type": "tool_end",
+          "content": "[Grep] Done",
+          "phase": "planning",
+          "tool_name": "Grep",
+          "detail": "4-\n5-`proofpunk-agent` drives a Claude Agent SDK session from a full-screen terminal\n6-interface and shows you what the session is actually doing while it does it: the\n7:agent tree as subagents fan out, assistant text as it streams, every tool call\n8-with its arguments and cost, every hook decision the Proofpunk plugin makes, the\n9-evidence run as it exists on disk, and a live performance budget.\n10-",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-09-18T05:32:37.002Z",
+          "type": "tool_end",
+          "content": "[Bash] Done",
+          "phase": "planning",
+          "tool_name": "Bash",
+          "detail": "{\n  \"schema\": \"proofpunk/implement/execution-ledger@1\",\n  \"run_started_utc\": \"2026-09-17T20:15Z\",\n  \"goal\": \"proofpunk-agent v1.0 — close or honestly report the §10.3 release gate\",\n  \"mode\": {\n    \"flags\": [\"--parallel\", \"--auto\", \"--mine\"],\n    \"note\": \"Resume, not greenfield. The repository already carried a build; this run measured what was true, corrected what was mis-stated, and left the gate open.\"\n  },\n  \"spec_authority\": \"Part I §1-§12 of the combined specification; §14 ground truth wins over Part I where they conflict.\",\n\n  \"gate_status\": {\n    \"closes\": false,\n    \"measured_utc\": \"2026-09-18T04:04:13Z\",\n    \"method\": \"Mechanical scan of every verdict row in RELEASE.md; first legal verdict token per row.\",\n    \"counts\": { \"PASS\": 52, \"UNVERIFIED\": 2, \"FAIL\": 3, \"BLOCKED\": 0 },\n    \"rule\": \"§10.3 requires every row to PASS; any non-PASS row — FAIL, UNVERIFIED, or BLOCKED — holds the gate open, and all five non-PASS rows (3 FAIL + 2 UNVERIFIED) do so here.\"\n  },\n\n  \"open_rows\": [\n    {\n      \"id\": \"R1\",\n      \"row\": \"render throughput >= 1500 tok/s (§7 Screen 5 rule 1)\",\n      \"verdict\": \"UNVERIFIED\",\n      \"release_md_line\": 283,\n      \"finding\": \"Not measurable live as written. The divisor in proofpunk_agent/screens/performance.py:599 is wall-clock elapsed, not render time, so the figure is bounded by model generation rate. Over the 30-minute window the renderer produced 33 throughput samples against 3607 RSS ticks (~0.9% of ticks had tokens to render).\",\n      \"prior_label\": \"FAIL live / PASS capacity\",\n      \"why_changed\": \"Two defects in one cell: the split verdict was not a legal §2 token, and 'FAIL live' asserted a renderer defect the evidence does not support. Verdict is now bare UNVERIFIED; the threshold itself is unchanged (§23 W7 forbids renegotiating the budget mid-build).\",\n      \"capacity_number_status\": \"SUPPORTING ONLY, NOT GATE EVIDENCE. validation/perf/driver.py:229 drives the real apply_event + reduce_metrics fold with generated payloads; §7 Screen 5 rule 5 forbids synthetic replays as completion evidence.\",\n      \"what_would_settle_it\": \"Nothing re-measurable on this host. A live session cannot sustain ~6000 chars/s into the pane. Settling it requires a gate respecification, which is out of scope for this build.\"\n    },\n    {\n      \"id\": \"R2\",\n      \"row\": \"RSS growth <= 10MB / 30min (§7 Screen 5 rule 1)\",\n      \"verdict\": \"UNVERIFIED\",\n      \"release_md_line\": 284,\n      \"finding\": \"The 25.672 MB FAIL is historical: it predates the _preload_sdk() fix and does not describe HEAD.\",\n      \"blocker_correction\": \"The previously stated ~$244.61 spend blocker was arithmetically wrong and is withdrawn, as was the first attempted repair (min(rate x window, one-session cost)), which was unsound in the UNSAFE direction and rejected. A conservative additive guard has since landed (validation/perf/driver.py:349-395): measured generating rate x window_seconds + largest observed session bill ($5.569389 floor). It over-refuses by construction.\",\n      \"verdict_unchanged_because\": \"Correcting the reason does not produce a measurement. No 30-minute window has been run against current code.\",\n      \"explicitly_rejected_shortcut\": \"Driving the app idle for 1800s would NOT settle this. §7 Screen 5 rule 1 gates RSS over an ACTIVE session; an idle window measures a different thing and would pass for the wrong reason.\",\n      \"what_would_settle_it\": \"One fresh 30-minute window on HEAD under real fan-out load. The window has not been re-run on HEAD — that missing run is the only thing holding this row open. Under the landed conservative guard the window projects $250.18 refused at the default $3.00 budget (rc=3, before any session starts), so running it requires a deliberate --max-budget raise.\"\n    },\n    {\n      \"id\": \"R3\",\n      \"row\": \"No invalid run id appears anywhere in this document (§2, §14.5)\",\n      \"verdict\": \"FAIL\",\n      \"release_md_line\": 475,\n      \"finding\": \"Doc-wide scan returns exactly one invalid id: run-20260917T110907-ui-self-hosted (rc=2, NO ARTIFACTS + UNSEALED, zero step-* files).\",\n      \"prior_claim_withdrawn\": \"RELEASE.md previously asserted 'no invalid run is cited anywhere in this document — re-verified by extracting every run-* reference and intersecting with the validator'. That claim was FALSE under its own stated method.\",\n      \"scoped_measurement\": \"24 artifact-column run ids, 0 invalid. The invalid id survives only in §5 narrative and the appendix, where it names the defect whose proof was re-earned in run-20260917T151647-p0-recapture-selfhost (validate rc=0).\",\n      \"why_not_deleted\": \"Deleting the id would make the scan clean by erasing the record of the defect. It stays; the document-wide row reads FAIL.\",\n      \"what_would_settle_it\": \"Operator decision: remove the narrative, or accept a permanent FAIL on the document-wide claim while the artifact-column claim stays PASS.\"\n    },\n    {\n      \"id\": \"R4\",\n      \"row\": \"Pre-existing runs re-earned under 5.0.0 (§14.5)\",\n      \"verdict\": \"FAIL\",\n      \"release_md_line\": 477,\n      \"finding\": \"35 uncited runs still invalid; 36 invalid of 116 total (measured_utc 2026-09-18T04:04:13Z). 12 runs were recovered this session: 8 rename+seal (the previously-identified recoverable set — real captures misnamed off the step-NN-slug convention, digests verified identical across every rename) and 4 bare seal (convention-named, genuinely captured, never sealed; the sole failure was a missing sealed= line). Reason breakdown of the 36: 19 empty NO ARTIFACTS+UNSEALED, 1 NO ARTIFACTS with a sealed inventory whose step files are absent from disk, 13 THIN, 2 missing .run-meta, 1 unparseable run-start, 1 THIN+TAMPERED. Row stays FAIL: 36 invalid means the obligation is not met.\",\n      \"stale_counts_corrected\": \"RELEASE.md §8 previously stated 101 total / 54 valid / 47 invalid / 26 cited / 45 uncited-invalid, then 115 total / 67 valid / 48 invalid / 29 referenced / 47 uncited-invalid, then 116 / 68 / 48 / 29 / 47 (2026-09-17T22:35:45Z). Re-measured 2026-09-18T04:04:13Z: 116 / 80 / 36 / 29 / 35.\",\n      \"what_would_settle_it\": \"The rename-recoverable population is exhausted — the 8 rename+seal and 4 bare-seal repairs are DONE. What remains requires re-capture with context (19 empty scratch runs, 13 THIN runs whose artifacts sit at or below the 1024-byte floor), plus operator decisions on the structurally dead: 2 runs with no .run-meta, 1 unparseable run-start, 1 whose sealed inventory names step files absent from disk. Deleting any run is consent-gated under §16.4(a) and was not done.\"\n    },\n    {\n      \"id\": \"R5\",\n      \"row\": \"Artifact citations use §21's `full path` row format\",\n      \"verdict\": \"FAIL\",\n      \"release_md_line\": 480,\n      \"finding\": \"Every artifact citation in RELEASE.md is repository-relative (e2e-evidence/run-.../step-NN-..., validation/capture.py), not absolute, so under a literal reading of §21 the document does not satisfy its own stated row format. Recorded as a new §8 row this session rather than silently claimed as compliant.\",\n      \"why_not_normalized\": \"Absolute paths would embed this host's home directory into a release document and break every citation for any other checkout; repo-relative paths resolve from the repository root for any reviewer with a clone. Recorded as a deliberate deviation (RELEASE.md §8 row + note) instead of normalizing.\",\n      \"scoped_measurement\": \"Documentation-format failure only — not a defect in any cited evidence. Every cited artifact still resolves from the repository root, and every artifact-column run (24 of 24) still returns validate OK.\",\n      \"what_would_settle_it\": \"Operator decision on whether §21's 'full path' is meant literally (absolute) or as 'the complete path from the repository root'. If literal, the citations need normalizing and the document becomes host-specific; if repo-root-relative, §21's wording is what should be amended.\"\n    }\n  ],\n\n  \"verified_this_run\": [\n    { \"claim\": \"116 run dirs, 80 valid, 36 invalid (measured_utc 2026-09-18T04:04:13Z; prior figures 112/64, 115/67, and 116/68/48 all went stale as later runs landed and 12 runs were repaired — 8 rename+seal, 4 bare seal, nothing deleted)\", \"method\": \"Ran the real validator with explicit --run against every run directory, personally, not via a subagent summary; full-estate sweeps repeated after each repair batch.\", \"tool\": \"/Users/nick/proofpunk/plugins/proofpunk/validators/fresh_evidence.py\" },\n    { \"claim\": \"29 run ids referenced doc-wide; 24 in artifact columns; exactly 1 invalid, prose-only\", \"method\": \"Cell-aware scan separating artifact columns from prose, re-run after each edit.\" },\n    { \"claim\": \"Throughput divisor is wall-clock\", \"method\": \"Read proofpunk_agent/screens/performance.py:595-607 directly.\" },\n    { \"claim\": \"Perf window does not re-prompt\", \"method\": \"Read validation/perf/driver.py:581-602 directly.\" },\n    { \"claim\": \"Plugin root resolves with skills/ and themes/; fresh_evidence.py --help rc=0\", \"method\": \"Executed --help; rc=0.\" },\n    { \"claim\": \"Local router configured (ANTHROPIC_BASE_URL present, cheap model routes)\", \"method\": \"Read ~/.claude/settings.json keys only; no secret values printed or recorded.\" }\n",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-09-18T05:32:47.102Z",
+          "type": "tool_start",
+          "content": "[Read] /Users/nick/proofpunk-agent/.auto-claude/specs/999-subagent-proof-v2/task_logs.json",
+          "phase": "planning",
+          "tool_name": "Read",
+          "tool_input": "/Users/nick/proofpunk-agent/.auto-claude/specs/999-subagent-proof-v2/task_logs.json"
+        },
+        {
+          "timestamp": "2026-09-18T05:32:47.667Z",
+          "type": "tool_start",
+          "content": "[Bash] ls /Users/nick/proofpunk-agent/.auto-claude/specs/001-screens-2-5-beyond-the-p1-shell-placeholder/ /Users/nick/proofpunk-agent/.auto-claude/specs/007-runaway-loop-detector/ 2>/dev/null && ls /Users...",
+          "phase": "planning",
+          "tool_name": "Bash",
+          "tool_input": "ls /Users/nick/proofpunk-agent/.auto-claude/specs/001-screens-2-5-beyond-the-p1-shell-placeholder/ /Users/nick/proofpunk-agent/.auto-claude/specs/007-runaway-loop-detector/ 2>/dev/null && ls /Users..."
+        },
+        {
+          "timestamp": "2026-09-18T05:32:47.668Z",
+          "type": "tool_end",
+          "content": "[Read] Done",
+          "phase": "planning",
+          "tool_name": "Read",
+          "detail": "  1\t{\n  2\t  \"spec_id\": \"999-subagent-proof-v2\",\n  3\t  \"created_at\": \"2026-09-18T05:32:09.090Z\",\n  4\t  \"updated_at\": \"2026-09-18T05:32:47.667Z\",\n  5\t  \"phases\": {\n  6\t    \"planning\": {\n  7\t      \"phase\": \"planning\",\n  8\t      \"status\": \"active\",\n  9\t      \"started_at\": \"2026-09-18T05:32:09.843Z\",\n 10\t      \"completed_at\": null,\n 11\t      \"entries\": [\n 12\t        {\n 13\t          \"timestamp\": \"2026-09-18T05:32:09.843Z\",\n 14\t          \"type\": \"phase_start\",\n 15\t          \"content\": \"Agentic spec orchestration\",\n 16\t          \"phase\": \"planning\"\n 17\t        },\n 18\t        {\n 19\t          \"timestamp\": \"2026-09-18T05:32:17.565Z\",\n 20\t          \"type\": \"text\",\n 21\t          \"content\": \"Task name \\\"999-subagent-proof-v2\\\" suggests a pipeline proof test. Checking project and prior v1 spec for context.\",\n 22\t          \"phase\": \"planning\"\n 23\t        },\n 24\t        {\n 25\t          \"timestamp\": \"2026-09-18T05:32:17.565Z\",\n 26\t          \"type\": \"tool_start\",\n 27\t          \"content\": \"[Bash] ls -la /Users/nick/proofpunk-agent/ && ls -la /Users/nick/proofpunk-agent/.auto-claude/specs/ 2>/dev/null\",\n 28\t          \"phase\": \"planning\",\n 29\t          \"tool_name\": \"Bash\",\n 30\t          \"tool_input\": \"ls -la /Users/nick/proofpunk-agent/ && ls -la /Users/nick/proofpunk-agent/.auto-claude/specs/ 2>/dev/null\"\n 31\t        },\n 32\t        {\n 33\t          \"timestamp\": \"2026-09-18T05:32:17.567Z\",\n 34\t          \"type\": \"tool_start\",\n 35\t          \"content\": \"[Glob] **/*\",\n 36\t          \"phase\": \"planning\",\n 37\t          \"tool_name\": \"Glob\",\n 38\t          \"tool_input\": \"**/*\"\n 39\t        },\n 40\t        {\n 41\t          \"timestamp\": \"2026-09-18T05:32:17.627Z\",\n 42\t          \"type\": \"tool_end\",\n 43\t          \"content\": \"[Glob] Done\",\n 44\t          \"phase\": \"planning\",\n 45\t          \"tool_name\": \"Glob\",\n 46\t          \"detail\": \"/Users/nick/proofpunk-agent/.auto-claude/specs/999-subagent-proof-v2/task_logs.json\\n/Users/nick/proofpunk-agent/.auto-claude/specs/999-subagent-proof-v2/project_index.json\\n/Users/nick/proofpunk-agent/.auto-claude/specs/999-subagent-proof-v2/task_metadata.json\\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/006-tool-allow-deny-lists/README.md\\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/006-tool-allow-deny-lists/proofpunk_agent/__pycache__/__main__.cpython-311.pyc\\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/006-tool-allow-deny-lists/proofpunk_agent/__main__.py\\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/app.py\\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/state/reducers/watchdog.py\\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/widgets/__pycache__/loop_alert_modal.cpython-311.pyc\\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/widgets/loop_alert_modal.py\\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/__pycache__/app.cpython-311.pyc\\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/__pycache__/__main__.cpython-311.pyc\\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/__main__.py\\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/__pycache__/policy.cpython-311.pyc\\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/proofpunk_agent/policy.py\\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/validation/e2e/__pycache__/scenario_session.cpython-311.pyc\\n/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/007-runaway-loop-detector/valid... (truncated)\n 47\t          \"collapsed\": true\n 48\t        },\n 49\t        {\n 50\t          \"timestamp\": \"2026-09-18T05:32:17.630Z\",\n 51\t          \"type\": \"tool_end\",\n 52\t          \"content\": \"[Bash] Done\",\n 53\t          \"phase\": \"planning\",\n 54\t          \"tool_name\": \"Bash\",\n 55\t          \"detail\": \"total 312\\ndrwxr-xr-x@  26 nick  staff    832 Sep 17 16:26 .\\ndrwxr-xr-x@ 797 nick  staff  25504 Sep 18 01:25 ..\\ndrwxr-xr-x@   5 nick  staff    160 Sep 17 18:03 .auto-claude\\ndrwxr-xr-x@  29 nick  staff    928 Sep 17 16:57 .debug\\ndrwxr-xr-x@  16 nick  staff    512 Sep 18 01:31 .git\\n-rw-r--r--@   1 nick  staff    156 Sep 17 07:25 .gitignore\\ndrwxr-xr-x@   5 nick  staff    160 Sep 17 06:13 .omc\\ndrwxr-xr-x@   3 nick  staff     96 Sep 17 16:31 .planning\\ndrwxr-xr-x@   4 nick  staff    128 Sep  1 21:01 build\\ndrwxr-xr-x@ 118 nick  staff   3776 Sep 17 18:20 e2e-evidence\\n-rw-r--r--@   1 nick  staff   1068 Sep 17 05:45 LICENSE\\n-rw-r--r--@   1 nick  staff   7047 Sep  1 20:04 P0-REFREEZE-2-ROW9.md\\n-rw-r--r--@   1 nick  staff   4024 Sep  8 12:46 P3-REFREEZE-REQUEST-DIGEST.md\\n-rw-r--r--@   1 nick  staff  10298 Sep 17 01:27 PHASE0-REFREEZE-2026-09-17.md\\n-rw-r--r--@   1 nick  staff   9702 Sep 17 01:16 PHASE0.md\\ndrwxr-xr-x@  11 nick  staff    352 Sep 17 07:47 proofpunk_agent\\ndrwxr-xr-x@   8 nick  staff    256 Sep  1 22:14 proofpunk_agent.egg-info\\n-rw-r--r--@   1 nick  staff   3310 Sep 17 05:47 pyproject.toml\\n-rw-r--r--@   1 nick  staff  17014 Sep 17 13:54 README.md\\n-rw-r--r--@   1 nick  staff  46157 Sep 18 00:03 RELEASE.md\\ndrwxr-xr-x@   8 nick  staff    256 Sep 17 01:44 validation\\n-rw-r--r--@   1 nick  staff   5542 Sep  1 21:00 VG-P0-VERDICT.md\\n-rw-r--r--@   1 nick  staff   5924 Sep  1 22:25 VG-P1-VERDICT.md\\n-rw-r--r--@   1 nick  staff   5280 Sep  8 12:40 VG-P2-VERDICT.md\\n-rw-r--r--@   1 nick  staff   7175 Sep  8 19:58 VG-P3-VERDICT.md\\n-rw-r--r--@   1 nick  staff   5428 Sep  8 21:33 VG-P5-VERDICT.md\\ntotal 0\\ndrwxr-xr-x@ 10 nick  staff  320 Sep 18 01:31 .\\ndrwxr-xr-x@  5 nick  staff  160 Sep 17 18:03 ..\\ndrwxr-xr-x@  5 nick  staff  160 Sep 16 21:31 001-screens-2-5-beyond-the-p1-shell-placeholder\\ndrwxr-xr-x@  5 nick  staff  160 Sep 16 21:31 002-promote-n-w-from-roadmap-honesty-stubs-to-real-bindings\\ndrwxr-xr-x@  5 nick  staff  160 Sep 16 2... (truncated)\n 56\t          \"collapsed\": true\n 57\t        },\n 58\t        {\n 59\t          \"timestamp\": \"2026-09-18T05:32:20.637Z\",\n 60\t          \"type\": \"tool_start\",\n 61\t          \"content\": \"[Read] /Users/nick/proofpunk-agent/.auto-claude/specs/999-subagent-proof-v2/task_metadata.json\",\n 62\t          \"phase\": \"planning\",\n 63\t          \"tool_name\": \"Read\",\n 64\t          \"tool_input\": \"/Users/nick/proofpunk-agent/.auto-claude/specs/999-subagent-proof-v2/task_metadata.json\"\n 65\t        },\n 66\t        {\n 67\t          \"timestamp\": \"2026-09-18T05:32:20.640Z\",\n 68\t          \"type\": \"tool_start\",\n 69\t          \"content\": \"[Read] /Users/nick/proofpunk-agent/.auto-claude/specs/999-subagent-proof-v2/project_index.json\",\n 70\t          \"phase\": \"planning\",\n 71\t          \"tool_name\": \"Read\",\n 72\t          \"tool_input\": \"/Users/nick/proofpunk-agent/.auto-claude/specs/999-subagent-proof-v2/project_index.json\"\n 73\t        },\n 74\t        {\n 75\t          \"timestamp\": \"2026-09-18T05:32:20.640Z\",\n 76\t          \"type\": \"tool_end\",\n 77\t          \"content\": \"[Read] Done\",\n 78\t          \"phase\": \"planning\",\n 79\t          \"tool_name\": \"Read\",\n 80\t          \"detail\": \"1\\t{\\n2\\t  \\\"sourceType\\\": \\\"roadmap\\\",\\n3\\t  \\\"featureId\\\": \\\"999-subagent-proof-v2\\\",\\n4\\t  \\\"category\\\": \\\"feature\\\"\\n5\\t}\\n6\\t\",\n 81\t          \"collapsed\": true\n 82\t        },\n 83\t        {\n 84\t          \"timestamp\": \"2026-09-18T05:32:20.641Z\",\n 85\t          \"type\": \"tool_end\",\n 86\t          \"content\": \"[Read] Done\",\n 87\t          \"phase\": \"planning\",\n 88\t          \"tool_name\": \"Read\",\n 89\t          \"detail\": \" 1\\t{\\n 2\\t  \\\"project_root\\\": \\\"/Users/nick/proofpunk-agent\\\",\\n 3\\t  \\\"project_type\\\": \\\"single\\\",\\n 4\\t  \\\"services\\\": {\\n 5\\t    \\\"main\\\": {\\n 6\\t      \\\"name\\\": \\\"main\\\",\\n 7\\t      \\\"path\\\": \\\"/Users/nick/proofpunk-agent\\\",\\n 8\\t      \\\"language\\\": \\\"Python\\\",\\n 9\\t      \\\"type\\\": \\\"backend\\\",\\n10\\t      \\\"package_manager\\\": \\\"pip\\\"\\n11\\t    }\\n12\\t  },\\n13\\t  \\\"infrastructure\\\": {},\\n14\\t  \\\"conventions\\\": {}\\n15\\t}\",\n 90\t          \"collapsed\": true\n 91\t        },\n 92\t        {\n 93\t          \"timestamp\": \"2026-09-18T05:32:24.828Z\",\n 94\t          \"type\": \"tool_start\",\n 95\t          \"content\": \"[Grep] subagent-proof\",\n 96\t          \"phase\": \"planning\",\n 97\t          \"tool_name\": \"Grep\",\n 98\t          \"tool_input\": \"subagent-proof\"\n 99\t        },\n100\t        {\n101\t          \"timestamp\": \"2026-09-18T05:32:25.116Z\",\n102\t          \"type\": \"tool_start\",\n103\t          \"content\": \"[Bash] ls /Users/nick/proofpunk-agent/proofpunk_agent/ /Users/nick/proofpunk-agent/.planning/ 2>/dev/null\",\n104\t          \"phase\": \"planning\",\n105\t          \"tool_name\": \"Bash\",\n106\t          \"tool_input\": \"ls /Users/nick/proofpunk-agent/proofpunk_agent/ /Users/nick/proofpunk-agent/.planning/ 2>/dev/null\"\n107\t        },\n108\t        {\n109\t          \"timestamp\": \"2026-09-18T05:32:25.125Z\",\n110\t          \"type\": \"tool_end\",\n111\t          \"content\": \"[Bash] Done\",\n112\t          \"phase\": \"planning\",\n113\t          \"tool_name\": \"Bash\",\n114\t          \"detail\": \"/Users/nick/proofpunk-agent/.planning/:\\nexecution-ledger.json\\n\\n/Users/nick/proofpunk-agent/proofpunk_agent/:\\n__init__.py\\n__main__.py\\n__pycache__\\napp.py\\nbridge\\nscreens\\nstate\\ntheme.py\\nwidgets\\n\",\n115\t          \"collapsed\": true\n116\t        },\n117\t        {\n118\t          \"timestamp\": \"2026-09-18T05:32:25.161Z\",\n119\t          \"type\": \"tool_end\",\n120\t          \"content\": \"[Grep] Done\",\n121\t          \"phase\": \"planning\",\n122\t          \"tool_name\": \"Grep\",\n123\t          \"detail\": \"No matches found\",\n124\t          \"collapsed\": true\n125\t        },\n126\t        {\n127\t          \"timestamp\": \"2026-09-18T05:32:30.273Z\",\n128\t          \"type\": \"tool_start\",\n129\t          \"content\": \"[Grep] 999\",\n130\t          \"phase\": \"planning\",\n131\t          \"tool_name\": \"Grep\",\n132\t          \"tool_input\": \"999\"\n133\t        },\n134\t        {\n135\t          \"timestamp\": \"2026-09-18T05:32:30.279Z\",\n136\t          \"type\": \"tool_start\",\n137\t          \"content\": \"[Bash] ls /Users/nick/proofpunk-agent/proofpunk_agent/state/ /Users/nick/proofpunk-agent/proofpunk_agent/bridge/ 2>/dev/null && head -50 /Users/nick/proofpunk-agent/README.m\n\n... [truncated]",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-09-18T05:32:47.676Z",
+          "type": "tool_end",
+          "content": "[Bash] Done",
+          "phase": "planning",
+          "tool_name": "Bash",
+          "detail": "/Users/nick/proofpunk-agent/.auto-claude/specs/001-screens-2-5-beyond-the-p1-shell-placeholder/:\nrequirements.json\nspec.md\ntask_metadata.json\n\n/Users/nick/proofpunk-agent/.auto-claude/specs/007-runaway-loop-detector/:\nrequirements.json\nspec.md\ntask_metadata.json\n/Users/nick/proofpunk-agent/proofpunk_agent/screens/:\n__init__.py\n__pycache__\nevidence.py\nhooks.py\nperformance.py\nsession.py\ntools.py\n\n/Users/nick/proofpunk-agent/proofpunk_agent/state/reducers/:\n__init__.py\n__pycache__\nhooks.py\nledger.py\nmetrics.py\ntree.py\n\n/Users/nick/proofpunk-agent/proofpunk_agent/widgets/:\n__init__.py\n__pycache__\noutput_modal.py\npermission_modal.py\nquit_modal.py\nrewind_modal.py\n",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-09-18T05:32:50.313Z",
+          "type": "tool_start",
+          "content": "[Read] /Users/nick/proofpunk-agent/.auto-claude/specs/007-runaway-loop-detector/spec.md",
+          "phase": "planning",
+          "tool_name": "Read",
+          "tool_input": "/Users/nick/proofpunk-agent/.auto-claude/specs/007-runaway-loop-detector/spec.md"
+        },
+        {
+          "timestamp": "2026-09-18T05:32:50.315Z",
+          "type": "tool_start",
+          "content": "[Read] /Users/nick/proofpunk-agent/proofpunk_agent/state/reducers/tree.py",
+          "phase": "planning",
+          "tool_name": "Read",
+          "tool_input": "/Users/nick/proofpunk-agent/proofpunk_agent/state/reducers/tree.py"
+        },
+        {
+          "timestamp": "2026-09-18T05:32:50.316Z",
+          "type": "tool_end",
+          "content": "[Read] Done",
+          "phase": "planning",
+          "tool_name": "Read",
+          "detail": " 1\t# Runaway Loop Detector\n 2\t\n 3\tDetect repeated identical tool calls/argument patterns in the live event stream and surface a watchdog alert with option to pause or halt the session.\n 4\t\n 5\t## Rationale\n 6\tN/A\n 7\t\n 8\t## User Stories\n 9\t- As an operator, I want the agent stopped automatically when it loops instead of burning budget\n10\t\n11\t## Acceptance Criteria\n12\t- [ ] Configurable repetition threshold in policy file\n13\t- [ ] Alert shown via existing alert mechanism; halt produces structured exit code\n14\t- [ ] Headless mode aborts run on trigger when policy sets auto-halt\n15\t",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-09-18T05:32:50.316Z",
+          "type": "tool_end",
+          "content": "[Read] Done",
+          "phase": "planning",
+          "tool_name": "Read",
+          "detail": "  1\t\"\"\"P3 agent-tree reducer (§7 Screen 1 -- SESSION VIEW, Agent Tree panel).\n  2\t\n  3\tThis module models the live agent hierarchy the tree panel renders: root\n  4\torchestrator always node 0 (rule 1), children attaching by the §4\n  5\tattribution rule, per-node glyph state (rule 2), and the derived\n  6\t``active_count``/``max_depth`` figures the panel displays underneath the\n  7\ttree (rule 3).\n  8\t\n  9\tThe attribution rule (§4, binding)\n 10\t-----------------------------------\n 11\t``events.py`` already carries the resolved attribution on every ``Event``:\n 12\t``event.parent`` (the linked parent id, or ``None``) and ``event.tier``\n 13\t(the ``AttributionTier`` that produced it). §4's strict preference order\n 14\t-- hook-provided ``agent_id``/``agent_type``, then ``parent_agent_id``,\n 15\tthen ``parent_tool_use_id``, then the labeled ``(unattributed)`` fallback\n 16\t-- is therefore the PRODUCER's decision (the bridge that builds each\n 17\t``Event``, landing in Phase 3), not this reducer's. This reducer's only\n 18\tjob is to APPLY that decision:\n 19\t\n 20\t- ``event.parent`` resolves to a node already in the tree -> attach there,\n 21\t  recording ``event.tier`` on the new node so the UI can render a\n 22\t  degraded-link label for anything below tier 1.\n 23\t- ``event.parent`` is ``None``, or names a node not present in the tree\n 24\t  (e.g. a genuinely unattributed spawn, or an out-of-order log) -> attach\n 25\t  under the root orchestrator and record ``AttributionTier.UNATTRIBUTED``.\n 26\t  This is the ONLY fallback path, and it is exactly the labeled\n 27\t  ``(unattributed)`` case §4 requires -- never a guess.\n 28\t\n 29\tNo heuristic in this file infers a parent from event timing, name\n 30\tsimilarity, or proximity in the log. That is the prohibition §4 states\n 31\texplicitly, and the only way to satisfy it mechanically is to never write\n 32\tsuch a heuristic in the first place.\n 33\t\n 34\tVocabulary ambiguity (documented, not guessed)\n 35\t-----------------------------------------------\n 36\tAt this phase ``events.py`` defines the event kinds this reducer handles\n 37\tbut not every field their payloads will carry once the Phase 3 bridge\n 38\tlands. Two gaps, resolved here the same way ``reduce_hooks`` resolves its\n 39\town gaps -- by reading a documented key out of ``event.data``/``event.parent``\n 40\trather than inventing new ``EventKind`` members:\n 41\t\n 42\t- **Owning agent for a tool call or permission prompt.** ``TOOL_STARTED``,\n 43\t  ``TOOL_FINISHED``, ``PERMISSION_REQUESTED``, and ``PERMISSION_RESOLVED``\n 44\t  all describe something that belongs to a running agent, not the agent\n 45\t  itself (``event.subject`` is the tool-use id or permission id). This\n 46\t  reducer reads the owning agent as ``event.parent`` if set, falling back\n 47\t  to ``event.data[\"agent_id\"]``. An event that resolves neither is\n 48\t  ignored for tree purposes (documented below), never applied to a\n 49\t  guessed node.\n 50\t- **Success vs failure on ``AGENT_FINISHED``.** Resolved via\n 51\t  ``event.data.get(\"error\")`` (truthy) or\n 52\t  ``event.data.get(\"status\") in {\"error\", \"errored\"}`` -> ``ERRORED``;\n 53\t  otherwise -> ``COMPLETE``.\n 54\t\n 55\tIgnored event kinds\n 56\t--------------------\n 57\t``ASSISTANT_TEXT``, ``HOOK_EVENT``, ``TASK_UPDATED``, ``RESULT``, and\n 58\t``ERROR`` do not carry tree-shape information at this phase (``ERROR`` is\n 59\tsystem/ledger-scoped; see ``reduce_hooks``'s own documented vocabulary).\n 60\tThey fall through the reducer's final ``else`` and return ``state``\n 61\tunchanged -- an explicit, total no-op, never an unhandled branch.\n 62\t\n 63\t``IDLE`` (§7 Screen 1 rule 2) is a valid ``NodeState`` value with no\n 64\tproducing transition in this phase: no handled event kind conveys \"an\n 65\tagent is idle\" yet. It exists so the UI's glyph table is complete and so\n 66\ta future event kind can target it without a reducer-shape change.\n 67\t\"\"\"\n 68\t\n 69\tfrom __future__ import annotations\n 70\t\n 71\tfrom dataclasses import dataclass, field, replace\n 72\tfrom enum import Enum\n 73\tfrom types import MappingProxyType\n 74\tfrom typing import Mapping\n 75\t\n 76\tfrom proofpunk_agent.state.events import AttributionTier, Event, EventKind\n 77\t\n 78\t__all__ = [\n 79\t    \"NodeState\",\n 80\t    \"TreeNode\",\n 81\t    \"TreeState\",\n 82\t    \"ROOT_AGENT_ID\",\n 83\t    \"EMPTY_TREE_STATE\",\n 84\t    \"reduce_tree\",\n 85\t]\n 86\t\n 87\t#: Root orchestrator's fixed node id (§7 Screen 1 rule 1: \"root orchestrator\n 88\t#: always node 0\"). A constant rather than a value read off the SDK session\n 89\t#: id keeps this reducer independent of the bridge's session-naming choices.\n 90\tROOT_AGENT_ID: str = \"orchestrator\"\n 91\t\n 92\t\n 93\tclass NodeState(str, Enum):\n 94\t    \"\"\"§7 Screen 1 rule 2 glyph states.\"\"\"\n 95\t\n 96\t    RUNNING = \"running\"\n 97\t    PERMISSION_PENDING = \"permission_pending\"\n 98\t    IDLE = \"idle\"\n 99\t    COMPLETE = \"complete\"\n100\t    ERRORED = \"errored\"\n101\t\n102\t\n103\t@dataclass(frozen=True)\n104\tclass TreeNode:\n105\t    \"\"\"One agent-tree node: identity, display state, and linkage.\n106\t\n107\t    ``attribution`` records the ``AttributionTier`` that produced\n108\t    ``parent_id`` (§4) so the UI can render the degraded-link label for\n109\t    anything below ``HOOK_AGENT_ID``. ``depth`` is cached at attach time\n110\t    (``parent.depth + 1``) rather than recomputed by walking ``parent_id``\n111\t    chains -- the tree only grows forward through this reducer, so a\n112\t    node's depth is fixed the moment it is attached.\n113\t    \"\"\"\n114\t\n115\t    agent_id: str\n116\t    name: str\n117\t    state: NodeState\n118\t    parent_id: str | None\n119\t    attribution: AttributionTier\n120\t    depth: int\n121\t    children: tuple[str, ...] = ()\n122\t    current_tool: str | None = None\n123\t\n124\t\n125\tdef _root_node() -> TreeNode:\n126\t    return TreeNode(\n127\t        agent_id=ROOT_AGENT_ID,\n128\t        name=\"orchestrator\",\n129\t        state=NodeState.RUNNING,\n130\t        parent_id=None,\n131\t        attribution=AttributionTier.HOOK_AGENT_ID,\n132\t        depth=0,\n133\t        children=(),\n134\t        current_tool=None,\n135\t    )\n136\t\n137\t\n138\t@dataclass(frozen=True)\n139\tclass TreeState:\n140\t    \"\"\"Full P3 hierarchy, keyed by ``agent_id``.\n141\t\n142\t    ``nodes`` is a ``MappingProxyType`` rather than a plain ``dict``: a\n143\t    frozen dataclass stops reassignment of the ``nodes`` attribute, but\n144\t    without the proxy a caller holding the dict object could still mutate\n145\t    it in place, silently corrupting a state some other part of the app\n146\t    (or a replay) still references.\n147\t    \"\"\"\n148\t\n149\t    nodes: Mapping[str, TreeNode] = field(\n150\t        default_factory=lambda: MappingProxyType({})\n151\t    )\n152\t\n153\t    @property\n154\t    def root(self) -> TreeNode | None:\n155\t        return self.nodes.get(ROOT_AGENT_ID)\n156\t\n157\t    @property\n158\t    def active_count(self) -> int:\n159\t        \"\"\"§7 Screen 1 rule 3: nodes currently in the ``running`` state.\"\"\"\n160\t        return sum(1 for n in self.nodes.values() if n.state is NodeState.RUNNING)\n161\t\n162\t    @property\n163\t    def max_depth(self) -> int:\n164\t        \"\"\"§7 Screen 1 rule 3: deepest attached node, 0 if only (or not\n165\t        even) the root exists.\"\"\"\n166\t        if not self.nodes:\n167\t            return 0\n168\t        return max(n.depth for n in self.nodes.values())\n169\t\n170\t\n171\tEMPTY_TREE_STATE = TreeState()\n172\t\n173\t\n174\tdef _put(state: TreeState, node: TreeNode) -> TreeState:\n175\t    \"\"\"Return a new ``TreeState`` with ``node`` inserted/replaced.\"\"\"\n176\t    updated = dict(state.nodes)\n177\t    updated[node.agent_id] = node\n178\t    return replace(state, nodes=MappingProxyType(updated))\n179\t\n180\t\n181\tdef _ensure_root(state: TreeState) -> TreeState:\n182\t    \"\"\"Guarantee a root node exists before any attach/update.\n183\t\n184\t    Events are expected in order (``SESSION_INIT`` first), but a reducer\n185\t    must stay total against a malformed or out-of-order log rather than\n186\t    raising ``KeyError`` deep in an attach step -- an implicit root keeps\n187\t    every later operation well-defined without ever guessing a parent.\n188\t    \"\"\"\n189\t    if ROOT_AGENT_ID in state.nodes:\n190\t        return state\n191\t    return _put(state, _root_node())\n192\t\n193\t\n194\tdef _resolve_owner(state: TreeState, event: Event) -> str | None:\n195\t    \"\"\"Owning agent for a tool/permission event (documented above):\n196\t    ``event.parent`` first, then ``event.data[\"agent_id\"]``, then\n197\t    ``None`` if neither names a node currently in the tree.\"\"\"\n198\t    candidate = event.parent or event.data.get(\"agent_id\")\n199\t    if isinstance(candidate, str) and candidate in state.nodes:\n200\t        return candidate\n201\t    return None\n202\t\n203\t\n204\tdef _with_node_state(state: TreeState, agent_id: str, new_state: NodeState) -> TreeState:\n205\t    node = state.nodes.get(agent_id)\n206\t    if node is None:\n207\t        return state\n208\t    return _put(state, replace(node, state=new_state))\n209\t\n210\t\n211\tdef _with_current_tool(\n212\t    state: TreeState, agent_id: str, current_tool: str | None\n213\t) -> TreeState:\n214\t    node = state.nodes.get(agent_id)\n215\t    if node is None:\n216\t        return state\n217\t    return _put(state, replace(node, current_tool=current_tool))\n218\t\n219\t\n220\tdef _handle_session_init(state: TreeState, event: Event) -> TreeState:\n221\t    \"\"\"§7 Screen 1 rule 1: (re)establish the root. A fresh ``SESSION_INIT``\n222\t    resets the tree to just the root -- any prior nodes belonged to a\n223\t    session that no longer exists.\"\"\"\n224\t    name = event.data.get(\"name\", \"orchestrator\")\n225\t    root = replace(_root_node(), name=name if isinstance(name, str) else \"orchestrator\")\n226\t    return TreeState(nodes=MappingProxyType({ROOT_AGENT_ID: root}))\n227\t\n228\t\n229\tdef _handle_agent_spawned(state: TreeState, event: Event) -> TreeState:\n230\t    \"\"\"§4 attribution applied (see module docstring): attach under\n231\t    ``event.parent`` if it names a node already in the tree at\n232\t    ``event.tier``; otherwise attach under root at ``UNATTRIBUTED``.\"\"\"\n233\t    state = _ensure_root(state)\n234\t    agent_id = event.subject\n235\t    if not agent_id or agent_id in state.nodes:\n236\t        # No subject to attach, or a duplicate spawn for an id already\n237\t        # present -- ignore rather than clobber an existing node's history.\n238\t        return state\n239\t\n240\t \n\n... [truncated]",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-09-18T05:33:02.227Z",
+          "type": "text",
+          "content": "Project context is clear. Now checking validation harness and prior subagent-related evidence to scope \"subagent proof v2\".",
+          "phase": "planning"
+        },
+        {
+          "timestamp": "2026-09-18T05:33:02.228Z",
+          "type": "tool_start",
+          "content": "[Bash] ls /Users/nick/proofpunk-agent/validation/ && ls /Users/nick/proofpunk-agent/e2e-evidence/ | grep -i -E \"spawn|subagent|lifecycle|c5\"",
+          "phase": "planning",
+          "tool_name": "Bash",
+          "tool_input": "ls /Users/nick/proofpunk-agent/validation/ && ls /Users/nick/proofpunk-agent/e2e-evidence/ | grep -i -E \"spawn|subagent|lifecycle|c5\" "
+        },
+        {
+          "timestamp": "2026-09-18T05:33:02.286Z",
+          "type": "tool_start",
+          "content": "[Grep] C5|spawn|agent tree|Agent Tree",
+          "phase": "planning",
+          "tool_name": "Grep",
+          "tool_input": "C5|spawn|agent tree|Agent Tree"
+        },
+        {
+          "timestamp": "2026-09-18T05:33:02.294Z",
+          "type": "tool_end",
+          "content": "[Grep] Done",
+          "phase": "planning",
+          "tool_name": "Grep",
+          "detail": "47-| obligation | verdict | artifact |\n48-|---|---|---|\n49-| C4 — mid-delta streaming capture | **PASS** | `e2e-evidence/run-20260917T095028-p5-c4-c5-closeout/step-01-c4-mid-delta.svg` |\n50:| C5 — subagent node rendered with attribution | **PASS** (`Depth: 1`, `Active: 2`) | `e2e-evidence/run-20260917T100943-p5-c5-spawn-name-fix/step-02-c5-child-node-rendered-live` |\n51-| C6 — interrupt round-trip honored | **PASS** (`aborted_streaming` vs `completed`) | `e2e-evidence/run-20260917T094439-p5-c6-interrupt/step-01-c6-interrupt-discrimination` |\n52-| C7 — permission modal gates a real tool | **PASS** (absent → `a` → written, 30ms) | `e2e-evidence/run-20260917T101256-p5-c7-modal-observed/step-03-c7-modal-answered-gate-released` |\n53-\n54:C5 and C7 were blocked by **product defects, not missing observations**:\n55-\n56:* **The tree could never draw a subagent.** `sdk.py` gated the spawn on\n57-  `block.name == \"Task\"`; the live SDK emits `\"Agent\"` (measured: Agent ×6,\n58-  Task ×0). `AGENT_SPAWNED` was never emitted, so `Depth` could not exceed 0 —\n59:  silently, next to a stream that plainly showed the spawn. Fixed with a\n60-  frozenset accepting both names.\n61-* **C7 needed three instrument fixes**, none of them the product: a plugin\n62-  root one level too high, output redirection shrinking the terminal below the\n--\n589-## What this build is honest about\n590-\n591-Four defects today shared one shape: **a plausible value never checked against\n592:the running system, failing silently.** The spawn tool name reasoned from a\n593-docstring. The evidence script path from a documented layout. The hook decision\n594-set from a vocabulary the hooks do not use. Metric key spellings that a typo\n595-would have turned into a permanently empty row.\n--\n633-| `run-20260917T095632-p5-c7-permission-modal` | C7 instrument failures, honestly recorded |\n634-| `run-20260917T100231-p7-screen4-selfhost` | Screen 4 calling the real `init-run` |\n635-| `run-20260917T100626-p6-hook-block-fix` | hook block rows reachable, 64 allow / 1 block |\n636:| `run-20260917T100943-p5-c5-spawn-name-fix` | C5 — `Depth: 1`, child node painted |\n637-| `run-20260917T101256-p5-c7-modal-observed` | C7 — gate held, then released on `a` |\n638-| `run-20260917T102642-fuzz-invariants-verified` | queue drained, 0 dropped after 1440 keys |\n639-| `run-20260917T151647-p0-recapture-selfhost` | Screen 4 self-hosted captures re-earned (3 grabs, 59458/59742/60265B) after the originally-cited run failed validate |",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-09-18T05:33:02.298Z",
+          "type": "tool_end",
+          "content": "[Bash] Done",
+          "phase": "planning",
+          "tool_name": "Bash",
+          "detail": "__init__.py\n__pycache__\ncapture.py\ne2e\nperf\nplans\nrun-20260917T095028-p5-c4-c5-closeout\nrun-20260917T100943-p5-c5-spawn-name-fix\nrun-20260917T104359-lifecycle-helper-proof\nrun-20260917T104442-lifecycle-wired-proof\nrun-20260917T104455-harness-lifecycle-wired\n",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-09-18T05:33:12.604Z",
+          "type": "text",
+          "content": "Full picture forming. C5 (\"subagent node rendered with attribution\") was proven in run-20260917T100943 after the `Task`/`Agent` spawn-name fix. Checking bridge spawn handling and lifecycle-proof runs for anchors, then assessing complexity.",
+          "phase": "planning"
+        },
+        {
+          "timestamp": "2026-09-18T05:33:12.605Z",
+          "type": "tool_start",
+          "content": "[Grep] Task|Agent|AGENT_SPAWNED",
+          "phase": "planning",
+          "tool_name": "Grep",
+          "tool_input": "Task|Agent|AGENT_SPAWNED"
+        },
+        {
+          "timestamp": "2026-09-18T05:33:13.081Z",
+          "type": "tool_start",
+          "content": "[Bash] cat /Users/nick/proofpunk-agent/e2e-evidence/run-20260917T104442-lifecycle-wired-proof/evidence-inventory.txt 2>/dev/null | head -30; echo ---; ls /Users/nick/proofpunk-agent/e2e-evidence/run-20260...",
+          "phase": "planning",
+          "tool_name": "Bash",
+          "tool_input": "cat /Users/nick/proofpunk-agent/e2e-evidence/run-20260917T104442-lifecycle-wired-proof/evidence-inventory.txt 2>/dev/null | head -30; echo ---; ls /Users/nick/proofpunk-agent/e2e-evidence/run-20260..."
+        },
+        {
+          "timestamp": "2026-09-18T05:33:13.088Z",
+          "type": "tool_end",
+          "content": "[Grep] Done",
+          "phase": "planning",
+          "tool_name": "Grep",
+          "detail": "89-None``) tool call, because ``reducers/tree.py``'s own module docstring\n90-frames that constant as reducer-internal precisely so the bridge does not\n91-need to know it (``reducers/tree.py:26-28``: \"keeps this reducer\n92-independent of the bridge's session-naming choices\"), and because\n93-``reducers/tree.py``'s ``_resolve_owner``/``_handle_tool_started`` already\n94-define root-level-tool-call-with-no-owner as a documented no-op for tree\n95-purposes (\"An event that resolves neither is ignored for tree purposes...\n96-never applied to a guessed node\") -- the ledger (Screen 2) still records\n97:every such call in full regardless. Agent-tree spawn/finish events\n98:(``AGENT_SPAWNED``/``AGENT_FINISHED``) are derived from a\n99:``ToolUseBlock``/``ToolResultBlock`` pair named ``\"Task\"`` (the\n100-subagent-spawning built-in tool; also the name ``reducers/ledger.py``'s\n101-own ``_KEY_ARG_CANDIDATES`` table already recognizes) and keyed by that\n102-tool call's own ``tool_use_id`` -- the same identifier PHASE0 Row 9's\n103-measured evidence showed chaining through ``parent_tool_use_id`` across\n104-three levels of nesting (PHASE0.md \"Row 9\" section), so a spawned agent's\n105-``subject`` is exactly the pointer its own descendants will later present\n106-as their ``parent_tool_use_id``.\n107-\n108-``ToolPermissionContext.agent_id`` (\"If running within the context of a\n109-sub-agent, the sub-agent's ID\" -- ``types.py`` ``ToolPermissionContext``\n110-docstring) is treated the same way as a message-level\n111-``parent_tool_use_id`` for ``PERMISSION_REQUESTED``/``PERMISSION_RESOLVED``\n112-attribution. This is a documented assumption, not a spec citation (PHASE0\n113-verified ``parent_tool_use_id`` on message types specifically, not this\n114-callback field): the two are the closest available analog at the same\n115-conceptual layer, and no cross-referencing against previously-seen\n116:``AGENT_SPAWNED`` subjects is attempted, since that would itself be a form\n117-of inference the strict order forbids outside the labeled fallback.\n118-\n119-Errors (§8.4). ``ResultError``, ``ProcessError``, ``CLIConnectionError``,\n120-and ``CLIJSONDecodeError`` (``_errors.py:6-134``) raised out of\n121-``client.receive_messages()`` or ``client.connect()`` are caught and\n122-projected to ``EventKind.ERROR`` carrying a human summary, the exception's\n123-class name, and a recovery action (``\"retry\" | \"resume\" | \"restart\" |\n124-\"none\"``), via the ``_ERROR_CLASS_RECOVERY``/``_TERMINAL_REASON_RECOVERY``/\n125-``_ASSISTANT_ERROR_RECOVERY`` tables below. Bridge death (the consumer\n126-loop exiting on an unrecoverable exception) freezes state rather than\n127-losing it: pending coalesced deltas are flushed first (``_flush_pending_\n128-deltas``, so partial in-flight text is not silently dropped), then a\n129-final ``ERROR`` event is emitted with ``data[\"terminal\"] = True`` and the\n130-last-known session id, so a caller can offer resume-with-same-session-id\n131:(``ClaudeAgentOptions.resume``, ``types.py:2005-2007``) without replaying\n132-the whole log. ``MirrorErrorMessage`` (a non-fatal ``SessionStore.append``\n133-failure, ``types.py:1262-1278``) is projected the same way with\n134-``recovery_action=\"none\"`` -- the local transcript is already durable, so\n135-nothing needs retrying.\n136-\n137-Vocabulary ambiguity (documented, not guessed; same convention\n138-``reducers/hooks.py`` and ``reducers/tree.py`` use for their own gaps).\n139-``state/events.py`` at this phase has no dedicated ``EventKind`` for a\n140-plain user-role message that is not a tool result, for ``RateLimitEvent``\n141-(when not rejected), or for the background-task lifecycle messages\n142:(``TaskStartedMessage``/``TaskProgressMessage``/``TaskNotificationMessage``\n143:/``TaskUpdatedMessage``) or unmodeled ``SystemMessage`` subtypes (e.g. the\n144-CLI-internal ``session_state_changed`` marker referenced at\n145-``_internal/query.py:388-391``). Inventing a new ``EventKind`` is out of\n146-this file's scope -- ``events.py`` is owned by a different lane (its own\n147-module docstring says so) -- and no reducer landed in this phase consumes\n148-task-lifecycle state (``§7`` Screen 3's ``SystemEventKind`` enum has no\n149-``TASK`` member; Screen 5's load-profile counters do not track tasks\n150-either), so none of the above are projected to an event. Nothing is\n151-silently lost in a way that matters, though: a plain ``UserMessage.uuid``\n--\n165-import contextlib\n166-import json\n167-from dataclasses import dataclass, replace\n168-from datetime import datetime, timezone\n169-from typing import Any, AsyncIterator, Literal, Mapping\n170-\n171-from claude_agent_sdk import (\n172-    AssistantMessage,\n173:    ClaudeAgentOptions,\n174-    ClaudeSDKClient,\n175-    CLIConnectionError,\n176-    CLIJSONDecodeError,\n177-    ConversationResetMessage,\n178-    HookEventMessage,\n179-    Message,\n180-    MirrorErrorMessage,\n181-    PermissionMode,\n--\n185-    RateLimitEvent,\n186-    RateLimitInfo,\n187-    ResultError,\n188-    ResultMessage,\n189-    ServerToolResultBlock,\n190-    ServerToolUseBlock,\n191-    StreamEvent,\n192-    SystemMessage,\n193:    TaskNotificationMessage,\n194:    TaskProgressMessage,\n195:    TaskStartedMessage,\n196:    TaskUpdatedMessage,\n197-    TextBlock,\n198-    ThinkingBlock,\n199-    ToolPermissionContext,\n200-    ToolResultBlock,\n201-    ToolUseBlock,\n202-    UserMessage,\n203-)\n204-\n--\n268-Command = SendMessage | Interrupt | SetPermissionMode | Checkpoint | Rewind\n269-\n270-RecoveryAction = Literal[\"retry\", \"resume\", \"restart\", \"none\"]\n271-\n272-DEFAULT_QUEUE_DEPTH_THRESHOLD = 32\n273-\n274-#: Tool names that spawn a subagent. A SET, not a constant, because the name\n275-#: is host- and version-dependent and getting it wrong fails SILENTLY: the\n276:#: gate simply never matches, ``AGENT_SPAWNED`` is never emitted, the tree\n277-#: never gains a child, and Screen 1 reports \"Depth: 0 / Active: 1\" forever\n278-#: while the stream plainly shows the spawn happening.\n279-#:\n280:#: That is not hypothetical. This gate read ``== \"Task\"`` -- reasoned from the\n281-#: documented tool name -- and measured across every live trace captured on\n282:#: 2026-09-17 the real name is \"Agent\" (6 occurrences, zero \"Task\"). So no\n283-#: subagent was ever drawn, which is why the C5 obligation could not be met\n284-#: no matter how long a driver polled.\n285-#:\n286:#: \"Task\" is retained: it is the documented name and a host that emits it must\n287-#: keep working. Adding a name is cheap; missing one costs a silent hole.\n288:_SPAWN_TOOL_NAMES = frozenset({\"Agent\", \"Task\"})\n289-\n290-# Best-effort SystemEventKind bucket hints for a generic (otherwise-unmodeled)\n291-# SystemMessage subtype, keyed by substring of the raw subtype string.\n292-# Deliberately NOT importing reducers.hooks.SystemEventKind: the bridge and\n293-# reducer share only a documented STRING contract (see reducers/hooks.py\n294-# module docstring \"Vocabulary ambiguity\"), never a Python type -- and\n295-# reduce_hooks constructs ``SystemEventKind(data.get(\"system_kind\", ...))``\n296-# via the enum's strict constructor (reducers/hooks.py:196-198), so an\n--\n401-# ---------------------------------------------------------------------------\n402-\n403-\n404-class SdkBridge:\n405-    \"\"\"Owns the session's single ``ClaudeSDKClient``. See module docstring.\"\"\"\n406-\n407-    def __init__(\n408-        self,\n409:        options: ClaudeAgentOptions | None = None,\n410-        *,\n411-        queue_depth_threshold: int = DEFAULT_QUEUE_DEPTH_THRESHOLD,\n412-    ) -> None:\n413:        base = options if options is not None else ClaudeAgentOptions()\n414-        # This bridge owns can_use_tool unconditionally -- see module\n415-        # docstring \"Permission requests are NOT a queued command\".\n416-        # include_partial_messages is forced on regardless of what the\n417-        # caller passed: this bridge's own backpressure/coalescing path\n418-        # (see module docstring \"Backpressure\") is built entirely around\n419-        # StreamEvent deltas, and a caller that omitted the flag would\n420-        # silently get a bridge whose central §8.2 rule 4 obligation is\n421-        # unreachable dead code rather than an explicit configuration choice.\n422:        self._options: ClaudeAgentOptions = replace(\n423-            base,\n424-            can_use_tool=self._handle_can_use_tool,\n425-            include_partial_messages=True,\n426-        )\n427-        self._queue_depth_threshold = queue_depth_threshold\n428-\n429-        self._client: ClaudeSDKClient | None = None\n430-        self._events: \"asyncio.Queue[Event]\" = asyncio.Queue()\n431-        self._commands: \"asyncio.Queue[Command]\" = asyncio.Queue()\n432-        self._pending_deltas: dict[tuple[str, int], _PendingDelta] = {}\n433-        self._pending_permissions: dict[str, _PendingPermission] = {}\n434-        self._task_tool_use_ids: set[str] = set()\n435:        self._consumer_task: \"asyncio.Task[None] | None\" = None\n436:        self._command_task: \"asyncio.Task[None] | None\" = None\n437-\n438-        #: Checkpoint identifiers observed passively (PHASE0 Row 12). Newest\n439-        #: last; a checkpoint/rewind screen reads the tail for \"current\".\n440-        self.checkpoint_ids: list[str] = []\n441-        #: Most recent rate-limit status, for a HUD to poll (see module\n442-        #: docstring \"Vocabulary ambiguity\").\n443-        self.rate_limit: RateLimitInfo | None = None\n444-        #: Last-known session id, opportunistically captured from any\n--\n557-                await client.interrupt()\n558-            case SetPermissionMode(mode=mode):\n559-                await client.set_permission_mode(mode)\n560-            case Checkpoint():\n561-                pass  # see Checkpoint dataclass docstring\n562-            case Rewind(user_message_id=user_message_id):\n563-                await client.rewind_files(user_message_id)\n564-\n565:    # -- can_use_tool callback (registered on ClaudeAgentOptions) -------\n566-\n567-    async def _handle_can_use_tool(\n568-        self,\n569-        tool_name: str,\n570-        tool_input: dict[str, Any],\n571-        context: ToolPermissionContext,\n572-    ) -> PermissionResult:\n573-        tool_use_id = context.tool_use_id or \"\"\n--\n609-            return self._project_assistant_message(message)\n610-  \n\n... [truncated]",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-09-18T05:33:13.092Z",
+          "type": "tool_end",
+          "content": "[Bash] Done",
+          "phase": "planning",
+          "tool_name": "Bash",
+          "detail": "---\nevidence-inventory.txt\n",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-09-18T05:33:29.779Z",
+          "type": "tool_start",
+          "content": "[Bash] for d in run-20260917T104359-lifecycle-helper-proof run-20260917T104442-lifecycle-wired-proof run-20260917T104455-harness-lifecycle-wired; do echo \"== $d\"; ls -la /Users/nick/proofpunk-agent/e2e-ev...",
+          "phase": "planning",
+          "tool_name": "Bash",
+          "tool_input": "for d in run-20260917T104359-lifecycle-helper-proof run-20260917T104442-lifecycle-wired-proof run-20260917T104455-harness-lifecycle-wired; do echo \"== $d\"; ls -la /Users/nick/proofpunk-agent/e2e-ev..."
+        },
+        {
+          "timestamp": "2026-09-18T05:33:29.814Z",
+          "type": "tool_end",
+          "content": "[Bash] Done",
+          "phase": "planning",
+          "tool_name": "Bash",
+          "detail": "== run-20260917T104359-lifecycle-helper-proof\ntotal 8\ndrwxr-xr-x@   4 nick  staff   128 Sep 17 06:43 .\ndrwxr-xr-x@ 118 nick  staff  3776 Sep 17 18:20 ..\n-rw-r--r--@   1 nick  staff    79 Sep 17 06:43 .run-meta\n-rw-r--r--@   1 nick  staff     0 Sep 17 06:43 evidence-inventory.txt\n       0 /Users/nick/proofpunk-agent/e2e-evidence/run-20260917T104359-lifecycle-helper-proof/evidence-inventory.txt\n== run-20260917T104442-lifecycle-wired-proof\ntotal 8\ndrwxr-xr-x@   4 nick  staff   128 Sep 17 06:44 .\ndrwxr-xr-x@ 118 nick  staff  3776 Sep 17 18:20 ..\n-rw-r--r--@   1 nick  staff    78 Sep 17 06:44 .run-meta\n-rw-r--r--@   1 nick  staff     0 Sep 17 06:44 evidence-inventory.txt\n       0 /Users/nick/proofpunk-agent/e2e-evidence/run-20260917T104442-lifecycle-wired-proof/evidence-inventory.txt\n== run-20260917T104455-harness-lifecycle-wired\ntotal 8\ndrwxr-xr-x@   4 nick  staff   128 Sep 17 06:44 .\ndrwxr-xr-x@ 118 nick  staff  3776 Sep 17 18:20 ..\n-rw-r--r--@   1 nick  staff    80 Sep 17 06:44 .run-meta\n-rw-r--r--@   1 nick  staff     0 Sep 17 06:44 evidence-inventory.txt\n       0 /Users/nick/proofpunk-agent/e2e-evidence/run-20260917T104455-harness-lifecycle-wired/evidence-inventory.txt\n===\n\"\"\"Evidence capture helper — artifacts that carry their own claim.\n\nWhy this module exists\n----------------------\nProofpunk 5.0.0 raised the evidence floor: ``fresh_evidence.py`` now REFUSES\nany artifact of 1024 bytes or fewer (``validators/fresh_evidence.py:46,216``)\nbecause \"a capture too small to carry its claim is re-captured with its\ncontext (the command, the rc, the surrounding state), not blessed.\"\n\nThe convention this repo used through P5/P6 wrote the exit code to its own\ntwo-byte ``step-NN-*.rc`` file. Measured on 2026-09-17: 36 such files, every\none exactly 2 bytes, and 84 of 180 total artifacts (46%) below the floor.\nEvery one is an automatic refusal. That is a structural collision between a\ncapture convention and the doctrine, not a set of individual mistakes.\n\nThe fix is NOT padding. Padding a 2-byte file to 1025 bytes would satisfy the\nvalidator while proving exactly as little as before -- defeating the rule from\ninside the tool meant to honour it. Instead a capture records the things the\ndoctrine actually asks for and that a reviewer actually needs:\n\n    the command argv, the cwd, the environment deltas, the exit code,\n    the wall duration, stdout, stderr, and the surrounding state\n\nwhich together clear the floor because they carry real information. A capture\nwhose total content is genuinely smaller than the floor is reported as such\nrather than inflated -- see ``CaptureResult.thin``.\n\nNothing here reimplements the evidence lifecycle: run creation, sealing and\nvalidation remain subprocess calls to the real script (doctrine Sec 2).\n\"\"\"\n\nfrom __future__ import annotations\n\nimport json\nimport os\nimport shlex\nimport subprocess\nimport time\nfrom dataclasses import dataclass, field\nfrom pathlib import Path\n",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-09-18T05:33:45.309Z",
+          "type": "text",
+          "content": "Discovery done. Key finding: the three v1 \"lifecycle proof\" runs are empty (0-byte inventories, no step files) — the only real subagent proof is C5's single-child render (Depth 1, Active 2) in run-20260917T100943. So v2 = a real, validator-clean proof of the subagent fan-out on HEAD. Assessing complexity.",
+          "phase": "planning"
+        },
+        {
+          "timestamp": "2026-09-18T05:33:45.310Z",
+          "type": "tool_start",
+          "content": "[SpawnSubagent]",
+          "phase": "planning",
+          "tool_name": "SpawnSubagent"
+        },
+        {
+          "timestamp": "2026-09-18T05:34:03.669Z",
+          "type": "tool_end",
+          "content": "[SpawnSubagent] Done",
+          "phase": "planning",
+          "tool_name": "SpawnSubagent",
+          "detail": "Subagent (complexity_assessor) failed: Structured output parse failed: No object generated: could not parse the response.",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-09-18T05:34:09.845Z",
+          "type": "text",
+          "content": "Assessor parse failure. Retrying once with tighter framing.",
+          "phase": "planning"
+        },
+        {
+          "timestamp": "2026-09-18T05:34:09.846Z",
+          "type": "tool_start",
+          "content": "[SpawnSubagent]",
+          "phase": "planning",
+          "tool_name": "SpawnSubagent"
+        },
+        {
+          "timestamp": "2026-09-18T05:34:26.474Z",
+          "type": "tool_end",
+          "content": "[SpawnSubagent] Done",
+          "phase": "planning",
+          "tool_name": "SpawnSubagent",
+          "detail": "Subagent (complexity_assessor) completed successfully.\n\nStructured output:\n```json\n{\n  \"complexity\": \"complex\",\n  \"confidence\": 0.75,\n  \"reasoning\": \"Task drives live SDK sessions, requires depth>=2 / concurrent-child tree rendering proof across bridge/sdk.py spawn gate, reducers/tree.py, and screens/session.py, with possible silent-failure code fixes. Headless Textual driving and SDK subagent lifecycle event shapes need research; prior V1 false-positive (empty artifacts) justifies self-critique of the spec before implementation.\",\n  \"needs_research\": true,\n  \"needs_self_critique\": true\n}\n```",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-09-18T05:34:50.017Z",
+          "type": "text",
+          "content": "COMPLEX (0.75 confidence), needs research + self-critique. Routing: discovery already done by me (code + evidence conventions read) — skipping spec_discovery. Spawning spec_gatherer.",
+          "phase": "planning"
+        },
+        {
+          "timestamp": "2026-09-18T05:34:50.018Z",
+          "type": "tool_start",
+          "content": "[SpawnSubagent]",
+          "phase": "planning",
+          "tool_name": "SpawnSubagent"
+        },
+        {
+          "timestamp": "2026-09-18T05:35:25.164Z",
+          "type": "tool_end",
+          "content": "[SpawnSubagent] Done",
+          "phase": "planning",
+          "tool_name": "SpawnSubagent",
+          "detail": "Subagent (spec_gatherer) completed successfully.\n\nOutput:\nTask is fully specified by the kickoff context. Writing requirements.json directly.=== REQUIREMENTS GATHERED ===\n\nTask: v2 subagent fan-out proof — live-rendered spawn with attribution, lifecycle COMPLETE (ERRORED if cheap), depth ≥ 2 or ≥ 2 concurrent children, sealed by fresh_evidence.py rc=0.\nType: feature\nServices: bridge/sdk.py, state/events.py, state/reducers/tree.py, screens/session.py, e2e-evidence tooling + fresh_evidence.py\n\nWrote to requirements.json:\n- 7 functional requirements (live spawn frame, attribution tiers, lifecycle COMPLETE/ERRORED, fan-out via Depth/Active figures, no-invented-numbers, glyph consistency, minimal silent-failure-fix clause)\n- 6 evidence requirements (run/step naming, per-step artifact types incl. live frame + rendered frame + probe source + jsonl chain, distinct slug, rc=0 seal, no empty artifacts, frame/jsonl cross-check)\n- 5 process rules (live-session-first, budget guard per driver.py, minimal-fix, no deletion of v1 empty runs per §16.4(a), re-verify spawn gate at current HEAD)\n- 4 non-goals (no R1-R5 re-opening, no perf claims, no v1 run renaming, no drive-by UI changes)\n- 3 open questions (ERRORED drivability, SDK depth ≥ 2 reliability, spawn label resolution)\n\nFile verified valid JSON with all required fields. Next phase: Context Discovery.",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-09-18T05:35:35.881Z",
+          "type": "text",
+          "content": "Gatherer done. Reading requirements.json while spawning spec_researcher in parallel.",
+          "phase": "planning"
+        },
+        {
+          "timestamp": "2026-09-18T05:35:35.881Z",
+          "type": "tool_start",
+          "content": "[Read] /Users/nick/proofpunk-agent/.auto-claude/specs/999-subagent-proof-v2/requirements.json",
+          "phase": "planning",
+          "tool_name": "Read",
+          "tool_input": "/Users/nick/proofpunk-agent/.auto-claude/specs/999-subagent-proof-v2/requirements.json"
+        },
+        {
+          "timestamp": "2026-09-18T05:35:47.699Z",
+          "type": "tool_start",
+          "content": "[SpawnSubagent]",
+          "phase": "planning",
+          "tool_name": "SpawnSubagent"
+        },
+        {
+          "timestamp": "2026-09-18T05:35:47.702Z",
+          "type": "tool_end",
+          "content": "[Read] Done",
+          "phase": "planning",
+          "tool_name": "Read",
+          "detail": " 1\t{\n 2\t  \"goal\": \"Produce a real, validator-clean v2 evidence run demonstrating subagent fan-out in proofpunk-agent beyond the v1 depth-1/single-child proof: subagent spawn rendered live in the agent tree with correct attribution, lifecycle transition to COMPLETE (and ERRORED if cheaply drivable), and fan-out (depth >= 2 nesting OR >= 2 concurrent children), all sealed by fresh_evidence.py rc=0.\",\n 3\t  \"functional_requirements\": [\n 4\t    \"FR1: Live subagent spawn appears in §7 Screen 1 Agent Tree panel during the SDK session (live frame captured), not only in replay.\",\n 5\t    \"FR2: Correct attribution on child node: attribution tier resolves to parent_agent_id or parent_tool_use_id (or HOOK_AGENT_ID if present); no UNATTRIBUTED fallback for the spawned children being proven.\",\n 6\t    \"FR3: Full lifecycle state transition observed: node enters RUNNING on spawn and reaches COMPLETE. If cheaply drivable in-session, also capture a node reaching ERRORED.\",\n 7\t    \"FR4: Fan-out beyond v1: either (a) nesting depth >= 2 (child spawns grandchild) or (b) >= 2 concurrent children under one parent, evidenced by Depth/Active figures in the rendered frame (e.g. Depth: 2 or Active: 3).\",\n 8\t    \"FR5: Tree figures render from measured state only; unavailable values render '--'; no invented numbers.\",\n 9\t    \"FR6: Agent Tree panel glyph/state rendering consistent with NodeState (RUNNING/PERMISSION_PENDING/IDLE/COMPLETE/ERRORED) as implemented in tree.py reducers.\",\n10\t    \"FR7: If a new silent-failure gap is found (repo convention from C5: plausible value never checked against running system — e.g. an unchecked comparison or projection), fix it minimally in source and re-earn the evidence with a fresh run.\"\n11\t  ],\n12\t  \"evidence_requirements\": [\n13\t    \"ER1: Evidence under e2e-evidence/run-YYYYMMDDTHHMMSS-subagent-proof-v2/ following repo conventions: step-NN-slug artifacts + evidence-inventory.txt.\",\n14\t    \"ER2: Each step captures a specific artifact: live session frame (spawn rendered during live session), rendered replay frame (post-transition tree), probe source used to drive the SDK, and any events.jsonl export showing the AGENT_SPAWNED/AGENT_FINISHED chain with parent_tool_use_id/parent_agent_id values.\",\n15\t    \"ER3: Run named with distinct slug (not colliding with the three empty v1 lifecycle runs).\",\n16\t    \"ER4: Run sealed by /Users/nick/proofpunk/plugins/proofpunk/validators/fresh_evidence.py --run <dir> with rc=0.\",\n17\t    \"ER5: Evidence inventory lists every step file; no empty artifacts (0-byte files fail the proof).\",\n18\t    \"ER6: Depth/Active figures and attribution labels in captured frames must match the jsonl event chain; cross-checked, not asserted.\"\n19\t  ],\n20\t  \"process_rules\": [\n21\t    \"PR1: Live-session-first: completion evidence must come from a live SDK session; synthetic replay may supplement (e.g. post-hoc rendered frame) but cannot substitute for the live spawn frame.\",\n22\t    \"PR2: Budget guard: driver invocations honor --max-budget policy per validation/perf/driver.py convention; no unbounded spend on probe sessions.\",\n23\t    \"PR3: Minimal-fix rule: any defect fix is the smallest change that closes the silent-failure gap; no drive-by refactors.\",\n24\t    \"PR4: Do not delete the three empty v1 lifecycle runs (run-20260917T104359-lifecycle-helper-proof, run-20260917T104442-lifecycle-wired-proof, run-20260917T104455-harness-lifecycle-wired); deletion is consent-gated per §16.4(a).\",\n25\t    \"PR5: HEAD has moved since the C5 proof (007-runaway-loop-detector landed); verify current spawn-gate and reducer behavior before assuming v1 findings still hold (spawn tool name \"Agent\" vs \"Task\" was previously measured 6:0).\"\n26\t  ],\n27\t  \"non_goals\": [\n28\t    \"NG1: Not re-opening release-gate rows R1-R5 or any other RELEASE.md rows.\",\n29\t    \"NG2: No performance claims (latency, throughput, cost) beyond what the budget guard reports.\",\n30\t    \"NG3: Not renaming or re-validating the v1 empty runs or the C5 depth-1 run.\",\n31\t    \"NG4: No UI changes beyond what a minimal defect fix requires.\"\n32\t  ],\n33\t  \"open_questions\": [\n34\t    \"OQ1: Is ERRORED state drivable in a single live session at acceptable cost? May require an agent that fails on purpose; if not cheaply drivable, note it and ship COMPLETE-only evidence.\",\n35\t    \"OQ2: Does claude-agent-sdk 0.2.144 reliably emit nesting depth >= 2 (grandchild spawn) on this host? PHASE0.md measured three-level parent_tool_use_id chaining, but SDK version may have changed; if depth >= 2 is flaky, fall back to >= 2 concurrent children as the fan-out proof.\",\n36\t    \"OQ3: Does AGENT_SPAWNED name resolution (subagent_type/description best-effort) produce a non-empty label for the probe used? If not, attribution still holds but label rendering should be captured as-is.\"\n37\t  ],\n38\t  \"task_description\": \"Complete v2 proof that subagent fan-out works in proofpunk-agent: live-rendered spawn with attribution, lifecycle COMPLETE (ERRORED if cheap), depth >= 2 or >= 2 concurrent children, sealed by fresh_evidence.py rc=0, going beyond v1's depth-1/single-child proof.\",\n39\t  \"workflow_type\": \"feature\",\n40\t  \"services_involved\": [\n41\t    \"bridge/sdk.py (spawn gate, event projection)\",\n42\t    \"state/events.py (AGENT_SPAWNED/AGENT_FINISHED)\",\n43\t    \"state/reducers/tree.py (tree fold, attribution, depth/active)\",\n44\t    \"screens/session.py (§7 Agent Tree panel rendering)\",\n45\t    \"e2e-evidence tooling + fresh_evidence.py validator\"\n46\t  ],\n47\t  \"created_at\": \"2026-09-18T00:00:00Z\"\n48\t}\n49\t",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-09-18T05:39:41.578Z",
+          "type": "tool_end",
+          "content": "[SpawnSubagent] Done",
+          "phase": "planning",
+          "tool_name": "SpawnSubagent",
+          "detail": "Subagent (spec_researcher) completed successfully.\n\nOutput:\nSufficient evidence gathered. Writing research.json.Write input truncating around 15KB. Shortening the file.=== RESEARCH COMPLETE ===\n\nIntegrations/research questions: 5 — all answered from repo-internal sources; no web needed.\n\n**capture_method** ✓ — C5 proof used `pty.fork()` + `python3 -m proofpunk_agent --project ... --max-budget 10 PROMPT` (prompt as argv, no tmux/composer), ANSI-stripped pty stream, regexed `Depth:`/`Active:`; SVG frames exported by the app via `PROOFPUNK_AGENT_SHOT_DIR/SHOT_NAME` → `app.save_screenshot()` (app.py:790,1570-1625). No Textual pilot/`run_test()` anywhere. One depth-1 spawn cost 13.32s, rc=0.\n\n**spawn_prompting** ✓ — proven single-child prompt quoted verbatim from step-04 (says \"Task tool\" but host emits \"Agent\", measured 6:0). Concurrent-children and depth-2 grandchild prompts sketched, unproven on host (medium risk). ERRORED drivable via subagent running `exit 7` (ToolResultBlock.is_error → tree.py:269 ERRORED).\n\n**sdk_event_shapes** ✓ — gate `_SPAWN_TOOL_NAMES = {\"Agent\",\"Task\"}` (sdk.py:288); `_agent_spawned_event` (sdk.py:761-779) uses `block.name/id`, `input.subagent_type|description` fallback `block.id`, `message.parent_tool_use_id`; `_agent_finished_event` (781-791) uses `tool_use_id`/`is_error`. Tiers: 1/2 absent on 0.2.144; tier-3 PARENT_TOOL_USE_ID operative; UNATTRIBUTED fallback in tree.py:240-245 (attribution-race risk flagged for FR2).\n\n**validator_contract** ✓ — init-run/next-step/seal/validate subcommands, 1024-byte strict floor, step-NN-slug numbering owned by script, `.run-meta` required, secrets redaction; driven via `validation/capture.py` EvidenceRun. (Script file itself outside readable root — mirrored from capture.py, low risk.)\n\n**budget_guard** ✓ — `perf/driver.py:381-427`: projection = rate×window + max observed bill, refuses if > `--max-budget` (default $3.00). v2 probes bypass run_benchmark via app-level `--max-budget 10` (C5 pattern); any driver.py use needs explicit raised `--max-budget`.\n\nUnverified claims: 4 (2 medium: depth-2 reliability, concurrent Active:3; 2 low).\n\nKey recommendations: Phase 0 HEAD re-verify (PR5), depth-2 first with concurrent fallback, capture events export live since app doesn't persist event log, pre-check `thin_artifacts()` before seal.\n\nresearch.json written to spec dir.",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-09-18T05:40:04.509Z",
+          "type": "text",
+          "content": "Research done — includes an attribution-race risk for FR2 (tiers 1/2 absent on SDK 0.2.144, tier-3 `parent_tool_use_id` operative). Spawning spec_writer with accumulated context.",
+          "phase": "planning"
+        },
+        {
+          "timestamp": "2026-09-18T05:40:04.510Z",
+          "type": "tool_start",
+          "content": "[SpawnSubagent]",
+          "phase": "planning",
+          "tool_name": "SpawnSubagent"
+        },
+        {
+          "timestamp": "2026-09-18T05:40:53.741Z",
+          "type": "tool_end",
+          "content": "[SpawnSubagent] Done",
+          "phase": "planning",
+          "tool_name": "SpawnSubagent",
+          "detail": "Subagent (spec_writer) completed successfully.\n\nOutput:\nFiles written:\n- `/Users/nick/proofpunk-agent/.auto-claude/specs/999-subagent-proof-v2/spec.md` (70 lines)\n- `/Users/nick/proofpunk-agent/.auto-claude/specs/999-subagent-proof-v2/implementation_plan.json` (valid JSON, schema-conformant)\n\nSummary:\n1. spec.md matches 007 terse style: Rationale (v1 empty runs, only depth-1 C5), User Stories, Scope/Non-goals from NG1-4, Evidence Plan with step sketch.\n2. Acceptance Criteria checkboxes map 1:1 to FR1-7, ER1-6, PR1-5; FR2 worded so tier-3 attribution counts and UNATTRIBUTED occurrences must be explained, not assumed away.\n3. OQ1-3 have pre-baked fallbacks: ERRORED not cheap → COMPLETE-only; depth-2 flaky → concurrent children.\n4. Plan: 5 phases, all subtasks pending — HEAD re-verify + init-run, probe build (.debug/v2_probe.py, no validation/e2e file since C5 did it inline), live proof runs (spawn/COMPLETE, fan-out with fallback, conditional ERRORED), seal + inventory, conditional minimal-fix phase (tree.py).\n5. Evidence artifacts follow step-NN pattern under `e2e-evidence/run-YYYYMMDDTHHMMSS-subagent-proof-v2/`, re-earn run uses `-r1` suffix.",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-09-18T05:41:06.171Z",
+          "type": "text",
+          "content": "Writer done. Spawning spec_critic per COMPLEX workflow.",
+          "phase": "planning"
+        },
+        {
+          "timestamp": "2026-09-18T05:41:06.172Z",
+          "type": "tool_start",
+          "content": "[SpawnSubagent]",
+          "phase": "planning",
+          "tool_name": "SpawnSubagent"
+        },
+        {
+          "timestamp": "2026-09-18T05:42:24.158Z",
+          "type": "tool_end",
+          "content": "[SpawnSubagent] Done",
+          "phase": "planning",
+          "tool_name": "SpawnSubagent",
+          "detail": "Subagent (spec_critic) completed successfully.\n\nOutput:\nRead complete. Analysis:\n\n## Critique\n\n**BLOCKER: none.**\n\n**MAJOR 1 — Missing prompt text (gap)**: Plan 3-1 says \"Proven C5 prompt\" and 3-2 says \"grandchild prompt\" but neither spec.md nor implementation_plan.json quotes the prompt verbatim. Research has them (`spawn_prompting.proven_single_child.prompt`, `nested_grandchild_depth_2.prompt_sketch`, `two_concurrent_children.prompt_sketch`, `errored_driving.prompt_sketch`). Implementer must not paraphrase the proven depth-1 prompt — paraphrase risks losing the spawn.\n\n**MAJOR 2 — events.jsonl production method unspecified (feasibility)**: Spec step 5 and ER2 require \"events.jsonl with AGENT_SPAWNED → AGENT_FINISHED chain\", but research flags: \"App does not persist its event log (C5 step-02 caveat): tree frame and attribution record cannot come from the same session unless the probe captures both live or adds an export step.\" The only known export path is Screen 4 tools-export jsonl (tools, not AGENT_* lifecycle events). Spec never says how AGENT_SPAWNED/AGENT_FINISHED rows are obtained from a live pty session. Implementer would have to guess.\n\n**MAJOR 3 — Conditional-fix trigger undefined (contradiction with FR2)**: FR2 says any UNATTRIBUTED occurrence \"is explained in the run narrative, not assumed away\", while Phase 5 triggers on \"a silent-failure gap is found\". If a child lands UNATTRIBUTED (tree.py:240-245), is that explain-and-ship or fix-and-re-earn? Ambiguous — implementer can't decide without guessing.\n\n**MINOR 4 — Run-slug collision check absent**: ER3 requires no collision with the three v1 empty runs; no phase verifies the timestamped dir doesn't already exist before `init-run`.\n\n**MINOR 5 — Fan-out step missing from spec Evidence Plan**: Plan creates step-06-fanout-live-frame / step-07-fanout-events-export; spec's Evidence Plan lists only 6 steps with no fan-out frame step. Also Phase 5's re-earn run uses `-r1` suffix and cites step-01, but numbering is script-owned — cosmetic.\n\n**MINOR 6 — PR2 wording drift**: requirements PR2 says \"honor --max-budget policy per driver convention\"; spec PR2 correctly tightens to `--max-budget 10` for app probes + raised budget for perf/driver.py. Good divergence, but spec should mark it as a deliberate refinement.\n\n**OK**: FR2 rewording correctly resolves the tier-3/UNATTRIBUTED contradiction (requirements' \"no UNATTRIBUTED fallback\" was too strict for SDK 0.2.144). PR1 live-first vs supplement-only is correctly worded in requirements and preserved. Honesty: no unmeasured claims stated as fact (OQ1/OQ2 framed as fallbacks; ERRORED \"if cheaply drivable\"). Plan schema valid, all fields present. All FR/ER/PR/NG/OQ from requirements appear in spec. File paths and capture mechanics match research (sdk.py:288, tree.py:229-273, pty.fork, SHOT_DIR SVG, 1024 floor, .run-meta, step numbering script-owned).\n\nApplying fixes to spec.md:=== SPEC CRITIQUE COMPLETE ===\n\nIssues Found: 6\n- High severity: 0\n- Major severity: 3 (missing verbatim prompts; events-export method unspecified; FR7 trigger ambiguous vs FR2)\n- Low severity: 3 (collision pre-check; fan-out steps absent from evidence plan; PR2 divergence unmarked)\n\nFixes Applied: 6\nConfidence Level: high\n\nVerdict: **FIX-FIRST** (fixed in this pass; now SHIP after the fixes)\nMinimal fix list applied:\n1. Verbatim prompt section added (research has proven depth-1 prompt; paraphrase risks losing the spawn).\n2. \"Events capture method\" subsection added — app doesn't persist its event log (C5 caveat); exporter verification mandated in source-facts step, probe-side tee fallback, same-session requirement for ER6. Raised as OQ4.\n3. FR7 trigger made decisive: fix-and-re-earn iff child UNATTRIBUTED while parent tool_use_id present in stream; SDK-side absence = narrative note + ship.\n4. Run-dir collision pre-check before init-run (ER3).\n5. Evidence Plan expanded to steps 1-9 covering fan-out frame/events and conditional ERRORED.\n6. PR2 annotated as deliberate refinement of requirements' generic budget rule.\n\nHonesty check passed: no unmeasured claims stated as fact; FR2 tier-3 wording correctly supersedes requirements' stricter \"no UNATTRIBUTED\" for SDK 0.2.144. Plan schema valid. All FR/ER/PR/NG/OQ traceable.\n\nspec.md updated; critique_report.json created.",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-09-18T05:42:29.791Z",
+          "type": "text",
+          "content": "Critic applied fixes itself. Verifying both files' current state and consistency.",
+          "phase": "planning"
+        },
+        {
+          "timestamp": "2026-09-18T05:42:29.793Z",
+          "type": "tool_start",
+          "content": "[Read] /Users/nick/proofpunk-agent/.auto-claude/specs/999-subagent-proof-v2/spec.md",
+          "phase": "planning",
+          "tool_name": "Read",
+          "tool_input": "/Users/nick/proofpunk-agent/.auto-claude/specs/999-subagent-proof-v2/spec.md"
+        },
+        {
+          "timestamp": "2026-09-18T05:42:29.797Z",
+          "type": "tool_start",
+          "content": "[Read] /Users/nick/proofpunk-agent/.auto-claude/specs/999-subagent-proof-v2/implementation_plan.json",
+          "phase": "planning",
+          "tool_name": "Read",
+          "tool_input": "/Users/nick/proofpunk-agent/.auto-claude/specs/999-subagent-proof-v2/implementation_plan.json"
+        },
+        {
+          "timestamp": "2026-09-18T05:42:29.798Z",
+          "type": "tool_end",
+          "content": "[Read] Done",
+          "phase": "planning",
+          "tool_name": "Read",
+          "detail": " 1\t# Subagent Proof v2\n 2\t\n 3\tProduce a real, validator-clean evidence run demonstrating subagent fan-out in proofpunk-agent beyond the v1 depth-1/single-child proof: live-rendered spawn with attribution, lifecycle COMPLETE (ERRORED if cheaply drivable), fan-out (depth >= 2 or >= 2 concurrent children), sealed by `fresh_evidence.py` rc=0.\n 4\t\n 5\t## Rationale\n 6\t\n 7\tV1 lifecycle runs are empty (three 0-byte-inventory runs on 2026-09-17); the only real proof is C5's depth-1 single-child capture. Fan-out, COMPLETE/ERRORED lifecycle, and a live events chain with attribution are unproven at current HEAD (007-runaway-loop-detector landed after C5).\n 8\t\n 9\t## User Stories\n10\t\n11\t- As a maintainer, I want a sealed evidence run proving subagents render live in the Agent Tree with correct attribution\n12\t- As a maintainer, I want the tree to show fan-out beyond depth-1 (nested grandchild or concurrent children)\n13\t- As a maintainer, I want node lifecycle COMPLETE (and ERRORED) observed in a live session, cross-checked against the events chain\n14\t\n15\t## Scope\n16\t\n17\t- Live SDK session driven via pty.fork() probe (`python3 -m proofpunk_agent --max-budget 10 PROMPT`), PROOFPUNK_AGENT_SHOT_DIR/SHOT_NAME SVG export, events export\n18\t- Evidence run `e2e-evidence/run-YYYYMMDDTHHMMSS-subagent-proof-v2/` per repo conventions, sealed via fresh_evidence.py validate rc=0\n19\t- Minimal source fix only if a silent-failure gap is found (see FR7 trigger definition below)\n20\t\n21\t## Non-goals\n22\t\n23\t- Not re-opening release-gate rows R1-R5 or any RELEASE.md rows\n24\t- No performance claims beyond budget-guard output\n25\t- Not renaming/re-validating v1 empty runs or the C5 depth-1 run\n26\t- No UI changes beyond a minimal defect fix\n27\t\n28\t## Evidence Plan\n29\t\n30\t- Run slug `subagent-proof-v2` (distinct from v1 empty runs; no deletions, §16.4(a)). Before `init-run`, verify the timestamped run dir does not already exist (ER3 collision check).\n31\t- Steps (numbering owned by `fresh_evidence.py next-step`; expect step-01..step-08 per implementation plan):\n32\t  1. step-NN-head-source-facts: spawn gate (`sdk.py:288` `_SPAWN_TOOL_NAMES`), `_agent_spawned_event` (761-779), `_agent_finished_event` (781-791), tree reducers (spawn/finish/figures) read at current HEAD; note any drift vs C5\n33\t  2. step-NN-probe-source: the probe script (pty.fork + argv prompt + Depth/Active regex + permission auto-approve 'a' + SHOT_DIR export)\n34\t  3. step-NN-live-spawn-frame: live frame with spawn rendered (Depth/Active), node label from subagent_type\n35\t  4. step-NN-lifecycle-frame: post-AGENT_FINISHED frame showing COMPLETE glyph (and ERRORED node if driven)\n36\t  5. step-NN-events-export: events chain AGENT_SPAWNED(subject, parent, tier) → AGENT_FINISHED(subject, error)\n37\t  6. step-NN-fanout-live-frame: live frame showing Depth >= 2 or Active >= 3 (FR4)\n38\t  7. step-NN-fanout-events-export: event chain proving nesting (grandchild .parent == child .subject) or >= 2 children under one parent\n39\t  8. step-NN-errored-frame (conditional): ERRORED node + AGENT_FINISHED error=true\n40\t  9. evidence-inventory.txt listing all steps; all artifacts >1024 bytes with real context (argv, rc, stdout tail), never padding\n41\t\n42\t### Events capture method (required reading)\n43\t\n44\tThe app does not persist its event log (C5 step-02 caveat): a tree frame and an attribution record cannot come from the same session unless the probe captures both live or adds an export step. The implementer must, before Phase 3:\n45\t- Verify at HEAD whether an in-app export exists that emits AGENT_SPAWNED/AGENT_FINISHED events (e.g. Screen 4 tools export — note the C5-era tools-export jsonl line shape carries `tier`/`agent_id`/`subject 'toolu_*'` but had zero Agent/Task calls, and it is a tools export, not a lifecycle-events export); and\n46\t- If no lifecycle-events export exists, add one to the probe: tee the live SDK message stream (or instrument via the existing state/events.py projection) to a jsonl file written directly into the step artifact, redacted per capture.py conventions.\n47\tThis decision and its source evidence belong in the step-NN-head-source-facts artifact. The AGENT_SPAWNED/AGENT_FINISHED rows must come from the same session as the captured frames (ER6 cross-check).\n48\t\n49\t### Prompts (verbatim; do not paraphrase)\n50\t\n51\t- Single child (proven, C5 step-04 lines 37-41, 13.32s Depth 1/Active 2):\n52\t  \"Use the Task tool to spawn exactly one subagent with subagent_type general-purpose. Tell that subagent to reply with the single word DEEPEST. Then report what it replied.\"\n53\t- Grandchild depth-2 (unproven; ~2 attempts then fall back per OQ2):\n54\t  \"Spawn a subagent (subagent_type general-purpose). Tell it to itself spawn one sub-subagent (subagent_type general-purpose) whose reply is the word DEEPEST, return it to you, and you report it to me.\"\n55\t- Two concurrent children (unproven; OQ2 fallback):\n56\t  \"Spawn TWO subagents at the same time (both in one message, do not wait for the first to finish), subagent_type general-purpose; each replies with a distinct word; then report both.\"\n57\t- ERRORED (conditional, OQ1):\n58\t  \"Spawn a subagent and tell it to run the Bash command 'exit 7' (guaranteed to fail) and report only its failure.\"\n59\t\n60\t## Acceptance Criteria\n61\t\n62\tFunctional:\n63\t- [ ] FR1: Live subagent spawn appears in §7 Screen 1 Agent Tree panel during the live SDK session (live frame captured), not only in replay\n64\t- [ ] FR2: Child node attribution resolves to parent_agent_id or parent_tool_use_id (tier-3 PARENT_TOOL_USE_ID counts as correct on SDK 0.2.144; tiers 1/2 absent); any UNATTRIBUTED fallback occurrence is explained in the run narrative with its mechanism, not assumed away\n65\t- [ ] FR3: Node enters RUNNING on spawn and reaches COMPLETE; if cheaply drivable, also capture ERRORED\n66\t- [ ] FR4: Fan-out beyond v1: Depth >= 2 nesting OR Active >= 3 (concurrent children) in the live frame\n67\t- [ ] FR5: Tree figures render from measured state only; unavailable values render '--'\n68\t- [ ] FR6: Glyph/state rendering consistent with NodeState per tree.py reducers\n69\t- [ ] FR7: If a new silent-failure gap is found, fix minimally in source and re-earn evidence with a fresh run\n70\t\n71\t  FR7 trigger definition (decisive, no judgment call): a silent-failure gap exists iff the events export shows an AGENT_SPAWNED whose child node landed UNATTRIBUTED in the tree (tree.py:240-245 path) for a child whose parent tool_use_id IS present in the session's message chain. In that case: explain in narrative AND apply the minimal fix + re-earn (Phase 5). An UNATTRIBUTED row whose parent tool_use_id is genuinely absent from the SDK stream is an SDK-side limitation — explain in narrative, ship, and note in recommendations; no source fix.\n72\t\n73\tEvidence:\n74\t- [ ] ER1: Artifacts under `e2e-evidence/run-<ts>-subagent-proof-v2/` follow step-NN-slug + evidence-inventory.txt conventions\n75\t- [ ] ER2: Each step captures its specific artifact: live frame, rendered replay/post-transition frame, probe source, events chain (jsonl or documented export form) with parent_tool_use_id/parent_agent_id from the same session as the frames\n76\t- [ ] ER3: Distinct slug; collision pre-checked before init-run (dir must not pre-exist; no overlap with the three v1 empty runs)\n77\t- [ ] ER4: `fresh_evidence.py --run <dir>` validate rc=0\n78\t- [ ] ER5: Inventory lists every step file; no 0-byte artifacts\n79\t- [ ] ER6: Depth/Active figures and attribution labels in frames match the events chain; cross-checked, not asserted\n80\t\n81\tProcess:\n82\t- [ ] PR1: Live-session-first; replay frames supplement only\n83\t- [ ] PR2: Probes use `--max-budget 10` (C5 pattern); any perf/driver.py use gets explicit raised --max-budget (default $3.00 refuses); flag documented in artifacts. (Deliberate refinement of the requirements' generic budget rule.)\n84\t- [ ] PR3: Minimal-fix rule on any defect\n85\t- [ ] PR4: v1 empty runs untouched\n86\t- [ ] PR5: Spawn-gate and reducer behavior re-verified at HEAD before proof runs (source facts step)\n87\t\n88\t## Open Questions (fallbacks pre-baked)\n89\t\n90\t- OQ1 ERRORED drivability: attempt fail-on-purpose subagent (Bash `exit 7` → is_error → ERRORED). If not cheaply drivable, note it and ship COMPLETE-only evidence (FR3 permits).\n91\t- OQ2 Depth-2 reliability: try grandchild prompt first (~2 attempts); if flaky, fall back to >= 2 concurrent children as the fan-out proof (both satisfy FR4).\n92\t- OQ3 AGENT_SPAWNED label resolution: if subagent_type/description yields empty label, attribution still holds; capture label rendering as-is.\n93\t- OQ4 Events export path: no confirmed in-app exporter for AGENT_SPAWNED/AGENT_FINISHED lifecycle events at current HEAD (see \"Events capture method\"). Resolve during the source-facts step; probe-side tee/instrumentation is the expected fallback.\n94\t",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-09-18T05:42:29.798Z",
+          "type": "tool_end",
+          "content": "[Read] Done",
+          "phase": "planning",
+          "tool_name": "Read",
+          "detail": "  1\t{\n  2\t  \"feature\": \"999-subagent-proof-v2\",\n  3\t  \"workflow_type\": \"feature\",\n  4\t  \"phases\": [\n  5\t    {\n  6\t      \"id\": \"1\",\n  7\t      \"name\": \"HEAD re-verify (no cost)\",\n  8\t      \"subtasks\": [\n  9\t        {\n 10\t          \"id\": \"1-1\",\n 11\t          \"title\": \"Source facts preflight at current HEAD\",\n 12\t          \"description\": \"Re-read _SPAWN_TOOL_NAMES (sdk.py:288), _agent_spawned_event (sdk.py:761-779), _agent_finished_event (sdk.py:781-791), attribution (sdk.py:391-396, events.py:45-61), tree reducers (tree.py spawn/finish/figures, 229-273) at HEAD post-007; note drift vs C5 assumptions. Write findings as step-01 source-facts artifact in the run dir.\",\n 13\t          \"status\": \"pending\",\n 14\t          \"files_to_create\": [\n 15\t            \"e2e-evidence/run-YYYYMMDDTHHMMSS-subagent-proof-v2/step-01-head-source-facts\"\n 16\t          ],\n 17\t          \"files_to_modify\": []\n 18\t        },\n 19\t        {\n 20\t          \"id\": \"1-2\",\n 21\t          \"title\": \"Init evidence run\",\n 22\t          \"description\": \"fresh_evidence.py init-run e2e-evidence/run-<ts>-subagent-proof-v2 (cwd=repo root); use validation/capture.py EvidenceRun with explicit --run for all subsequent steps.\",\n 23\t          \"status\": \"pending\",\n 24\t          \"files_to_create\": [\n 25\t            \"e2e-evidence/run-YYYYMMDDTHHMMSS-subagent-proof-v2/.run-meta\"\n 26\t          ],\n 27\t          \"files_to_modify\": []\n 28\t        }\n 29\t      ]\n 30\t    },\n 31\t    {\n 32\t      \"id\": \"2\",\n 33\t      \"name\": \"Probe build\",\n 34\t      \"subtasks\": [\n 35\t        {\n 36\t          \"id\": \"2-1\",\n 37\t          \"title\": \"Write v2 capture probe\",\n 38\t          \"description\": \"v2 probe modeled on C5: pty.fork(), child execvp python3 -m proofpunk_agent --project ... --proofpunk-path ... --max-budget 10 PROMPT; TIOCSWINSZ 44x130; ANSI-stripped frame; Depth:/Active: regex; auto-approve PERMISSION REQUEST with 'a' after 0.6s; PROOFPUNK_AGENT_SHOT_DIR/SHOT_NAME SVG export; 180s deadline. Capture probe source as a step artifact.\",\n 39\t          \"status\": \"pending\",\n 40\t          \"files_to_create\": [\n 41\t            \".debug/v2_probe.py\",\n 42\t            \"e2e-evidence/run-YYYYMMDDTHHMMSS-subagent-proof-v2/step-02-v2-probe-source\"\n 43\t          ],\n 44\t          \"files_to_modify\": []\n 45\t        }\n 46\t      ]\n 47\t    },\n 48\t    {\n 49\t      \"id\": \"3\",\n 50\t      \"name\": \"Live proof runs\",\n 51\t      \"subtasks\": [\n 52\t        {\n 53\t          \"id\": \"3-1\",\n 54\t          \"title\": \"Single-child live spawn + lifecycle COMPLETE\",\n 55\t          \"description\": \"Proven C5 prompt (single general-purpose subagent, reply DEEPEST). Capture live frame with subagent_type label (FR1), wait past AGENT_FINISHED for COMPLETE glyph (FR3a), capture events.jsonl AGENT_SPAWNED(subject=toolu_X,parent,tier=3) -> AGENT_FINISHED(toolu_X,error=false); cross-check figures vs events (FR2, ER2, ER6).\",\n 56\t          \"status\": \"pending\",\n 57\t          \"files_to_create\": [\n 58\t            \"e2e-evidence/run-YYYYMMDDTHHMMSS-subagent-proof-v2/step-03-live-spawn-frame\",\n 59\t            \"e2e-evidence/run-YYYYMMDDTHHMMSS-subagent-proof-v2/step-04-lifecycle-complete-frame\",\n 60\t            \"e2e-evidence/run-YYYYMMDDTHHMMSS-subagent-proof-v2/step-05-events-export\"\n 61\t          ],\n 62\t          \"files_to_modify\": []\n 63\t        },\n 64\t        {\n 65\t          \"id\": \"3-2\",\n 66\t          \"title\": \"Fan-out: depth-2 with concurrent fallback\",\n 67\t          \"description\": \"FR4. Try grandchild prompt (child spawns sub-subagent returning DEEPEST) for Depth: 2; if flaky after ~2 attempts, switch to two-concurrent-children prompt (both in one message) for Active: 3 (OQ2 fallback). Verify >= 2 AGENT_SPAWNED under one parent (concurrent) or grandchild AGENT_SPAWNED.parent == child AGENT_SPAWNED.subject (nested) in events export; cross-check frame figures (ER6).\",\n 68\t          \"status\": \"pending\",\n 69\t          \"files_to_create\": [\n 70\t            \"e2e-evidence/run-YYYYMMDDTHHMMSS-subagent-proof-v2/step-06-fanout-live-frame\",\n 71\t            \"e2e-evidence/run-YYYYMMDDTHHMMSS-subagent-proof-v2/step-07-fanout-events-export\"\n 72\t          ],\n 73\t          \"files_to_modify\": []\n 74\t        },\n 75\t        {\n 76\t          \"id\": \"3-3\",\n 77\t          \"title\": \"ERRORED capture (conditional, cheap)\",\n 78\t          \"description\": \"FR3b / OQ1. If cheap: subagent told to run Bash 'exit 7' and report failure; capture ERRORED node + AGENT_FINISHED error=true. If not cheaply drivable, note in run narrative and ship COMPLETE-only (FR3 permits).\",\n 79\t          \"status\": \"pending\",\n 80\t          \"files_to_create\": [\n 81\t            \"e2e-evidence/run-YYYYMMDDTHHMMSS-subagent-proof-v2/step-08-errored-frame\"\n 82\t          ],\n 83\t          \"files_to_modify\": []\n 84\t        }\n 85\t      ]\n 86\t    },\n 87\t    {\n 88\t      \"id\": \"4\",\n 89\t      \"name\": \"Seal + inventory\",\n 90\t      \"subtasks\": [\n 91\t        {\n 92\t          \"id\": \"4-1\",\n 93\t          \"title\": \"Pre-check artifacts and seal\",\n 94\t          \"description\": \"thin_artifacts() pre-check: every artifact strictly >1024 bytes with real context (argv, rc, stdout/stderr tail), secrets redacted, no padding. evidence-inventory.txt lists every step file. fresh_evidence.py seal then validate --run <dir> rc=0 (ER4, ER5).\",\n 95\t          \"status\": \"pending\",\n 96\t          \"files_to_create\": [\n 97\t            \"e2e-evidence/run-YYYYMMDDTHHMMSS-subagent-proof-v2/evidence-inventory.txt\"\n 98\t          ],\n 99\t          \"files_to_modify\": []\n100\t        }\n101\t      ]\n102\t    },\n103\t    {\n104\t      \"id\": \"5\",\n105\t      \"name\": \"Conditional: minimal defect fix + re-earn\",\n106\t      \"subtasks\": [\n107\t        {\n108\t          \"id\": \"5-1\",\n109\t          \"title\": \"Minimal fix if silent-failure gap found\",\n110\t          \"description\": \"CONDITIONAL — only if a silent-failure gap emerges (e.g. attribution race: child AGENT_SPAWNED before parent node exists -> UNATTRIBUTED under root, tree.py:240-245). Apply smallest change closing the gap (PR3/FR7, NG4: no UI changes beyond minimal fix), then re-run phases 2-4 in a fresh run dir with fresh seal.\",\n111\t          \"status\": \"pending\",\n112\t          \"files_to_create\": [\n113\t            \"e2e-evidence/run-YYYYMMDDTHHMMSS-subagent-proof-v2-r1/step-01-head-source-facts\"\n114\t          ],\n115\t          \"files_to_modify\": [\n116\t            \"proofpunk_agent/state/reducers/tree.py\"\n117\t          ]\n118\t        }\n119\t      ]\n120\t    }\n121\t  ]\n122\t}\n123\t",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-09-18T05:42:38.775Z",
+          "type": "text",
+          "content": "Both files consistent with the critic's fixes. Persisting the complexity assessment (required output), then final validation.",
+          "phase": "planning"
+        },
+        {
+          "timestamp": "2026-09-18T05:42:38.776Z",
+          "type": "tool_start",
+          "content": "[Write] /Users/nick/proofpunk-agent/.auto-claude/specs/999-subagent-proof-v2/complexity_assessment.json",
+          "phase": "planning",
+          "tool_name": "Write",
+          "tool_input": "/Users/nick/proofpunk-agent/.auto-claude/specs/999-subagent-proof-v2/complexity_assessment.json"
+        },
+        {
+          "timestamp": "2026-09-18T05:42:45.424Z",
+          "type": "tool_start",
+          "content": "[SpawnSubagent]",
+          "phase": "planning",
+          "tool_name": "SpawnSubagent"
+        },
+        {
+          "timestamp": "2026-09-18T05:42:45.426Z",
+          "type": "tool_end",
+          "content": "[Write] Done",
+          "phase": "planning",
+          "tool_name": "Write",
+          "detail": "Successfully wrote 10 lines to /Users/nick/proofpunk-agent/.auto-claude/specs/999-subagent-proof-v2/complexity_assessment.json",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-09-18T05:43:18.761Z",
+          "type": "tool_end",
+          "content": "[SpawnSubagent] Done",
+          "phase": "planning",
+          "tool_name": "SpawnSubagent",
+          "detail": "Subagent (spec_validation) completed successfully.\n\nOutput:\nAll checks pass. Writing report.**Verdict: VALID** — report written to `/Users/nick/proofpunk-agent/.auto-claude/specs/999-subagent-proof-v2/validation_report.json`.\n\nChecks:\n1. **Files** — spec.md, implementation_plan.json, complexity_assessment.json, requirements.json, research.json all present, non-empty. ✓\n2. **Plan structure** — valid JSON; 5 phases; every phase has id/name/subtasks[]; every subtask has string id, description, title, status \"pending\", files_to_create, files_to_modify. ✓\n3. **spec.md** — Rationale, User Stories, checkbox Acceptance Criteria (FR1-7, ER1-6, PR1-5), Scope/Non-goals, Evidence Plan all present. No unmeasured claim stated as fact — unproven items carry fallbacks (OQ1-OQ4) and \"unverified_claims\" live in research.json. ✓\n4. **Cross-consistency** — Evidence Plan steps align with plan artifacts step-01..step-08 + evidence-inventory.txt (numbering explicitly owned by `fresh_evidence.py next-step`). FR7 decisive trigger (UNATTRIBUTED child whose parent tool_use_id exists in message chain) matches Phase 5 conditional trigger. Prompts section contains the proven depth-1 prompt verbatim (byte-identical to research.json C5 step-04 string). ✓\n5. **Project reality** — sdk.py:288 `_SPAWN_TOOL_NAMES`, :761 `_agent_spawned_event`, :781 `_agent_finished_event`; tree.py `reduce_tree` (:319) with UNATTRIBUTED fallback (:240-245); screens/session.py and validation/capture.py exist. ✓\n\n3 warnings, 0 errors — all minor (placeholder run-dir timestamps, prose numbering asymmetry on the conditional step, documented FR2 refinement). Package is ready for implementation.",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-09-18T05:43:24.394Z",
+          "type": "text",
+          "content": "Validation passed. Final file check.",
+          "phase": "planning"
+        },
+        {
+          "timestamp": "2026-09-18T05:43:24.396Z",
+          "type": "tool_start",
+          "content": "[Bash] ls -la /Users/nick/proofpunk-agent/.auto-claude/specs/999-subagent-proof-v2/ && python3 -c \"import json; json.load(open('/Users/nick/proofpunk-agent/.auto-claude/specs/999-subagent-proof-v2/impleme...",
+          "phase": "planning",
+          "tool_name": "Bash",
+          "tool_input": "ls -la /Users/nick/proofpunk-agent/.auto-claude/specs/999-subagent-proof-v2/ && python3 -c \"import json; json.load(open('/Users/nick/proofpunk-agent/.auto-claude/specs/999-subagent-proof-v2/impleme..."
+        },
+        {
+          "timestamp": "2026-09-18T05:43:24.440Z",
+          "type": "tool_end",
+          "content": "[Bash] Done",
+          "phase": "planning",
+          "tool_name": "Bash",
+          "detail": "total 368\ndrwxr-xr-x@ 12 nick  staff     384 Sep 18 01:43 .\ndrwxr-xr-x@ 10 nick  staff     320 Sep 18 01:31 ..\n-rw-r--r--@  1 nick  staff     751 Sep 18 01:42 complexity_assessment.json\n-rw-r--r--@  1 nick  staff    3493 Sep 18 01:42 critique_report.json\n-rw-r--r--@  1 nick  staff    5887 Sep 18 01:40 implementation_plan.json\n-rw-r--r--@  1 nick  staff     316 Sep 18 01:32 project_index.json\n-rw-r--r--@  1 nick  staff    5378 Sep 18 01:35 requirements.json\n-rw-r--r--@  1 nick  staff   12634 Sep 18 01:39 research.json\n-rw-r--r--@  1 nick  staff    8564 Sep 18 01:41 spec.md\n-rw-r--r--@  1 nick  staff  122006 Sep 18 01:43 task_logs.json\n-rw-r--r--@  1 nick  staff      95 Sep 18 01:31 task_metadata.json\n-rw-r--r--@  1 nick  staff    2729 Sep 18 01:43 validation_report.json\nimplementation_plan.json: valid JSON\n",
+          "collapsed": true
+        },
+        {
+          "timestamp": "2026-09-18T05:43:34.725Z",
+          "type": "text",
+          "content": "Spec package complete and validated.\n\n## Pipeline summary\n\n**Task**: `999-subagent-proof-v2` — v2 evidence proof of subagent fan-out in proofpunk-agent.\n\n**Discovery finding** (drove spec scope): the three v1 \"lifecycle\" runs are empty (0-byte inventories); the only real proof is C5's depth-1 single child (`run-20260917T100943`, Depth: 1, Active: 2). HEAD moved since (007 watchdog landed). So v2 = live spawn + attribution + COMPLETE lifecycle + fan-out (Depth ≥ 2 or Active ≥ 3), sealed `rc=0`.\n\n**Workflow executed** (COMPLEX, 0.75 confidence):\n1. Discovery — done by orchestrator (code: `bridge/sdk.py` spawn gate, `reducers/tree.py`, `screens/session.py`; evidence conventions; RELEASE.md gate state)\n2. `spec_gatherer` → requirements.json (FR1-7, ER1-6, PR1-5, NG1-4, OQ1-3)\n3. `spec_researcher` → research.json (C5 capture method: `pty.fork()` + `--max-budget 10` + `PROOFPUNK_AGENT_SHOT_DIR`; validator contract; tier-3 attribution operative on SDK 0.2.144)\n4. `spec_writer` → spec.md + implementation_plan.json\n5. `spec_critic` → 3 MAJOR + 3 MINOR found and fixed: verbatim prompts (paraphrase risks losing the spawn), events-capture method (app doesn't persist its event log — OQ4 raised), decisive FR7 fix-and-re-earn trigger, collision pre-check, fan-out steps, PR2 budget refinement\n6. `spec_validation` → **VALID**, 0 errors (3 minor warnings: placeholder run-dir timestamps, one prose numbering asymmetry)\n\n**Outputs in** `/Users/nick/proofpunk-agent/.auto-claude/specs/999-subagent-proof-v2/`:\n- `spec.md` (8.4K) — terse repo style; verbatim prompts; evidence plan step-01..08; pre-baked fallbacks (depth-2 flaky → concurrent children; ERRORED not cheap → COMPLETE-only)\n- `implementation_plan.json` (5.7K, valid JSON) — 5 phases: HEAD re-verify → probe build → live proof runs → seal + inventory → conditional minimal fix + re-earn\n- Supporting: `requirements.json`, `research.json`, `complexity_assessment.json`, `critique_report.json`, `validation_report.json`\n\nKey honesty guard",
+          "phase": "planning"
+        },
+        {
+          "timestamp": "2026-09-18T05:43:34.727Z",
+          "type": "phase_end",
+          "content": "Completed planning phase",
+          "phase": "planning"
+        }
+      ]
+    },
+    "coding": {
+      "phase": "coding",
+      "status": "pending",
+      "started_at": null,
+      "completed_at": null,
+      "entries": []
+    },
+    "validation": {
+      "phase": "validation",
+      "status": "pending",
+      "started_at": null,
+      "completed_at": null,
+      "entries": []
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "gate": "F-16-redrive-local-origin-push-test",
+  "setup": "git init --bare /tmp/aperant-gate-origin.git; git remote add origin /tmp/aperant-gate-origin.git (entirely local, no real GitHub/remote host touched)",
+  "action": "selected feature/conflict-branch worktree, pressed p",
+  "observed_message": "gh pr create failed: none of the git remotes configured for this repository point to a...",
+  "push_outcome": {
+    "attempted": true,
+    "succeeded": true,
+    "verified_via": "git -C /tmp/aperant-gate-origin.git log --oneline feature/conflict-branch -- confirmed commit 0e5ca18 present on the local bare remote, exactly matching the worktree's HEAD"
+  },
+  "gh_pr_create_outcome": {
+    "attempted": true,
+    "failed": true,
+    "reason": "local bare repo has no GitHub host association -- gh correctly refuses",
+    "message_verbatim_prefix": "gh pr create failed: none of the git remotes configured for this repository point to a"
+  },
+  "safety_verification": {
+    "no_real_github_repo_touched": true,
+    "no_pr_created_anywhere": true,
+    "everything_local_to_tmp": true
+  },
+  "upgrade_from_prior_run": "Prior P5.new-pr-creation result was UNVERIFIED with 'push failed: fatal: origin does not appear to be a git repository' (no remote configured at all). This test adds a real local remote, proving the PUSH mechanism works end-to-end (git push --set-upstream origin <branch> succeeded, verified on the remote side), while gh pr create is correctly and honestly blocked on a non-GitHub target.",
+  "verdict": "PASS for push mechanism (materially stronger evidence than before); UNVERIFIED (correctly) for the PR-appears-on-GitHub claim, which requires a real GitHub host and was deliberately not attempted per the safety constraint."
+}

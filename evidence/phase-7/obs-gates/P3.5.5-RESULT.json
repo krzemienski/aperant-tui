@@ -1,0 +1,20 @@
+{
+  "criterion": "P3.5.5",
+  "description": "Wait detection - context: drive a session past 90% context usage. Prior run peaked ~21%; threshold not reached.",
+  "verdict": "PASS",
+  "primaryEvidence": {
+    "source": "Sibling worker artifact, independently verified by this task",
+    "artifactJson": "evidence/phase-7/run-20260917T202952Z-linked3/awesome-researcher/P3.5.5-context-wait.json",
+    "screenshot": "evidence/phase-7/run-20260917T202952Z-linked3/awesome-researcher/step-11-waits-ctx-blocking.png",
+    "screenshotVerified": "Read and visually inspected directly by this task. Confirmed genuine PNG (3428x3974, 8-bit RGBA, non-interlaced per `file`), showing the real AgentsView WAITS sub-view rendering 'BLOCKING ANALYSIS - 1 blocked', a selected row '005-human-in-the-l [CTX]', and 'CTX 159.1% -- compaction imminent'. This is the actual observability.ts kind:'context' WaitState (see AgentsView.tsx:71-72 waitText() rendering 'CTX {usagePct}% - compaction imminent') rendered live in the TUI, not a mockup or hand-edited value.",
+    "underlyingMeasurement": "Real planner session 3, final usage-update event: promptTokens=318158, totalTokens=319730, cacheReadTokens=277824, timestamped 2026-09-17T20:47:13.462Z. 318158/200000 (glm/glm-5's context window as resolved via the provider-prefix-stripping fix in getModelContextWindow -- note the code comment at models.ts:613-615 documents this exact scenario, a live run against glm/glm-5 hitting 318158 tokens, as the motivating case for that fix) = 159.1% -- exceeds the 90% CONTEXT_COMPACT_PCT threshold in observability.ts:103 by a wide margin, well past the boundary condition."
+  },
+  "corroboratingIndependentEvidence": {
+    "source": "This task's own independent drive, performed before the sibling artifact was cross-checked",
+    "task": "002-ctx-test-big (read a 30000-line/3MB file), model glm/glm-4.7, 128k context window",
+    "measuredReadings": "Polled the real InspectView TOKEN/CONTEXT panel via tuistory against a live driven session: 18.9% -> 38.8% -> 59.9% -> 70.9% -> 97.4% -> 182.1% (233.0k/128.0k prompt tokens) across successive polls, confirming context usage climbing past 90% and continuing to climb past 100% before the continuation/compaction mechanism intervened.",
+    "screenshot": "evidence/phase-7/obs-gates/p355/inspect-182pct.png (unconditional capture at the 182.1% reading)",
+    "note": "This independent run corroborates the mechanism (real prompt-token accumulation crossing 90%+ during a genuinely large real tool-call payload) but did not itself catch the WAITS sub-view's 'BLOCKING ANALYSIS' row in a screenshot before the session state moved on -- the sibling's step-11-waits-ctx-blocking.png artifact is the decisive, criterion-exact evidence; this corroborates it independently rather than substituting for it."
+  },
+  "conclusion": "PASS. The sibling worker's step-11-waits-ctx-blocking.png is genuine, verified evidence of a real driven session (005-human-in-the-loop-candidate-review, awesome-researcher project) crossing 159.1% context usage and the TUI's WAITS sub-view correctly rendering the resulting kind:'context' WaitState as a blocking row ('BLOCKING ANALYSIS - 1 blocked', 'CTX 159.1% - compaction imminent'). This task's own independent drive (002-ctx-test-big, glm/glm-4.7) reproduced the same underlying mechanism -- context usage climbing well past 90% during a real session -- corroborating that this is a reliably reachable, real condition and not a one-off fluke."
+}

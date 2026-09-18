@@ -66,6 +66,16 @@ const CONVERGENCE_NUDGE_AGENT_TYPES = new Set<string>([
   'pr_reviewer', 'pr_finding_validator',
 ]);
 
+/** [APERANT-PATCH stream-ping] (2026-09-17): parses a positive-integer env
+ *  var, falling back to `defaultMs` if unset or malformed. Guards against
+ *  `setTimeout(fn, NaN)`, which fires on the
+ *  next tick instead of respecting the intended budget. */
+function readTimeoutMsEnv(envVar: string | undefined, defaultMs: number): number {
+  if (!envVar) return defaultMs;
+  const parsed = parseInt(envVar, 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : defaultMs;
+}
+
 /** Timeout for post-stream result promises (result.text, result.totalUsage).
  *  Some providers (e.g., OpenAI Codex) may not properly resolve these promises
  *  after the stream closes. 10 seconds is generous — these should resolve instantly
@@ -89,15 +99,64 @@ const POST_STREAM_TIMEOUT_MS = 10_000;
  *  still climbing with context (r=0.539 over n=25 gaps), so 60s was also
  *  killing healthy sessions mid-CODING at ~62k tokens. 180s keeps ~8x
  *  headroom over the observed legitimate worst case while still bounding a
- *  true hang. */
-const STREAM_INACTIVITY_TIMEOUT_MS = 180_000;
+ *  true hang.
+ *
+ *  [APERANT-PATCH stream-ping] (2026-09-17): overridable via
+ *  APERANT_STREAM_INACTIVITY_TIMEOUT_MS. Additive — behavior is identical
+ *  to upstream when the env var is unset (falls back to the pre-existing
+ *  180_000 literal).
+ *
+ *  Investigation found the reset loop below (`for await` over
+ *  `result.fullStream`) already resets unconditionally on EVERY part type —
+ *  text-delta, reasoning-delta, tool-call, tool-result, step-finish,
+ *  usage-update, etc. — so "only text deltas reset it" was never true. The
+ *  real gap was one layer lower: the Anthropic SSE-to-part transform
+ *  (@ai-sdk/anthropic dist/index.js, `case "ping": { return; }`) discards
+ *  server ping/keepalive frames before they can ever become a stream part,
+ *  UNLESS `includeRawChunks` is enabled on the streamText() call — which it
+ *  was not. A provider holding the connection open with periodic pings but
+ *  no new content for >180s was therefore invisible to this watchdog and
+ *  read as dead. `includeRawChunks: true` below (see the streamText() call)
+ *  makes the provider's raw SSE frames — including pings — surface as
+ *  `{ type: 'raw' }` parts, which this loop already resets on unconditionally.
+ *  A truly dead connection (zero bytes of any kind, including pings) still
+ *  times out correctly.
+ *
+ *  Why the default STAYS at 180s rather than reverting to 60s now that
+ *  pings are visible: the ping fix and this budget guard two DIFFERENT
+ *  gaps. Pings are keepalive frames on an ALREADY-ESTABLISHED response
+ *  stream; they cannot arrive before the provider opens that response in
+ *  the first place. The original D22 measurement (21-23s inter-step
+ *  latency at ~52k prompt tokens, climbing with context, r=0.539 over
+ *  n=25 gaps) is the time between one step finishing and the NEXT
+ *  streamText() call's response starting at all — a cold-start gap during
+ *  which there is no open stream yet for a ping to travel on. The ping
+ *  fix does not shrink that gap, so a return to 60s would still kill
+ *  healthy long-context sessions the same way pre-D22 did, independent of
+ *  ping visibility. 180s (measured ~8x headroom over the worst observed
+ *  legitimate cold-start gap) remains the correct default; operators on a
+ *  provider known to always keep the connection open with regular pings
+ *  (no cold-start gap at all) can lower the window via the env var for
+ *  faster dead-connection detection. */
+const STREAM_INACTIVITY_TIMEOUT_MS = readTimeoutMsEnv(
+  process.env.APERANT_STREAM_INACTIVITY_TIMEOUT_MS,
+  180_000,
+);
 
 /** D22: inactivity budget while a LOCAL TOOL is executing. No provider data
  *  is expected during this window and tools carry their own timeouts, so the
  *  stream watchdog must sit strictly OUTSIDE them — then the tool layer
  *  reports the precise failure first, and this fires only if the tool layer
- *  itself wedges. 660s = the 600s max tool budget plus dispatch overhead. */
-const TOOL_EXECUTION_INACTIVITY_TIMEOUT_MS = 660_000;
+ *  itself wedges. 660s = the 600s max tool budget plus dispatch overhead.
+ *  [APERANT-PATCH stream-ping] (2026-09-17): overridable via
+ *  APERANT_TOOL_INACTIVITY_TIMEOUT_MS. Additive — falls back to the
+ *  pre-existing 660_000 literal when unset. No default-value change; this
+ *  is not part of the ping-visibility fix, only the same
+ *  env-configurability applied consistently to both watchdog budgets. */
+const TOOL_EXECUTION_INACTIVITY_TIMEOUT_MS = readTimeoutMsEnv(
+  process.env.APERANT_TOOL_INACTIVITY_TIMEOUT_MS,
+  660_000,
+);
 
 // =============================================================================
 // Runner Options
@@ -390,6 +449,35 @@ async function executeStream(
     ...(useOutputSchema ? { output: Output.object({ schema: config.outputSchema! }) } : {}),
     stopWhen: stopCondition,
     abortSignal: mergedAbortSignal,
+    // [APERANT-PATCH stream-ping] (2026-09-17): surface provider
+    // ping/keepalive frames (and any other raw SSE chunk the AI SDK would
+    // otherwise swallow before it becomes a typed part — see
+    // @ai-sdk/anthropic's `case "ping": { return; }`) as `{ type: 'raw' }`
+    // fullStream parts. The consumption loop below resets the inactivity
+    // watchdog on every part unconditionally, so this closes the gap where
+    // a provider holding the connection open (pings, or any other
+    // non-content signal) with no text/reasoning/tool activity for minutes
+    // at a time looked identical to a dead connection.
+    //
+    // This is only-additive at every fullStream consumer in this vendored
+    // runtime — audited 2026-09-17:
+    //   - runner.ts:571 (this call's own consumption loop) — resets the
+    //     watchdog unconditionally on `part.type`, no switch; new 'raw'
+    //     parts fall through cleanly.
+    //   - stream-handler.ts:162-188 processPart() — `switch (part.type)`
+    //     with NO `default` clause, explicit comment already anticipates
+    //     'raw' as an ignored type ("Ignore other part types (... raw,
+    //     etc.)"); an unmatched 'raw' silently no-ops.
+    //   - stream-handler.ts:100-108 FullStreamPart union — includes a
+    //     `{ type: string; [key: string]: unknown }` fallback member, so
+    //     'raw' type-checks without a cast.
+    // `includeRawChunks` is a per-call streamText() option, not global SDK
+    // state — it affects only THIS call site's stream, not the five other
+    // streamText() calls in this vendored tree (ideation.ts:189,
+    // insights.ts:275, roadmap.ts:148,280, github/parallel-orchestrator.ts
+    // :563,760,918), none of which pass includeRawChunks and are therefore
+    // completely unaffected by this patch.
+    includeRawChunks: true,
     ...((thinkingOptions || isCodex || (useOutputSchema && isAnthropicModel)) ? {
       providerOptions: {
         ...(thinkingOptions ?? {}),

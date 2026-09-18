@@ -9,6 +9,14 @@
  *     'structured')
  *   - AgentManager 'stream-event' — raw StreamEvent relay (tool-call/result,
  *     step-finish, usage-update) via the [APERANT-PATCH observability-tap]
+ *   - AgentManager 'log' — free-text lines; ONE of them
+ *     ("Starting agent session: type=X, model=Y", worker.ts:394 `postLog`) is
+ *     the only place the REAL, provider-resolved model id (e.g. 'glm/glm-5',
+ *     as opposed to task_metadata.json's shorthand or absent 'model' field —
+ *     ensureAgent()'s 'default' fallback) is ever observable from this
+ *     process. Parsed here to fix the contextWindowLimit used for CTX%
+ *     display, which otherwise silently used the 200k fallback for every
+ *     model that isn't a bare, unprefixed catalog id.
  *   - sentinel files in the spec dir (RATE_LIMIT_PAUSE / AUTH_PAUSE / RESUME /
  *     PAUSE) — polled from disk, exactly where pause-handler.ts reads them
  *   - AGENT_CONFIGS — tool grants / thinking level, imported from the vendored
@@ -48,6 +56,22 @@ export interface TokenUsage {
 export interface AgentSnapshot {
   id: string;
   type: AgentType | 'unknown';
+  /**
+   * F-19 fix: the verbatim agent-type string a SUBAGENT_* task-event
+   * reported, independent of whether it resolves to a real AGENT_CONFIGS
+   * key. `type` above is the *resolved* key used for tool/MCP grant
+   * lookups (AGENT_CONFIGS[type]) and MUST stay a valid AgentType so
+   * applyAgentType() keeps working — but that resolution can silently
+   * coerce an unrecognized spawn (e.g. `complexity_assessor`, a real
+   * SpawnSubagent input per spawn-subagent.ts's schema, but not an
+   * AGENT_CONFIGS key) onto an unrelated label (`spec_gatherer`). A
+   * reader of the graph must never see that confident wrong label without
+   * a way to see the ground truth, so `rawType` carries the exact string
+   * the orchestrator actually spawned; display code prefers it over
+   * `type`. `null` for any agent never touched by a SUBAGENT_* event
+   * (i.e. every pre-P3.5.11 agent, and every top-level task).
+   */
+  rawType: string | null;
   taskId: string;
   phase: string;
   phaseSource: 'structured' | 'inferred';
@@ -174,6 +198,7 @@ export class ObservabilityService extends EventEmitter {
     }) => this.onProgress(taskId, progress));
     on('task-event', (taskId, event: Record<string, unknown>) => this.onTaskEvent(taskId, event));
     on('stream-event', (taskId, event: Record<string, unknown>) => this.onStreamEvent(taskId, event));
+    on('log', (taskId, message: string) => this.onLog(taskId, String(message)));
     on('error', (taskId, error: string) => this.onError(taskId, String(error)));
     on('exit', (taskId, code: number | null) => this.onExit(taskId, code));
 
@@ -237,6 +262,7 @@ export class ObservabilityService extends EventEmitter {
         snap: {
           id: taskId,
           type: 'unknown',
+          rawType: null,
           taskId,
           phase: 'idle',
           phaseSource: 'inferred',
@@ -290,6 +316,27 @@ export class ObservabilityService extends EventEmitter {
     a.snap.autoClaudeTools = cfg.autoClaudeTools;
   }
 
+  /** Matches worker.ts:394's `postLog(\`Starting agent session: type=${session.agentType}, model=${session.modelId}\`)` — the ONE
+   *  place the real, provider-resolved model id is observable here. */
+  private static readonly SESSION_START_RE = /^Starting agent session: type=\S+, model=(\S+)$/;
+
+  private onLog(taskId: string, message: string): void {
+    const match = ObservabilityService.SESSION_START_RE.exec(message);
+    if (!match) return;
+    const resolvedModelId = match[1];
+    const a = this.ensureAgent(taskId);
+    // Refresh model + contextWindowLimit from the id the session ACTUALLY
+    // resolved to (e.g. 'glm/glm-5' via a router-backed provider account) —
+    // ensureAgent() only had task_metadata.json's shorthand (or the
+    // 'default' fallback when absent, as for a roadmap-converted task with
+    // no model field) at agent-creation time, which is what left
+    // contextWindowLimit pinned to the 200k catalog-miss default for the
+    // whole session's lifetime.
+    a.snap.model = resolvedModelId;
+    a.snap.contextWindowLimit = getModelContextWindow(resolvedModelId);
+    this.dirty = true;
+  }
+
   private onTaskEvent(taskId: string, event: Record<string, unknown>): void {
     const a = this.ensureAgent(taskId);
     const type = String(event.type ?? '');
@@ -318,6 +365,35 @@ export class ObservabilityService extends EventEmitter {
       const iter = typeof event.iteration === 'number' ? event.iteration : 0;
       const max = typeof event.maxIterations === 'number' ? event.maxIterations : 50;
       a.snap.qaIteration = { current: iter, max };
+    }
+    // Agentic-orchestration opt-in (2026-09-17): SUBAGENT_* task-events
+    // (worker.ts's onSubagentEvent callback, agentic
+    // spec-orchestration mode only) construct a distinct child
+    // AgentSnapshot keyed by subagentId, with parentId = the orchestrator's
+    // taskId — this is what makes GraphView (AgentsView.tsx) render a real
+    // second node instead of folding subagent traffic into the parent's
+    // own trace (spec P3.5.11 "subagent nodes"). Additive: SUBAGENT_* is a
+    // new event type worker.ts never emitted before this patch, so this
+    // branch is unreachable for any pre-existing (non-agentic) session.
+    // First-party file (apps/tui/**) — no [APERANT-PATCH] marker needed.
+    if (type === 'SUBAGENT_SPAWNING' || type === 'SUBAGENT_COMPLETED' || type === 'SUBAGENT_FAILED') {
+      const subagentId = String(event.subagentId ?? '');
+      const rawAgentType = String(event.agentType ?? 'unknown');
+      if (subagentId) {
+        const child = this.ensureAgent(subagentId);
+        child.snap.parentId = taskId;
+        child.snap.depth = a.snap.depth + 1;
+        // F-19 fix: rawType always carries the verbatim spawned string,
+        // independent of resolution outcome below, so display code can
+        // show the reader ground truth instead of the resolved label.
+        child.snap.rawType = rawAgentType;
+        const resolvedAgentType = (rawAgentType in AGENT_CONFIGS ? rawAgentType : 'spec_gatherer') as AgentType;
+        this.applyAgentType(child, resolvedAgentType);
+        if (type === 'SUBAGENT_SPAWNING') child.snap.state = 'running';
+        if (type === 'SUBAGENT_COMPLETED') child.snap.state = 'done';
+        if (type === 'SUBAGENT_FAILED') child.snap.state = 'error';
+        this.pushTrace(subagentId, `task:${type}`, undefined, undefined, type === 'SUBAGENT_FAILED', rawAgentType);
+      }
     }
     this.pushTrace(taskId, `task:${type}`, undefined, undefined, false, JSON.stringify(event).slice(0, 120));
     this.dirty = true;

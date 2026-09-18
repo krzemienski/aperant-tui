@@ -1,0 +1,30 @@
+{
+  "criterion": "P3.5.3",
+  "description": "Wait detection - concurrency: live run with >=4 concurrent subtasks producing a concurrency wait row in the waits sub-view",
+  "verdict": "UNVERIFIABLE-BY-DESIGN",
+  "distinctFrom": "This is NOT the same gap as the executor-level vitest 3/3 evidence already cited in phase-3.5-VALIDATION.md. That evidence proves executeParallel() itself works in isolation under test. This finding proves executeParallel() is never reachable from any production code path, so no live run -- however configured -- can ever produce a concurrency wait row.",
+  "findings": [
+    {
+      "claim": "kind: 'concurrency' is declared in the WaitState union but never constructed anywhere in the codebase",
+      "evidence": "apps/tui/src/services/observability.ts:34 declares `{ kind: 'concurrency'; slot: number; maxSlots: number; since: number }` as a WaitState variant. Exhaustive repo-wide grep for the literal construction pattern `kind: 'concurrency'` (or any `kind:` assignment building this variant) returns ZERO matches outside the type declaration itself and the AgentsView.tsx WAIT_META/waitText rendering code (which only formats a value if one is ever produced). observability.ts's only wait-constructing function, recomputeWait() (lines 416-440), exhaustively covers 'context', 'tool', 'mcp' -- there is no code path that returns 'concurrency'.",
+      "location": "apps/tui/src/services/observability.ts:34 (declaration); apps/tui/src/services/observability.ts:416-440 (recomputeWait, the only constructor, never builds 'concurrency')"
+    },
+    {
+      "claim": "executeParallel() -- the vendored concurrency-limiting executor with maxConcurrency, onSubtaskQueued, onRateLimited etc -- is dead code in production",
+      "evidence": "Repo-wide grep for `executeParallel(` and `from '../parallel-executor'` / `from '@main/ai/orchestration/parallel-executor'` shows exactly two importers: apps/desktop/src/main/ai/orchestration/__tests__/parallel-executor.test.ts and apps/tui/src/services/__tests__/parallel-executor-queued.test.ts. No file under apps/desktop/src/main/agent/, apps/desktop/src/main/ai/orchestration/build-orchestrator.ts, or apps/desktop/src/main/ai/agent/worker.ts ever imports or calls executeParallel().",
+      "location": "apps/desktop/src/main/ai/orchestration/parallel-executor.ts (the executor); grep confirms zero production importers"
+    },
+    {
+      "claim": "The real production coding-phase path (build-orchestrator.ts) processes subtasks strictly SEQUENTIALLY via iterateSubtasks(), which is a single while(true) loop -- no batching, no Promise.allSettled, no concurrency limiting of any kind",
+      "evidence": "apps/desktop/src/main/ai/orchestration/build-orchestrator.ts:425-466 (runCodingPhase) calls iterateSubtasks() from subtask-iterator.ts. subtask-iterator.ts:124-143 (iterateSubtasks) is a `while (true)` loop that loads the plan, finds the next pending subtask, awaits config.runSubtaskSession(subtask, attempt) to completion, then loops -- one subtask fully finishes (success, stuck, or cancelled) before the next one starts. There is no concurrent execution of subtasks anywhere in this path.",
+      "location": "apps/desktop/src/main/ai/orchestration/build-orchestrator.ts:425-466; apps/desktop/src/main/ai/orchestration/subtask-iterator.ts:124-268"
+    },
+    {
+      "claim": "The TUI's own task-start call site hardcodes parallel:false, workers:1 by deliberate design (branch-safety comment), and agent-manager.ts's startTaskExecution() never even reads options.parallel or options.workers",
+      "evidence": "apps/tui/src/services/agent-start-service.ts:550 passes `{ parallel: false, workers: 1, pushNewBranches: false }` to am.startTaskExecution(), with an explicit multi-line comment explaining this is deliberate (worktree/branch-publish safety, D23). Repo-wide grep for `options.parallel` and `options.workers` inside apps/desktop/src/main/agent/agent-manager.ts returns ZERO matches -- startTaskExecution(taskId, projectPath, specId, options, projectId) at agent-manager.ts:464-612 stores `options` verbatim via storeTaskContext()/registerTaskWithOperationRegistry() for bookkeeping/restart purposes only, and never branches on options.parallel or options.workers to select a concurrent execution strategy.",
+      "location": "apps/tui/src/services/agent-start-service.ts:517-552; apps/desktop/src/main/agent/agent-manager.ts:464-612 (startTaskExecution body, 148 lines, no options.parallel/options.workers read)"
+    }
+  ],
+  "conclusion": "This is an architectural fact, not a missing test condition or a driving-effort gap. There is no live-drivable path in this codebase, as currently wired, to (a) run >=4 genuinely concurrent subtasks in production, or (b) have observability.ts ever emit a `kind: 'concurrency'` WaitState even if concurrent execution somehow occurred. Both the concurrency machinery (executeParallel) and its observability tap point (kind:'concurrency') exist in source but are structurally disconnected from every production entry point. No amount of additional driving, task configuration, or model selection changes this -- it would require a source-code change (wiring executeParallel into build-orchestrator.ts and/or constructing the concurrency WaitState in observability.ts), which is out of scope for this evidence-gathering task per the scope boundary (apps/tui/src/** and apps/desktop/src/main/** are owned by other workers).",
+  "recommendedFollowUp": "Flagging loudly per task instructions: this looks like a genuine app defect (or at minimum an intentionally-incomplete feature) that should be surfaced to whichever worker owns apps/desktop/src/main/** and apps/tui/src/services/observability.ts. Two independent fixes would be needed to ever close this gate: (1) wire executeParallel() into build-orchestrator.ts's coding phase (a real behavior change, not observability-only), and (2) add a call site in observability.ts that constructs kind:'concurrency' when subtasks are actually running in parallel."
+}

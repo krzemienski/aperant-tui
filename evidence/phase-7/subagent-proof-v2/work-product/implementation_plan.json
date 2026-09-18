@@ -1,0 +1,122 @@
+{
+  "feature": "999-subagent-proof-v2",
+  "workflow_type": "feature",
+  "phases": [
+    {
+      "id": "1",
+      "name": "HEAD re-verify (no cost)",
+      "subtasks": [
+        {
+          "id": "1-1",
+          "title": "Source facts preflight at current HEAD",
+          "description": "Re-read _SPAWN_TOOL_NAMES (sdk.py:288), _agent_spawned_event (sdk.py:761-779), _agent_finished_event (sdk.py:781-791), attribution (sdk.py:391-396, events.py:45-61), tree reducers (tree.py spawn/finish/figures, 229-273) at HEAD post-007; note drift vs C5 assumptions. Write findings as step-01 source-facts artifact in the run dir.",
+          "status": "pending",
+          "files_to_create": [
+            "e2e-evidence/run-YYYYMMDDTHHMMSS-subagent-proof-v2/step-01-head-source-facts"
+          ],
+          "files_to_modify": []
+        },
+        {
+          "id": "1-2",
+          "title": "Init evidence run",
+          "description": "fresh_evidence.py init-run e2e-evidence/run-<ts>-subagent-proof-v2 (cwd=repo root); use validation/capture.py EvidenceRun with explicit --run for all subsequent steps.",
+          "status": "pending",
+          "files_to_create": [
+            "e2e-evidence/run-YYYYMMDDTHHMMSS-subagent-proof-v2/.run-meta"
+          ],
+          "files_to_modify": []
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "name": "Probe build",
+      "subtasks": [
+        {
+          "id": "2-1",
+          "title": "Write v2 capture probe",
+          "description": "v2 probe modeled on C5: pty.fork(), child execvp python3 -m proofpunk_agent --project ... --proofpunk-path ... --max-budget 10 PROMPT; TIOCSWINSZ 44x130; ANSI-stripped frame; Depth:/Active: regex; auto-approve PERMISSION REQUEST with 'a' after 0.6s; PROOFPUNK_AGENT_SHOT_DIR/SHOT_NAME SVG export; 180s deadline. Capture probe source as a step artifact.",
+          "status": "pending",
+          "files_to_create": [
+            ".debug/v2_probe.py",
+            "e2e-evidence/run-YYYYMMDDTHHMMSS-subagent-proof-v2/step-02-v2-probe-source"
+          ],
+          "files_to_modify": []
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "name": "Live proof runs",
+      "subtasks": [
+        {
+          "id": "3-1",
+          "title": "Single-child live spawn + lifecycle COMPLETE",
+          "description": "Proven C5 prompt (single general-purpose subagent, reply DEEPEST). Capture live frame with subagent_type label (FR1), wait past AGENT_FINISHED for COMPLETE glyph (FR3a), capture events.jsonl AGENT_SPAWNED(subject=toolu_X,parent,tier=3) -> AGENT_FINISHED(toolu_X,error=false); cross-check figures vs events (FR2, ER2, ER6).",
+          "status": "pending",
+          "files_to_create": [
+            "e2e-evidence/run-YYYYMMDDTHHMMSS-subagent-proof-v2/step-03-live-spawn-frame",
+            "e2e-evidence/run-YYYYMMDDTHHMMSS-subagent-proof-v2/step-04-lifecycle-complete-frame",
+            "e2e-evidence/run-YYYYMMDDTHHMMSS-subagent-proof-v2/step-05-events-export"
+          ],
+          "files_to_modify": []
+        },
+        {
+          "id": "3-2",
+          "title": "Fan-out: depth-2 with concurrent fallback",
+          "description": "FR4. Try grandchild prompt (child spawns sub-subagent returning DEEPEST) for Depth: 2; if flaky after ~2 attempts, switch to two-concurrent-children prompt (both in one message) for Active: 3 (OQ2 fallback). Verify >= 2 AGENT_SPAWNED under one parent (concurrent) or grandchild AGENT_SPAWNED.parent == child AGENT_SPAWNED.subject (nested) in events export; cross-check frame figures (ER6).",
+          "status": "pending",
+          "files_to_create": [
+            "e2e-evidence/run-YYYYMMDDTHHMMSS-subagent-proof-v2/step-06-fanout-live-frame",
+            "e2e-evidence/run-YYYYMMDDTHHMMSS-subagent-proof-v2/step-07-fanout-events-export"
+          ],
+          "files_to_modify": []
+        },
+        {
+          "id": "3-3",
+          "title": "ERRORED capture (conditional, cheap)",
+          "description": "FR3b / OQ1. If cheap: subagent told to run Bash 'exit 7' and report failure; capture ERRORED node + AGENT_FINISHED error=true. If not cheaply drivable, note in run narrative and ship COMPLETE-only (FR3 permits).",
+          "status": "pending",
+          "files_to_create": [
+            "e2e-evidence/run-YYYYMMDDTHHMMSS-subagent-proof-v2/step-08-errored-frame"
+          ],
+          "files_to_modify": []
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "name": "Seal + inventory",
+      "subtasks": [
+        {
+          "id": "4-1",
+          "title": "Pre-check artifacts and seal",
+          "description": "thin_artifacts() pre-check: every artifact strictly >1024 bytes with real context (argv, rc, stdout/stderr tail), secrets redacted, no padding. evidence-inventory.txt lists every step file. fresh_evidence.py seal then validate --run <dir> rc=0 (ER4, ER5).",
+          "status": "pending",
+          "files_to_create": [
+            "e2e-evidence/run-YYYYMMDDTHHMMSS-subagent-proof-v2/evidence-inventory.txt"
+          ],
+          "files_to_modify": []
+        }
+      ]
+    },
+    {
+      "id": "5",
+      "name": "Conditional: minimal defect fix + re-earn",
+      "subtasks": [
+        {
+          "id": "5-1",
+          "title": "Minimal fix if silent-failure gap found",
+          "description": "CONDITIONAL — only if a silent-failure gap emerges (e.g. attribution race: child AGENT_SPAWNED before parent node exists -> UNATTRIBUTED under root, tree.py:240-245). Apply smallest change closing the gap (PR3/FR7, NG4: no UI changes beyond minimal fix), then re-run phases 2-4 in a fresh run dir with fresh seal.",
+          "status": "pending",
+          "files_to_create": [
+            "e2e-evidence/run-YYYYMMDDTHHMMSS-subagent-proof-v2-r1/step-01-head-source-facts"
+          ],
+          "files_to_modify": [
+            "proofpunk_agent/state/reducers/tree.py"
+          ]
+        }
+      ]
+    }
+  ]
+}

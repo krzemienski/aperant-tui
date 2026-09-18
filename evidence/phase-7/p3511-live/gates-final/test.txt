@@ -1,0 +1,24 @@
+
+> aperant-tui-workspace@0.1.0 test
+> npm test -w @aperant/tui
+
+
+> @aperant/tui@0.1.0 test
+> vitest run
+
+
+ RUN  v2.1.9 /Users/nick/dev/aperant-tui/apps/tui
+
+ ✓ src/services/__tests__/moonshot-provider.test.ts (6 tests) 38ms
+ ✓ src/services/__tests__/parallel-executor-queued.test.ts (3 tests) 7063ms
+   ✓ parallel-executor onSubtaskQueued (observability tap) > announces exactly the subtasks that sit in later batches 4060ms
+   ✓ parallel-executor onSubtaskQueued (observability tap) > announces nothing when every subtask fits the first batch 1001ms
+   ✓ parallel-executor onSubtaskQueued (observability tap) > still announces queued subtasks when an early batch fails (allSettled semantics) 2002ms
+
+ Test Files  2 passed (2)
+      Tests  9 passed (9)
+   Start at  00:54:49
+   Duration  7.29s (transform 43ms, setup 0ms, collect 97ms, tests 7.10s, environment 0ms, prepare 71ms)
+
+
+EXIT_CODE=0

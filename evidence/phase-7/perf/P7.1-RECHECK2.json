@@ -1,0 +1,142 @@
+{
+  "criterion": "P7.1 — 200-task board scrolls at >=60fps",
+  "source": "docs/plan/ROADMAP.md:16",
+  "recheck_of": [
+    "evidence/phase-7/perf/P7.1-RESULT.json (Stage 1: original FAIL — unmodified, preserved)",
+    "evidence/phase-7/perf/P7.1-RECHECK.json (Stage 2: viewport-windowing fix — unmodified, preserved)"
+  ],
+  "generated_at": "2026-09-17T00:00:00Z",
+  "hypothesis_tested": "Assignment hypothesis: 'App shell chrome (TitleBar/TabBar/StatusLine) re-rendering unmemoized on every keystroke via shared Zustand store' is the remaining bottleneck after Stage 2's viewport-windowing fix.",
+  "measurement_method": {
+    "instrument": "Temporary render-probe (apps/tui/src/util/render-probe.ts, since REMOVED) — a no-op-unless-env-var-set function appended to a side-channel log file (never stdout/stderr, which would corrupt the Ink terminal frame). Called at the top of App, TitleBar, TabBar, StatusLine, Panel, and BoardView render bodies, plus inside BoardView's `j` keybinding handler, gated behind APERANT_RENDER_PROBE_LOG env var.",
+    "removed_after_measurement": true,
+    "files_touched_for_instrumentation_now_clean": [
+      "apps/tui/src/App.tsx",
+      "apps/tui/src/components/TitleBar.tsx",
+      "apps/tui/src/components/TabBar.tsx",
+      "apps/tui/src/components/StatusLine.tsx",
+      "apps/tui/src/components/Panel.tsx",
+      "apps/tui/src/views/BoardView.tsx"
+    ]
+  },
+  "direct_measurement_result": {
+    "single_isolated_keypress": {
+      "components_that_rendered": ["BoardView", "Panel:TASKS", "Panel:DETAIL", "Panel:AGENT STREAM"],
+      "components_that_did_NOT_render": ["App", "TitleBar", "TabBar", "StatusLine"],
+      "note": "App/TitleBar/TabBar/StatusLine were observed rendering ONLY during the unrelated 2-second setInterval(refreshTasks, 2000) polling tick in App.tsx, timestamp-correlated to prove it was not keypress-triggered."
+    },
+    "sustained_15_key_burst": {
+      "j_handler_invocations": 4,
+      "BoardView_renders": 4,
+      "Panel_renders_each": 4,
+      "App_TitleBar_TabBar_StatusLine_renders": 0,
+      "ratio": "Exactly 1:1 between handler invocations and BoardView/Panel renders — zero excess/wasted re-renders observed anywhere.",
+      "handler_call_timestamps_ms_delta": [7, 5, 3],
+      "note": "All 4 registered handler calls landed within a ~15ms window at the START of the ~348ms burst, then silence for the remaining ~333ms — consistent with keystrokes being dropped upstream of React, not React failing to keep up with re-renders."
+    },
+    "conclusion": "The assignment's hypothesis is DISPROVEN by direct measurement. App shell chrome does not re-render per keystroke, with or without the fix — React's existing narrow Zustand selectors (individual field selectors, not `(s) => s`) and the fact that `sel` lives entirely inside BoardView's own component state already prevent any chrome re-render. There was nothing to memoize that was actually re-rendering."
+  },
+  "root_cause_found_instead": {
+    "mechanism_1_render_throttle": {
+      "location": "node_modules/ink/build/ink.js:39",
+      "code": "throttle(this.onRender, 32, { leading: true, trailing: true })",
+      "finding": "Ink 5.2.1 (confirmed installed version) throttles its OWN terminal repaint to at most once per 32ms, independent of React reconciliation speed. This is a hard architectural ceiling of ~31.25fps for ANY Ink application, unrelated to app code quality.",
+      "implication": "60fps (16.67ms/frame) is structurally unreachable in this Ink version via any component-level optimization (memoization, selector narrowing, virtualization) — the bottleneck is below the React layer."
+    },
+    "mechanism_2_keypress_coalescing": {
+      "location": "node_modules/ink/build/hooks/use-input.js:45-46, node_modules/ink/build/parse-keypress.js",
+      "code": "const handleData = (data) => { const keypress = parseKeypress(data); ... }",
+      "finding_verified_live": "Directly tested: `parseKeypress('j')` returns `{name: \"j\", sequence: \"j\", ...}` (correct). `parseKeypress('jjjj')` returns `{name: \"\", sequence: \"jjjj\", ...}` — an UNRECOGNIZED pattern, because Ink's parser expects one keypress worth of bytes per stdin `data` event, not a multi-character run.",
+      "propagation_to_app": "use-input.js:67 sets `input = keypress.sequence` (= 'jjjj' in the multi-char case, since ctrl=false and it's not in nonAlphanumericKeys). apps/tui/src/hooks/useKeymap.ts's normalizeKey() (line 34-35, OUT OF SCOPE for this task — not one of the authorized files) returns 'jjjj' verbatim for a plain non-modifier key. `ref.current['jjjj']` is undefined (only 'j' is a registered binding), so the ENTIRE coalesced chunk is silently dropped — zero scroll steps, not partial credit.",
+      "why_this_happens_under_sustained_input": "tuistory's `type` command (and any sufficiently fast real-user key-repeat) can write multiple 'j' bytes to the PTY faster than the Node process's stdin read-loop drains them under system/process scheduling load. The kernel PTY layer coalesces the pending bytes into ONE read()/data event, which Ink's architecture (one data event = one parsed keypress) cannot decompose.",
+      "implication": "This is the primary driver of the measured drop rate (73-93% across all three stages) — not a rendering-performance problem, an input-handling design limitation in Ink's keypress parser."
+    },
+    "scope_note": "Both mechanisms live in node_modules/ink (a third-party dependency) and, for the dispatch step, apps/tui/src/hooks/useKeymap.ts (NOT one of the files this task's scope was extended to cover — the assignment named BoardView.tsx, TitleBar.tsx, TabBar.tsx, StatusLine.tsx, Panel.tsx, and narrowly-scoped App.tsx selectors only). Fixing either would require patching/vendoring/upgrading the Ink dependency or editing useKeymap.ts, both outside the authorized scope for this task."
+  },
+  "fix_applied_stage3": {
+    "files_changed": [
+      "apps/tui/src/components/TitleBar.tsx",
+      "apps/tui/src/components/TabBar.tsx",
+      "apps/tui/src/components/StatusLine.tsx"
+    ],
+    "description": "Wrapped TitleBar, TabBar, and StatusLine in React.memo. Applied as a legitimate, correct hygiene improvement (their props — plain strings/objects — are referentially stable across unrelated App re-renders, e.g. the counts/profile polling tick), NOT because measurement showed them re-rendering per keystroke — it showed the opposite. Documented honestly in-code as measured-not-to-matter.",
+    "file_deliberately_NOT_changed": {
+      "file": "apps/tui/src/components/Panel.tsx",
+      "reason": "Panel's `children` prop is a freshly-created JSX tree on every call from BoardView. React.memo's shallow prop comparison would never find `children` referentially equal across renders, so wrapping Panel in React.memo would be a no-op that LOOKS like an optimization but never actually skips a re-render. Applying it anyway would be a misleading, dishonest change. Documented in-code with the reasoning instead."
+    },
+    "app_tsx_selectors": "Already narrow (individual field selectors: `useAppStore((s) => s.view)`, `useAppStore((s) => s.themeName)`, etc. — not a broad `(s) => s` subscription). No change needed or made; confirmed correct as-is."
+  },
+  "measurements_all_three_stages": [
+    {
+      "id": "M1_isolated_single_keypress_settle_ms",
+      "stage1_original_no_fix":       { "median_ms": 10.0, "n_trials": 30 },
+      "stage2_windowing_fix":         { "median_ms": 6.0,  "n_trials": 30 },
+      "stage3_windowing_plus_memo":   { "median_ms": 6.0,  "n_trials": 30, "mean_ms": 5.93, "min_ms": 4, "max_ms": 8 },
+      "threshold_ms": 16.67,
+      "note": "All three stages already pass this specific sub-metric. Stage 2->3 change (6.0ms->6.0ms) is a wash, as predicted by the direct render-probe evidence."
+    },
+    {
+      "id": "M2_sustained_rapid_scroll_200task_THE_BINDING_METRIC",
+      "stage1_original_no_fix":     { "avg_registered_of_15": 1.0, "drop_pct_median": 93.33, "ms_per_step": 296.7, "fps_equiv": 3.37 },
+      "stage2_windowing_fix":       { "avg_registered_of_15": 3.5, "drop_pct_median": 76.67, "ms_per_step": 96.4,  "fps_equiv": 10.38 },
+      "stage3_windowing_plus_memo": { "avg_registered_of_15": 3.5, "drop_pct_median": 76.67, "ms_per_step": 94.3,  "fps_equiv": 10.61, "n_trials": 8,
+                                       "registered_per_trial": [3, 3, 4, 3, 4, 4, 3, 4] },
+      "stage2_to_stage3_delta": "96.4ms -> 94.3ms = 2.2% difference, well within measurement noise (individual trial-to-trial variance was already ±10% in Stage 2's own 8 trials). NOT a real improvement — consistent with the direct render-probe evidence that chrome components were never the bottleneck.",
+      "threshold_ms": 16.67,
+      "verdict_for_this_measurement": "STILL FAIL, unchanged in substance from Stage 2. 94.3ms/step remains ~5.7x slower than the 16.67ms/60fps budget."
+    },
+    {
+      "id": "M3_sustained_rapid_scroll_20task_comparison",
+      "stage1_original_no_fix":     { "drop_pct_median": 53.33, "n_trials": 4 },
+      "stage2_windowing_fix":       { "drop_pct_median": 66.67, "n_trials": 4 },
+      "stage3_windowing_plus_memo": { "drop_pct_median": 60.0, "n_trials": 4, "registered_per_trial": [7, 5, 6, 6] },
+      "conclusion": "Consistent within noise across all three stages (53-67% range) — confirms the 20-task board was never affected by either fix, as expected: it was never large enough for windowing to shrink its render tree, and chrome was never re-rendering to begin with."
+    },
+    {
+      "id": "M0_control_pty_delivery_integrity",
+      "stage1": "50/50 delivered", "stage2": "50/50 delivered", "stage3": "50/50 delivered",
+      "conclusion": "Unchanged across all three stages, as expected (independent of the app under test). Confirms the measured M2 changes/non-changes are real application-level effects, not instrument drift."
+    }
+  ],
+  "navigation_correctness_recheck": {
+    "method": "200 sequential single keypresses from task 1, column headers recorded as they scrolled into view.",
+    "column_headers_observed": { "BACKLOG": 23, "QUEUE": 15, "BUILDING": 23, "AI REVIEW": 25, "HUMAN": 39, "DONE": 25, "ERROR": 50 },
+    "sum": 200,
+    "final_selection": "200-fix-theme-tokens-200",
+    "result": "PASS — unchanged and correct after chrome memoization."
+  },
+  "manual_behavior_regression_check": {
+    "method": "Live session drive: pressed '6' to open Settings, moved theme selection with 'j', persisted with return (theme changed default -> matrix, confirmed ACTIVE marker and persistence), pressed '1' to return to Board (confirmed new theme applied instantly across the view switch — the already-proven P6.1a criterion), pressed 'j' twice (confirmed selection advanced correctly, task 1 -> task 3), pressed 'H' (confirmed column move persisted and logged: '003-add- ai_review -> in_progress (persisted)' in AGENT STREAM).",
+    "result": "PASS — theme switching, tab switching, board scroll, column moves, persistence, and AGENT STREAM logging all function identically to before the chrome React.memo change. No behavioral regression from either the render-probe removal or the memoization."
+  },
+  "threshold": { "target_fps": 60, "target_ms_per_frame": 16.67 },
+  "verdict": "FAIL (unreachable within authorized scope)",
+  "verdict_reasoning": "The chrome-memoization fix was applied correctly and is a legitimate hygiene improvement, but it produced no measurable change (94.3ms vs 96.4ms — within noise) because the assignment's hypothesis was empirically false: direct render-probe measurement proved App/TitleBar/TabBar/StatusLine never re-render per keystroke, with or without React.memo. The real, source-verified bottleneck lives in node_modules/ink's own architecture: (1) a hard-coded 32ms render throttle that caps ANY Ink app below 60fps regardless of React-level optimization, and (2) a keypress parser that processes one raw stdin data event as one keypress, silently dropping entire multi-character chunks that the PTY coalesces under sustained rapid input — verified directly by calling parseKeypress('jjjj') and observing it return an unrecognized empty-name result. Both mechanisms are outside apps/tui/src/views/BoardView.tsx, the four named chrome components, Panel.tsx, and App.tsx's Zustand selectors (which were already confirmed narrow and correct) — the authorized scope for this task. Fixing them would require either patching/vendoring/upgrading the Ink dependency itself, or editing apps/tui/src/hooks/useKeymap.ts (not named in the authorized file list). Reported honestly as FAIL with the specific unreachable-within-scope reasoning, per instructions, rather than claiming the memo fix helped when measurement shows it did not.",
+  "cross_stage_summary": {
+    "stage1_baseline_no_fix":        "296.7ms/step, 93.33% drop, ~3.4fps  — FAIL",
+    "stage2_viewport_windowing_fix": "96.4ms/step,  76.67% drop, ~10.4fps — FAIL (improved 3.08x)",
+    "stage3_chrome_memoization":     "94.3ms/step,  76.67% drop, ~10.6fps — FAIL (no measurable further improvement; root cause is out-of-scope)",
+    "ink_architectural_ceiling":     "32ms/frame (~31.25fps) — the theoretical best case for ANY Ink app, never reachable to 60fps regardless of app-level fixes",
+    "real_bottleneck":               "Keypress coalescing in node_modules/ink's parseKeypress (single data-event assumption), not React render cost at any stage measured."
+  },
+  "artifacts": {
+    "fix_files_stage3": [
+      "apps/tui/src/components/TitleBar.tsx",
+      "apps/tui/src/components/TabBar.tsx",
+      "apps/tui/src/components/StatusLine.tsx",
+      "apps/tui/src/components/Panel.tsx (comment-only, no functional change — documented why memo was NOT applied)"
+    ],
+    "stage1_original_fail_preserved_unmodified": [
+      "evidence/phase-7/perf/P7.1-RESULT.json",
+      "evidence/phase-7/perf/P7.1-VERDICT.md"
+    ],
+    "stage2_recheck_preserved_unmodified": [
+      "evidence/phase-7/perf/P7.1-RECHECK.json",
+      "evidence/phase-7/perf/P7.1-RECHECK-VERDICT.md"
+    ],
+    "stage3_this_recheck": [
+      "evidence/phase-7/perf/P7.1-RECHECK2.json",
+      "evidence/phase-7/perf/P7.1-RECHECK2-VERDICT.md"
+    ]
+  }
+}

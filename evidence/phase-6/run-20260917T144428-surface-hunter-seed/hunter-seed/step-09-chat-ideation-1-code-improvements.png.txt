@@ -1,0 +1,26 @@
+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ hunter-seed /Users/nick/dev/hunter-seed │ ⑂ main                                                                                                       ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ IDEATION · 6 types                                                                                                                                                                               │ │
+│ │ [q] Q&A  [1-6] ideation types  · index absent /Users/nick/dev/hunter-seed/.auto-claude/project_index.json                                                                                        │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ 1 Code Improvements 2 UI/UX 3 Docs Gaps 4 Security 5 Performance 6 Code Quality                                                                                                                  │ │
+│ │ · Disambiguate novelty-check file matching beyond basename                                                                                                                                       │ │
+│ │   harness/novelty.py matches the crashing file against the upstream clone by basename only, and the co                                                                                           │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Extend dedup signature with ASAN operation and emit machine-readable output                                                                                                                    │ │
+│ │   dedup.py's _signature uses (crash_type, top_frame) but crash_reason() already extracts an operation                                                                                            │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Cache and resume recon focus areas per target                                                                                                                                                  │ │
+│ │   The recon stage (harness/recon.py + _cmd_recon) re-runs an agent every invocation even for an unchan                                                                                           │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Persist re-attack crashes from patch grading as CrashArtifacts                                                                                                                                 │ │
+│ │   In patch_grade.py, when the re-attack tier finds a crash, only a pass/fail verdict surfaces — the ne                                                                                           │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Unify harness and dnr_harness signal handling, checkpointing, and result writing                                                                                                               │ │
+│ │   dnr_harness/cli.py reimplements _on_signal, _write_result, checkpointed _run_all, and batch status l                                                                                           │ │
+│ └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ CHAT  a ask · q qa mode · i ideate · x stop · 1-6 ideation type                                                                                                                         : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

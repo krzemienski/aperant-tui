@@ -1,0 +1,135 @@
+{
+  "spec_id": "999-subagent-proof-live-drive",
+  "task": "Subagent proof live drive: one budgeted live Claude Agent SDK session, driven as an end user in a real PTY, that finally proves proofpunk-agent's agent tree renders real spawned subagents end-to-end (SDK stream -> AGENT_SPAWNED event -> tree reducer -> Session Screen 1 rail).",
+  "gathered_by": "orchestrator (spec_gatherer subagent unavailable: 'Invalid JSON response' on every spawn; requirements derived from direct repository inspection)",
+  "sources_inspected": [
+    "task_metadata.json (roadmap-sourced, category feature)",
+    "proofpunk_agent/bridge/sdk.py (attribution docstring, _SPAWN_TOOL_NAMES, AGENT_SPAWNED derivation)",
+    "proofpunk_agent/state/reducers/tree.py (attach rule, NodeState, active_count/max_depth)",
+    "proofpunk_agent/state/events.py (EventLog in-memory only; no disk export exists)",
+    "proofpunk_agent/screens/session.py (glyph table, agent_tree_lines(), Depth:/Active: summary, (unattributed) label)",
+    "validation/e2e/screen23_live.py (live-drive conventions: one session, $15 ceiling, prompt engineering, F12 capture rename, max_turns shim)",
+    "validation/e2e/pty_backend.py (real-PTY contract, no pytest/mocks doctrine)",
+    "e2e-evidence/run-20260909T013926-p6-screens-2-3/ (step-NN layout, verdict files)",
+    "e2e-evidence/run-20260909T000144-p5-screen1/step-14-single-tree-drive-fixed.py (prior OFFLINE tree proof; render() not .renderable)"
+  ],
+  "functional_requirements": [
+    {
+      "id": "FR-01",
+      "requirement": "Single live session: the drive boots python3 -m proofpunk_agent with the plugin loaded, in one real PTY sized >= 100x28 (120x34 preferred), passing the spawn-inducing prompt as the positional PROMPT argument and a hard USD ceiling via --max-budget.",
+      "acceptance_criteria": [
+        "Exactly one live SDK session is paid for in the run",
+        "Budget ceiling recorded in the driver argv and echoed in the evidence log",
+        "Boot confirmed by waiting for the app's boot marker before sending keys"
+      ]
+    },
+    {
+      "id": "FR-02",
+      "requirement": "Spawn-inducing prompt: the PROMPT explicitly instructs the model to delegate work to subagent(s) via the built-in spawning tool, names the spawn tool candidates the bridge recognizes, and bounds the work so the turn terminates.",
+      "acceptance_criteria": [
+        "Prompt text archived verbatim in the run dir",
+        "Prompt requests at least one subagent delegation and one nested (subagent-of-subagent) delegation as a stretch ask",
+        "Prompt tells the model to stop after the delegated work returns"
+      ]
+    },
+    {
+      "id": "FR-03",
+      "requirement": "Primary assertion (PASS-critical Arm A): a captured Session Screen 1 frame shows the AGENT TREE pane with at least one non-root glyph row indented under the orchestrator, and a 'Depth: N' line with N >= 1.",
+      "acceptance_criteria": [
+        "At least one captured frame (text scrape and/or F12 SVG) contains a glyph row at indentation depth 1 whose label is not 'orchestrator'",
+        "The same frame (or a frame from the same turn) shows 'Depth: ' with value >= 1",
+        "'Active:' count line present; observed value recorded verbatim"
+      ]
+    },
+    {
+      "id": "FR-04",
+      "requirement": "Cross-screen corroboration: a captured Screen 2 (tools/ledger) frame shows a tool row whose name is a bridge-recognized spawn tool ('Agent' or 'Task').",
+      "acceptance_criteria": [
+        "Captured Screen 2 frame contains 'Agent' or 'Task' as an observed tool name",
+        "The observed spawn-tool name distribution is recorded verbatim (never assumed)"
+      ]
+    },
+    {
+      "id": "FR-05",
+      "requirement": "Observation instrument (optional but preferred): a PYTHONPATH sitecustomize shim exports the driven app's in-memory EventLog to a JSON file at shutdown, WITHOUT altering ClaudeAgentOptions, event contents, or any product file. If used, the dump becomes the disk corroboration artifact.",
+      "acceptance_criteria": [
+        "Shim touches no product file and changes no SDK option or Event payload",
+        "Dump file archived in the run dir; contains at least one AGENT_SPAWNED event with subject set",
+        "Offline fold of the dumped log through reduce_tree reproduces the same max_depth and node count as the live frame claimed"
+      ]
+    },
+    {
+      "id": "FR-06",
+      "requirement": "Nested-tree stretch arm (separate verdict, Arm B): if the model nests a subagent inside a subagent, a captured frame shows a glyph row at indentation depth >= 2 and 'Depth: N' with N >= 2; parentage comes only from the SDK-provided linkage, never driver inference.",
+      "acceptance_criteria": [
+        "Depth-2 row observed in a captured frame, OR Arm B recorded as NOT-OBSERVED with the raw tree-frame sequence attached",
+        "No driver-side parent inference from timing, names, or log proximity"
+      ]
+    },
+    {
+      "id": "FR-07",
+      "requirement": "Attribution honesty arm (record-only, Arm C): the run records the attribution tier distribution observed for tree-attached nodes, including any '(unattributed)' labeled rows, exactly as rendered.",
+      "acceptance_criteria": [
+        "Verdict reports counts of tier-3 (parent_tool_use_id) links vs '(unattributed)' fallback rows",
+        "No attempt to hide, relabel, or repair unattributed rows during the run"
+      ]
+    },
+    {
+      "id": "FR-08",
+      "requirement": "Permission-gate handling: if the spawn or nested tool calls raise the PERMISSION REQUEST modal, the driver answers it (allow/deny keys) and records each modal appearance and the key sent.",
+      "acceptance_criteria": [
+        "Modal watch loop polls for the literal 'PERMISSION REQUEST' title",
+        "Every modal appearance + driver response + resulting tree glyph transition (if visible) logged"
+      ]
+    },
+    {
+      "id": "FR-09",
+      "requirement": "Evidence archive: everything lands under e2e-evidence/run-<YYYYMMDDTHHMMSSZ>-999-subagent-proof-live-drive/ following the step-NN-<slug> convention: preflight check, driver source, per-step .log files, all frames/SVGs (+PNG conversions where rsvg-convert available), the EventLog dump if FR-05 used, and a final verdict markdown.",
+      "acceptance_criteria": [
+        "Run dir name carries the UTC timestamp and the slug",
+        "Verdict file gives PASS/FAIL/NOT-OBSERVED/ABANDONED per arm with the frame excerpts that justify each",
+        "No pytest, no mocks, stubs, or fakes anywhere in citable artifacts"
+      ]
+    },
+    {
+      "id": "FR-10",
+      "requirement": "Abandon and defect criteria are explicit: budget exhausted with zero spawns observed -> verdict ABANDONED (with raw tool-name distribution); CLI unreachable or plugin root rejected at preflight -> verdict BLOCKED; any product defect exposed (wrong glyph, missing pane, crash) -> a finding .md in the run dir, and remediation happens as a follow-up step-NN, never silently.",
+      "acceptance_criteria": [
+        "Driver stops spending at the ceiling and writes ABANDONED verdict with what WAS observed",
+        "Defects documented as findings before any fix is attempted; fixes re-driven only within remaining budget or a new run dir"
+      ]
+    }
+  ],
+  "non_functional_requirements": [
+    {
+      "id": "NFR-01",
+      "requirement": "Honesty doctrine: every number in the verdict (depth, active count, cost, tier distribution) is read off a captured frame or the event dump; nothing is estimated or invented.",
+      "acceptance_criteria": ["Each verdict claim cites the artifact it came from"]
+    },
+    {
+      "id": "NFR-02",
+      "requirement": "Terminal floor respected: PTY never sized below 100x28; resize behavior is out of scope for this run.",
+      "acceptance_criteria": ["Driver asserts PTY dimensions >= 100x28 at boot"]
+    },
+    {
+      "id": "NFR-03",
+      "requirement": "Cost ceiling: total live spend bounded by the --max-budget value ($15 default, matching the screen23_live precedent).",
+      "acceptance_criteria": ["--max-budget present in argv; spend figure recorded in verdict if the app exposes it"]
+    }
+  ],
+  "out_of_scope": [
+    "Offline-only tree rendering proof (already delivered by run-20260909T000144-p5-screen1 step-14)",
+    "Product changes to _SPAWN_TOOL_NAMES, the tree reducer, or the session screen unless the live drive exposes a defect",
+    "Interactive collapse/expand of tree nodes",
+    "Resize/fuzz testing",
+    "Headless/CI mode",
+    "Multi-session fan-out (one session only)"
+  ],
+  "open_questions": [
+    "Q1: Will the model reliably call the spawn tool from a plain instruction? Mitigated by explicit prompt naming the tool and by ABANDONED verdict path.",
+    "Q2: Which spawn-tool name does this host emit ('Agent' vs 'Task')? Recorded, never assumed (historical defect root cause).",
+    "Q3: Do spawn tool calls trigger the permission modal on this host? Recorded via FR-08 loop.",
+    "Q4: Is depth-2 nesting achievable within budget? Treated as Arm B NOT-OBSERVED fallback.",
+    "Q5: Does the EventLog shutdown dump (FR-05 shim) capture cleanly on app exit paths? Pre-checked in preflight step against the quit path."
+  ]
+}

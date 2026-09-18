@@ -1,0 +1,26 @@
+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ hunter-seed /Users/nick/dev/hunter-seed │ ⑂ main                                                                                                       ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ IDEATION · 6 types                                                                                                                                                                               │ │
+│ │ [q] Q&A  [1-6] ideation types  · index absent /Users/nick/dev/hunter-seed/.auto-claude/project_index.json                                                                                        │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ 1 Code Improvements 2 UI/UX 3 Docs Gaps 4 Security 5 Performance 6 Code Quality                                                                                                                  │ │
+│ │ · Run docker build/rm/run off the event loop (async subprocess or to_thread)                                                                                                                     │ │
+│ │   docker_ops.build(), run(), and read_file() use blocking subprocess.run(). They are called from async                                                                                           │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Cache manifest in streaming judge context instead of re-reading report.json files under the lock                                                                                               │ │
+│ │   _stream_dispatch holds ctx["lock"] while run_judge runs an entire LLM agent session (minutes), and b                                                                                           │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Drain run_agent stderr concurrently to prevent pipe-backpressure stalls                                                                                                                        │ │
+│ │   run_agent spawns the CLI with stderr=asyncio.subprocess.PIPE but never reads proc.stderr until the s                                                                                           │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Skip docker build when the image already matches target context (content-hash cache key)                                                                                                       │ │
+│ │   docker_ops.build() unconditionally runs `docker build` on every _cmd_run invocation. For iterative s                                                                                           │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Parse ASAN reason once per crash in dedup (currently parsed twice)                                                                                                                             │ │
+│ │   dedup() computes `reason = crash.get("reason") or crash_reason(...)` and then calls _signature(crash                                                                                           │ │
+│ └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ CHAT  a ask · q qa mode · i ideate · x stop · 1-6 ideation type                                                                                                                         : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

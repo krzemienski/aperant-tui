@@ -1,0 +1,10 @@
+{
+  "gate": "P5.new-diffpane",
+  "real_diff_verified_via": "git diff HEAD in divergent worktree",
+  "expected_diffstat": "1 file changed, 15 insertions(+)",
+  "ui_diffstat_shown": "1 file changed, 15 insertions(+)",
+  "match": true,
+  "scroll_j_worked": true,
+  "scroll_pagedown_worked": true,
+  "verdict": "PASS"
+}

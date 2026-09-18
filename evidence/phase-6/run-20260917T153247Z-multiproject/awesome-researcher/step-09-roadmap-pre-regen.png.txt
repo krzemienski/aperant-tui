@@ -1,0 +1,23 @@
+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ awesome-researcher /Users/nick/awesome-researcher │ ⑂ feat/awesome-researcher                                                                          ◉ 0 running  ◆ 1 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃ PHASES                                                                 ┃│ DETAIL                                                                                                                 │ │
+│ ┃ ❯ ○ PHASE phase-1 Core Discovery Engine                                ┃│ Core Discovery Engine                                                                                                  │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/6 features                                      ┃│  ⇒ Awesome list parsing and category extraction [planned · Must Have]                                                  │ │
+│ ┃                                                                        ┃│    spec 004-awesome-list-parsing-and-category-extraction                                                               │ │
+│ ┃   ○ PHASE phase-2 Operational Hardening & Budgets                      ┃│  · LLM-based list context analysis [planned · Must Have]                                                               │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/3 features                                      ┃│    c → convert to task spec                                                                                            │ │
+│ ┃                                                                        ┃│  · Progressive WebSearch discovery with reflective query refinement [planned · Must Have]                              │ │
+│ ┃   ○ PHASE phase-3 UX & Measurement                                     ┃│    c → convert to task spec                                                                                            │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/2 features                                      ┃│  · Deduplication pipeline (SimHash near-dupes + canonical URL/content hash) [planned · Must Have]                      │ │
+│ ┃                                                                        ┃│    c → convert to task spec                                                                                            │ │
+│ ┃   ○ PHASE phase-4 Scale & Integrations                                 ┃│  · Quality scoring and live-web validation [planned · Must Have]                                                       │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/2 features                                      ┃│    c → convert to task spec                                                                                            │ │
+│ ┃                                                                        ┃│  · Updated Markdown rendering and run artifacts [planned · Must Have]                                                  │ │
+│ ┃                                                                        ┃│    c → convert to task spec                                                                                            │ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛└────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│  g generate · G refresh · j/k phase · c convert→spec                                                                                                                                                 │
+│ ROAD  g generate (G force regen) · x stop · j/k phase · c convert→spec                                                                                                                  : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

@@ -1,0 +1,15 @@
+{
+  "project_root": "/Users/nick/proofpunk-agent",
+  "project_type": "single",
+  "services": {
+    "main": {
+      "name": "main",
+      "path": "/Users/nick/proofpunk-agent",
+      "language": "Python",
+      "type": "backend",
+      "package_manager": "pip"
+    }
+  },
+  "infrastructure": {},
+  "conventions": {}
+}

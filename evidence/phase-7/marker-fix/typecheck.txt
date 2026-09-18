@@ -1,0 +1,12 @@
+
+> aperant-tui-workspace@0.1.0 typecheck
+> npm run typecheck -w @aperant/tui
+
+
+> @aperant/tui@0.1.0 typecheck
+> tsc --noEmit
+
+
+--- STDERR ---
+
+EXIT_CODE=0

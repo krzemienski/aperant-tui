@@ -1,0 +1,12 @@
+{
+  "gate": "P5.new-merge-real",
+  "action": "select feature/divergent worktree, press m",
+  "git_log_verification": {
+    "command": "git log --oneline --all --graph",
+    "output": "*   1be7685 Merge branch 'feature/divergent'\n|\\  \n| * 6bef1b7 feature: add new_feature() and change hello() message\n* | 9cc27c7 Add .gitignore for .auto-claude scratch dir\n|/  \n* 2c357e9 Initial commit: README + app.py",
+    "merge_commit_sha": "1be7685f8969bca5808749c76aad51d30efb64cd",
+    "merge_commit_message": "Merge branch 'feature/divergent'",
+    "files_changed": "app.py | 2 +-, feature.py | 2 ++"
+  },
+  "verdict": "PASS -- verified by git log, exactly as the gate's own wording requires"
+}

@@ -1,0 +1,30 @@
+{
+  "gate": "P7.4-term-compatibility",
+  "test_1_xterm_256color": {
+    "term_value": "xterm-256color",
+    "boot_confirmed": true,
+    "layout_coherent": true,
+    "box_drawing_intact": true,
+    "tabs_tested": [
+      "board (boot)",
+      "road"
+    ],
+    "expected_color_tier": "'256' (matches /256color/ regex in detectColorTier)",
+    "verdict": "PASS"
+  },
+  "test_2_xterm_basic": {
+    "term_value": "xterm",
+    "boot_confirmed": true,
+    "layout_coherent": true,
+    "box_drawing_intact": true,
+    "tabs_tested": [
+      "board (boot)",
+      "road"
+    ],
+    "expected_color_tier": "'16' (no /256color/ match, not in kitty/wezterm/alacritty/ghostty/foot list -> falls back to ANSI-16 per truecolor.ts:14)",
+    "verdict": "PASS"
+  },
+  "degraded_color_acceptable": true,
+  "corruption_observed": false,
+  "verdict": "PASS -- both TERM values render coherently, layout and box-drawing intact in both cases; degraded color tier for basic 'xterm' is expected and correct behavior per the app's own tier-detection design, not corruption."
+}

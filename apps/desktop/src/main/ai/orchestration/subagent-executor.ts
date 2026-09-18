@@ -3,17 +3,44 @@
  * ================
  *
  * Implements the SubagentExecutor interface from spawn-subagent.ts.
- * Runs nested generateText() sessions for specialist subagents.
+ * Runs nested streamText() sessions for specialist subagents.
  *
  * Key design decisions:
- * - Uses generateText() (not streamText()) because subagent output goes back to
- *   the orchestrator's context, not to the UI stream.
+ * - [APERANT-PATCH subagent-executor-stream] (2026-09-18): uses `streamText()`
+ *   + `fullStream` consumption instead of upstream's `generateText()`. See
+ *   `SubagentExecutorImpl.spawn()` below for the full mechanism and evidence.
+ *   This is the same F-16 defect class already fixed once in this codebase
+ *   (`merge-resolver.ts`, `merge-resolver-stream`, 2026-09-17): the
+ *   operator's Anthropic-compatible router always frames HTTP responses as
+ *   SSE — `Content-Type: text/event-stream`, body terminated by the literal
+ *   14-byte `data: [DONE]\n\n` — even for requests that never set
+ *   `stream: true`. `generateText()`'s non-streaming `doGenerate()` requires
+ *   the ENTIRE body to parse as one JSON document
+ *   (`@ai-sdk/provider-utils/src/response-handler.ts:createJsonResponseHandler`
+ *   → `safeParseJSON`) and rejects the whole response over those trailing
+ *   bytes with `APICallError({ message: 'Invalid JSON response' })`.
+ *   `doStream()`'s SSE parser expects and discards that terminator
+ *   normally. Confirmed live: every `SpawnSubagent` call in
+ *   `evidence/phase-7/subagent-proof/` failed identically with this exact
+ *   message (4/4 attempts, both `complexity_assessor` and `spec_gatherer`)
+ *   before this fix. Additive to the vendored contract: `SubagentExecutor`,
+ *   `SubagentSpawnParams`, `SubagentResult` (all from `spawn-subagent.ts`)
+ *   and `SubagentExecutorConfig` are unchanged; only the internal SDK call
+ *   primitive and result-extraction mechanism differ. Structured output
+ *   (`Output.object({ schema })`) is preserved exactly: this exact AI SDK
+ *   build (`ai@^7.0.62`, confirmed by reading `node_modules/ai/dist/index.d.ts`)
+ *   exposes `StreamTextResult.output: PromiseLike<InferCompleteOutput<OUTPUT>>`
+ *   and `StreamTextResult.steps: PromiseLike<Array<StepResult>>` — the same
+ *   `output`-config shape and the same parsed-object contract `generateText()`
+ *   uses, just promise-wrapped because the stream must finish first. No
+ *   behavior degradation: subagents using `expectStructuredOutput` still get
+ *   a schema-parsed `structuredOutput` object, not raw text.
  * - Subagents get their own tool set from AGENT_CONFIGS (excluding SpawnSubagent).
  * - Inherits allowedWritePaths from parent context for write containment.
  * - Step budget is capped at SUBAGENT_MAX_STEPS (default 100).
  */
 
-import { generateText, Output, stepCountIs } from 'ai';
+import { streamText, Output, stepCountIs } from 'ai';
 import type { LanguageModel, Tool as AITool } from 'ai';
 import type { ZodSchema } from 'zod';
 
@@ -96,8 +123,15 @@ export interface SubagentExecutorConfig {
   loadPrompt: (promptName: string) => Promise<string>;
   /** Abort signal from the parent orchestrator */
   abortSignal?: AbortSignal;
-  /** Optional callback for subagent stream events */
-  onSubagentEvent?: (agentType: string, event: string) => void;
+  /** Optional callback for subagent stream events.
+   * [APERANT-PATCH agentic-orchestration-optin] (2026-09-17): `subagentId`
+   * added as a third param so callers (worker.ts) can emit a stable,
+   * per-spawn identity for graph-node construction downstream (spec
+   * P3.5.11). Additive: existing 2-arg callback shapes still satisfy this
+   * type as long as they ignore the extra arg — no existing caller reads
+   * a 3rd param, so nothing breaks; the only real caller (worker.ts) is
+   * updated in this same patch. */
+  onSubagentEvent?: (agentType: string, event: string, subagentId: string) => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -105,7 +139,7 @@ export interface SubagentExecutorConfig {
 // ---------------------------------------------------------------------------
 
 /**
- * SubagentExecutorImpl — runs nested generateText() sessions for specialist subagents.
+ * SubagentExecutorImpl — runs nested streamText() sessions for specialist subagents.
  */
 export class SubagentExecutorImpl implements SubagentExecutor {
   private readonly config: SubagentExecutorConfig;
@@ -118,8 +152,13 @@ export class SubagentExecutorImpl implements SubagentExecutor {
     const startTime = Date.now();
     const agentType = resolveAgentType(params.agentType);
     const promptName = resolvePromptName(params.agentType);
+    // [APERANT-PATCH agentic-orchestration-optin] (2026-09-17): stable id
+    // for this spawn, distinct across concurrent/sequential spawns of the
+    // same agentType (startTime has ms resolution; a Math.random suffix
+    // avoids collision on same-tick spawns from parallel tool calls).
+    const subagentId = `${params.agentType}-${startTime}-${Math.random().toString(36).slice(2, 8)}`;
 
-    this.config.onSubagentEvent?.(params.agentType, 'spawning');
+    this.config.onSubagentEvent?.(params.agentType, 'spawning', subagentId);
 
     try {
       // 1. Load system prompt for the subagent
@@ -152,40 +191,105 @@ export class SubagentExecutorImpl implements SubagentExecutor {
         ? STRUCTURED_OUTPUT_AGENTS[params.agentType]
         : undefined;
 
-      // 5. Run generateText() with the subagent configuration
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- generateText overloads don't resolve with conditional output spread
-      const generateOptions: any = {
-        model: this.config.model,
-        system: systemPrompt,
-        messages: [{ role: 'user' as const, content: userMessage }],
-        tools,
-        stopWhen: stepCountIs(SUBAGENT_MAX_STEPS),
-        abortSignal: this.config.abortSignal,
-        ...(outputSchema
-          ? { output: Output.object({ schema: outputSchema }) }
-          : {}),
-      };
+      // 5. Run streamText() with the subagent configuration.
+      // [APERANT-PATCH subagent-executor-stream] (2026-09-18): streamText(),
+      // not generateText() — see the file header for the full F-16-class
+      // evidence. `output`/`stopWhen`/`tools`/`abortSignal` are the exact
+      // same config generateText() took; only the call primitive and
+      // result-extraction differ.
+      // Branched (not conditionally spread) into two static call shapes so
+      // `streamText()`'s overloaded, generic `OUTPUT` type parameter
+      // resolves correctly without an `any`-typed options object — each
+      // branch's literal has a shape TypeScript can infer directly.
+      const messages = [{ role: 'user' as const, content: userMessage }];
+      const result = outputSchema
+        ? streamText({
+            model: this.config.model,
+            system: systemPrompt,
+            messages,
+            tools,
+            stopWhen: stepCountIs(SUBAGENT_MAX_STEPS),
+            abortSignal: this.config.abortSignal,
+            output: Output.object({ schema: outputSchema }),
+          })
+        : streamText({
+            model: this.config.model,
+            system: systemPrompt,
+            messages,
+            tools,
+            stopWhen: stepCountIs(SUBAGENT_MAX_STEPS),
+            abortSignal: this.config.abortSignal,
+          });
 
-      const result = await generateText(generateOptions);
+      // 6. Consume the stream fully before reading any result accessor.
+      // Every `StreamTextResult` accessor below (`.text`, `.steps`,
+      // `.output`) is itself a `PromiseLike` that internally awaits stream
+      // completion, but we drive `fullStream` explicitly (same pattern as
+      // `merge-resolver.ts`) so a transport-level `error` part — the exact
+      // failure mode this migration fixes — is caught HERE, before it can
+      // surface as a rejected promise from `.output`/`.steps` and be
+      // mistaken for a structured-output-schema failure.
+      let accumulatedText = '';
+      let streamError: string | undefined;
+      for await (const part of result.fullStream) {
+        if (part.type === 'text-delta') {
+          accumulatedText += part.text;
+        } else if (part.type === 'error') {
+          streamError = part.error instanceof Error ? part.error.message : String(part.error);
+        }
+      }
 
-      this.config.onSubagentEvent?.(params.agentType, 'completed');
+      if (streamError) {
+        // Event ordering: the stream itself failed — this is the 'failed'
+        // branch, fired only now that the stream has genuinely finished
+        // (not immediately after the streamText() call returns, which
+        // happens synchronously before any network I/O occurs). Getting
+        // this wrong would let the graph render 'completed' for a subagent
+        // whose stream actually errored.
+        this.config.onSubagentEvent?.(params.agentType, 'failed', subagentId);
+        return {
+          error: streamError,
+          stepsExecuted: 0,
+          durationMs: Date.now() - startTime,
+        };
+      }
 
-      // 6. Extract results
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- result.output type varies with OUTPUT generic
-      const resultAny = result as any;
-      const structuredOutput =
-        outputSchema && resultAny.output != null
-          ? (resultAny.output as Record<string, unknown>)
-          : undefined;
+      // 7. Extract results. `fullStream` has fully drained above, so these
+      // PromiseLike accessors resolve immediately from already-populated
+      // internal state — no additional network round-trip.
+      let structuredOutput: Record<string, unknown> | undefined;
+      if (outputSchema && 'output' in result) {
+        try {
+          const parsedOutput: unknown = await result.output;
+          if (parsedOutput != null) structuredOutput = parsedOutput as Record<string, unknown>;
+        } catch (outputError) {
+          // Structured output was requested but the model's final text
+          // didn't parse against the schema (e.g. NoOutputGeneratedError).
+          // This is a genuine subagent failure, not a transport error —
+          // reported distinctly so it isn't conflated with the SSE/JSON
+          // transport defect this migration fixes.
+          this.config.onSubagentEvent?.(params.agentType, 'failed', subagentId);
+          const message = outputError instanceof Error ? outputError.message : String(outputError);
+          return {
+            error: `Structured output parse failed: ${message}`,
+            stepsExecuted: 0,
+            durationMs: Date.now() - startTime,
+          };
+        }
+      }
+
+      const steps = await result.steps;
+
+      this.config.onSubagentEvent?.(params.agentType, 'completed', subagentId);
 
       return {
-        text: result.text || undefined,
+        text: accumulatedText || undefined,
         structuredOutput,
-        stepsExecuted: result.steps?.length ?? 1,
+        stepsExecuted: steps?.length ?? 1,
         durationMs: Date.now() - startTime,
       };
     } catch (error) {
-      this.config.onSubagentEvent?.(params.agentType, 'failed');
+      this.config.onSubagentEvent?.(params.agentType, 'failed', subagentId);
       const message = error instanceof Error ? error.message : String(error);
       return {
         error: message,

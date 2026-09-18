@@ -1,0 +1,41 @@
+{
+  "defect": "CTX%/token-total display inflation in the swarm/waits observability views (secondary, distinct from the original CODING_FAILED root cause)",
+  "status": "ROOT-CAUSED, FIXED, AND END-TO-END VERIFIED",
+  "root_cause_confirmed": true,
+  "file": "apps/desktop/src/main/ai/session/stream-handler.ts",
+  "function": "handleFinishStep (the finish-step handler inside createStreamHandler)",
+  "root_cause": "`state.cumulativeUsage.promptTokens += promptTokens` (line 265, pre-fix) treated `promptTokens` from each AI SDK finish-step event as a per-step DELTA and summed it across every step. In real chat-completion API semantics, `promptTokens` at each step IS the whole conversation-so-far sent to the model that turn (it already grows monotonically as the conversation lengthens) -- it is not incremental. Summing an already-cumulative quantity across N steps produces roughly O(N^2) growth relative to the real context size, which is exactly the runaway CTX% (99% -> 117% -> 162% -> 1088%, Sigma tokens 2206.6k) observed live on the awesome-researcher re-drive.",
+  "why_the_abort_guard_was_unaffected": "session/runner.ts's context-window abort guard (lines 401-403, 499-506) reads `event.usage.promptTokens` from the per-step `step-finish` StreamEvent, which is `stepUsage` in stream-handler.ts (the correct, non-accumulated per-step value) -- NOT `state.cumulativeUsage`. This is why real coding work (6+ commits) proceeded correctly even while the UI displayed an absurd CTX% -- the actual session-level safety guard was reading the right number the whole time; only the swarm/waits DISPLAY was wrong.",
+  "fix_applied": "Changed `state.cumulativeUsage.promptTokens` and `.cacheReadTokens`/`.cacheCreationTokens` from `+=` accumulation to plain assignment (latest value wins), since these ARE already-cumulative-per-session quantities from the SDK's own usage object. `completionTokens` correctly remains `+=` accumulated (it genuinely is a per-step delta -- each step generates new completion tokens on top of prior ones). `totalTokens` is now derived as `promptTokens + completionTokens` post-fix instead of also being independently summed.",
+  "unit_proof": {
+    "method": "real code path via npx tsx calling the actual createStreamHandler/processPart, not a mock",
+    "test": "simulated a 3-step session with realistic growing prompt sizes (10k, 45k, 90k)",
+    "before_fix_would_show": "finalPromptTokens: 145000 (10000+45000+90000, wrong sum)",
+    "after_fix_shows": "finalPromptTokens: 90000 (the correct latest real prompt size)"
+  },
+  "worker_bundle_rebuilt": true,
+  "worker_bundle_rebuild_verified": "byte-searched the rebuilt apps/tui/dist/agent-worker.cjs and confirmed the assignment form (not +=) is present before driving anything -- learned from the earlier stale-bundle mistake on the primary models.ts fix",
+  "end_to_end_verification": {
+    "performed": true,
+    "method": "re-drove a real multi-step agentic session on awesome-researcher task 005-human-in-the-loop-candidate-review-with-selective- (resuming remaining subtasks) through the real TUI against the live router, with the rebuilt worker bundle",
+    "real_work_product_from_the_verification_run": "subtask-4-1 completed (commit f13b3a1: offline end-to-end review tests) -- the task is now 10/11 subtasks complete",
+    "before_fix_reference": {"ctx_pct": 1088.2, "sigma_tokens_k": 2206.6, "growth_pattern": "exponential/quadratic"},
+    "after_fix_observed": {
+      "readings": [
+        {"ctx_pct": 16, "sigma_tokens_k": 32.6, "step": "5/100"},
+        {"ctx_pct": 20, "sigma_tokens_k": 44.7, "step": "12/1000"},
+        {"ctx_pct": 22, "sigma_tokens_k": 50.2, "prompt_k": 43.8, "compl_k": 6.4},
+        {"ctx_pct": 24, "sigma_tokens_k": 58.6, "prompt_k": 48.2, "compl_k": 10.4}
+      ],
+      "growth_pattern": "linear/sane, matching raw event-log promptTokens samples (41913 -> 43315 -> 43826 -> 43904 -> 44574) which climb by small, realistic increments rather than exploding",
+      "artifact": "CTX-INFLATION-FIX-VERIFIED.json (full detail, screenshots with sha256s)"
+    },
+    "screenshots": [
+      "awesome-researcher/step-23-ctx-fix-verify-early.png",
+      "awesome-researcher/step-24-ctx-fix-verify-growing-sane.png",
+      "awesome-researcher/step-25-tokens-fix-verify-sane.png",
+      "awesome-researcher/step-26-ctx-fix-verify-final-sane.png"
+    ]
+  },
+  "residual_smaller_finding_not_in_scope": "The displayed CTX% (16-24%) still divides by 200000 rather than GLM-5's real 128000, because the swarm/tokens panel's contextWindowLimit (observability.ts:253, getModelContextWindow(meta?.model ?? 'default')) resolves against task metadata's model shorthand, not the resolved router-prefixed id the session guard uses. This is a DIFFERENT call site than the one fixed for the primary CODING_FAILED defect, and was NOT corrected in this pass -- flagged honestly as a further finding, not folded into this fix's verified claim. The CRITICAL bug (quadratic accumulation) is conclusively resolved regardless of this residual denominator mismatch."
+}

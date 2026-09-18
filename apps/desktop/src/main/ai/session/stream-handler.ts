@@ -261,12 +261,26 @@ export function createStreamHandler(onEvent: SessionEventCallback) {
     const cacheCreate = u?.inputTokenDetails?.cacheWriteTokens ?? u?.cacheCreationTokens;
     const thinking = u?.outputTokenDetails?.reasoningTokens;
 
-    // Accumulate usage
-    state.cumulativeUsage.promptTokens += promptTokens;
+    // [APERANT-PATCH token-accounting-fix]: `promptTokens` at each finish-step is the whole conversation-so-far sent
+    // to the model on that turn (standard chat-completion usage semantics),
+    // NOT a per-step delta. It must be tracked as the LATEST value, not
+    // accumulated — `+=` here double/triple/N-counts the growing prompt on
+    // every step of a multi-step agentic session. `completionTokens` (and
+    // `totalTokens`, which sums the two) genuinely IS a per-step delta (each
+    // step generates new completion tokens on top of prior ones) and
+    // correctly accumulates. Verified against a live run: the observability
+    // swarm view showed CTX 1088% (Sigma tokens 2206.6k) on a session whose
+    // real prompt size, per `step-finish`'s own per-step usage, never
+    // exceeded 5-figure token counts — the inflated total was this
+    // mis-accumulation, not real context pressure. The session-level context
+    // window abort guard (session/runner.ts:401-403, 499-506) was unaffected
+    // because it reads `event.usage.promptTokens` from the per-step
+    // `step-finish` event (`stepUsage` below), not `state.cumulativeUsage`.
+    state.cumulativeUsage.promptTokens = promptTokens;
     state.cumulativeUsage.completionTokens += completionTokens;
-    state.cumulativeUsage.totalTokens += totalTokens;
-    if (cacheRead) state.cumulativeUsage.cacheReadTokens = (state.cumulativeUsage.cacheReadTokens ?? 0) + cacheRead;
-    if (cacheCreate) state.cumulativeUsage.cacheCreationTokens = (state.cumulativeUsage.cacheCreationTokens ?? 0) + cacheCreate;
+    state.cumulativeUsage.totalTokens = state.cumulativeUsage.promptTokens + state.cumulativeUsage.completionTokens;
+    if (cacheRead) state.cumulativeUsage.cacheReadTokens = cacheRead;
+    if (cacheCreate) state.cumulativeUsage.cacheCreationTokens = cacheCreate;
     if (thinking) state.cumulativeUsage.thinkingTokens = (state.cumulativeUsage.thinkingTokens ?? 0) + thinking;
 
     const stepUsage: TokenUsage = {

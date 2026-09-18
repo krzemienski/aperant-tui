@@ -1,0 +1,119 @@
+{
+  "criterion": "P7.1 — 200-task board scrolls at >=60fps",
+  "source": "docs/plan/ROADMAP.md:16",
+  "prior_status": "PENDING (docs/plan/ACCEPTANCE-INVENTORY.md:260)",
+  "generated_at": "2026-09-17T00:00:00Z",
+  "harness": {
+    "driver": "tools/tuistory_drive.py (tuistory 0.11.0)",
+    "app_entry": "npx tsx src/cli.tsx <project> (apps/tui/src/cli.tsx)",
+    "terminal_size": { "cols": 200, "rows": 50 }
+  },
+  "fixture": {
+    "builder_script": "tools/build-fixture-200.py",
+    "path": "/tmp/ap-perf-200",
+    "specs_dir": "/tmp/ap-perf-200/.auto-claude/specs",
+    "task_count_on_disk": 200,
+    "task_count_rendered_by_board": 200,
+    "board_column_breakdown_observed": {
+      "BACKLOG": 23,
+      "QUEUE": 15,
+      "BUILDING (in_progress)": 23,
+      "AI REVIEW": 25,
+      "HUMAN (human_review)": 39,
+      "DONE": 25,
+      "ERROR (includes pr_created, per groupByStatus fallback bucket)": 50
+    },
+    "column_sum_check": "23+15+23+25+39+25+50 = 200 (matches)",
+    "title_bar_cross_check": "23 running (== BUILDING), 64 review (== AI REVIEW 25 + HUMAN 39)",
+    "comparison_fixtures_used": {
+      "small_4_task": "/tmp/aperant-fixture (existing tools/build-fixture.py)",
+      "intermediate_20_task": "/tmp/ap-perf-20 (tools/build-fixture-200.py with APERANT_PERF_N_TASKS=20)"
+    }
+  },
+  "architectural_finding": {
+    "summary": "apps/tui/src/views/BoardView.tsx has NO viewport-windowed scrolling. `j`/`k` only move a `sel` index (setSel); the component unconditionally maps and renders every task in every status group every render. Panel.tsx's `overflow=\"hidden\"` cannot clip because nothing bounds the TASKS panel's height to the terminal's row count — Ink measures intrinsic content height, so a 200-task board produces a >200-line-tall render tree rather than a fixed ~40-row scrolling window.",
+    "evidence": "A single `current_frame()` capture at sel=0 (freshly launched, 50-row PTY) returned 215 total lines and 178 distinct task-id tokens visible simultaneously — i.e. essentially the entire flat task list rendered in one paint, not a windowed subset.",
+    "files_read_not_modified": [
+      "apps/tui/src/views/BoardView.tsx",
+      "apps/tui/src/components/Panel.tsx",
+      "apps/tui/src/services/task-service.ts",
+      "apps/desktop/src/main/project-store.ts"
+    ]
+  },
+  "measurements": [
+    {
+      "id": "M1_isolated_single_keypress_settle",
+      "method": "For each trial: relaunch is NOT repeated per-trial (steady state); fire ONE 'j' keystroke via `tuistory capture-frames -s <session> j --count 25 --interval 2`, which has the daemon write the key once and then sample the LIVE PTY buffer at a fixed 2ms cadence with no per-frame subprocess-spawn cost. SHA-256 hash each sampled frame; record the sample index (in ms) at which the buffer first differs from the pre-press frame and the index at which it reaches its final (settled) value.",
+      "what_this_measures": "Wall-clock time from keystroke delivery to the terminal buffer settling into its final post-scroll render, sampled at 2ms granularity — i.e. keypress-to-rendered-frame latency for ONE scroll step, with the board already holding the full 200-task render tree in memory (steady-state repaint cost, not initial mount cost).",
+      "n_trials": 30,
+      "unit": "milliseconds",
+      "raw_samples_ms": [14, 12, 10, 10, 10, 12, 12, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 8, 10, 10, 10],
+      "median_ms": 10.0,
+      "mean_ms": 10.27,
+      "min_ms": 8,
+      "max_ms": 14,
+      "stdev_ms": 1.01,
+      "threshold_ms": 16.67,
+      "samples_at_or_under_threshold": "30/30 (100%)",
+      "caveat": "Sample granularity is 2ms; a settle event is only localized to a 2ms window, not measured with sub-2ms precision. All 30 samples land comfortably (2.7ms-8.7ms of margin) under the 16.67ms/60fps budget for a SINGLE isolated keypress."
+    },
+    {
+      "id": "M2_sustained_rapid_scroll_200task",
+      "method": "Relaunch fresh (sel resets to task index 0). Send 15 'j' characters in ONE `tuistory type` call (tuistory's built-in per-character delivery pacing, ~125 attempted-keys/sec observed wall-clock rate — no per-keystroke CLI subprocess spawn overhead). Read the DETAIL panel's authoritative `spec <NNN-...>` line before and after to compute how many of the 15 sent keystrokes actually registered as a selection-index change (net progress = a real, user-visible scroll step).",
+      "what_this_measures": "Whether the app's input handling keeps up with keys arriving faster than one render cycle apart, at 200-task render cost — the actual 'scroll' scenario the criterion describes (a user holding/repeating j rapidly), not an isolated single press.",
+      "n_trials": 8,
+      "n_keys_sent_per_trial": 15,
+      "registered_scroll_steps_per_trial": [1, 1, 1, 1, 1, 1, 1, 1],
+      "drop_rate_pct": 93.33,
+      "avg_wall_time_s_per_trial": 0.2967,
+      "derived_effective_ms_per_registered_scroll_step": 296.7,
+      "derived_effective_fps": 3.37,
+      "threshold_ms": 16.67,
+      "verdict_for_this_measurement": "FAIL — 296.7ms per registered scroll step is ~18x slower than the 16.67ms/60fps budget; effective throughput is ~3.4 scroll-steps/sec, not 60/sec."
+    },
+    {
+      "id": "M3_sustained_rapid_scroll_20task_comparison",
+      "method": "Identical protocol to M2 but against a 20-task fixture (/tmp/ap-perf-20, built by the same tools/build-fixture-200.py with APERANT_PERF_N_TASKS=20) to test whether the drop rate is a fixed terminal/Node input-batching floor (scale-independent) or scales with board render cost.",
+      "n_trials": 4,
+      "n_keys_sent_per_trial": 15,
+      "registered_scroll_steps_per_trial": [7, 5, 7, 8],
+      "drop_rate_pct_median": 53.33,
+      "avg_wall_time_s_per_trial": 0.3345,
+      "conclusion": "Drop rate is board-size-dependent: 93.3% dropped at 200 tasks vs 46-67% (median 53.3%) dropped at 20 tasks under an identical attempted input rate. This rules out a fixed instrument/terminal ceiling as the sole explanation and implicates per-render cost scaling with task count — consistent with the M0 architectural finding that BoardView renders the full unwindowed list every repaint."
+    },
+    {
+      "id": "M0_control_pty_delivery_integrity",
+      "method": "Launched a plain `cat` process (no React/Ink, no application logic) under the same tuistory PTY driver and sent the identical 50-character rapid `j`-burst via `tuistory type`, then read back cat's echoed stdout.",
+      "result": "50/50 characters delivered and echoed back intact by `cat`.",
+      "conclusion": "The PTY/tuistory delivery path is NOT the bottleneck — it reliably delivers 100% of rapid keystrokes to the child process. The measured drop in M2/M3 is therefore an application-level effect (Ink re-render/input-handling falling behind at 200-task render cost), not a measurement/instrument artifact."
+    }
+  ],
+  "threshold": {
+    "target_fps": 60,
+    "target_ms_per_frame": 16.67
+  },
+  "verdict": "FAIL",
+  "verdict_reasoning": "The criterion asks whether the board 'scrolls' at >=60fps. A single isolated keypress settles in a median of 10ms (well under 16.67ms) — but that is not what 'scrolling' means to a user, and it does not reflect steady sustained-scroll throughput. Under sustained rapid input (the actual scroll scenario), only ~6.7% of keystrokes register as visible scroll steps on the 200-task board, yielding an effective throughput of ~3.4 registered-scroll-steps/sec (~296.7ms/step) — roughly 18x slower than the 60fps/16.67ms budget. A negative control (plain `cat` process) confirms 100% keystroke delivery through the PTY, ruling out the measurement instrument as the cause. A same-protocol comparison against a 20-task board shows a substantially lower (though still failing) drop rate, indicating the degradation scales with the unwindowed board's render cost — consistent with the architectural finding that BoardView.tsx has no scroll-viewport windowing and re-renders all 200 tasks on every keystroke.",
+  "artifacts": {
+    "fixture_builder": "tools/build-fixture-200.py",
+    "fixture_path": "/tmp/ap-perf-200",
+    "screenshots": [
+      {
+        "file": "evidence/phase-7/perf/screens/01-top-of-board.png",
+        "sha256": "e7064fa6d3293ad57e64c45cc7cf5cd7311922d3fa07f478a56e5b5a402b49fa",
+        "state": "top of board, sel=task 001 (fresh launch)"
+      },
+      {
+        "file": "evidence/phase-7/perf/screens/02-mid-scroll.png",
+        "sha256": "47d5bf0e6863f9a917a02d38ff5e065660d25e58e771d3db29ea26b86a669b1f",
+        "state": "mid-scroll, sel=task 101 (reached via 99 individually-confirmed reliable single keypresses)"
+      },
+      {
+        "file": "evidence/phase-7/perf/screens/03-bottom-of-board.png",
+        "sha256": "0ab6ba12d5c56f5b6fababc3d9b5d23c814c54128c2b3e56aa37e2666772a984",
+        "state": "bottom of board, sel=task 200 (last task, reached via reliable single keypresses)"
+      }
+    ],
+    "verdict_doc": "evidence/phase-7/perf/P7.1-VERDICT.md"
+  }
+}

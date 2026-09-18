@@ -1,0 +1,985 @@
+diff --git a/awesome_researcher/agents/validator.py b/awesome_researcher/agents/validator.py
+index ca1a60b..1e1acc5 100644
+--- a/awesome_researcher/agents/validator.py
++++ b/awesome_researcher/agents/validator.py
+@@ -306,17 +306,31 @@ class Validator:
+     def _emit(self, event_type: EventType, candidate: dict[str, Any], reason: str) -> None:
+         if self._event_bus is None or not self._run_id:
+             return
++        metadata: dict[str, Any] = {
++            "url": str(candidate.get("url", "")),
++            "final_url": str(candidate.get("final_url", "")),
++            "status_code": int(candidate.get("status_code", 0) or 0),
++            "reason": reason,
++        }
++        if event_type is EventType.CANDIDATE_VALIDATED:
++            # Enriched payload so the TUI Review table and attach replays can
++            # render title/category/score/description without re-reading the
++            # candidate files. CANDIDATE_REJECTED keeps the base fields.
++            description = str(candidate.get("description") or candidate.get("snippet") or "")
++            metadata.update(
++                {
++                    "title": str(candidate.get("title", "") or ""),
++                    "category": str(candidate.get("category", "") or ""),
++                    "score": self._score_of(candidate),
++                    "description": description[:200],
++                }
++            )
+         event = make_event(
+             self._run_id,
+             event_type,
+             "validator",
+             message=reason,
+-            metadata={
+-                "url": str(candidate.get("url", "")),
+-                "final_url": str(candidate.get("final_url", "")),
+-                "status_code": int(candidate.get("status_code", 0) or 0),
+-                "reason": reason,
+-            },
++            metadata=metadata,
+         )
+         self._publish(event)
+ 
+diff --git a/awesome_researcher/core/events.py b/awesome_researcher/core/events.py
+index 6aa743a..0dd88fb 100644
+--- a/awesome_researcher/core/events.py
++++ b/awesome_researcher/core/events.py
+@@ -40,6 +40,8 @@ class EventType(str, Enum):
+     CANDIDATE_SCORED = "candidate_scored"
+     CANDIDATE_VALIDATED = "candidate_validated"
+     CANDIDATE_REJECTED = "candidate_rejected"
++    CANDIDATE_REVIEW_DECIDED = "candidate_review_decided"
++    REVIEW_COMPLETED = "review_completed"
+     ARTIFACT_WRITTEN = "artifact_written"
+     MEMORY_UPDATED = "memory_updated"
+     WARNING = "warning"
+diff --git a/awesome_researcher/core/review.py b/awesome_researcher/core/review.py
+new file mode 100644
+index 0000000..3c8e4ed
+--- /dev/null
++++ b/awesome_researcher/core/review.py
+@@ -0,0 +1,305 @@
++"""Human-in-the-loop review decisions: model, on-disk store, and pure applier.
++
++This module is the file-based contract shared by the pipeline's review gate
++(``run_pipeline --review-mode``) and the TUI Review screen. The pipeline
++writes the initial auto decisions, the TUI rewrites them as the reviewer
++approves/rejects/edits each candidate and finally flips ``finalized``, and the
++gate proceeds once it observes that flag. The same file drives ``--attach``
++replays, so live and replayed runs share one persistence path with no
++cross-loop object passing.
++
++Everything here parses defensively in the style of ``tui/state.py``: a
++missing, null, or oddly-shaped field degrades to a sane default instead of
++raising inside a render or gate loop.
++"""
++
++from __future__ import annotations
++
++from dataclasses import dataclass
++from enum import Enum
++from pathlib import Path
++from typing import Any
++
++from awesome_researcher.utils.helpers import read_json, write_json
++
++# Filename of the decision store inside a run directory.
++DECISIONS_FILENAME = "review_decisions.json"
++
++# Fields a reviewer may override on an edited candidate. Everything else in
++# the validated record is carried through untouched.
++EDITABLE_FIELDS: tuple[str, ...] = ("title", "description", "category")
++
++
++class DecisionStatus(str, Enum):
++    """Lifecycle of one candidate under review."""
++
++    APPROVED = "approved"
++    REJECTED = "rejected"
++    EDITED = "edited"
++    PENDING = "pending"
++
++
++def _as_str(value: Any, default: str = "") -> str:
++    try:
++        if value is None:
++            return default
++        return str(value)
++    except (TypeError, ValueError):
++        return default
++
++
++def _as_bool(value: Any, default: bool = False) -> bool:
++    if value is None:
++        return default
++    if isinstance(value, bool):
++        return value
++    if isinstance(value, (int, float)):
++        return bool(value)
++    text = _as_str(value).strip().lower()
++    if text in {"true", "1", "yes", "y", "finalized", "final"}:
++        return True
++    if text in {"false", "0", "no", "n", ""}:
++        return False
++    return default
++
++
++def _as_decision(value: Any) -> DecisionStatus:
++    """Coerce an arbitrary stored value into a DecisionStatus.
++
++    Legacy files written by ``main._write_review_decisions`` used
++    ``"accepted"`` for validator-approved candidates; map it onto APPROVED so
++    old runs still fold correctly. Anything unrecognized degrades to PENDING.
++    """
++
++    if isinstance(value, DecisionStatus):
++        return value
++    text = _as_str(value).strip().lower()
++    if text == "accepted":
++        return DecisionStatus.APPROVED
++    try:
++        return DecisionStatus(text)
++    except ValueError:
++        return DecisionStatus.PENDING
++
++
++def _as_edited(value: Any) -> dict[str, str] | None:
++    """Coerce the ``edited`` override payload into a plain str->str dict."""
++
++    if not isinstance(value, dict):
++        return None
++    return {str(k): _as_str(v) for k, v in value.items()}
++
++
++@dataclass(slots=True)
++class ReviewDecision:
++    """One reviewer decision about one candidate, identified by URL."""
++
++    url: str
++    title: str = ""
++    decision: DecisionStatus = DecisionStatus.PENDING
++    reason: str = ""
++    edited: dict[str, str] | None = None
++    reviewer: str = ""
++    decided_at: str = ""
++
++    def to_dict(self) -> dict[str, Any]:
++        """JSON-ready dict (decision serialized as its value string)."""
++
++        return {
++            "url": self.url,
++            "title": self.title,
++            "decision": self.decision.value,
++            "reason": self.reason,
++            "edited": dict(self.edited) if self.edited else None,
++            "reviewer": self.reviewer,
++            "decided_at": self.decided_at,
++        }
++
++    @classmethod
++    def from_dict(cls, data: Any) -> "ReviewDecision":
++        """Defensively rebuild a ReviewDecision; never raises."""
++
++        if not isinstance(data, dict):
++            return cls(url="")
++        return cls(
++            url=_as_str(data.get("url")),
++            title=_as_str(data.get("title")),
++            decision=_as_decision(data.get("decision")),
++            reason=_as_str(data.get("reason")),
++            edited=_as_edited(data.get("edited")),
++            reviewer=_as_str(data.get("reviewer")),
++            decided_at=_as_str(data.get("decided_at")),
++        )
++
++
++class DecisionStore:
++    """Read/write the ``<run_dir>/review_decisions.json`` envelope.
++
++    Envelope schema (v2)::
++
++        {"finalized": <bool>, "decisions": [<ReviewDecision dict>, ...]}
++
++    Legacy files are a bare ``[<decision dict>, ...]`` list; ``load()`` and
++    every other reader tolerate both shapes. All writes go through
++    ``helpers.write_json`` so updates land atomically (tmp + rename) and a
++    concurrent reader never observes a torn file.
++    """
++
++    def __init__(self, run_dir: str | Path) -> None:
++        self.path = Path(run_dir) / DECISIONS_FILENAME
++
++    # -- raw envelope ------------------------------------------------------
++
++    def _read_envelope(self) -> dict[str, Any]:
++        """Return the raw envelope dict; legacy lists and garbage degrade
++        gracefully to an empty, unfinalized envelope."""
++
++        raw = read_json(self.path, default=None)
++        if isinstance(raw, dict):
++            decisions = raw.get("decisions")
++            return {
++                "finalized": _as_bool(raw.get("finalized")),
++                "decisions": [d for d in decisions if isinstance(d, dict)]
++                if isinstance(decisions, list)
++                else [],
++            }
++        # Legacy bare-list file (written before the envelope existed).
++        if isinstance(raw, list):
++            return {
++                "finalized": False,
++                "decisions": [d for d in raw if isinstance(d, dict)],
++            }
++        return {"finalized": False, "decisions": []}
++
++    def _write_envelope(self, finalized: bool, decisions: list[dict[str, Any]]) -> None:
++        write_json(self.path, {"finalized": finalized, "decisions": decisions})
++
++    # -- public API ----------------------------------------------------------
++
++    def load(self) -> list[ReviewDecision]:
++        """All decisions in file order (later entries win on duplicate URLs)."""
++
++        return [
++            ReviewDecision.from_dict(d) for d in self._read_envelope()["decisions"]
++        ]
++
++    def is_finalized(self) -> bool:
++        """True once the reviewer has marked the review session complete."""
++
++        return _as_bool(self._read_envelope().get("finalized"))
++
++    def finalize(self) -> None:
++        """Flip ``finalized`` while preserving the current decisions."""
++
++        envelope = self._read_envelope()
++        self._write_envelope(True, envelope["decisions"])
++
++    def upsert_decision(self, decision: ReviewDecision) -> None:
++        """Insert or replace (by URL) one decision and write atomically."""
++
++        envelope = self._read_envelope()
++        record = decision.to_dict()
++        decisions = envelope["decisions"]
++        kept = [d for d in decisions if _as_str(d.get("url")) != decision.url]
++        kept.append(record)
++        # Keep stable file order for diffs; new record last is fine.
++        self._write_envelope(envelope["finalized"], kept)
++
++    def upsert_decisions(self, decisions: list[ReviewDecision]) -> None:
++        """Bulk upsert in one atomic write (order preserved, later wins)."""
++
++        envelope = self._read_envelope()
++        existing = envelope["decisions"]
++        by_url = {_as_str(d.get("url")): d for d in existing if isinstance(d, dict)}
++        for decision in decisions:
++            by_url[decision.url] = decision.to_dict()
++        self._write_envelope(
++            envelope["finalized"], list(by_url.values())
++        )
++
++    def decisions_for(self, urls: list[str]) -> dict[str, ReviewDecision]:
++        """Map each requested URL to its latest decision (missing URLs absent)."""
++
++        wanted = {_as_str(u) for u in urls if _as_str(u)}
++        latest: dict[str, ReviewDecision] = {}
++        for decision in self.load():
++            if decision.url in wanted:
++                latest[decision.url] = decision
++        return latest
++
++    def pending_urls(self, validated_urls: list[str]) -> list[str]:
++        """URLs with no decision yet (or still PENDING), preserving input order."""
++
++        decided = {
++            d.url: d
++            for d in self.load()
++            if d.decision is not DecisionStatus.PENDING
++        }
++        pending: list[str] = []
++        seen: set[str] = set()
++        for url in validated_urls:
++            url = _as_str(url)
++            if not url or url in seen:
++                continue
++            seen.add(url)
++            if url not in decided:
++                pending.append(url)
++        return pending
++
++
++def apply_decisions(
++    validated: list[dict[str, Any]], decisions: list[ReviewDecision]
++) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
++    """Split validated candidates by reviewer decision. Pure; never raises.
++
++    Returns ``(approved_records, rejected_by_reviewer)``:
++
++    - ``approved_records``: copies of the validated dicts for every candidate
++      that is APPROVED, EDITED, or undecided. The gate's timeout fallback and
++      the approve-all shortcut both rely on undecided candidates passing
++      through. EDITED decisions override ``title``/``description``/``category``
++      from ``decision.edited`` (blank overrides are ignored).
++    - ``rejected_by_reviewer``: one ``{url, title, reason, decision}`` dict per
++      candidate the reviewer explicitly REJECTED, in validated order.
++
++    Input dicts are never mutated; edited overrides land on copies.
++    """
++
++    latest: dict[str, ReviewDecision] = {}
++    for decision in decisions or []:
++        if decision is not None and decision.url:
++            latest[decision.url] = decision
++
++    approved_records: list[dict[str, Any]] = []
++    rejected_by_reviewer: list[dict[str, Any]] = []
++
++    for record in validated or []:
++        if not isinstance(record, dict):
++            continue
++        url = _as_str(record.get("url"))
++        decision = latest.get(url)
++
++        if decision is not None and decision.decision is DecisionStatus.REJECTED:
++            rejected_by_reviewer.append(
++                {
++                    "url": url,
++                    "title": _as_str(record.get("title")) or decision.title,
++                    "reason": decision.reason or "reviewer.rejected",
++                    "decision": DecisionStatus.REJECTED.value,
++                }
++            )
++            continue
++
++        out = dict(record)
++        if (
++            decision is not None
++            and decision.decision is DecisionStatus.EDITED
++            and decision.edited
++        ):
++            for field_name in EDITABLE_FIELDS:
++                override = decision.edited.get(field_name)
++                if isinstance(override, str) and override.strip():
++                    out[field_name] = override
++        approved_records.append(out)
++
++    return approved_records, rejected_by_reviewer
+diff --git a/awesome_researcher/main.py b/awesome_researcher/main.py
+index 2a9af96..23365a4 100644
+--- a/awesome_researcher/main.py
++++ b/awesome_researcher/main.py
+@@ -52,8 +52,10 @@ from awesome_researcher.core.deduplication import DeduplicationEngine
+ from awesome_researcher.core.events import EventBus, EventType, make_event
+ from awesome_researcher.core.quality_scorer import QualityScorer
+ from awesome_researcher.core.search_memory import SearchMemory
++from awesome_researcher.core.review import DecisionStore, DecisionStatus, ReviewDecision, apply_decisions
+ from awesome_researcher.parsers.awesome_parser import ReadmeFetchError, fetch_and_parse
+ from awesome_researcher.renderers.list_renderer import ListRenderer, ResourceInsert, SourcePatcher
++from awesome_researcher.renderers.pr_body import PRBodyGenerator
+ from awesome_researcher.renderers.report_generator import ReportGenerator
+ from awesome_researcher.renderers.timeline_visualizer import TimelineVisualizer
+ from awesome_researcher.utils.cost_tracking import CostTracker
+@@ -360,6 +362,137 @@ def _write_review_decisions(
+     write_json(run_dir / "review_decisions.json", decisions)
+ 
+ 
++def _merged_review_decisions(
++    validated: list[dict[str, Any]], decisions: list[ReviewDecision]
++) -> list[ReviewDecision]:
++    """One decision per validated URL: the reviewer's verdict if present, else
++    an auto-approve record shaped like ``_write_review_decisions``' output.
++
++    Reviewer-signed decisions for URLs no longer in ``validated`` are preserved
++    verbatim so nothing the reviewer said is silently dropped. Unsigned
++    out-of-validated records are the validator's auto-reject seed (already
++    captured in ``rejected_links.json``) and are dropped so the review block
++    counts only what the reviewer actually decided.
++    """
++
++    by_url: dict[str, ReviewDecision] = {}
++    for d in decisions or []:
++        if d is not None and d.url:
++            by_url[d.url] = d
++    now = datetime.now(timezone.utc).isoformat()
++    merged: list[ReviewDecision] = []
++    seen: set[str] = set()
++    for record in validated or []:
++        if not isinstance(record, dict):
++            continue
++        url = str(record.get("url", "") or "")
++        if not url or url in seen:
++            continue
++        seen.add(url)
++        reviewer = by_url.get(url)
++        if reviewer is not None:
++            merged.append(reviewer)
++        else:
++            merged.append(
++                ReviewDecision(
++                    url=url,
++                    title=str(record.get("title", "") or ""),
++                    decision=DecisionStatus.APPROVED,
++                    reason=str(record.get("acceptance_reason", "") or "validator.accepted"),
++                    decided_at=now,
++                )
++            )
++    for url, d in by_url.items():
++        if url not in seen and d.reviewer:
++            merged.append(d)
++    return merged
++
++
++async def _run_review_gate(
++    *,
++    run_dir: Path,
++    validated: list[dict[str, Any]],
++    config: Config,
++    t0: float,
++    run_id: str,
++    bus: EventBus,
++    poll_interval: float = 0.5,
++) -> tuple[list[dict[str, Any]], dict[str, Any]]:
++    """Interactive review gate: wait for the reviewer, then apply the decisions.
++
++    Polls ``<run_dir>/review_decisions.json`` every ``poll_interval`` seconds
++    until the reviewer flips ``finalized`` or the run's remaining wall-time
++    budget (``config.wall_time_seconds`` measured against ``t0``) is gone — a
++    timeout publishes a WARNING and proceeds with auto-approve.
++
++    Returns ``(approved_records, review_block)``: the validated candidates that
++    survived review (EDITED field overrides applied) and the payload for
++    ``manifest['review']`` (per-candidate decision records incl. reject
++    reasons). Extracted from ``run_pipeline`` so tests can drive the gate
++    against a temp run dir without the SDK pipeline.
++    """
++
++    await bus.publish(
++        make_event(
++            run_id,
++            EventType.PHASE_STARTED,
++            "main",
++            phase="review",
++            message="phase: review (waiting for reviewer decisions)",
++        )
++    )
++    store = DecisionStore(run_dir)
++    remaining = config.wall_time_seconds - (time.monotonic() - t0)
++    deadline = time.monotonic() + max(0.0, remaining)
++    finalized = False
++    while time.monotonic() <= deadline:
++        if store.is_finalized():
++            finalized = True
++            break
++        if time.monotonic() >= deadline:
++            break
++        await asyncio.sleep(min(poll_interval, max(0.05, deadline - time.monotonic())))
++    if not finalized:
++        # One last look — the reviewer may have finalized inside the final sleep.
++        finalized = store.is_finalized()
++
++    mode = "manual" if finalized else "timeout-auto-approve"
++    if not finalized:
++        await bus.publish(
++            make_event(
++                run_id,
++                EventType.WARNING,
++                "main",
++                message="review gate timed out; auto-approving undecided candidates",
++                metadata={"mode": mode, "wall_time_seconds": config.wall_time_seconds},
++            )
++        )
++
++    decisions = store.load()
++    approved_records, _rejected_by_reviewer = apply_decisions(validated, decisions)
++
++    # Rewrite the store with the merged verdicts (reviewer decisions first,
++    # auto-approve defaults for anything undecided) so pr_body.md and attach
++    # replays see the final decisions in the envelope format.
++    merged = _merged_review_decisions(validated, decisions)
++    store.upsert_decisions(merged)
++
++    approved_count = sum(
++        1 for d in merged if d.decision is not DecisionStatus.REJECTED and d.decision is not DecisionStatus.EDITED
++    )
++    edited_count = sum(1 for d in merged if d.decision is DecisionStatus.EDITED)
++    rejected_count = sum(1 for d in merged if d.decision is DecisionStatus.REJECTED)
++    review_block = {
++        "finalized": finalized,
++        "mode": mode,
++        "approved_count": approved_count,
++        "reviewer_rejected_count": rejected_count,
++        "edited_count": edited_count,
++        "decisions": [d.to_dict() for d in merged],
++    }
++    return approved_records, review_block
++
++
+ # ---------------------------------------------------------------------------
+ # Pipeline runtime state.
+ # ---------------------------------------------------------------------------
+@@ -412,6 +545,7 @@ def _refresh_artifacts_manifest(manifest: dict[str, Any], run_dir: Path) -> None
+         "insertion_manifest": "insertion_manifest.json",
+         "research_report": "research_report.md",
+         "graph": "graph.html",
++        "pr_body": "pr_body.md",
+     }
+     artifacts: dict[str, str] = {}
+     for key, rel in expected.items():
+@@ -679,6 +813,22 @@ async def run_pipeline(
+                 manifest, run_dir, run_id, started_at, t0, cost_tracker, 0, EXIT_INTERRUPT
+             )
+ 
++        # Phase 6.5: interactive review gate (--review-mode only). Polls
++        # review_decisions.json until the reviewer finalizes (or the wall-time
++        # budget is exhausted, which auto-approves the rest). Only approved /
++        # edited candidates — with edited field overrides — become inserts.
++        approved_records: list[dict[str, Any]] = validated
++        if args.review_mode:
++            approved_records, review_block = await _run_review_gate(
++                run_dir=run_dir,
++                validated=validated,
++                config=config,
++                t0=t0,
++                run_id=run_id,
++                bus=bus,
++            )
++            manifest["review"] = review_block
++
+         # Phase 7: render updated list
+         await bus.publish(
+             make_event(
+@@ -696,7 +846,7 @@ async def run_pipeline(
+                 description=v.get("description", ""),
+                 category=v.get("category", ""),
+             )
+-            for v in validated
++            for v in approved_records
+             if v.get("title") and v.get("url")
+         ]
+         inserts = inserts[: config.max_links]
+@@ -749,6 +899,12 @@ async def run_pipeline(
+         timeline.write(run_dir)
+         manifest["artifacts"]["graph"] = "graph.html"
+ 
++        # PR body — synthesized from the on-disk review_decisions.json (the
++        # merged verdicts after the gate, or the auto decisions otherwise).
++        pr_body = PRBodyGenerator(config, event_bus=bus, run_id=run_id)
++        await pr_body.write(run_dir)
++        manifest["artifacts"]["pr_body"] = "pr_body.md"
++
+         await bus.publish(
+             make_event(
+                 run_id,
+@@ -1183,11 +1339,15 @@ def _replay_attach(args: argparse.Namespace) -> int:
+         click.echo(f"run not found: {root}", err=True)
+         return EXIT_CONFIG
+     try:
+-        # ReportGenerator.write is async (it publishes ARTIFACT_WRITTEN events);
+-        # replay is a sync entry point, so drive it on a fresh loop. Both writers
+-        # only read on-disk JSON — no network or paid model call is made.
++        # ReportGenerator.write and PRBodyGenerator.write are async (they
++        # publish ARTIFACT_WRITTEN events); replay is a sync entry point, so
++        # drive them on a fresh loop. All writers only read on-disk JSON — no
++        # network or paid model call is made. The PR body is re-rendered from
++        # review_decisions.json so decision edits made during an attach review
++        # session are reflected.
+         asyncio.run(ReportGenerator().write(root))
+         TimelineVisualizer().write(root)
++        asyncio.run(PRBodyGenerator().write(root))
+         _ensure_agents_log_alias(root)
+     except Exception as exc:  # pragma: no cover
+         click.echo(f"replay failed: {exc}", err=True)
+@@ -1296,7 +1456,9 @@ __all__ = [
+     "run_pipeline",
+     "_build_parser",
+     "_ensure_agents_log_alias",
++    "_merged_review_decisions",
+     "_refresh_artifacts_manifest",
++    "_run_review_gate",
+     "_write_review_decisions",
+ ]
+ 
+diff --git a/awesome_researcher/renderers/pr_body.py b/awesome_researcher/renderers/pr_body.py
+new file mode 100644
+index 0000000..211a4a4
+--- /dev/null
++++ b/awesome_researcher/renderers/pr_body.py
+@@ -0,0 +1,242 @@
++"""Generate a Markdown pull-request body from run-directory artifacts.
++
++Like :mod:`report_generator`, this is synthesized purely from the JSON files
++already on disk (``run_manifest.json``, ``validated_links.json``,
++``rejected_links.json``, ``review_decisions.json``) so it can be regenerated
++at any time — live at the end of a run, or from an ``--attach`` replay after
++the reviewer edits decisions. Each section degrades to a placeholder when its
++source artifact is absent so the body is never an INTERNAL ERROR.
++
++Layout:
++  - summary line (approved / reviewer-rejected / edited / auto-rejected)
++  - ``## Reviewer decisions`` table (decision, title, url, reviewer reason)
++  - ``## Auto-rejected by validator`` table (url, reason), capped at 25 rows
++  - footer with the run id and artifact pointers
++"""
++
++from __future__ import annotations
++
++from dataclasses import dataclass, field
++from pathlib import Path
++from typing import TYPE_CHECKING, Any
++
++from awesome_researcher.core.events import EventBus, EventType, make_event
++from awesome_researcher.core.review import DecisionStore, DecisionStatus, ReviewDecision
++from awesome_researcher.renderers.report_generator import _md_escape, _short, _table
++from awesome_researcher.utils.helpers import read_json
++
++if TYPE_CHECKING:
++    from awesome_researcher.config import Config
++
++# The auto-rejected table is capped so a noisy run cannot produce a
++# 500-row PR body; the overflow is summarized in a trailing note.
++_MAX_AUTO_REJECTED_ROWS = 25
++
++
++# ---------------------------------------------------------------------------
++# Pure body-building helpers (offline-testable, no I/O, no events).
++# ---------------------------------------------------------------------------
++
++
++def _decision_rows(
++    decisions: list[ReviewDecision],
++    validated: list[dict[str, Any]],
++) -> tuple[list[list[Any]], dict[str, int]]:
++    """Build the Reviewer-decisions table rows plus the summary counts.
++
++    Rows cover every candidate with an explicit decision (approved / edited /
++    reviewer-rejected) and every validated URL that never got one — those pass
++    through as approved (the gate's timeout fallback relies on the same rule)
++    and are labeled with an auto-approve note.
++    """
++
++    by_url: dict[str, dict[str, Any]] = {}
++    for record in validated or []:
++        if isinstance(record, dict):
++            url = str(record.get("url", "") or "")
++            if url:
++                by_url[url] = record
++
++    rows: list[list[Any]] = []
++    counts = {"approved": 0, "rejected": 0, "edited": 0}
++    seen: set[str] = set()
++
++    for decision in decisions or []:
++        if not decision.url or decision.url in seen:
++            continue
++        seen.add(decision.url)
++        record = by_url.get(decision.url, {})
++        title = decision.title or str(record.get("title", "") or "")
++        if decision.decision is DecisionStatus.REJECTED:
++            counts["rejected"] += 1
++            reason = decision.reason or "reviewer rejected"
++        elif decision.decision is DecisionStatus.EDITED:
++            counts["edited"] += 1
++            edited = decision.edited or {}
++            overrides = ", ".join(
++                f"{k}: {_short(str(v), 60)}" for k, v in sorted(edited.items()) if str(v).strip()
++            )
++            reason = decision.reason or (f"edited — {overrides}" if overrides else "edited")
++        else:
++            # APPROVED (legacy "accepted" maps here too); PENDING without an
++            # explicit rejection behaves as approved downstream, so label it.
++            counts["approved"] += 1
++            reason = decision.reason or (
++                "" if decision.decision is DecisionStatus.APPROVED else "no reviewer decision"
++            )
++        rows.append([decision.decision.value, _md_escape(_short(title, 60)), _md_escape(decision.url), _md_escape(_short(reason, 120))])
++
++    # Validated candidates the decisions file never mentioned.
++    for url, record in by_url.items():
++        if url in seen:
++            continue
++        counts["approved"] += 1
++        rows.append(
++            [
++                DecisionStatus.APPROVED.value,
++                _md_escape(_short(str(record.get("title", "") or ""), 60)),
++                _md_escape(url),
++                "no reviewer decision recorded",
++            ]
++        )
++
++    return rows, counts
++
++
++def _auto_rejected_rows(rejected: list[dict[str, Any]]) -> tuple[list[list[Any]], int]:
++    """Capped auto-rejected table rows plus the number of hidden overflow rows."""
++
++    rows: list[list[Any]] = []
++    for record in (rejected or [])[:_MAX_AUTO_REJECTED_ROWS]:
++        if not isinstance(record, dict):
++            continue
++        rows.append(
++            [
++                _md_escape(str(record.get("url", "") or "")),
++                _md_escape(_short(str(record.get("reason", "") or "unspecified"), 120)),
++            ]
++        )
++    overflow = max(0, len(rejected or []) - _MAX_AUTO_REJECTED_ROWS)
++    return rows, overflow
++
++
++# ---------------------------------------------------------------------------
++# The PR body generator.
++# ---------------------------------------------------------------------------
++
++
++@dataclass(slots=True)
++class PRData:
++    """Snapshot of the run artifacts the PR body needs.
++
++    Every field is optional; missing artifacts render as placeholders so the
++    body is always a valid Markdown document, never an exception.
++    """
++
++    run_manifest: dict[str, Any] = field(default_factory=dict)
++    validated: list[dict[str, Any]] = field(default_factory=list)
++    rejected: list[dict[str, Any]] = field(default_factory=list)
++    decisions: list[ReviewDecision] = field(default_factory=list)
++
++    @classmethod
++    def from_run_dir(cls, run_dir: str | Path) -> PRData:
++        """Read every optional artifact from a run directory; missing → default."""
++
++        root = Path(run_dir)
++        return cls(
++            run_manifest=read_json(root / "run_manifest.json", default={}) or {},
++            validated=read_json(root / "validated_links.json", default=[]) or [],
++            rejected=read_json(root / "rejected_links.json", default=[]) or [],
++            decisions=DecisionStore(root).load(),
++        )
++
++
++class PRBodyGenerator:
++    """Synthesize a Markdown PR body from a run directory.
++
++    The body is also written to disk via :meth:`write`, which emits an
++    ``ARTIFACT_WRITTEN`` event when an event bus is supplied.
++    """
++
++    def __init__(
++        self,
++        config: Config | None = None,
++        event_bus: EventBus | None = None,
++        run_id: str = "",
++    ) -> None:
++        self._config = config
++        self._event_bus = event_bus
++        self._run_id = run_id
++
++    # -- pure body builder ---------------------------------------------------
++
++    def build(self, data: PRData) -> str:
++        """Return the full Markdown PR body for the given data."""
++
++        run_id = str(data.run_manifest.get("run_id", "") or self._run_id or "(unknown run)")
++        decision_rows, counts = _decision_rows(data.decisions, data.validated)
++        auto_rows, overflow = _auto_rejected_rows(data.rejected)
++
++        lines: list[str] = [
++            f"# Awesome list update — {run_id}",
++            "",
++            f"{counts['approved']} approved / {counts['rejected']} reviewer-rejected / "
++            f"{counts['edited']} edited / {len(data.rejected)} auto-rejected by validator.",
++            "",
++            "## Reviewer decisions",
++            "",
++            _table(["Decision", "Title", "URL", "Reviewer reason"], decision_rows),
++            "",
++            "## Auto-rejected by validator",
++            "",
++            _table(["URL", "Reason"], auto_rows),
++            "",
++        ]
++        if overflow > 0:
++            lines.append(f"_…and {overflow} more auto-rejected links omitted (see `rejected_links.json`)._")
++            lines.append("")
++        lines.extend(
++            [
++                "---",
++                "",
++                f"- **Run**: `{_md_escape(run_id)}`",
++                "- **Artifacts**: `validated_links.json`, `rejected_links.json`, "
++                "`review_decisions.json`, `research_report.md`",
++                "",
++            ]
++        )
++        return "\n".join(lines)
++
++    # -- I/O path with observability ----------------------------------------
++
++    async def write(self, run_dir: str | Path, data: PRData | None = None) -> Path:
++        """Build (or accept) a body and write it to ``pr_body.md``."""
++
++        root = Path(run_dir)
++        root.mkdir(parents=True, exist_ok=True)
++        if data is None:
++            data = PRData.from_run_dir(root)
++        body = self.build(data)
++        out = root / "pr_body.md"
++        out.write_text(body, encoding="utf-8")
++        if self._event_bus is not None:
++            await self._event_bus.publish(
++                make_event(
++                    self._run_id,
++                    EventType.ARTIFACT_WRITTEN,
++                    "pr_body_generator",
++                    phase="render",
++                    message=f"wrote {out.name}",
++                    metadata={
++                        "path": str(out),
++                        "bytes": len(body),
++                    },
++                )
++            )
++        return out
++
++
++__all__ = [
++    "PRData",
++    "PRBodyGenerator",
++]
+diff --git a/awesome_researcher/tui/state.py b/awesome_researcher/tui/state.py
+index 05fdfe5..ed998a6 100644
+--- a/awesome_researcher/tui/state.py
++++ b/awesome_researcher/tui/state.py
+@@ -118,6 +118,12 @@ class PipelineState:
+         "validated_count",
+         "rejected_count",
+         "rejection_reasons",
++        "review_candidates",
++        "review_decisions",
++        "review_finalized",
++        "approved_count",
++        "reviewer_rejected_count",
++        "edited_count",
+         "total_cost",
+         "total_tokens",
+         "cost_ceiling",
+@@ -146,6 +152,16 @@ class PipelineState:
+         self.rejected_count: int = 0
+         # rejection reason -> count
+         self.rejection_reasons: dict[str, int] = {}
++        # Review workspace: one row per validated candidate url, plus the
++        # reviewer's per-url decisions. Decisions may reference urls that have
++        # no candidate row yet (attach replays can interleave event order), so
++        # they are stored independently and joined only at render time.
++        self.review_candidates: list[dict[str, Any]] = []
++        self.review_decisions: dict[str, dict[str, Any]] = {}
++        self.review_finalized: bool = False
++        self.approved_count: int = 0
++        self.reviewer_rejected_count: int = 0
++        self.edited_count: int = 0
+         self.total_cost: float = 0.0
+         self.total_tokens: int = 0
+         self.cost_ceiling: float = cost_ceiling
+@@ -265,10 +281,15 @@ class PipelineState:
+             self.scored_count += 1
+         elif et is EventType.CANDIDATE_VALIDATED:
+             self.validated_count += 1
++            self._add_review_candidate(meta)
+         elif et is EventType.CANDIDATE_REJECTED:
+             self.rejected_count += 1
+             reason = str(meta.get("reason", "") or event.message or "unspecified")
+             self.rejection_reasons[reason] = self.rejection_reasons.get(reason, 0) + 1
++        elif et is EventType.CANDIDATE_REVIEW_DECIDED:
++            self._apply_review_decision(meta)
++        elif et is EventType.REVIEW_COMPLETED:
++            self.review_finalized = True
+ 
+         elif et is EventType.ARTIFACT_WRITTEN:
+             self.artifacts.append(
+@@ -321,6 +342,69 @@ class PipelineState:
+         agent.cost += _as_float(meta.get("cost"))
+         self.total_tokens += in_tok + out_tok
+ 
++    # -- review workspace -------------------------------------------------
++
++    def _add_review_candidate(self, meta: dict[str, Any]) -> None:
++        """Upsert one Review-table row from CANDIDATE_VALIDATED metadata.
++
++        Older logs may lack the enriched fields; every read degrades to a
++        sane default so the fold never raises inside the render loop.
++        """
++
++        url = str(meta.get("url", "") or "")
++        if not url:
++            return
++        row = {
++            "url": url,
++            "title": str(meta.get("title", "") or ""),
++            "category": str(meta.get("category", "") or ""),
++            "score": _as_float(meta.get("score")),
++            "description": str(meta.get("description", "") or ""),
++        }
++        for existing in self.review_candidates:
++            if existing.get("url") == url:
++                # Re-validated url refreshes its row in place.
++                existing.update(row)
++                return
++        self.review_candidates.append(row)
++
++    def _apply_review_decision(self, meta: dict[str, Any]) -> None:
++        """Record one CANDIDATE_REVIEW_DECIDED payload, url-keyed.
++
++        Unseen urls are still stored: attach replays may interleave decision
++        events before their CANDIDATE_VALIDATED counterpart. A re-decision on
++        the same url unwinds the previous tally so counts stay consistent.
++        """
++
++        url = str(meta.get("url", "") or "")
++        if not url:
++            return
++        record: dict[str, Any] = {
++            "url": url,
++            "decision": str(meta.get("decision", "") or ""),
++            "reason": str(meta.get("reason", "") or ""),
++            "reviewer": str(meta.get("reviewer", "") or ""),
++            "decided_at": str(meta.get("decided_at", "") or ""),
++        }
++        edited = meta.get("edited")
++        if isinstance(edited, dict):
++            overrides = {k: edited[k] for k in ("title", "description", "category") if k in edited}
++            if overrides:
++                record["edited"] = overrides
++        previous = self.review_decisions.get(url)
++        if previous is not None:
++            self._tally_review_decision(str(previous.get("decision", "")), delta=-1)
++        self.review_decisions[url] = record
++        self._tally_review_decision(record["decision"])
++
++    def _tally_review_decision(self, decision: str, delta: int = 1) -> None:
++        if decision == "approved":
++            self.approved_count = max(0, self.approved_count + delta)
++        elif decision == "rejected":
++            self.reviewer_rejected_count = max(0, self.reviewer_rejected_count + delta)
++        elif decision == "edited":
++            self.edited_count = max(0, self.edited_count + delta)
++
+     @staticmethod
+     def _err_row(event: Event) -> dict[str, Any]:
+         return {
+@@ -351,6 +435,15 @@ class PipelineState:
+                 "rejected": self.rejected_count,
+             },
+             "rejection_reasons": dict(self.rejection_reasons),
++            "review": {
++                "finalized": self.review_finalized,
++                "decisions": list(self.review_decisions.values()),
++                "counts": {
++                    "approved": self.approved_count,
++                    "reviewer_rejected": self.reviewer_rejected_count,
++                    "edited": self.edited_count,
++                },
++            },
+             "cost": {
+                 "total": self.total_cost,
+                 "ceiling": self.cost_ceiling,

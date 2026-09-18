@@ -1,0 +1,124 @@
+{
+  "step-00-pre-start.png.txt": [
+    {
+      "is_last_at_shutter": true,
+      "phase": "-",
+      "stream": []
+    }
+  ],
+  "step-01-phase-planning-live.png.txt": [
+    {
+      "is_last_at_shutter": false,
+      "phase": "planning",
+      "stream": [
+        "03:45:54 start 007-runa → vendored AgentManager…                                                      │ │",
+        "03:45:54 started 007-runa: agent started — phase planning                                             │ │"
+      ]
+    },
+    {
+      "is_last_at_shutter": true,
+      "phase": "-",
+      "stream": [
+        "03:45:54 start 007-runa → vendored AgentManager…                                                      │ │",
+        "03:45:54 started 007-runa: agent started — phase planning                                             │ │"
+      ]
+    }
+  ],
+  "step-02-tab7-idle-inferred-preexisting.png.txt": [
+    {
+      "is_last_at_shutter": false,
+      "phase": "planning",
+      "stream": [
+        "03:45:54 start 007-runa → vendored AgentManager…                                                      │ │",
+        "03:45:54 started 007-runa: agent started — phase planning                                             │ │"
+      ]
+    },
+    {
+      "is_last_at_shutter": true,
+      "phase": "idle ~ inferred",
+      "stream": []
+    }
+  ],
+  "step-03-phase-planning-live-t2.png.txt": [
+    {
+      "is_last_at_shutter": false,
+      "phase": "planning",
+      "stream": [
+        "03:45:54 start 007-runa → vendored AgentManager…                                                      │ │",
+        "03:45:54 started 007-runa: agent started — phase planning                                             │ │"
+      ]
+    },
+    {
+      "is_last_at_shutter": false,
+      "phase": null,
+      "stream": []
+    },
+    {
+      "is_last_at_shutter": true,
+      "phase": "planning",
+      "stream": []
+    }
+  ],
+  "step-04-board-phase-stale-planning-during-coding.png.txt": [
+    {
+      "is_last_at_shutter": false,
+      "phase": "planning",
+      "stream": [
+        "03:45:54 start 007-runa → vendored AgentManager…                                                      │ │",
+        "03:45:54 started 007-runa: agent started — phase planning                                             │ │"
+      ]
+    },
+    {
+      "is_last_at_shutter": false,
+      "phase": null,
+      "stream": []
+    },
+    {
+      "is_last_at_shutter": true,
+      "phase": "planning",
+      "stream": []
+    }
+  ],
+  "step-05-tab7-inspect-stale-planning-during-coding.png.txt": [
+    {
+      "is_last_at_shutter": false,
+      "phase": "planning",
+      "stream": [
+        "03:45:54 start 007-runa → vendored AgentManager…                                                      │ │",
+        "03:45:54 started 007-runa: agent started — phase planning                                             │ │"
+      ]
+    },
+    {
+      "is_last_at_shutter": false,
+      "phase": null,
+      "stream": []
+    },
+    {
+      "is_last_at_shutter": true,
+      "phase": "planning ~ inferred",
+      "stream": []
+    }
+  ],
+  "step-06-stopped.png.txt": [
+    {
+      "is_last_at_shutter": false,
+      "phase": "planning",
+      "stream": [
+        "03:45:54 start 007-runa → vendored AgentManager…                                                      │ │",
+        "03:45:54 started 007-runa: agent started — phase planning                                             │ │"
+      ]
+    },
+    {
+      "is_last_at_shutter": false,
+      "phase": null,
+      "stream": []
+    },
+    {
+      "is_last_at_shutter": true,
+      "phase": "planning",
+      "stream": [
+        "03:56:44 stopped 007-runa                                                                             │ │"
+      ]
+    }
+  ]
+}

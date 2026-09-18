@@ -1,0 +1,26 @@
+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ hunter-seed /Users/nick/dev/hunter-seed │ ⑂ main                                                                                                       ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ IDEATION · 6 types                                                                                                                                                                               │ │
+│ │ [q] Q&A  [1-6] ideation types  · index absent /Users/nick/dev/hunter-seed/.auto-claude/project_index.json                                                                                        │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ 1 Code Improvements 2 UI/UX 3 Docs Gaps 4 Security 5 Performance 6 Code Quality                                                                                                                  │ │
+│ │ · Add a README for dnr_harness/ package                                                                                                                                                          │ │
+│ │   harness/ has a thorough README.md (prerequisites, demo walkthrough, security warnings), but dnr_harn                                                                                           │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Document config.yaml schema and CLI flags for the vuln harness                                                                                                                                 │ │
+│ │   harness/config.py (73 lines, 1 function, no docstrings) parses target config.yaml, and harness/cli.p                                                                                           │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Add design-to-implementation status map for design/ documents                                                                                                                                  │ │
+│ │   design/ARCHITECTURE.md, AGENTS.md, CONTRACTS.md, and TUI-SPEC.md are explicitly marked 'Status: Desi                                                                                           │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Add docstrings to low-coverage harness modules (dedup, novelty, config, __init__)                                                                                                              │ │
+│ │   harness/dedup.py (87 lines), harness/novelty.py (95 lines), and harness/config.py have no module or                                                                                            │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Add getting-started tutorial walking one full skill → pipeline cycle                                                                                                                           │ │
+│ │   docs/ is organized by topic (pipeline.md, patching.md, triage.md, threat-model.md) and README.md lis                                                                                           │ │
+│ └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ CHAT  a ask · q qa mode · i ideate · x stop · 1-6 ideation type                                                                                                                         : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

@@ -1,0 +1,48 @@
+{
+  "goal": "Produce a real, validator-clean v2 evidence run demonstrating subagent fan-out in proofpunk-agent beyond the v1 depth-1/single-child proof: subagent spawn rendered live in the agent tree with correct attribution, lifecycle transition to COMPLETE (and ERRORED if cheaply drivable), and fan-out (depth >= 2 nesting OR >= 2 concurrent children), all sealed by fresh_evidence.py rc=0.",
+  "functional_requirements": [
+    "FR1: Live subagent spawn appears in §7 Screen 1 Agent Tree panel during the SDK session (live frame captured), not only in replay.",
+    "FR2: Correct attribution on child node: attribution tier resolves to parent_agent_id or parent_tool_use_id (or HOOK_AGENT_ID if present); no UNATTRIBUTED fallback for the spawned children being proven.",
+    "FR3: Full lifecycle state transition observed: node enters RUNNING on spawn and reaches COMPLETE. If cheaply drivable in-session, also capture a node reaching ERRORED.",
+    "FR4: Fan-out beyond v1: either (a) nesting depth >= 2 (child spawns grandchild) or (b) >= 2 concurrent children under one parent, evidenced by Depth/Active figures in the rendered frame (e.g. Depth: 2 or Active: 3).",
+    "FR5: Tree figures render from measured state only; unavailable values render '--'; no invented numbers.",
+    "FR6: Agent Tree panel glyph/state rendering consistent with NodeState (RUNNING/PERMISSION_PENDING/IDLE/COMPLETE/ERRORED) as implemented in tree.py reducers.",
+    "FR7: If a new silent-failure gap is found (repo convention from C5: plausible value never checked against running system — e.g. an unchecked comparison or projection), fix it minimally in source and re-earn the evidence with a fresh run."
+  ],
+  "evidence_requirements": [
+    "ER1: Evidence under e2e-evidence/run-YYYYMMDDTHHMMSS-subagent-proof-v2/ following repo conventions: step-NN-slug artifacts + evidence-inventory.txt.",
+    "ER2: Each step captures a specific artifact: live session frame (spawn rendered during live session), rendered replay frame (post-transition tree), probe source used to drive the SDK, and any events.jsonl export showing the AGENT_SPAWNED/AGENT_FINISHED chain with parent_tool_use_id/parent_agent_id values.",
+    "ER3: Run named with distinct slug (not colliding with the three empty v1 lifecycle runs).",
+    "ER4: Run sealed by /Users/nick/proofpunk/plugins/proofpunk/validators/fresh_evidence.py --run <dir> with rc=0.",
+    "ER5: Evidence inventory lists every step file; no empty artifacts (0-byte files fail the proof).",
+    "ER6: Depth/Active figures and attribution labels in captured frames must match the jsonl event chain; cross-checked, not asserted."
+  ],
+  "process_rules": [
+    "PR1: Live-session-first: completion evidence must come from a live SDK session; synthetic replay may supplement (e.g. post-hoc rendered frame) but cannot substitute for the live spawn frame.",
+    "PR2: Budget guard: driver invocations honor --max-budget policy per validation/perf/driver.py convention; no unbounded spend on probe sessions.",
+    "PR3: Minimal-fix rule: any defect fix is the smallest change that closes the silent-failure gap; no drive-by refactors.",
+    "PR4: Do not delete the three empty v1 lifecycle runs (run-20260917T104359-lifecycle-helper-proof, run-20260917T104442-lifecycle-wired-proof, run-20260917T104455-harness-lifecycle-wired); deletion is consent-gated per §16.4(a).",
+    "PR5: HEAD has moved since the C5 proof (007-runaway-loop-detector landed); verify current spawn-gate and reducer behavior before assuming v1 findings still hold (spawn tool name "Agent" vs "Task" was previously measured 6:0)."
+  ],
+  "non_goals": [
+    "NG1: Not re-opening release-gate rows R1-R5 or any other RELEASE.md rows.",
+    "NG2: No performance claims (latency, throughput, cost) beyond what the budget guard reports.",
+    "NG3: Not renaming or re-validating the v1 empty runs or the C5 depth-1 run.",
+    "NG4: No UI changes beyond what a minimal defect fix requires."
+  ],
+  "open_questions": [
+    "OQ1: Is ERRORED state drivable in a single live session at acceptable cost? May require an agent that fails on purpose; if not cheaply drivable, note it and ship COMPLETE-only evidence.",
+    "OQ2: Does claude-agent-sdk 0.2.144 reliably emit nesting depth >= 2 (grandchild spawn) on this host? PHASE0.md measured three-level parent_tool_use_id chaining, but SDK version may have changed; if depth >= 2 is flaky, fall back to >= 2 concurrent children as the fan-out proof.",
+    "OQ3: Does AGENT_SPAWNED name resolution (subagent_type/description best-effort) produce a non-empty label for the probe used? If not, attribution still holds but label rendering should be captured as-is."
+  ],
+  "task_description": "Complete v2 proof that subagent fan-out works in proofpunk-agent: live-rendered spawn with attribution, lifecycle COMPLETE (ERRORED if cheap), depth >= 2 or >= 2 concurrent children, sealed by fresh_evidence.py rc=0, going beyond v1's depth-1/single-child proof.",
+  "workflow_type": "feature",
+  "services_involved": [
+    "bridge/sdk.py (spawn gate, event projection)",
+    "state/events.py (AGENT_SPAWNED/AGENT_FINISHED)",
+    "state/reducers/tree.py (tree fold, attribution, depth/active)",
+    "screens/session.py (§7 Agent Tree panel rendering)",
+    "e2e-evidence tooling + fresh_evidence.py validator"
+  ],
+  "created_at": "2026-09-18T00:00:00Z"
+}

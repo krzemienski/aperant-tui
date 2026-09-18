@@ -1,0 +1,33 @@
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ proofpunk-agent /Users/nick/proofpunk-agent │ ⑂ master                                                                                                 ◉ 0 running  ◆ 1 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│  1 swarm   2 graph   3 inspect   4 trace   5 tokens   6 waits  4 agents · esc then 1-7 to switch tabs                                                                                                │
+│                                                                                                                                                                                                      │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃ AGENT SWARM · 4 live                                                          ┃ │ SWARM VITALS                                                                                                   │ │
+│ ┃    AGENT              TYPE               STEPS      CTX      WAITING ON       ┃ │ running   1                                                                                                    │ │
+│ ┃  ❯ ● 999-subagent-pro   planner            13/1000    █░░░░    — executing    ┃ │ blocked   0                                                                                                    │ │
+│ ┃                                                       24%                     ┃ │ paused    0                                                                                                    │ │
+│ ┃    ✗ │ complexity_asses complexity_assess… 0/1000     ░░░░░ 0% — executing    ┃ │ Σ tokens  36.5k                                                                                                │ │
+│ ┃    ✓ │ complexity_asses complexity_assess… 0/1000     ░░░░░ 0% — executing    ┃ └────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ ┃    ✓ │ spec_gatherer-17 spec_gatherer      0/1000     ░░░░░ 0% — executing    ┃                                                                                                                    │
+│ ┃                                                                               ┃ ┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃   phase: ▪ structured vs ~ inferred provenance shown in INSPECT               ┃ │ LIVE TOOL TRACE                                                                                                │ │
+│ ┃                                                                               ┃ │ 05:34:34 999-subagent text-delta                                                                               │ │
+│ ┃                                                                               ┃ │ 05:34:34 999-subagent text-delta                                                                               │ │
+│ ┃                                                                               ┃ │ 05:34:34 999-subagent text-delta                                                                               │ │
+│ ┃                                                                               ┃ │ 05:34:34 999-subagent text-delta                                                                               │ │
+│ ┃                                                                               ┃ │ 05:34:34 999-subagent text-delta                                                                               │ │
+│ ┃                                                                               ┃ │ 05:34:50 999-subagent → SpawnSubagent {"agent_type":"spec_gatherer","task":"Gather and validate requirements … │ │
+│ ┃                                                                               ┃ │ 05:34:50 spec_gathere task:SUBAGENT_SPAWNING spec_gatherer                                                     │ │
+│ ┃                                                                               ┃ │ 05:34:50 999-subagent task:SUBAGENT_SPAWNING {"type":"SUBAGENT_SPAWNING","subagentId":"spec_gatherer-17897096… │ │
+│ ┃                                                                               ┃ │ 05:35:25 spec_gathere task:SUBAGENT_COMPLETED spec_gatherer                                                    │ │
+│ ┃                                                                               ┃ │ 05:35:25 999-subagent task:SUBAGENT_COMPLETED {"type":"SUBAGENT_COMPLETED","subagentId":"spec_gatherer-178970… │ │
+│ ┃                                                                               ┃ │ 05:35:25 999-subagent ← 35147ms Subagent (spec_gatherer) completed successfully.                               │ │
+│ ┃                                                                               ┃ │                                                                                                                │ │
+│ ┃                                                                               ┃ │ Output:                                                                                                        │ │
+│ ┃                                                                               ┃ │ Task is fully speci…                                                                                           │ │
+│ ┃                                                                               ┃ │ 05:35:25 999-subagent step-finish step 13 · 31.6k tok                                                          │ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ └────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ AGENTS  1-6 sub-view · j/k select · ⏎ inspect · f filter · r resume                                                                                                                     : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

@@ -1,0 +1,41 @@
+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ hunter-seed /Users/nick/dev/hunter-seed │ ⑂ main                                                                                                       ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ GENERATION                                                                                                                                                                                       │ │
+│ │ idle                                                                                                                                                                                             │ │
+│ │ - **P1 Usability & Onboarding** (must-heavy): auto-config advisor (F-038), prebuilt-image demo mode                                                                                              │ │
+│ │ - **P2 Detection Depth & Accuracy**: ensemble multi-model verification (F-042), semantic codebase in                                                                                             │ │
+│ │ - **P3 Scale & Operations**: build artifact cache (F-046), pluggable sandbox backends (F-047), cost                                                                                              │ │
+│ │ - **P4 Ecosystem & Extensibility**: external detector plugin API (F-049), Java/C#/Python target pack                                                                                             │ │
+│ │ Each feature has MoSCoW priority, complexity, impact, acceptance criteria, user stories, and depende                                                                                             │ │
+│ │ Phase features completed                                                                                                                                                                         │ │
+│ └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓┌────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃ PHASES                                                                     ┃│ DETAIL                                                                                                             │ │
+│ ┃   ○ PHASE P1 Usability & Onboarding Hardening                              ┃│ Scale & Operations                                                                                                 │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/10 features                                         ┃│  · CI/CD native integrations (GitHub Actions, GitLab) [planned · Must]                                             │ │
+│ ┃                                                                            ┃│    c → convert to task spec                                                                                        │ │
+│ ┃   ○ PHASE P2 Detection Depth & Accuracy                                    ┃│  · Owner routing and ticketing integration [planned · Should]                                                      │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/10 features                                         ┃│    c → convert to task spec                                                                                        │ │
+│ ┃                                                                            ┃│  · SOC SIEM integration for D&R track [planned · Could]                                                            │ │
+│ ┃ ❯ ○ PHASE P3 Scale & Operations                                            ┃│    c → convert to task spec                                                                                        │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/10 features                                         ┃│  · Policy and safety guardrails layer [planned · Must]                                                             │ │
+│ ┃                                                                            ┃│    c → convert to task spec                                                                                        │ │
+│ ┃   ○ PHASE P4 Ecosystem & Extensibility                                     ┃│  · Multi-tenant run profiles and team configuration [planned · Should]                                             │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/7 features                                          ┃│    c → convert to task spec                                                                                        │ │
+│ ┃                                                                            ┃│  · D&R detection content testing framework [planned · Should]                                                      │ │
+│ ┃                                                                            ┃│    c → convert to task spec                                                                                        │ │
+│ ┃                                                                            ┃│  · Finding knowledge graph and cross-run correlation [planned · Could]                                             │ │
+│ ┃                                                                            ┃│    c → convert to task spec                                                                                        │ │
+│ ┃                                                                            ┃│  · Build artifact and container cache layer [planned · must]                                                       │ │
+│ ┃                                                                            ┃│    c → convert to task spec                                                                                        │ │
+│ ┃                                                                            ┃│  · Sandbox portability layer (Firecracker, Kata, Docker fallbacks) [planned · should]                              │ │
+│ ┃                                                                            ┃│    c → convert to task spec                                                                                        │ │
+│ ┃                                                                            ┃│  · Cost forecasting and budget guardrails [planned · should]                                                       │ │
+│ ┃                                                                            ┃│    c → convert to task spec                                                                                        │ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛└────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│  g generate · G refresh · j/k phase · c convert→spec                                                                                                                                                 │
+│ ROAD  g generate (G force regen) · c convert→spec                                                                                                                                       : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

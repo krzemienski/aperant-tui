@@ -1,0 +1,119 @@
+This file contains TWO diffs.
+
+===============================================================================
+PART 1: Full `git diff` against HEAD for the two target files (as instructed).
+IMPORTANT: this includes a large pre-existing UNCOMMITTED code change (the
+actual token-accounting-fix logic: `+=` -> `=` reassignment, and the new
+`slashIdx` router-prefix-strip branch) that was ALREADY PRESENT in the
+working tree BEFORE this task began — confirmed by the initial `read` calls
+made at the start of this turn, which showed that code already in place
+prior to any edit by this agent. That pre-existing code diff is NOT part of
+this task's edit and is not claimed as comment-only.
+===============================================================================
+
+diff --git a/apps/desktop/src/main/ai/session/stream-handler.ts b/apps/desktop/src/main/ai/session/stream-handler.ts
+index 592114a..581033d 100644
+--- a/apps/desktop/src/main/ai/session/stream-handler.ts
++++ b/apps/desktop/src/main/ai/session/stream-handler.ts
+@@ -261,12 +261,26 @@ export function createStreamHandler(onEvent: SessionEventCallback) {
+     const cacheCreate = u?.inputTokenDetails?.cacheWriteTokens ?? u?.cacheCreationTokens;
+     const thinking = u?.outputTokenDetails?.reasoningTokens;
+ 
+-    // Accumulate usage
+-    state.cumulativeUsage.promptTokens += promptTokens;
++    // [APERANT-PATCH token-accounting-fix]: `promptTokens` at each finish-step is the whole conversation-so-far sent
++    // to the model on that turn (standard chat-completion usage semantics),
++    // NOT a per-step delta. It must be tracked as the LATEST value, not
++    // accumulated — `+=` here double/triple/N-counts the growing prompt on
++    // every step of a multi-step agentic session. `completionTokens` (and
++    // `totalTokens`, which sums the two) genuinely IS a per-step delta (each
++    // step generates new completion tokens on top of prior ones) and
++    // correctly accumulates. Verified against a live run: the observability
++    // swarm view showed CTX 1088% (Sigma tokens 2206.6k) on a session whose
++    // real prompt size, per `step-finish`'s own per-step usage, never
++    // exceeded 5-figure token counts — the inflated total was this
++    // mis-accumulation, not real context pressure. The session-level context
++    // window abort guard (session/runner.ts:401-403, 499-506) was unaffected
++    // because it reads `event.usage.promptTokens` from the per-step
++    // `step-finish` event (`stepUsage` below), not `state.cumulativeUsage`.
++    state.cumulativeUsage.promptTokens = promptTokens;
+     state.cumulativeUsage.completionTokens += completionTokens;
+-    state.cumulativeUsage.totalTokens += totalTokens;
+-    if (cacheRead) state.cumulativeUsage.cacheReadTokens = (state.cumulativeUsage.cacheReadTokens ?? 0) + cacheRead;
+-    if (cacheCreate) state.cumulativeUsage.cacheCreationTokens = (state.cumulativeUsage.cacheCreationTokens ?? 0) + cacheCreate;
++    state.cumulativeUsage.totalTokens = state.cumulativeUsage.promptTokens + state.cumulativeUsage.completionTokens;
++    if (cacheRead) state.cumulativeUsage.cacheReadTokens = cacheRead;
++    if (cacheCreate) state.cumulativeUsage.cacheCreationTokens = cacheCreate;
+     if (thinking) state.cumulativeUsage.thinkingTokens = (state.cumulativeUsage.thinkingTokens ?? 0) + thinking;
+ 
+     const stepUsage: TokenUsage = {
+diff --git a/apps/desktop/src/shared/constants/models.ts b/apps/desktop/src/shared/constants/models.ts
+index 1c99b70..65af5a2 100644
+--- a/apps/desktop/src/shared/constants/models.ts
++++ b/apps/desktop/src/shared/constants/models.ts
+@@ -604,6 +604,15 @@ export function resolveModelEquivalent(
+  * Look up the context window size for a model shorthand or full model ID.
+  * Searches ALL_AVAILABLE_MODELS by value first, then searches
+  * DEFAULT_MODEL_EQUIVALENCES for full model IDs (e.g., 'claude-opus-4-6').
++ * Also strips a leading `provider/` prefix (e.g. a router-style id like
++ * 'glm/glm-5' coming through ANTHROPIC_DEFAULT_*_MODEL / APERANT_MODEL when
++ * ANTHROPIC_BASE_URL points at a local router) and retries — without this,
++ * every router-prefixed model id silently falls through to the 200k
++ * fallback below, disabling the 70%/90% compaction guard in
++ * session/runner.ts for models with a smaller real window (verified: a
++ * live run against 'glm/glm-5', whose real window is 128,000, hit
++ * 318,158 prompt tokens — 159.1% of the 200k fallback — before any
++ * compaction warning or hard abort fired).
+  * Falls back to 200,000 (conservative default) if not found.
+  */
+ export function getModelContextWindow(modelIdOrShorthand: string): number {
+@@ -613,6 +622,18 @@ export function getModelContextWindow(modelIdOrShorthand: string): number {
+     return directMatch.capabilities.contextWindow;
+   }
+ 
++  // [APERANT-PATCH token-accounting-fix]: Router-prefixed id (e.g. 'glm/glm-5') — retry the direct lookup against
++  // the part after the first '/'. Only applies when there IS a '/', so bare
++  // shorthands and full Claude ids (no slash) are unaffected.
++  const slashIdx = modelIdOrShorthand.indexOf('/');
++  if (slashIdx !== -1) {
++    const unprefixed = modelIdOrShorthand.slice(slashIdx + 1);
++    const unprefixedMatch = ALL_AVAILABLE_MODELS.find((m) => m.value === unprefixed);
++    if (unprefixedMatch?.capabilities?.contextWindow) {
++      return unprefixedMatch.capabilities.contextWindow;
++    }
++  }
++
+   // Search equivalences for full model IDs (e.g., 'claude-opus-4-6' → find 'opus' entry)
+   for (const [shorthand, providerMap] of Object.entries(DEFAULT_MODEL_EQUIVALENCES)) {
+     for (const spec of Object.values(providerMap)) {
+
+===============================================================================
+PART 2: ISOLATED diff of THIS TASK'S EDIT ONLY (before-my-edit vs after-my-edit,
+using the exact text captured by the `read` calls at the start of this turn as
+the "before" state). This is the actual scope of work performed under this
+task, and it is comment-only.
+===============================================================================
+
+--- apps/desktop/src/main/ai/session/stream-handler.ts (before my edit, i.e. state at task start)
++++ apps/desktop/src/main/ai/session/stream-handler.ts (after my edit)
+@@ -1,2 +1,2 @@
+-    // `promptTokens` at each finish-step is the whole conversation-so-far sent
++    // [APERANT-PATCH token-accounting-fix]: `promptTokens` at each finish-step is the whole conversation-so-far sent
+     // to the model on that turn (standard chat-completion usage semantics),
+
+--- apps/desktop/src/shared/constants/models.ts (before my edit, i.e. state at task start)
++++ apps/desktop/src/shared/constants/models.ts (after my edit)
+@@ -1,2 +1,2 @@
+-  // Router-prefixed id (e.g. 'glm/glm-5') — retry the direct lookup against
++  // [APERANT-PATCH token-accounting-fix]: Router-prefixed id (e.g. 'glm/glm-5') — retry the direct lookup against
+   // the part after the first '/'. Only applies when there IS a '/', so bare
+
+===============================================================================
+VERDICT: This task's own edit (Part 2) touches exactly two lines, both
+`//`-comment lines, prepending the required `[APERANT-PATCH token-accounting-fix]: `
+tag to an existing comment sentence. No code line, string literal, or
+non-comment token was added or removed by this task's edit. The additional
+non-comment lines visible in Part 1 (the full git diff vs HEAD) are
+pre-existing uncommitted work from earlier in this session, not introduced
+by this task.
+===============================================================================

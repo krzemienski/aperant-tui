@@ -1,0 +1,27 @@
+{
+  "gate": "P5.1",
+  "verification": "byte-level set diff of (path, branch) tuples",
+  "git_authoritative": [
+    {
+      "path": "/private/tmp/aperant-gate-scratch",
+      "branch": "main"
+    },
+    {
+      "path": "/private/tmp/aperant-gate-scratch/.auto-claude/worktrees/tasks/feature-divergent",
+      "branch": "feature/divergent"
+    }
+  ],
+  "ui_rendered": [
+    {
+      "path": "/private/tmp/aperant-gate-scratch",
+      "branch": "main"
+    },
+    {
+      "path": "/private/tmp/aperant-gate-scratch/.auto-claude/worktrees/tasks/feature-divergent",
+      "branch": "feature/divergent"
+    }
+  ],
+  "set_diff_git_minus_ui": [],
+  "set_diff_ui_minus_git": [],
+  "verdict": "PASS"
+}

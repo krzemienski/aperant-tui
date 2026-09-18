@@ -1,0 +1,32 @@
+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ aperant-gate-scratch /tmp/aperant-gate-scratch │ ⑂ main                                                                                                ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┌──────────────────────────────────────────────────────────────────────────────────────────────────────┐ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ │
+│ │ WORKTREES                                                                                            │ ┃ DIFF · feature/divergent                                                                ┃ │
+│ │   ⑂ main                                                                                             │ ┃ head 6bef1b7409  diff 1 file changed, 15 insertions(+)                                  ┃ │
+│ │     /private/tmp/aperant-gate-scratch                                                                │ ┃                                                                                         ┃ │
+│ │ ❯ ⑂ feature/divergent                                                                                │ ┃ diff --git a/app.py b/app.py                                                            ┃ │
+│ │     /private/tmp/aperant-gate-scratch/.auto-claude/worktrees/tasks/feature-divergent                 │ ┃ index 9a37335..48bc19f 100644                                                           ┃ │
+│ │                                                                                                      │ ┃ --- a/app.py                                                                            ┃ │
+│ │                                                                                                      │ ┃ +++ b/app.py                                                                            ┃ │
+│ │                                                                                                      │ ┃ @@ -3,3 +3,18 @@ def hello():                                                           ┃ │
+│ │                                                                                                      │ ┃                                                                                         ┃ │
+│ │                                                                                                      │ ┃                                                                                         ┃ │
+│ │                                                                                                      │ ┃  CONSTANT = 1                                                                           ┃ │
+│ │                                                                                                      │ ┃ +EXTRA_LINE_1 = "line one"                                                              ┃ │
+│ │                                                                                                      │ ┃ +EXTRA_LINE_2 = "line two"                                                              ┃ │
+│ │                                                                                                      │ ┃ +EXTRA_LINE_3 = "line three"                                                            ┃ │
+│ │                                                                                                      │ ┃ +EXTRA_LINE_4 = "line four"                                                             ┃ │
+│ │                                                                                                      │ ┃ +EXTRA_LINE_5 = "line five"                                                             ┃ │
+│ │                                                                                                      │ ┃ +EXTRA_LINE_6 = "line six"                                                              ┃ │
+│ │                                                                                                      │ ┃ +EXTRA_LINE_7 = "line seven"                                                            ┃ │
+│ │                                                                                                      │ ┃ +EXTRA_LINE_8 = "line eight"                                                            ┃ │
+│ │                                                                                                      │ ┃ +EXTRA_LINE_9 = "line nine"                                                             ┃ │
+│ │                                                                                                      │ ┃ +EXTRA_LINE_10 = "line ten"                                                             ┃ │
+│ │                                                                                                      │ ┃ +EXTRA_LINE_11 = "line eleven"                                                          ┃ │
+│ │                                                                                                      │ ┃ +EXTRA_LINE_12 = "line twelve"                                                          ┃ │
+│ │                                                                                                      │ ┃ … 4 more line(s), j/k to scroll                                                         ┃ │
+│ └──────────────────────────────────────────────────────────────────────────────────────────────────────┘ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ │
+│ TREE  tab focus · j/k select/scroll · m merge · p PR · R AI-resolve                                                                                                                     : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

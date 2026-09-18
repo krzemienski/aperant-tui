@@ -1,0 +1,21 @@
+{
+  "gate": "P5.new-merge-guards",
+  "test_a_self_merge": {
+    "action": "select main worktree row, press m (main repo's current branch is also main)",
+    "expected_message": "refusing to merge \"main\" into itself",
+    "observed_message": "refusing to merge \"main\" into itself",
+    "match": true,
+    "git_log_unchanged": true,
+    "verdict": "PASS"
+  },
+  "test_b_dirty_tree": {
+    "action": "select feature/divergent worktree, dirty README.md in main repo, press m",
+    "expected_message": "refusing to merge: \"main\" has uncommitted changes that would be clobbered \u2014 commit or stash first",
+    "observed_message": "refusing to merge: \"main\" has uncommitted changes that would be clobbered \u2014 commit or stash first",
+    "match": true,
+    "git_log_unchanged": true,
+    "verdict": "PASS",
+    "cleanup": "git checkout -- README.md (reverted the test dirt)"
+  },
+  "verdict": "PASS"
+}

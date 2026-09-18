@@ -1,0 +1,28 @@
+{
+  "valid": true,
+  "files_checked": [
+    "spec.md",
+    "implementation_plan.json",
+    "complexity_assessment.json",
+    "requirements.json",
+    "research.json",
+    "proofpunk_agent/bridge/sdk.py",
+    "proofpunk_agent/state/reducers/tree.py",
+    "proofpunk_agent/screens/session.py",
+    "validation/capture.py"
+  ],
+  "errors": [],
+  "warnings": [
+    "implementation_plan.json subtasks omit a 'title' field only in the sense that it IS present; however plans reference placeholder run dir 'run-YYYYMMDDTHHMMSS-subagent-proof-v2' in files_to_create — expected, since timestamps are runtime-assigned via init-run.",
+    "spec.md step list includes conditional step-09-style errored frame listed as item 8 (step-NN-errored-frame) plus inventory as item 9; implementation plan allocates step-08 to errored-frame and inventory via Phase 4. Numbering is explicitly declared as owned by fresh_evidence.py next-step, so expected step-01..step-08 alignment holds; inventory (item 9 in spec prose) is a convention file, not a numbered step artifact — consistent, minor prose-vs-plan numbering asymmetry only.",
+    "FR2 in spec.md is a deliberate refinement of requirements.json FR2 (permits explained UNATTRIBUTED occurrences rather than forbidding them) — documented as such in spec; flagged for traceability, not an error."
+  ],
+  "checks_detail": {
+    "required_files": "All 5 present and non-empty",
+    "implementation_plan_structure": "Valid JSON; top-level 'phases' array of 5; every phase has id/name/subtasks[]; every subtask has string id, string description, title, status 'pending', files_to_create, files_to_modify",
+    "spec_md_sections": "Rationale ✓, User Stories ✓, Acceptance Criteria with checkboxes ✓, Scope + Non-goals ✓, Evidence Plan ✓; FR1-7, ER1-6, PR1-5 all present as checkboxes; targets stated with fallbacks (OQ1-OQ4), no unmeasured claim stated as fact",
+    "cross_consistency": "Evidence Plan step list (source-facts, probe-source, live-spawn, lifecycle, events, fanout-live, fanout-events, conditional errored, inventory) matches plan artifacts step-01..step-08 + evidence-inventory.txt; FR7 trigger definition (AGENT_SPAWNED lands UNATTRIBUTED while parent tool_use_id present in message chain) matches Phase 5 conditional trigger description; Prompts section contains proven depth-1 prompt verbatim (matches research.json step-04 prompt string exactly)",
+    "project_reality": "sdk.py:288 _SPAWN_TOOL_NAMES ✓; sdk.py:761 _agent_spawned_event ✓; sdk.py:781 _agent_finished_event ✓; tree.py reduce_tree (line 319) + UNATTRIBUTED fallback (lines 240-245) ✓; screens/session.py exists ✓; validation/capture.py exists ✓"
+  },
+  "checked_at": "2026-09-18T00:00:00Z"
+}

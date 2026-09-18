@@ -1,0 +1,58 @@
+
+
+> aperant-tui-workspace@0.1.0 dev
+> npm run dev -w @aperant/tui --project /Users/nick/awesome-researcher
+
+
+> @aperant/tui@0.1.0 dev
+> tsx src/cli.tsx /Users/nick/awesome-researcher
+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ awesome-researcher /Users/nick/awesome-researcher │ ⑂ feat/awesome-researcher                                                      ◉ 0 running  ◆ 1 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                            │
+│ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ ┌────────────────────────────────────────────────┐ │
+│ │ WORKTREES                                                                                                                 │ │ STATUS · feat/awesome-researcher               │ │
+│ │ ❯ ⑂ feat/awesome-researcher                                                                                               │ │ head 15c94710a6                                │ │
+│ │     /Users/nick/awesome-researcher                                                                                        │ │ diff clean                                     │ │
+│ │   ⑂ auto-claude/004-awesome-list-parsing-and-category-extraction                                                          │ │ unified diff + merge arrive in Phase 5         │ │
+│ │     /Users/nick/awesome-researcher/.auto-claude/worktrees/tasks/004-awesome-list-parsing-and-category-extraction          │ │                                                │ │
+│ │                                                                                                                           │ │                                                │ │
+│ │                                                                                                                           │ │                                                │ │
+│ │                                                                                                                           │ │                                                │ │
+│ └───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ └────────────────────────────────────────────────┘ │
+│ TREE  j/k select                                                                                                                                                    : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

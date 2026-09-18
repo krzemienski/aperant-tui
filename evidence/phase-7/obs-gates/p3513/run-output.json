@@ -1,0 +1,19 @@
+{
+  "criterion": "P3.5.13",
+  "eventsSent": 759,
+  "elapsedSec": 5.106,
+  "actualEventsPerSec": 148.66,
+  "snapshotCount": 305,
+  "coalescingRatio": 2.49,
+  "expectedMaxSnapshotsAt16ms": 320,
+  "maxEventLoopLagMs": 7.32,
+  "avgEventLoopLagMs": 6.59,
+  "stallsOver50ms": 0,
+  "finalAgentCount": 1,
+  "finalTraceLength": 608,
+  "finalAgentSnapshot": {
+    "stepsExecuted": 757,
+    "totalTokens": 9084,
+    "phase": "coding"
+  }
+}

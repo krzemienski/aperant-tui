@@ -1,15 +1,18 @@
 /**
  * InsightsView — codebase Q&A over the REAL vendored insights runner
- * (ai/runners/insights.runInsightsQuery) plus five-type ideation
- * (ai/runners/ideation.runIdeation). Phase 4.
+ * (ai/runners/insights.runInsightsQuery) plus six-type ideation
+ * (ai/runners/ideation.runIdeation). Phase 4. F-13: this comment said
+ * "five-type" while IDEATION_TYPES has six entries and the Keys line below
+ * already said "all six types" — internal drift, fixed.
  *
- * Keys: `a` ask (opens the question input) · type + ⏎ submits · `x` abort ·
+ * Keys: `a` ask (opens the question input) · type + ⏎ submits, esc cancels
+ * (F-10) · `x` abort ·
  * `i` run ideation (all six types) · `1..6` select ideation type view ·
  * `q` back to Q&A. Answers stream token-by-token; ideation writes real
  * JSON per type under .auto-claude/ideation/ and renders findings.
  */
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Box, Text } from 'ink';
+import { Box, Text, useInput } from 'ink';
 import fs from 'node:fs';
 import path from 'node:path';
 import type { Project } from '@shared/types';
@@ -18,6 +21,7 @@ import { Panel } from '../components/Panel';
 import TextInput from 'ink-text-input';
 import { useKeymap } from '../hooks/useKeymap';
 import { useAppStore } from '../stores/app-store';
+import { applyAccountEnv } from '../services/agent-start-service';
 import { runInsightsQuery } from '@main/ai/runners/insights';
 import { runIdeation } from '@main/ai/runners/ideation';
 
@@ -80,6 +84,9 @@ export function InsightsView({ theme: c, project, isActive }: Props) {
   const ask = useCallback(async (q: string) => {
     setAnswer(''); setBusy(true);
     const ac = new AbortController(); abortRef.current = ac;
+    // D-C: mirror the provisioned account into the standard SDK env names
+    // before the runner resolves auth — see agent-start-service.applyAccountEnv.
+    applyAccountEnv();
     try {
       await runInsightsQuery(
         // D15: the default must be a SHORTHAND, not a full router id. A full id
@@ -104,6 +111,9 @@ export function InsightsView({ theme: c, project, isActive }: Props) {
   const runIdeationAll = useCallback(async () => {
     setIdeationStatus('starting…'); setBusy(true);
     const ac = new AbortController(); abortRef.current = ac;
+    // D-C: mirror the provisioned account into the standard SDK env names
+    // before the runner resolves auth — see agent-start-service.applyAccountEnv.
+    applyAccountEnv();
     try {
       // The vendored resolvePromptsDir relies on __dirname (CJS/Electron),
       // which does not exist under the TUI's tsx ESM runtime (D6 class).
@@ -119,13 +129,31 @@ export function InsightsView({ theme: c, project, isActive }: Props) {
         return;
       }
       const outputDir = path.join(project.path, '.auto-claude', 'ideation');
+      // F-09: every text-delta used to be discarded and replaced with the
+      // same constant `${t.label}… streaming` string, so once the first
+      // chunk arrived the status line never changed again — React doesn't
+      // even re-render on an identical string, so a run could sit frozen
+      // for minutes with no visible motion. Accumulate a running character
+      // count and a short tail of the streamed text instead, and coalesce
+      // updates on a byte threshold so we don't flood setState per token.
       for (const t of IDEATION_TYPES) {
         if (ac.signal.aborted) break;
-        setIdeationStatus(`${t.label}…`);
+        const typeIdx = IDEATION_TYPES.indexOf(t) + 1;
+        setIdeationStatus(`${typeIdx}/${IDEATION_TYPES.length} ${t.label}…`);
+        let streamed = '';
+        let sinceFlush = 0;
         await runIdeation(
           // D15 (see ask()): shorthand default, redirectable via env.
           { projectDir: project.path, outputDir, promptsDir, ideationType: t.key, abortSignal: ac.signal, modelShorthand: (process.env.APERANT_MODEL ?? 'sonnet') as never },
-          (ev) => { if (ev.type === 'text-delta') setIdeationStatus(`${t.label}… streaming`); },
+          (ev) => {
+            if (ev.type !== 'text-delta') return;
+            streamed += ev.text;
+            sinceFlush += ev.text.length;
+            if (sinceFlush < 24) return;
+            sinceFlush = 0;
+            const tail = streamed.slice(-40).replace(/\s+/g, ' ');
+            setIdeationStatus(`${typeIdx}/${IDEATION_TYPES.length} ${t.label}… ${streamed.length}ch · …${tail}`);
+          },
         );
       }
       setIdeationStatus(null); setIdeationReload((k) => k + 1); setMode('ideation');
@@ -153,6 +181,20 @@ export function InsightsView({ theme: c, project, isActive }: Props) {
   }, { isActive: isActive && !asking });
 
   useEffect(() => () => abortRef.current?.abort(), []);
+
+  // F-10: while `asking` is true the view's own keymap above is disabled
+  // ({ isActive: isActive && !asking }) and App.tsx's global escape is
+  // deliberately stood down too (textInputActive, D18) — that stand-down is
+  // correct, it stops a typed '?'/':' from opening help/palette mid-question.
+  // But the combination left NO escape handler live at all while the ask box
+  // was open: TextInput (ink-text-input) only exposes onChange/onSubmit, no
+  // onCancel, so there was no way out except backspacing to empty and
+  // submitting. A separate useInput scoped to `{ isActive: asking }` handles
+  // ONLY escape and lets every other keystroke (including '?' and ':')
+  // continue reaching TextInput's onChange as before.
+  useInput((_input, key) => {
+    if (key.escape) { setAsking(false); setQuestion(''); }
+  }, { isActive: asking });
 
   // D18: while the ask box is focused it owns the keyboard — the global
   // keymap must stand down or a typed '?' opens help and a typed ':' opens the
@@ -200,6 +242,7 @@ export function InsightsView({ theme: c, project, isActive }: Props) {
                 <Text color={c.accent}>? </Text>
                 <TextInput value={question} onChange={setQuestion}
                   onSubmit={(v) => { const q = v.trim(); setAsking(false); setQuestion(''); if (q) ask(q); }} />
+                <Text color={c.faint}>  (esc cancel)</Text>
               </Box>
             ) : (
               <Text color={c.faint}>a — ask about this codebase {busy ? '· streaming… x abort' : ''}</Text>

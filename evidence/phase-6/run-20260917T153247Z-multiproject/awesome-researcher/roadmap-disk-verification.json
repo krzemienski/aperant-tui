@@ -1,0 +1,24 @@
+{
+  "phase_count": 3,
+  "phases": [
+    "P-1 Trust & Review Workflow",
+    "P-2 Continuous Operation",
+    "P-3 Scale & Intelligence"
+  ],
+  "sample_features": [
+    {
+      "id": "F-101",
+      "title": "Human-in-the-loop candidate review with selective approval"
+    },
+    {
+      "id": "F-102",
+      "title": "Automatic PR draft generation from approved candidates"
+    },
+    {
+      "id": "F-103",
+      "title": "Link-rot audit of existing list entries"
+    }
+  ],
+  "ui_matches_disk": true,
+  "domain_relevance": "Features (PR draft generation from approved candidates, link-rot audit, scheduled cron runs, WebSearch discovery providers) are genuinely specific to awesome-researcher's actual domain: a Python pipeline on Claude Agent SDK that discovers, dedupes, and proposes entries for awesome-lists. Not generic filler."
+}

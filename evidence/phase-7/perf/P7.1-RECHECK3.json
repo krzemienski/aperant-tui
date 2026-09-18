@@ -1,0 +1,143 @@
+{
+  "criterion": "P7.1 — 200-task board scrolls at >=60fps",
+  "source": "docs/plan/ROADMAP.md:16",
+  "recheck_of": [
+    "evidence/phase-7/perf/P7.1-RESULT.json (Stage 1: original FAIL — unmodified, preserved)",
+    "evidence/phase-7/perf/P7.1-RECHECK.json (Stage 2: viewport-windowing fix — unmodified, preserved)",
+    "evidence/phase-7/perf/P7.1-RECHECK2.json (Stage 3: chrome-memoization investigation — unmodified, preserved)"
+  ],
+  "generated_at": "2026-09-17T00:00:00Z",
+  "scope_extended_to": ["apps/tui/src/hooks/useKeymap.ts"],
+  "fix_applied_stage4": {
+    "files_changed": [
+      "apps/tui/src/hooks/useKeymap.ts",
+      "apps/tui/src/views/BoardView.tsx"
+    ],
+    "mechanism": "useKeymap gained an optional `splittableKeys?: string[]` opt-in allowlist (default: undefined — inert everywhere unless a caller explicitly opts in). When the whole-string lookup on the normalized key name fails AND the failed name is a UNIFORM RUN of exactly one repeated character (`name === ch.repeat(name.length)`) AND that character is in the caller's `splittableKeys` list AND a binding exists for it, the binding is dispatched once per character instead of the whole coalesced chunk being silently dropped.",
+      "safety_predicate": {
+      "uniform_run_check": "name === name[0].repeat(name.length) — a MIXED chunk (e.g. 'jk' from fast alternating presses, or pasted text) never matches and is never split. There is no way to know which handler(s) the user intended for an ambiguous chunk; firing the wrong one is worse than dropping it, exactly as it was dropped before this fix.",
+      "explicit_opt_in": "splittableKeys defaults to undefined/empty. Verified via source read: every OTHER useKeymap call site in the codebase (App.tsx x2, AgentsView.tsx, InsightsView.tsx, LogsView.tsx, RoadmapView.tsx, SettingsView.tsx, TerminalView.tsx, WorktreeView.tsx) passes no splittableKeys — the new code path is a guaranteed no-op for all of them. Only BoardView.tsx opts in, and only for ['j', 'k'].",
+      "why_only_j_and_k": "j/k are pure `setSel((s) => Math.min/max(...))` functional-state-updater calls with zero side effects — safe to fire N times synchronously in one React batch because each queued updater call correctly reads the PRIOR queued value, not a stale closure. H/L (moveTask) and s/x (start/stop) were deliberately NOT added to the allowlist: move() reads `task.status` from a per-render closure variable that does not update mid-batch, so N synchronous H calls would all attempt to move the SAME stale task from the SAME stale status rather than converging correctly. start()'s original guard read `starting` component state the same way — a coalesced multi-s chunk could have double-fired startTask (a real process spawn) before the fix. As defense in depth this was hardened anyway (see below) even though s is not in the allowlist."
+    },
+    "defense_in_depth_hardening": {
+      "file": "apps/tui/src/views/BoardView.tsx",
+      "change": "start()'s reentrancy guard changed from reading `starting` (React state, does not update mid-batch) to reading a new `startingRef` (useRef, updates synchronously). This makes start() itself safe against a same-tick multi-call regardless of whether `s` is ever added to a splittableKeys list in the future.",
+      "note": "`starting` state is still set (for any UI that reads it) — only the reentrancy GUARD now uses the ref."
+    },
+    "text_input_isolation_proof": {
+      "claim": "The fix cannot intercept typing in the Insights ask box.",
+      "proof_by_construction": [
+        "InsightsView.tsx's useKeymap({a, i, x, q, 1-6, ...}, {isActive: isActive && !asking}) passes NO splittableKeys — the new split code path never executes for this call site, with or without `asking`.",
+        "Additionally, when asking=true, isActive becomes false. Ink's own useInput (node_modules/ink/build/hooks/use-input.js:32-35 and :41-44) never subscribes its 'input' event listener when isActive is false — the callback (and therefore my new code) literally cannot fire while the ask box is open.",
+        "ink-text-input's TextInput component registers its OWN, entirely separate useInput({isActive: focus}) instance — verified by reading node_modules/ink-text-input/build/index.js — which never touches useKeymap.ts or the new code at all."
+      ],
+      "verified_live": "Typed 'does j:k scroll work? test' (including literal '?' and ':' characters, the exact characters App.tsx's D18 comment warns are otherwise captured by the global palette/help keymap) into the ask box via tuistory type(). The full string landed intact in the input field; no help overlay or command palette opened."
+    }
+  },
+  "measurement_method": "Identical M0/M1/M2/M3 protocol to Stages 1-3: same /tmp/ap-perf-200 and /tmp/ap-perf-20 fixtures, same trial counts (M1: 30, M2: 8, M3: 4), same tuistory type()-based sustained-burst delivery, same DETAIL-panel spec-id extraction for registered-step counting.",
+  "measurements_all_four_stages": [
+    {
+      "id": "M1_isolated_single_keypress_settle_ms",
+      "stage1": { "median_ms": 10.0 },
+      "stage2": { "median_ms": 6.0 },
+      "stage3": { "median_ms": 6.0 },
+      "stage4": { "median_ms": 6.0, "mean_ms": 5.8, "min_ms": 4, "max_ms": 8, "n_trials": 30 },
+      "note": "Unchanged from Stage 3, exactly as expected — single isolated presses never enter the coalesced-chunk split path (the whole-string lookup already succeeds on the first try for a lone 'j')."
+    },
+    {
+      "id": "M2_sustained_rapid_scroll_200task_THE_BINDING_METRIC",
+      "stage1": { "avg_registered_of_15": 1.0, "drop_pct": 93.33, "ms_per_step": 296.7, "fps_equiv": 3.37 },
+      "stage2": { "avg_registered_of_15": 3.5, "drop_pct": 76.67, "ms_per_step": 96.4, "fps_equiv": 10.38 },
+      "stage3": { "avg_registered_of_15": 3.5, "drop_pct": 76.67, "ms_per_step": 94.3, "fps_equiv": 10.61 },
+      "stage4": {
+        "avg_registered_of_15": 15.0, "drop_pct": 0.0, "ms_per_step": 22.39, "fps_equiv": 44.67,
+        "n_trials": 8, "registered_per_trial": [15, 15, 15, 15, 15, 15, 15, 15],
+        "wall_s_per_trial": [0.337, 0.334, 0.335, 0.336, 0.335, 0.340, 0.334, 0.336]
+      },
+      "threshold_ms": 16.67,
+      "verdict_for_this_measurement": "STILL FAIL on the raw number (22.39ms/step vs 16.67ms threshold), but drop rate is fully eliminated (93.33% -> 0%) and the derived fps-equivalent rose from ~10.6 to ~44.7 — an 8.3x improvement in the primary bottleneck this whole investigation chain targeted."
+    },
+    {
+      "id": "M3_sustained_rapid_scroll_20task_comparison",
+      "stage1": { "drop_pct": 53.33 },
+      "stage2": { "drop_pct": 66.67 },
+      "stage3": { "drop_pct": 60.0 },
+      "stage4": { "drop_pct": 0.0, "n_trials": 4, "registered_per_trial": [15, 15, 15, 15] },
+      "conclusion": "20-task board ALSO drops to 0% — confirms the fix is a genuine mechanism-level change in useKeymap.ts/BoardView.tsx, not an artifact specific to the 200-task fixture's render cost. This is the expected cross-check result and materially different from Stages 2-3, where the 20-task board was unaffected by fixes that only reduced render COST (windowing, memoization) rather than fixing keystroke DELIVERY."
+    },
+    {
+      "id": "M0_control_pty_delivery_integrity",
+      "stage1": "50/50", "stage2": "50/50", "stage3": "50/50", "stage4": "50/50",
+      "conclusion": "Unchanged across all four stages, as expected (independent of the app under test)."
+    }
+  ],
+  "instrument_ceiling_finding": {
+    "summary": "M2's headline 22.39ms/registered-step number is NOT primarily app or Ink cost at Stage 4 — it is now dominated by tuistory's own `type` command delivery pacing.",
+    "evidence": {
+      "handler_processing_speed": "Used a temporary high-resolution render probe (process.hrtime.bigint(), since fully removed after measurement) to time from the first keystroke's handler call to the last of 15. Result: all 15 `j` handler invocations, 5 BoardView re-renders, and the resulting correct scroll (1 -> 16) completed within approximately 20.3ms of the FIRST keystroke's handler firing — while `tuistory type()`'s call itself did not return control to the test script for another ~313ms.",
+      "instrument_isolation_test": "Independently timed `tuistory type('j'*15)` against a plain `cat` process (zero app logic, zero React, zero Ink) under the identical tuistory session/PTY setup: 315.2ms wall time for 15 characters = 21.01ms/char — statistically indistinguishable from the app's measured 22.39ms/registered-step.",
+      "conclusion": "tuistory's `type` command has a fixed internal per-character delivery/simulation pacing of ~21ms/char (undocumented, no configuration flag exposed per `tuistory type --help`) that exists independent of any application under test. This pacing is itself BELOW the 16.67ms/60fps target rate, meaning M2 as measured via `type()` can no longer distinguish 'the app processes keys in <16.67ms each' from 'the app processes keys in ~21ms each' — the instrument's own floor sits inside the range being measured. Extrapolated app-side-only throughput: ~1.36ms/keystroke (15 keys / ~20.3ms), implying a theoretical ~736 keystrokes/sec capacity, far in excess of the 60/sec the criterion requires — but this extrapolation is reported as a secondary finding, not substituted for the M2 headline number, because it was derived from a different (probe-based) measurement, not the same protocol as M2."
+    }
+  },
+  "ink_architectural_ceiling_restated": {
+    "location": "node_modules/ink/build/ink.js:39",
+    "code": "throttle(this.onRender, 32, { leading: true, trailing: true })",
+    "arithmetic": {
+      "throttle_interval_ms": 32,
+      "max_sustained_repaint_rate_fps": 31.25,
+      "target_ms_per_frame": 16.67,
+      "ink_floor_vs_target_ratio": "32 / 16.67 = 1.92x — Ink's own hard floor is 1.92x slower than the 60fps/16.67ms target",
+      "conclusion": "Even in the theoretical limit of zero app-side processing time, Ink 5.2.1's own throttle() wrapper caps the maximum achievable steady-state repaint rate at 31.25fps for ANY application built on it. This is unrelated to and unaffected by the Stage 4 keymap fix — the fix addressed keystroke DELIVERY (making sure input reaches the app's state at all), not Ink's own PAINT rate (how often the terminal buffer is actually flushed once state changes)."
+    },
+    "unresolved_by_stage4": "Not measured directly in this recheck (the 22.39ms M2 number never got close enough to 32ms to exercise Ink's throttle as the binding constraint — the tuistory type() instrument's own ~21ms floor intervened first), but stands as documented, source-verified fact from Stage 3's investigation, unchanged by this stage's fix."
+  },
+  "regression_checks": {
+    "insights_ask_box_typing": {
+      "method": "Opened ask box (tab 4, 'a'), typed 'does j:k scroll work? test' via tuistory type() — deliberately including literal '?' and ':' characters, the exact characters App.tsx's D18 comment documents as otherwise captured by the global help/palette keymap.",
+      "result": "PASS — full string landed intact in the input field. No help overlay or command palette opened."
+    },
+    "H_L_column_moves": {
+      "method": "Pressed H on task 001 (queue -> backlog), confirmed persisted+logged. Pressed L (backlog -> queue), confirmed persisted+logged and cross-checked against the DETAIL panel's [QUEUED] status badge.",
+      "result": "PASS — both moves correct, persisted to disk, logged in AGENT STREAM."
+    },
+    "theme_switching": {
+      "method": "Opened Settings (tab 6), moved theme selection with j, persisted with return (default theme -> amber, confirmed ACTIVE marker), switched back to Board (tab 1).",
+      "result": "PASS — theme applied instantly across the view switch, matching the already-proven P6.1a criterion. Not regressed."
+    },
+    "tab_navigation": {
+      "method": "Switched between board/chat/settings tabs, including the documented escape-then-digit pattern required inside chat/agents views per App.tsx's D14 comment.",
+      "result": "PASS — all tab switches worked correctly."
+    },
+    "isolated_j_k_still_correct": {
+      "method": "Single separate td.press() calls for 'j', confirmed selection moves by exactly 1 each time.",
+      "result": "PASS — unaffected by the split-path addition."
+    }
+  },
+  "navigation_correctness_recheck": {
+    "method": "200 sequential single keypresses from task 1, column headers recorded as they scrolled into view.",
+    "note": "Not re-run with the full 200-press protocol this stage (already re-verified identically in Stages 2 and 3 with zero deviation); instead cross-verified via the M2/M3 sustained-burst trials themselves, which correctly landed at expected task numbers (base+15) in all 12 trials (8 on 200-task, 4 on 20-task), and via the regression-check session's H/L/theme/tab navigation all functioning correctly post-fix.",
+    "result": "PASS — consistent with prior stages, no drift observed."
+  },
+  "threshold": { "target_fps": 60, "target_ms_per_frame": 16.67 },
+  "verdict": "FAIL — drop-rate root cause fixed (8.3x throughput improvement); remaining gap is architecturally unreachable within this dependency without vendoring/patching/upgrading Ink",
+  "verdict_reasoning": "The useKeymap.ts coalesced-keystroke fix eliminated the actual measured defect this entire investigation chain was chasing: sustained-scroll keystroke drop went from 93.33% (Stage 1) to 0% (Stage 4), an 8.3x improvement in effective throughput (3.37fps -> 44.67fps by the M2 metric). All regression checks pass — no behavior was broken to achieve this. However, the raw M2 number (22.39ms/registered-step) still exceeds the 16.67ms/60fps threshold, and — critically — that remaining gap is now proven, via an independent probe measurement and an instrument-isolation control against a trivial `cat` process, to be dominated by the MEASUREMENT INSTRUMENT's (tuistory type()) own ~21ms/char delivery pacing floor, not by the app or Ink. The app's actual keystroke-processing throughput is now far faster than 60fps requires (~1.36ms/keystroke, ~736/sec capacity). Separately and unconditionally, Ink 5.2.1's own architecture caps sustained repaint at 31.25fps (32ms hard throttle, node_modules/ink/build/ink.js:39) — a ceiling that exists independent of this fix and was never reached in these measurements because the instrument's own pacing floor intervened first. 60fps remains FAIL and is architecturally unreachable within this dependency version without vendoring, patching, or upgrading Ink — which this task was explicitly instructed not to do. A future fix would require: (1) upgrading `ink` past whatever version removes or configures the 32ms throttle (if any later version does), or (2) vendoring/patching `node_modules/ink/build/ink.js`'s throttle call directly, both dependency decisions outside this task's authorization.",
+  "cross_stage_summary": {
+    "stage1_baseline_no_fix":            "296.7ms/step, 93.33% drop, ~3.4fps  — FAIL",
+    "stage2_viewport_windowing_fix":     "96.4ms/step,  76.67% drop, ~10.4fps — FAIL (3.08x improved)",
+    "stage3_chrome_memoization":         "94.3ms/step,  76.67% drop, ~10.6fps — FAIL (no further measurable improvement; wrong hypothesis, disproven and documented)",
+    "stage4_keymap_coalesced_fix":       "22.39ms/step,  0.00% drop, ~44.7fps — FAIL (8.3x improved from stage1; root cause of the DROP fully eliminated)",
+    "instrument_ceiling_at_stage4":      "tuistory type()'s own ~21ms/char pacing floor, independently verified against a trivial cat process — the app's real keystroke-processing cost is ~1.36ms/key, far under 16.67ms",
+    "ink_architectural_ceiling":         "32ms/frame (~31.25fps) — never reached in these measurements (instrument floor intervened first); stands as a separate, unconditional, source-verified limit for any future measurement that gets past the instrument's own pacing",
+    "final_answer": "60fps is unreachable within apps/tui/src/** given Ink 5.2.1's hard-coded 32ms render throttle, full stop — independent of any further app-side fix. The Stage 4 fix closed the gap this task COULD close (keystroke delivery, an app-level defect); what remains is a dependency-level ceiling this task was explicitly instructed not to touch."
+  },
+  "artifacts": {
+    "fix_files_stage4": [
+      "apps/tui/src/hooks/useKeymap.ts",
+      "apps/tui/src/views/BoardView.tsx"
+    ],
+    "stage1_preserved_unmodified": ["evidence/phase-7/perf/P7.1-RESULT.json", "evidence/phase-7/perf/P7.1-VERDICT.md"],
+    "stage2_preserved_unmodified": ["evidence/phase-7/perf/P7.1-RECHECK.json", "evidence/phase-7/perf/P7.1-RECHECK-VERDICT.md"],
+    "stage3_preserved_unmodified": ["evidence/phase-7/perf/P7.1-RECHECK2.json", "evidence/phase-7/perf/P7.1-RECHECK2-VERDICT.md"],
+    "stage4_this_recheck": ["evidence/phase-7/perf/P7.1-RECHECK3.json", "evidence/phase-7/perf/P7.1-RECHECK3-VERDICT.md"]
+  }
+}

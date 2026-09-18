@@ -1,0 +1,17 @@
+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ hunter-seed /Users/nick/dev/hunter-seed │ ⑂ main                                                                                                       ◉ 0 running  ◆ 2 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ ┌─────────────────────────────────────────────────────────────┐ │
+│ ┃ WORKTREES                                                                                                                        ┃ │ DIFF · main                                                 │ │
+│ ┃ ❯ ⑂ main                                                                                                                         ┃ │ head bb718fd22a  diff clean                                 │ │
+│ ┃     /Users/nick/dev/hunter-seed                                                                                                  ┃ │                                                             │ │
+│ ┃   ⑂ feat/hunter-v1-build                                                                                                         ┃ │ (clean — no changes against HEAD)                           │ │
+│ ┃     /Users/nick/dev/hunter-seed-wt-hunter-v1-build                                                                               ┃ │                                                             │ │
+│ ┃   ⑂ auto-claude/001-guided-quickstart-skill                                                                                      ┃ │                                                             │ │
+│ ┃     /Users/nick/dev/hunter-seed/.auto-claude/worktrees/tasks/001-guided-quickstart-skill                                         ┃ │                                                             │ │
+│ ┃   ⑂ auto-claude/002-symbolized-crash-triage-with-rich-sanitizer-teleme                                                           ┃ │                                                             │ │
+│ ┃     /Users/nick/dev/hunter-seed/.auto-claude/worktrees/tasks/002-symbolized-crash-triage-with-rich-sanitizer-teleme              ┃ │                                                             │ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ └─────────────────────────────────────────────────────────────┘ │
+│ TREE  tab focus · j/k select/scroll · m merge · p PR · R AI-resolve                                                                                                                     : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

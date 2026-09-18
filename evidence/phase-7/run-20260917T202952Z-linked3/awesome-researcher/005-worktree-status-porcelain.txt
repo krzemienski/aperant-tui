@@ -1,0 +1,15 @@
+WORKTREE status --porcelain --untracked-files=all:
+?? .auto-claude/specs/005-human-in-the-loop-candidate-review-with-selective-/requirements.json
+?? .auto-claude/specs/005-human-in-the-loop-candidate-review-with-selective-/spec.md
+?? .auto-claude/specs/005-human-in-the-loop-candidate-review-with-selective-/task_logs.json
+?? .auto-claude/specs/005-human-in-the-loop-candidate-review-with-selective-/task_metadata.json
+
+WORKTREE log --oneline -3:
+e756dec fix(logging): recreate log dir if wiped mid-run
+ebf52b6 docs: record full $100 awesome-video run with defaults ON
+f03c1e2 feat(search): enable reflective refinement + near-dup by default
+
+merge-base(feat/awesome-researcher, auto-claude/005-...) = e756dec8386fcca729592f224bd34925b37d3fb7
+feat/awesome-researcher HEAD                            = 15c94710a6c35e2cb2c0dc2993964d3751586b13
+auto-claude/005-... branch HEAD                          = e756dec8386fcca729592f224bd34925b37d3fb7
+CONCLUSION: merge_base == branch_005_head == pre-existing history, NOT new commits from this run. This run's CODING_FAILED at planning produced ZERO new commits and NO implementation_plan.json.

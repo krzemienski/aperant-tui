@@ -1,0 +1,26 @@
+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ hunter-seed /Users/nick/dev/hunter-seed │ ⑂ main                                                                                                       ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ IDEATION · 6 types                                                                                                                                                                               │ │
+│ │ [q] Q&A  [1-6] ideation types  · index absent /Users/nick/dev/hunter-seed/.auto-claude/project_index.json                                                                                        │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ 1 Code Improvements 2 UI/UX 3 Docs Gaps 4 Security 5 Performance 6 Code Quality                                                                                                                  │ │
+│ │ · Per-run phase status summary for parallel hunts                                                                                                                                                │ │
+│ │   When running with --runs N --parallel, progress lines from all runs interleave on stderr as flat '[f                                                                                           │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Surface per-stage token usage and cost in run output                                                                                                                                           │ │
+│ │   agent.py already parses per-turn `usage` blocks from stream-json transcripts but the CLI never shows                                                                                           │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Honor NO_COLOR and add --no-color flag                                                                                                                                                         │ │
+│ │   agent.color() gates ANSI output on stream.isatty() only. Respect the standard NO_COLOR env conventio                                                                                           │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Expose exit-code convention and examples in --help                                                                                                                                             │ │
+│ │   The exit-code contract (0 = goal met, 1 = usage/config/auth, 2 = cannot run, 3 = internal error) is                                                                                            │ │
+│ │                                                                                                                                                                                                  │ │
+│ │ · Tell users where partial results live on Ctrl-C                                                                                                                                                │ │
+│ │   The SIGINT handler prints '[cleanup] signal N received, terminating subprocesses + removing containe                                                                                           │ │
+│ └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ CHAT  a ask · q qa mode · i ideate · x stop · 1-6 ideation type                                                                                                                         : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

@@ -1,0 +1,50 @@
+[
+ {
+  "seq": 1,
+  "file": "f10/step-01-f10-askbox-open.png",
+  "name": "f10-askbox-open",
+  "anchor": "/\\(esc cancel\\)/",
+  "keys_sent": "a",
+  "caption": "Ask box open, shows \"(esc cancel)\" hint",
+  "ok": true,
+  "anchor_matched": true,
+  "bytes": 81754,
+  "ts": "16:25:15",
+  "err": null,
+  "sha256": "90e096e94857e7a051358230dc0c64b2c5905e91c3a9160ccd2c64786b2635e7",
+  "duplicate_of": null,
+  "secret_hits": []
+ },
+ {
+  "seq": 2,
+  "file": "f10/step-02-f10-askbox-typed.png",
+  "name": "f10-askbox-typed",
+  "anchor": "/what does this repo do/",
+  "keys_sent": "(typed)",
+  "caption": "Question typed into ask box",
+  "ok": true,
+  "anchor_matched": true,
+  "bytes": 84770,
+  "ts": "16:25:17",
+  "err": null,
+  "sha256": "e6a81ce03fbf320c296995d24888f6d71548847b11753375a825cd3828b66d29",
+  "duplicate_of": null,
+  "secret_hits": []
+ },
+ {
+  "seq": 3,
+  "file": "f10/step-03-f10-after-escape.png",
+  "name": "f10-after-escape",
+  "anchor": "/\\[q\\] Q&A/",
+  "keys_sent": "escape",
+  "caption": "After escape: ask box closed, question cleared",
+  "ok": true,
+  "anchor_matched": true,
+  "bytes": 83239,
+  "ts": "16:25:20",
+  "err": null,
+  "sha256": "897e53e12a1cb150fa65fd7a8081e596e3fa8b9fefdbafb85711d2e81f508e46",
+  "duplicate_of": null,
+  "secret_hits": []
+ }
+]

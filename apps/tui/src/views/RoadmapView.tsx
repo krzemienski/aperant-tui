@@ -47,13 +47,46 @@ interface Props {
 
 const MAX_LOG_LINES = 8;
 
+// F-07: agent-queue.ts emits `roadmap-log` once per raw AI-SDK text-delta
+// chunk (agent-queue.ts:440-443 — one emit per part of result.fullStream),
+// not once per logical line. The same channel also carries whole synthesized
+// messages for phase-start/phase-complete/error (agent-queue.ts:423-424,
+// 436-437, 445) as single complete strings. Treating every payload as its
+// own display line rendered generation as one word per line. Chunks are now
+// accumulated into a trailing "partial" line and split on '\n'; the three
+// synthesized whole-message shapes are recognized and always flushed onto
+// their own line first so a phase/error report can never be absorbed
+// mid-word into a streaming partial.
+const DISCRETE_LOG_RE = /^(Running .+ phase\.\.\.|Phase .+ (?:completed|failed)|Error: .*)$/;
+
+interface LogBuf { lines: string[]; partial: string; }
+const EMPTY_LOG_BUF: LogBuf = { lines: [], partial: '' };
+
+function pushLogChunk(buf: LogBuf, raw: string): LogBuf {
+  if (DISCRETE_LOG_RE.test(raw)) {
+    const lines = buf.partial ? [...buf.lines, buf.partial, raw] : [...buf.lines, raw];
+    return { lines: lines.slice(-(MAX_LOG_LINES - 1)), partial: '' };
+  }
+  let lines = buf.lines;
+  let partial = buf.partial;
+  // Normalize CRLF to LF; a bare CR overwrites the in-progress line instead
+  // of starting a new one (terminal carriage-return semantics).
+  for (const ch of raw.replace(/\r\n/g, '\n')) {
+    if (ch === '\n') { lines = [...lines, partial]; partial = ''; }
+    else if (ch === '\r') { partial = ''; }
+    else { partial += ch; }
+  }
+  if (lines.length > MAX_LOG_LINES - 1) lines = lines.slice(-(MAX_LOG_LINES - 1));
+  return { lines, partial };
+}
+
 export function RoadmapView({ theme: c, project, isActive }: Props) {
   const flash = useAppStore((s) => s.flash);
   const [reloadKey, setReloadKey] = useState(0);
   const [selected, setSelected] = useState(0);
   const [running, setRunning] = useState(false);
   const [progress, setProgress] = useState<roadmapSvc.RoadmapProgress | null>(null);
-  const [logLines, setLogLines] = useState<string[]>([]);
+  const [logBuf, setLogBuf] = useState<LogBuf>(EMPTY_LOG_BUF);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const { roadmap, path: rp, error } = useMemo(
@@ -90,8 +123,7 @@ export function RoadmapView({ theme: c, project, isActive }: Props) {
         setRunning(p.phase !== 'complete' && p.phase !== 'error');
         if (p.phase === 'complete') { setReloadKey((k) => k + 1); flash('roadmap generated'); }
       } else if (kind === 'log') {
-        const line = String(payload);
-        setLogLines((ls) => [...ls.slice(-(MAX_LOG_LINES - 1)), line]);
+        setLogBuf((buf) => pushLogChunk(buf, String(payload)));
       } else if (kind === 'error') {
         setErrorMsg(String(payload));
         setRunning(false);
@@ -104,7 +136,7 @@ export function RoadmapView({ theme: c, project, isActive }: Props) {
   }, [project.id]);
 
   const generate = useCallback((refresh: boolean) => {
-    setLogLines([]); setErrorMsg(null); setRunning(true);
+    setLogBuf(EMPTY_LOG_BUF); setErrorMsg(null); setRunning(true);
     setProgress({ phase: 'starting', progress: 5, message: 'Starting roadmap generation…' });
     // D15: default to a SHORTHAND, not a full router id. Full ids reach the
     // queue verbatim, so a dead upstream route leaves no way to redirect;
@@ -136,9 +168,11 @@ export function RoadmapView({ theme: c, project, isActive }: Props) {
     ? `RUNNING · ${progress?.phase ?? ''} ${progress?.progress ?? 0}% — ${progress?.message ?? ''}`
     : errorMsg ? `ERROR: ${errorMsg}` : 'idle';
 
+  const logDisplay = logBuf.partial ? [...logBuf.lines, logBuf.partial] : logBuf.lines;
+
   return (
     <Box flexDirection="column" flexGrow={1} gap={0}>
-      {(running || errorMsg || logLines.length > 0) && (
+      {(running || errorMsg || logDisplay.length > 0) && (
         <Panel title="GENERATION" theme={c} focused={isActive && running}>
           <Text color={running ? c.accent : errorMsg ? c.err : c.ok}>{status}</Text>
           {running && progress ? (
@@ -147,10 +181,10 @@ export function RoadmapView({ theme: c, project, isActive }: Props) {
               <Text color={c.dim}>{progress.phase}</Text>
             </Box>
           ) : null}
-          {logLines.length > 0 && (
+          {logDisplay.length > 0 && (
             <Box flexDirection="column" marginTop={0}>
-              {logLines.map((l, i) => (
-                <Text key={i} color={i === logLines.length - 1 ? c.dim : c.faint} wrap="truncate-end">
+              {logDisplay.map((l, i) => (
+                <Text key={i} color={i === logDisplay.length - 1 ? c.dim : c.faint} wrap="truncate-end">
                   {l.length > 100 ? l.slice(0, 100) : l}
                 </Text>
               ))}

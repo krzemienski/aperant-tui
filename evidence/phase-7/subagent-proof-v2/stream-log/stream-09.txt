@@ -1,0 +1,37 @@
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ proofpunk-agent /Users/nick/proofpunk-agent │ ⑂ master                                                                                                 ◉ 0 running  ◆ 1 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│  1 swarm   2 graph   3 inspect   4 trace   5 tokens   6 waits  5 agents · esc then 1-7 to switch tabs                                                                                                │
+│                                                                                                                                                                                                      │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ │
+│ ┃ EVENT TRACE · all agents · 3233 events                                                                                                                                                           ┃ │
+│ ┃   TIME      AGENT         EVENT          TOOL                DUR     PAYLOAD                                                                                                                     ┃ │
+│ ┃ 05:35:34.662 999-subagent thinking-delta—                  —                                                                                                                                     ┃ │
+│ ┃ 05:35:34.662 999-subagent thinking-delta—                  —                                                                                                                                     ┃ │
+│ ┃ 05:35:34.662 999-subagent text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 05:35:34.662 999-subagent text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 05:35:34.662 999-subagent text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 05:35:34.662 999-subagent text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 05:35:34.662 999-subagent text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 05:35:34.663 999-subagent text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 05:35:34.663 999-subagent text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 05:35:34.663 999-subagent text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 05:35:34.663 999-subagent text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 05:35:34.663 999-subagent text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 05:35:34.663 999-subagent text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 05:35:34.663 999-subagent text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 05:35:34.663 999-subagent text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 05:35:34.663 999-subagent text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 05:35:34.663 999-subagent text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 05:35:34.663 999-subagent text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 05:35:34.663 999-subagent text-delta    —                  —                                                                                                                                     ┃ │
+│ ┃ 05:35:35.882 999-subagent tool-call     Read               —       {"file_path":"/Users/nick/proofpunk-agent/.auto-claude/specs/999-subagent-pro…                                                ┃ │
+│ ┃ 05:35:47.700 999-subagent tool-call     SpawnSubagent      —       {"agent_type":"spec_researcher","task":"Research implementation approach for …                                                ┃ │
+│ ┃ 05:35:47.700 spec_researc task:SUBAGENT_SPAWNING—                  —       spec_researcher                                                                                                       ┃ │
+│ ┃ 05:35:47.700 999-subagent task:SUBAGENT_SPAWNING—                  —       {"type":"SUBAGENT_SPAWNING","subagentId":"spec_researcher-1789709747700-w34ao8","agentType":"spec_researcher","paren… ┃ │
+│ ┃ 05:35:47.702 999-subagent tool-result   Read               11821ms  1                                                                                                                                  ┃ │
+│ ┃  2    "goal": "Produce a real, validator-clean v2 evidence run demonstrat                                                                                                                         ┃ │
+│ ┃ f toggles agent filter · ring buffer 10k · outlier >3000ms highlighted                                                                                                                           ┃ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ │
+│ AGENTS  1-6 sub-view · j/k select · ⏎ inspect · f filter · r resume                                                                                                                     : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

@@ -1,0 +1,36 @@
+{
+  "gate": "P6.2-profile-switch",
+  "stage_1_single_account_honesty": {
+    "action": "focused ACCOUNTS panel with tab, pressed enter with only 1 account configured",
+    "expected": "honest 'already active' message, not a fake switch",
+    "observed_message": "Anthropic (operator router) is the only account \u2014 already active",
+    "match": "EXACT -- matches source code SettingsView.tsx:64 template literal precisely",
+    "verdict": "PASS"
+  },
+  "stage_2_active_tag": {
+    "action": "observe ACCOUNTS panel row rendering",
+    "observed": "anthropic Anthropic (operator router) configured  http://127.0.0.1:20128/v1  ACTIVE",
+    "inline_active_tag_present": true,
+    "head_of_priority_account": "anthropic (confirmed as the only/head account)",
+    "verdict": "PASS"
+  },
+  "stage_3_no_key_material": {
+    "fields_shown": [
+      "id (anthropic)",
+      "name (Anthropic (operator router))",
+      "hasKey status (configured)",
+      "baseUrl (http://127.0.0.1:20128/v1)",
+      "ACTIVE tag"
+    ],
+    "fields_NOT_shown": "no apiKey, no token, no authorization header value",
+    "secret_scan_result": "0 hits (scan_secrets on full snapshot text)",
+    "source_confirmation": "account-service.ts:212 docstring: 'List configured provider accounts without exposing credentials'",
+    "verdict": "PASS"
+  },
+  "multi_account_switch_test": {
+    "attempted": false,
+    "reason": "Provisioning a second real provider account requires real credentials for a second provider (e.g. Moonshot/Kimi API key). No second credential was available or invented, per explicit instruction not to fabricate one.",
+    "verdict": "UNVERIFIED-no-second-credential"
+  },
+  "overall_verdict": "PASS for all testable stages; UNVERIFIED (correctly, not converted to a fake PASS) for the multi-account switch path since only one account exists in this environment."
+}

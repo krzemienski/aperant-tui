@@ -1,0 +1,14 @@
+{
+  "gate": "P5.new-ai-conflict-resolution",
+  "setup": "Two branches (main, feature/conflict-branch) independently edited the same line of app.py to different values; merged feature/conflict-branch via m; real conflict confirmed (git status: UU app.py, conflict markers present).",
+  "conflict_verified_on_disk": true,
+  "conflict_markers_confirmed": "<<<<<<< HEAD / ======= / >>>>>>> feature/conflict-branch around lines 2-6 of app.py",
+  "R_pressed_times": 3,
+  "outcome_all_3_attempts": "AI resolved 0 file(s), failed on 1: app.py (Invalid JSON response)",
+  "reproducibility": "Deterministic -- identical error message on 2 independent retries via capture-frames",
+  "file_state_after_failure": "UNCHANGED -- git status still shows UU app.py, conflict markers still present, no corruption, no false-success claim",
+  "root_cause_analysis": "resolveMergeConflict() in apps/desktop/src/main/ai/runners/merge-resolver.ts calls Vercel AI SDK's generateText() (non-streaming) against the live glm/glm-5 router. 'Invalid JSON response' is not emitted by merge-resolver.ts itself (it only forwards error.message) -- it originates from the AI SDK provider layer or the router's HTTP response parsing for this specific non-streaming call shape. The SAME router+model combination succeeded for roadmap generation and insights Q&A in the prior session, both of which use different (likely streaming) call paths -- suggesting this is a genuine integration gap specific to the non-streaming generateText() path against this router, not a driver artifact or flaky network blip.",
+  "app_behavior_is_correct": "The app's error handling worked exactly as designed: it caught the failure, reported an honest, specific toast message, did NOT write to app.py, and did NOT falsely claim success or leave the file in a corrupted/partial state. filesResolved=[], filesFailed=['app.py (Invalid JSON response)'], ok=false per the resolveConflictsWithAI() contract read from source.",
+  "committed_not_true": "Confirmed: nothing was committed. git status remained UU app.py throughout all 3 attempts.",
+  "verdict": "FAIL (feature) / PASS (error-handling honesty) -- the AI resolution itself did not succeed on this router+model combination for this conflict, but the app never lied about it, never corrupted the file, and never auto-committed a broken state. This is a genuine upstream integration defect worth reporting, not a driver mistake."
+}

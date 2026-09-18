@@ -1,0 +1,16 @@
+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ awesome-researcher /Users/nick/awesome-researcher │ ⑂ feat/awesome-researcher                                                                          ◉ 0 running  ◆ 1 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ ┌───────────────────────────────────────────────────────────────┐ │
+│ ┃ WORKTREES                                                                                                                      ┃ │ DIFF · feat/awesome-researcher                                │ │
+│ ┃ ❯ ⑂ feat/awesome-researcher                                                                                                    ┃ │ head 15c94710a6  diff clean                                   │ │
+│ ┃     /Users/nick/awesome-researcher                                                                                             ┃ │                                                               │ │
+│ ┃   ⑂ auto-claude/004-awesome-list-parsing-and-category-extraction                                                               ┃ │ (clean — no changes against HEAD)                             │ │
+│ ┃     /Users/nick/awesome-researcher/.auto-claude/worktrees/tasks/004-awesome-list-parsing-and-category-extraction               ┃ │                                                               │ │
+│ ┃                                                                                                                                ┃ │                                                               │ │
+│ ┃                                                                                                                                ┃ │                                                               │ │
+│ ┃                                                                                                                                ┃ │                                                               │ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ └───────────────────────────────────────────────────────────────┘ │
+│ TREE  tab focus · j/k select/scroll · m merge · p PR · R AI-resolve                                                                                                                     : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

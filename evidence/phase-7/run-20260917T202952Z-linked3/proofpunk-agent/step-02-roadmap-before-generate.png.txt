@@ -1,0 +1,23 @@
+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ proofpunk-agent /Users/nick/proofpunk-agent │ ⑂ master                                                                                                 ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓┌──────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃ PHASES                                                                                   ┃│ DETAIL                                                                                               │ │
+│ ┃ ❯ ○ PHASE P12 Runtime Intelligence                                                       ┃│ Runtime Intelligence                                                                                 │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/6 features                                                        ┃│  · Portable Session Bundle Export [planned · must]                                                   │ │
+│ ┃                                                                                          ┃│    c → convert to task spec                                                                          │ │
+│ ┃   ○ PHASE P13 Collaboration & Sharing                                                    ┃│  · Static HTML Report Generator [planned · should]                                                   │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/6 features                                                        ┃│    c → convert to task spec                                                                          │ │
+│ ┃                                                                                          ┃│  · Review Annotations on Replay [planned · could]                                                    │ │
+│ ┃   ○ PHASE P14 Ecosystem & Scale                                                          ┃│    c → convert to task spec                                                                          │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/7 features                                                        ┃│  · Tool Misuse Detector [proposed · MUST]                                                            │ │
+│ ┃                                                                                          ┃│    c → convert to task spec                                                                          │ │
+│ ┃                                                                                          ┃│  · Objective Drift Detector [proposed · SHOULD]                                                      │ │
+│ ┃                                                                                          ┃│    c → convert to task spec                                                                          │ │
+│ ┃                                                                                          ┃│  · Time-Travel Debug Scrubber [proposed · COULD]                                                     │ │
+│ ┃                                                                                          ┃│    c → convert to task spec                                                                          │ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛└──────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│  g generate · G refresh · j/k phase · c convert→spec                                                                                                                                                 │
+│ ROAD  g generate (G force regen) · x stop · j/k phase · c convert→spec                                                                                                                  : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

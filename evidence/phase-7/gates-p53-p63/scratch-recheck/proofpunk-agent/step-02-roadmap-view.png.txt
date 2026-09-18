@@ -1,0 +1,19 @@
+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ proofpunk-agent /Users/nick/proofpunk-agent │ ⑂ master                                                                                                 ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓┌─────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃ PHASES                                                                                    ┃│ DETAIL                                                                                              │ │
+│ ┃ ❯ ○ PHASE P12 Collaboration & Sharing                                                     ┃│ Collaboration & Sharing                                                                             │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/3 features                                                         ┃│  · Portable Session Bundle Export [planned · must]                                                  │ │
+│ ┃                                                                                           ┃│    c → convert to task spec                                                                         │ │
+│ ┃   ○ PHASE P13 Policy & Autonomy Controls                                                  ┃│  · Static HTML Report Generator [planned · should]                                                  │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/3 features                                                         ┃│    c → convert to task spec                                                                         │ │
+│ ┃                                                                                           ┃│  · Review Annotations on Replay [planned · could]                                                   │ │
+│ ┃   ○ PHASE P14 Scale & Ecosystem                                                           ┃│    c → convert to task spec                                                                         │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/4 features                                                         ┃│                                                                                                     │ │
+│ ┃                                                                                           ┃│                                                                                                     │ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛└─────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│  g generate · G refresh · j/k phase · c convert→spec                                                                                                                                                 │
+│ ROAD  g generate (G force regen) · x stop · j/k phase · c convert→spec                                                                                                                  : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

@@ -1,0 +1,110 @@
+{
+  "criterion": "P7.1 — 200-task board scrolls at >=60fps",
+  "source": "docs/plan/ROADMAP.md:16",
+  "recheck_of": "evidence/phase-7/perf/P7.1-RESULT.json (original FAIL — NOT overwritten, stands as the record of the pre-fix defect)",
+  "generated_at": "2026-09-17T00:00:00Z",
+  "fix_applied": {
+    "file_changed": "apps/tui/src/views/BoardView.tsx",
+    "scope": "This file only. No other file under apps/tui/src/** or apps/desktop/src/main/** was touched.",
+    "description": "Replaced the unconditional per-column `.map()` over every task (which rendered all 200 tasks — 215 total lines — on every single keystroke) with a viewport-windowed render. groupByStatus(tasks) output is flattened into a header+item row list; only a terminal-height-sized window of that flat list is rendered, scrolled to keep the selected task (`sel`) visible. Window size is derived from `useStdout().stdout.rows` (the same convention `PtyPane.tsx` already used) minus a fixed chrome allowance (App border, TitleBar, TabBar, StatusLine, Panel border+title). Column header counts (e.g. `BACKLOG (23)`) still read the TRUE per-status total (`items.length`), not the windowed subset, so headers remain accurate at any scroll position.",
+    "preserved_behavior": [
+      "j/k/up/down selection movement",
+      "H/L column moves (persist via moveTask -> vendored persistPlanStatusSync)",
+      "return focus toggle (list <-> detail)",
+      "s start / x stop (real vendored AgentManager calls, unchanged)",
+      "l open logs",
+      "DETAIL pane binding to the selected task",
+      "AGENT STREAM log rendering",
+      "column header counts reflecting true per-status totals"
+    ]
+  },
+  "harness": {
+    "driver": "tools/tuistory_drive.py (tuistory 0.11.0) — IDENTICAL to the original run",
+    "app_entry": "npx tsx src/cli.tsx <project> (apps/tui/src/cli.tsx) — now running the PATCHED BoardView.tsx",
+    "terminal_size": { "cols": 200, "rows": 50 }
+  },
+  "fixture": {
+    "path": "/tmp/ap-perf-200",
+    "task_count_on_disk": 200,
+    "note": "SAME fixture directory as the original run — not regenerated, so before/after numbers are directly comparable against identical data.",
+    "comparison_fixture_20task": "/tmp/ap-perf-20 (same as original run)"
+  },
+  "navigation_correctness_check": {
+    "method": "Fired 200 sequential single td.press('j') calls (individually confirmed reliable — each call registers exactly one scroll step) starting from task 1, recording every column header's `(N)` count as it scrolled into view.",
+    "column_headers_observed": {
+      "BACKLOG": 23, "QUEUE": 15, "BUILDING": 23, "AI REVIEW": 25,
+      "HUMAN": 39, "DONE": 25, "ERROR": 50
+    },
+    "sum": 200,
+    "matches_pre_fix_breakdown": true,
+    "final_selection_after_200_presses": "200-fix-theme-tokens-200",
+    "result": "PASS — all 200 tasks are still reachable, correctly grouped, and correctly counted after windowing. The board is not just faster, it is still correct."
+  },
+  "measurements_before_vs_after": [
+    {
+      "id": "M1_isolated_single_keypress_settle",
+      "method": "IDENTICAL to original: `tuistory capture-frames -s <session> j --count 25 --interval 2`, hashing sampled frames to find first-change and settle indices, 30 trials.",
+      "unit": "milliseconds",
+      "before": { "median_ms": 10.0, "mean_ms": 10.27, "min_ms": 8, "max_ms": 14, "n_trials": 30 },
+      "after":  { "median_ms": 6.0, "mean_ms": 6.53, "min_ms": 6, "max_ms": 10, "n_trials": 30,
+                  "raw_settle_samples_ms": [10, 8, 8, 8, 8, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6] },
+      "threshold_ms": 16.67,
+      "before_pass_rate": "30/30 (100%) — was already under threshold before the fix",
+      "after_pass_rate": "30/30 (100%) — still under threshold, with more margin",
+      "note": "This metric was never the binding constraint (see M2). Improved anyway because the render tree Ink diffs on each keystroke is now bounded to viewport size instead of the full 200-task list."
+    },
+    {
+      "id": "M2_sustained_rapid_scroll_200task",
+      "method": "IDENTICAL to original: 15 'j' characters sent in ONE `tuistory type` call (~125 attempted-keys/sec), counting registered selection changes via the DETAIL panel's `spec <id>` line before/after. 8 trials, same fixture (/tmp/ap-perf-200), same n_keys_sent=15.",
+      "before": {
+        "n_trials": 8, "registered_scroll_steps_per_trial": [1, 1, 1, 1, 1, 1, 1, 1],
+        "avg_registered": 1.0, "drop_rate_pct": 93.33,
+        "avg_wall_time_s": 0.2967, "effective_ms_per_registered_step": 296.7,
+        "effective_fps_equivalent": 3.37
+      },
+      "after": {
+        "n_trials": 8, "registered_scroll_steps_per_trial": [3, 3, 3, 4, 3, 4, 4, 4],
+        "avg_registered": 3.5, "drop_rate_pct_median": 76.67,
+        "avg_wall_time_s": 0.3373, "effective_ms_per_registered_step": 96.4,
+        "effective_fps_equivalent": 10.38
+      },
+      "improvement_factor": "3.08x faster (296.7ms -> 96.4ms per registered scroll step)",
+      "threshold_ms": 16.67,
+      "verdict_for_this_measurement": "STILL FAIL — 96.4ms/step is ~5.8x slower than the 16.67ms/60fps budget, though a real and substantial improvement over the pre-fix 296.7ms/step (~18x slower)."
+    },
+    {
+      "id": "M3_sustained_rapid_scroll_20task_comparison",
+      "method": "IDENTICAL to original: same protocol against /tmp/ap-perf-20 (20-task fixture), 4 trials, n_keys_sent=15 per trial.",
+      "before": { "n_trials": 4, "registered_per_trial": [7, 5, 7, 8], "drop_rate_pct_median": 53.33, "avg_wall_time_s": 0.3345 },
+      "after":  { "n_trials": 4, "registered_per_trial": [5, 5, 7, 5], "drop_rate_pct_median": 66.67, "avg_wall_time_s": 0.3346 },
+      "conclusion": "Unchanged within measurement noise. Expected: a 20-task board already rendered its entire (small) task list in one paint before the fix, so viewport windowing has no effect here — the 20-task board was never the bottleneck the fix targets. This is a useful negative result: it confirms the improvement measured in M2 is specific to boards large enough that windowing actually shrinks the render tree, not a general speedup that would also show up here by coincidence."
+    },
+    {
+      "id": "M0_control_pty_delivery_integrity",
+      "method": "IDENTICAL to original: plain `cat` process under the same tuistory PTY driver, sent the identical 50-character rapid `j`-burst via `tuistory type`, read back echoed stdout.",
+      "before": "50/50 characters delivered and echoed back intact.",
+      "after": "50/50 characters delivered and echoed back intact.",
+      "conclusion": "Unchanged, as expected (the control does not depend on the app under test). Confirms the M2 improvement is a real application-level effect of the fix, not a change in instrument behavior."
+    }
+  ],
+  "threshold": { "target_fps": 60, "target_ms_per_frame": 16.67 },
+  "verdict": "FAIL (improved)",
+  "verdict_reasoning": "The viewport-windowing fix produces a real, reproducible, measured improvement: sustained-scroll throughput on the 200-task board went from 296.7ms/registered-step (93.33% keystroke drop, ~3.4fps-equivalent) to 96.4ms/registered-step (76.67% median drop, ~10.4fps-equivalent) — a 3.08x speedup. Navigation correctness is fully preserved (all 200 tasks reachable, header counts still true, selection landing verified). However, 96.4ms/step remains ~5.8x slower than the 16.67ms/60fps budget the criterion specifies. The remaining bottleneck is not eliminated by viewport windowing alone; it is likely a mix of (a) Ink's own reconciliation/diff cost even over a bounded ~40-row tree, (b) React re-render cost of the surrounding App shell (TitleBar/TabBar/StatusLine) which also re-renders on every keystroke since state lives in a shared Zustand store, and (c) the PTY/ANSI write-and-flush cost for a ~40-row-wide frame, none of which this fix touched. The criterion remains FAIL, honestly reported as an improved-but-still-failing result rather than rounded up to PASS.",
+  "remaining_work_not_attempted": [
+    "Profile whether Ink's own repaint (even over the now-bounded ~40-row tree) or the surrounding App shell's re-render is the dominant remaining cost — this fix only bounded BoardView's own row count, it did not memoize App.tsx's chrome components against BoardView's per-keystroke state changes.",
+    "Consider React.memo on TitleBar/TabBar/StatusLine if they re-render on every BoardView selection change despite receiving unchanged props.",
+    "Investigate whether tuistory's own type()/capture-frames overhead has a floor around ~90-100ms per registered event that this measurement cannot see below (would require an even lower-overhead instrument to rule out)."
+  ],
+  "artifacts": {
+    "fix_file": "apps/tui/src/views/BoardView.tsx",
+    "original_fail_result": "evidence/phase-7/perf/P7.1-RESULT.json (unmodified, preserved as the pre-fix record)",
+    "original_fail_verdict": "evidence/phase-7/perf/P7.1-VERDICT.md (unmodified, preserved as the pre-fix record)",
+    "recheck_result": "evidence/phase-7/perf/P7.1-RECHECK.json",
+    "recheck_verdict": "evidence/phase-7/perf/P7.1-RECHECK-VERDICT.md",
+    "screenshot_after_fix_bottom": {
+      "file": "evidence/phase-7/perf/screens/04-after-fix-bottom.png",
+      "sha256": "ea860a91cb8eb4b95a564b417b4b022cdce646fe31e738e1d944a0d2f4e19da3",
+      "state": "bottom of board after fix, sel=task 200, reached via 200 sequential reliable keypresses; frame is now viewport-bounded (~49 lines vs ~215 pre-fix)"
+    }
+  }
+}

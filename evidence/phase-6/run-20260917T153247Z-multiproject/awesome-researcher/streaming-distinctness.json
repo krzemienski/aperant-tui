@@ -1,0 +1,14 @@
+{
+  "method": "capture-frames (6 frames, 900ms interval) + snapshot polling (16 polls, 2-3s interval)",
+  "total_samples": 22,
+  "distinct_samples": 6,
+  "states_observed": [
+    "idle(pre-regen, old content phase-1/2/3)",
+    "RUNNING discovery (early)",
+    "RUNNING features 50% (early, discovery completing)",
+    "RUNNING features 50% (mid, discovery doc written)",
+    "RUNNING features 50% (late, phases panel updating to P-1/P-2/P-3)",
+    "idle(post-regen, new content: 3 phases P-1/P-2/P-3, 9 new features F-101..F-303)"
+  ],
+  "note": "Same 65536-byte pipe truncation bug as project A \u2014 worked around via file redirect. Combined with wider-interval snapshot polling to capture the full idle->discovery->features->idle transition."
+}

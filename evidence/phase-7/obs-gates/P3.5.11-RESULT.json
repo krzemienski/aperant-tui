@@ -1,0 +1,39 @@
+{
+  "criterion": "P3.5.11",
+  "description": "Graph topology - subagent nodes: need SpawnSubagent tool-call traffic. None occurred in the prior run.",
+  "verdict": "UNVERIFIED",
+  "unmetPrecondition": "No production code path reachable from the normal task-start flow (startTaskExecution / startSpecCreation, the two entry points the TUI's board 's' key actually drives) ever activates the code branch that could produce real SpawnSubagent tool-call traffic. This was determined by source tracing, not by exhausting a live drive -- driving harder through the normal UI flow cannot reach this branch because it does not exist on that path.",
+  "traceOfRealTriggerPath": [
+    {
+      "step": "Which agent types are granted the SpawnSubagent tool at all",
+      "finding": "Only 'spec_orchestrator' and 'build_orchestrator' (agent-configs.ts:235-250, tools: [...ALL_BUILTIN_TOOLS, 'SpawnSubagent']). Confirmed by the codebase's own test: agent-configs.test.ts:121-135 asserts exactly these two types have it and all others don't.",
+      "location": "apps/desktop/src/main/ai/config/agent-configs.ts:235-250"
+    },
+    {
+      "step": "Which code path actually EXECUTES SpawnSubagent as a real LLM tool call",
+      "finding": "spawn-subagent.ts's execute() (the tool handler) is only reachable when the LLM itself decides to call the SpawnSubagent tool during a streamText()/generateText() loop where that tool is present in the model's tool set AND the agent is actually driven by an LLM loop (not a hardcoded TS pipeline).",
+      "location": "apps/desktop/src/main/ai/tools/builtin/spawn-subagent.ts:95-133"
+    },
+    {
+      "step": "worker.ts routes agentType='spec_orchestrator' to ONE of two functions based on session.useAgenticOrchestration",
+      "finding": "if (session.useAgenticOrchestration) → runAgenticSpecOrchestrator() [the LLM drives the pipeline via tool calls, including SpawnSubagent]. else → runSpecOrchestrator() [a hardcoded TypeScript SpecOrchestrator class explicitly invokes each phase's agent type in sequence -- spec_gatherer, spec_researcher, spec_writer, spec_critic -- via its own runSession() callback, never letting the orchestrator LLM itself decide to spawn a subagent].",
+      "location": "apps/desktop/src/main/ai/agent/worker.ts:432-438"
+    },
+    {
+      "step": "useAgenticOrchestration is never set to true anywhere in the repository",
+      "finding": "Exhaustive repo-wide grep for `useAgenticOrchestration` (including the repomix aggregate) returns exactly 2 hits total: the optional-field type declaration in ai/agent/types.ts:79, and the `if (session.useAgenticOrchestration)` branch check in worker.ts:434. Zero call sites -- production or test -- ever assign `true` to this field.",
+      "location": "grep across apps/desktop/src/main/**: 2 total matches, 0 assignments to true"
+    },
+    {
+      "step": "startTaskExecution() (build_orchestrator entry point, the one actually driven for P3.5.5/P3.5.7 in this session) uses build-orchestrator.ts's runCodingPhase(), which calls iterateSubtasks() -- a sequential TypeScript loop, structurally identical in kind to runSpecOrchestrator's hardcoded phase pipeline. It has no LLM-tool-call loop where the orchestrator agent's own model output could invoke SpawnSubagent.",
+      "location": "apps/desktop/src/main/ai/orchestration/build-orchestrator.ts:425-466; subtask-iterator.ts:124-268"
+    },
+    {
+      "step": "startSpecCreation() sets agentType: 'spec_orchestrator' in its sessionConfig object literal but never sets useAgenticOrchestration, so it defaults to falsy/undefined -- routing to the same non-agentic runSpecOrchestrator() hardcoded pipeline.",
+      "location": "apps/desktop/src/main/agent/agent-manager.ts:408-438 (sessionConfig object; useAgenticOrchestration absent from the literal)"
+    }
+  ],
+  "attemptedDrive": "During this task's P3.5.5 investigation, a real task (001-ctx-test, then 002-ctx-test-big) was driven end-to-end through startTaskExecution -> build_orchestrator -> planner -> coder -> qa_reviewer -> qa_fixer, observed live via tuistory. This is the SAME code path traced above: no orchestrator LLM loop exists in this path for SpawnSubagent to ever be offered as a tool, let alone called. The graph sub-view (2) was not separately screenshotted for this specific criterion since the source trace already proves the mechanism (spawn traffic) cannot occur on any code path reachable from the TUI's normal task-start flow (board 's' key), regardless of what task content or model is chosen.",
+  "conclusion": "UNVERIFIED. The unmet precondition is precise: SpawnSubagent tool-call traffic requires an agentic (LLM-driven-orchestration) session, and the only flag that enables that mode -- useAgenticOrchestration -- is never set to true anywhere in the codebase, including by either of the two real task-start entry points (startTaskExecution, startSpecCreation). Both entry points instead route to hardcoded TypeScript phase-pipeline orchestrators (SpecOrchestrator class, BuildOrchestrator's iterateSubtasks loop) where SpawnSubagent is never offered as a tool to an LLM that could call it. Reaching this precondition would require either (a) a source change to set useAgenticOrchestration:true on one of the two session-config builders, which is out of scope per the stated scope boundary, or (b) discovering an alternative, currently-undocumented entry point that does set this flag -- exhaustive grep found none.",
+  "distinctFromP353": "Unlike P3.5.3 (which is dead code + zero call sites, i.e. structurally impossible under ANY configuration), this gap is a live, reachable-but-unexercised-by-default feature flag. Setting useAgenticOrchestration:true (a config change, not a code change) at either sessionConfig builder WOULD activate the code path that offers SpawnSubagent to the LLM -- whether the LLM then actually chooses to call it is a separate, genuinely runtime-dependent question this task did not get to test because the flag itself has no exposed toggle in the TUI's task-start flow."
+}

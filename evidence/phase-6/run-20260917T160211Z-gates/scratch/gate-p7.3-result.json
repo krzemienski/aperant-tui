@@ -1,0 +1,34 @@
+{
+  "gate": "P7.3-pty-kill-resilience",
+  "action_sequence": [
+    {
+      "step": "identify shell PID via echo $$",
+      "result": "PID 51641, confirmed via ps -p 51641 -> /bin/zsh -l"
+    },
+    {
+      "step": "kill -9 51641 from outside",
+      "result": "process confirmed dead via ps -p 51641 returning no rows"
+    },
+    {
+      "step": "observe TUI reaction",
+      "result": "app did NOT crash; term tab correctly shows '\u25cb shell \u00b7 exited', 'shell exited.', 'press r to respawn a real shell'"
+    },
+    {
+      "step": "press r",
+      "result": "shell respawned with NEW PID 55743 (confirmed via ps -p 55743 -> /bin/zsh -l, genuinely different process)"
+    },
+    {
+      "step": "verify respawned shell functional",
+      "result": "typed 'echo RESPAWNED_$$' -> echoed 'RESPAWNED_55743' correctly, real command execution confirmed"
+    },
+    {
+      "step": "verify OTHER tabs still respond",
+      "result": "board tab (TASKS panel) and tree tab (WORKTREES, all 3 worktrees) both re-rendered correctly on navigation, no crash, no stale/frozen state"
+    }
+  ],
+  "app_crashed": false,
+  "exited_state_shown_honestly": true,
+  "respawn_produces_working_shell": true,
+  "other_tabs_remain_responsive": true,
+  "verdict": "PASS -- all 4 sub-checks (a-d from the brief) confirmed"
+}

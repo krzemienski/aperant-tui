@@ -1,0 +1,25 @@
+
+> aperant-tui-workspace@0.1.0 test
+> npm test -w @aperant/tui
+
+
+> @aperant/tui@0.1.0 test
+> vitest run
+
+
+[1m[7m[36m RUN [39m[27m[22m [36mv2.1.9 [39m[90m/Users/nick/dev/aperant-tui/apps/tui[39m
+
+ [32m✓[39m src/services/__tests__/moonshot-provider.test.ts [2m([22m[2m6 tests[22m[2m)[22m[90m 38[2mms[22m[39m
+ [32m✓[39m src/services/__tests__/parallel-executor-queued.test.ts [2m([22m[2m3 tests[22m[2m)[22m[33m 7062[2mms[22m[39m
+   [33m[2m✓[22m[39m parallel-executor onSubtaskQueued (observability tap)[2m > [22mannounces exactly the subtasks that sit in later batches [33m4057[2mms[22m[39m
+   [33m[2m✓[22m[39m parallel-executor onSubtaskQueued (observability tap)[2m > [22mannounces nothing when every subtask fits the first batch [33m1001[2mms[22m[39m
+   [33m[2m✓[22m[39m parallel-executor onSubtaskQueued (observability tap)[2m > [22mstill announces queued subtasks when an early batch fails (allSettled semantics) [33m2003[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m2 passed[39m[22m[90m (2)[39m
+[2m      Tests [22m [1m[32m9 passed[39m[22m[90m (9)[39m
+[2m   Start at [22m 02:27:45
+[2m   Duration [22m 7.24s[2m (transform 38ms, setup 0ms, collect 76ms, tests 7.10s, environment 0ms, prepare 61ms)[22m
+
+
+
+EXIT_CODE=0

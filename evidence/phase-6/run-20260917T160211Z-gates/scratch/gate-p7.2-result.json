@@ -1,0 +1,26 @@
+{
+  "gate": "P7.2-resize-reflow",
+  "sequence": [
+    {
+      "step": "launch at 200x50",
+      "confirmed_via": "tuistory sessions metadata + boot capture width 3428px"
+    },
+    {
+      "step": "resize to 80x24",
+      "result": "layout correctly reflowed -- title bar wrapped to 2 lines, panels narrowed, borders intact, no corruption, no overlapping text"
+    },
+    {
+      "step": "resize to 90x30 then 250x60 (stacked, no intervening keypress)",
+      "result": "tuistory sessions correctly reported each new size, but snapshot/current_frame briefly lagged behind visually until a keypress (tab) triggered React re-render -- current_frame() then showed the correct, clean, uncorrupted 250-col layout"
+    },
+    {
+      "step": "resize back to 200x50",
+      "result": "auto re-rendered correctly WITHOUT requiring an intervening keypress this time -- current_frame() showed clean 200-col layout matching original boot width (3428px)"
+    }
+  ],
+  "corruption_observed": false,
+  "overlapping_text_observed": false,
+  "broken_borders_observed": false,
+  "note_on_snapshot_vs_current_frame": "raw `snapshot`/`read` return full terminal SCROLLBACK, which can show stale smaller frames stacked above the current one after a resize -- this is normal terminal-emulator scrollback behavior, not app corruption. tuistory_drive.py's current_frame() strips to the last rendered frame only and was used for all size verdicts here.",
+  "verdict": "PASS -- both resize directions (200x50 -> 80x24 -> 200x50) reflowed cleanly with no corruption. One observation worth noting: a resize occasionally needs a subsequent keypress before Ink's re-render is visible in a snapshot taken very soon after the resize call (SIGWINCH-triggered re-render may lag by one interaction); this did not affect the FINAL settled state in either capture and both anchor-gated PNGs are clean."
+}

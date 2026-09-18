@@ -1,0 +1,32 @@
+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ proofpunk-agent /Users/nick/proofpunk-agent │ ⑂ master                                                                                                 ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ ┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃ WORKTREES                                                ┃ │ DIFF · master                                                                                                                       │ │
+│ ┃ ❯ ⑂ master                                               ┃ │ head 656fd1a262  diff 2 files changed, 100 insertions(+), 1 deletion(-)                                                             │ │
+│ ┃     /Users/nick/proofpunk-agent                          ┃ │                                                                                                                                     │ │
+│ ┃                                                          ┃ │ diff --git a/proofpunk_agent/screens/tools.py b/proofpunk_agent/screens/tools.py                                                    │ │
+│ ┃                                                          ┃ │ index 69aa9b4..e8ecb0b 100644                                                                                                       │ │
+│ ┃                                                          ┃ │ --- a/proofpunk_agent/screens/tools.py                                                                                              │ │
+│ ┃                                                          ┃ │ +++ b/proofpunk_agent/screens/tools.py                                                                                              │ │
+│ ┃                                                          ┃ │ @@ -107,6 +107,7 @@ from proofpunk_agent.state.reducers.ledger import (                                                             │ │
+│ ┃                                                          ┃ │      ToolStatus,                                                                                                                    │ │
+│ ┃                                                          ┃ │      reduce_ledger,                                                                                                                 │ │
+│ ┃                                                          ┃ │  )                                                                                                                                  │ │
+│ ┃                                                          ┃ │ +from proofpunk_agent.widgets.output_modal import OutputModal                                                                       │ │
+│ ┃                                                          ┃ │                                                                                                                                     │ │
+│ ┃                                                          ┃ │  __all__ = ["ToolsScreen"]                                                                                                          │ │
+│ ┃                                                          ┃ │                                                                                                                                     │ │
+│ ┃                                                          ┃ │ @@ -338,6 +339,12 @@ class ToolsScreen(Static):                                                                                     │ │
+│ ┃                                                          ┃ │          #: distinct-value set has actually changed.                                                                                │ │
+│ ┃                                                          ┃ │          self._last_agent_options: list[tuple[str, str]] = []                                                                       │ │
+│ ┃                                                          ┃ │          self._last_tool_options: list[tuple[str, str]] = []                                                                        │ │
+│ ┃                                                          ┃ │ +        #: Last ledger row whose selection was posted to the shell inspector.                                                      │ │
+│ ┃                                                          ┃ │ +        #: Kept here so `v` can open the full-output modal without re-deriving                                                     │ │
+│ ┃                                                          ┃ │ +        #: the cursor through DataTable internals, and so a keyboard operator                                                      │ │
+│ ┃                                                          ┃ │ +        #: who arrowed onto a row (RowHighlighted) has a concrete target even                                                      │ │
+│ ┃                                                          ┃ │ … 139 more line(s), j/k to scroll                                                                                                   │ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ └─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ TREE  tab focus · j/k select/scroll · m merge · p PR · R AI-resolve                                                                                                                     : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

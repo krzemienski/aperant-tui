@@ -1,0 +1,66 @@
+{
+  "gate": "P6.3",
+  "criterion": "Onboarding completes on a machine with no ~/.aperant/ and ends in a working board",
+  "verdict": "PASS",
+  "prior_status": "PARTIAL — architecturally argued from source only (config-service.ts:29, libs/electron-shim/index.js:36-48) but never DRIVEN as an explicit cold start",
+  "setup": {
+    "empty_home_dir": "/tmp/ap-cold-1789679063",
+    "confirmed_empty_before_launch": "ls -la /tmp/ap-cold-1789679063 -> total 0, only . and ..",
+    "target_project": "/Users/nick/dev/hunter-seed (real git repo, read-only — never modified)",
+    "launch_env_var": "APERANT_USER_DATA=/tmp/ap-cold-1789679063",
+    "launch_command": "npx tsx src/cli.tsx /Users/nick/dev/hunter-seed"
+  },
+  "action": "Launched the real TUI via tuistory with APERANT_USER_DATA pointed at the freshly-created empty temp dir, against the real hunter-seed project (never modified — used strictly as a read source of real project state).",
+  "facet_1_screen": {
+    "boot_and_board": {
+      "observed": "Board rendered coherently on first frame: real project name 'hunter-seed' in header, real branch '⑂ main', TASKS panel populated with the project's actual .auto-claude tasks (001-guid [REVIEW], 002-symb 50%), DETAIL panel showing real subtask/phase data. No crash, no blank screen, no error overlay.",
+      "screenshot": "/Users/nick/dev/aperant-tui/evidence/phase-7/gates-p53-p63/scratch/step-02-p63-cold-boot-board.png",
+      "sha256": "9359bcc41327fa0c899f559499b5f5d74c9e0025137f141da4b335b8d2a8e6ee",
+      "anchor": "no profile",
+      "anchor_matched": true,
+      "note": "The board is NOT empty in this run because hunter-seed already has real .auto-claude task specs from prior gate runs on this machine — this is expected and does not compromise the cold-start proof, since the criterion under test is the USER-DATA/config cold start, not the project's own task history. The header confirms the honest zero-account state independently: '● no profile'."
+    },
+    "settings_zero_accounts": {
+      "observed": "Settings tab (6) renders coherently. THEME panel shows 'model glm/glm-5 (env APERANT_MODEL)' and 'queue 0 accounts'. ACCOUNTS panel explicitly states 'no provider accounts — press a (anthropic router) or m (moonshot) from env' — the app reports zero configured accounts honestly rather than crashing or fabricating a default account.",
+      "screenshot": "/Users/nick/dev/aperant-tui/evidence/phase-7/gates-p53-p63/scratch/step-03-p63-cold-settings.png",
+      "sha256": "8cb94bc82698d9f913802cee48bf395d17760f08e591361634a0c96a64d36875",
+      "anchor": "no provider accounts",
+      "anchor_matched": true
+    }
+  },
+  "facet_2_disk": {
+    "before": {
+      "command": "ls -la /tmp/ap-cold-1789679063 (immediately after mkdir, before launch)",
+      "output": "total 0\ndrwxr-xr-x  2 nick wheel   64 ... .\ndrwxrwxrwt  ... .. (only . and .. — genuinely empty)"
+    },
+    "after": {
+      "command": "ls -laR /tmp/ap-cold-1789679063 (after TUI boot)",
+      "output": "top-level: crashDumps/ (empty), logs/ (empty), store/ (contains projects.json). No tui.json yet (correct — config-service.ts:29's Zod-default path is only materialized to disk on an explicit write such as a theme change or account add; the app read defaults in memory without ever needing to touch disk for config)."
+    },
+    "created_by_app": [
+      "crashDumps/ (empty directory — electron-shim scaffolding, libs/electron-shim/index.js:36-48)",
+      "logs/ (empty directory — same scaffolding; agent-events.jsonl would land here per agent-start-service.ts:76-77 once an agent runs, none was started in this test)",
+      "store/projects.json (618 bytes) — REAL project registration written by the app: contains a genuine crypto-random UUID (c2b11f83-b2ca-4d25-8ae6-ba95520c6bda), the real project name 'hunter-seed', the real absolute path '/Users/nick/dev/hunter-seed', real default settings (model: opus, memoryBackend: file, linearSync: false, notifications block, useClaudeMd: true), and real createdAt/updatedAt ISO timestamps (2026-09-17T21:05:14.786Z) matching the actual boot time. Not a placeholder or empty scaffold."
+    ],
+    "config_service_default_path_confirmed": "tui.json absent from disk after boot — confirms config-service.ts:29's `!fs.existsSync(p)` branch was taken (returns Zod schema defaults in memory) and that this is a lazy-write path, not a boot-time-write path. This matches the architectural claim exactly, now backed by a real filesystem observation instead of only a source-code read."
+  },
+  "facet_3_logs_no_crash": {
+    "command": "td.read_stream(session, all_output=True) after boot, tab switch to Settings, and idle",
+    "bytes_captured": 3819,
+    "crash_markers_searched": ["Error:", "TypeError", "ReferenceError", "Unhandled", "stack trace", "at Object.", "ENOENT", "EACCES", "throw ", "Segmentation", "panic"],
+    "crash_markers_found": [],
+    "secret_scan_hits": [],
+    "verdict": "No crash, no stack trace, no unhandled exception in the captured stream."
+  },
+  "read_only_verification": {
+    "command": "cd /Users/nick/dev/hunter-seed && git status --porcelain",
+    "output": "?? .DS_Store\n?? .agentkit/\n?? .auto-claude/",
+    "interpretation": "All three untracked paths pre-date this run by hours to weeks (.DS_Store mtime Sep 15 18:14; .agentkit/ownership.json mtime Aug 9 15:39; .auto-claude/specs mtime Sep 17 11:39, .auto-claude/ideation mtime Sep 17 01:44 — all well before this test's launch at ~17:05 on Sep 17). hunter-seed was not modified by this cold-start test; it was used strictly as a real read-only project source, as instructed."
+  },
+  "safety_verification": {
+    "hunter_seed_not_modified": true,
+    "temp_dir_confirmed_empty_before_launch": true,
+    "cleanup_performed": true,
+    "cleanup_method": "TUI session closed via td.close(); crashDumps/ and logs/ removed with rmdir, store/projects.json removed with rm, store/ removed with rmdir, root /tmp/ap-cold-1789679063 removed with rmdir. Confirmed gone via `ls -d /tmp/ap-cold-1789679063` -> 'No such file or directory'. Purely local filesystem cleanup — no remote/GitHub action, consistent with the operator's remote-mutation freeze."
+  }
+}

@@ -1,0 +1,94 @@
+{
+  "feature": "999-subagent-proof-live-drive",
+  "workflow_type": "investigation",
+  "notes": "Live-SDK evidence drive; run directory scripts are the deliverable. No product files are modified unless a documented defect finding justifies a remediation subtask (Phase 4 is conditional).",
+  "phases": [
+    {
+      "id": "1",
+      "name": "Preflight and scaffolding",
+      "subtasks": [
+        {
+          "id": "1-1",
+          "title": "Create run directory and preflight step",
+          "description": "Create e2e-evidence/run-<ts>-999-subagent-proof-live-drive/. Write step-01-preflight.py: run `python3 -m proofpunk_agent --check` and record plugin root + precedence rung; assert PTY can be allocated at 120x34; echo the budget ceiling ($15) and the exact spawn-inducing PROMPT (also written verbatim to PROMPT.txt); dry-run the EventLog shutdown-dump shim against the app quit path (open question Q5) and record whether FR-05 is enabled for this run.",
+          "status": "pending",
+          "files_to_create": [
+            "e2e-evidence/run-<ts>-999-subagent-proof-live-drive/step-01-preflight.py",
+            "e2e-evidence/run-<ts>-999-subagent-proof-live-drive/PROMPT.txt"
+          ],
+          "files_to_modify": []
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "name": "Live drive",
+      "subtasks": [
+        {
+          "id": "2-1",
+          "title": "Write the live tree drive (step-02)",
+          "description": "Write step-02-live-tree-drive.py using validation/e2e/scenario_session.py PtySession and the _app_argv pattern: one session, `python3 -m proofpunk_agent \"<PROMPT>\" --max-budget 15` in a 120x34 real PTY, observation shim on PYTHONPATH if preflight enabled it. Wait for the PROOFPUNK AGENT boot marker. Poll loop scrapes the AGENT TREE pane (assert exactly one AGENT TREE header), logging every (timestamp, Depth line, Active line, glyph-row count) transition to frames/. Turn end detected by the HUD footer marker ('i interrupt') disappearing, not a fixed sleep. Concurrent watch for the literal PERMISSION REQUEST modal title; answer 'a' for spawn-tool calls, log every appearance/response. F12 SVG capture at first depth>=1 observation and at turn end, renaming the first artifact before the second (app refuses overwrite). Convert SVGs to PNG with rsvg-convert when available. Single in-session re-prompt allowed if no spawn within a wall-clock window. On budget exhaustion with zero spawns, exit to ABANDONED verdict path with raw observed tool-name distribution.",
+          "status": "pending",
+          "files_to_create": [
+            "e2e-evidence/run-<ts>-999-subagent-proof-live-drive/step-02-live-tree-drive.py"
+          ],
+          "files_to_modify": []
+        },
+        {
+          "id": "2-2",
+          "title": "Execute the drive and archive artifacts",
+          "description": "Execute step-02. Verify archived artifacts: step-02 log, frames/ scrapes with transition timeline, SVG/PNG captures, events-dump.json if the shim ran, observed spawn-tool-name distribution, permission-modal interaction log. Assert no artifact contains pytest/mocks/stubs/fakes and no product file was touched.",
+          "status": "pending",
+          "files_to_create": [
+            "e2e-evidence/run-<ts>-999-subagent-proof-live-drive/step-02-live-tree-drive.log",
+            "e2e-evidence/run-<ts>-999-subagent-proof-live-drive/frames/",
+            "e2e-evidence/run-<ts>-999-subagent-proof-live-drive/step-02-*.svg"
+          ],
+          "files_to_modify": []
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "name": "Corroboration and verdict",
+      "subtasks": [
+        {
+          "id": "3-1",
+          "title": "Fold the dumped log offline (conditional on FR-05)",
+          "description": "If events-dump.json exists: write and run step-03-log-fold-corroboration.py loading the dump, folding events through proofpunk_agent.state.reducers.tree.reduce_tree, and asserting max_depth and node count equal the values the live frames recorded. Any mismatch is a defect finding (see 4-1), not a silent pass. If the shim was disabled at preflight, record frames-only evidence in the verdict instead.",
+          "status": "pending",
+          "files_to_create": [
+            "e2e-evidence/run-<ts>-999-subagent-proof-live-drive/step-03-log-fold-corroboration.py"
+          ],
+          "files_to_modify": []
+        },
+        {
+          "id": "3-2",
+          "title": "Write the verdict",
+          "description": "Write step-04-verdict.md with per-arm outcomes: Arm A PASS (depth>=1 glyph row + Depth line in frame, corroborated by Screen 2 Agent/Task tool row) or ABANDONED/BLOCKED with raw distributions; Arm B PASS/NOT-OBSERVED with transition timeline; Arm C attribution tier distribution and (unattributed) counts verbatim. Every claim cites the artifact it came from.",
+          "status": "pending",
+          "files_to_create": [
+            "e2e-evidence/run-<ts>-999-subagent-proof-live-drive/step-04-verdict.md"
+          ],
+          "files_to_modify": []
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "name": "Defect remediation (conditional)",
+      "subtasks": [
+        {
+          "id": "4-1",
+          "title": "Document and fix any product defect the drive exposes",
+          "description": "Only if the drive exposes a product defect (wrong glyph, missing pane, reducer mismatch, unrecognized third spawn-tool name): first write step-NN-<slug>-finding.md describing the defect with the frame/log excerpts that show it; then implement the minimal product fix as a follow-up step; then re-drive within remaining budget or under a fresh run directory. Never edit an already-executed step's artifacts.",
+          "status": "pending",
+          "files_to_create": [
+            "e2e-evidence/run-<ts>-999-subagent-proof-live-drive/step-NN-<slug>-finding.md"
+          ],
+          "files_to_modify": []
+        }
+      ]
+    }
+  ]
+}

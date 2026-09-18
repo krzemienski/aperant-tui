@@ -1,0 +1,20 @@
+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ awesome-researcher /Users/nick/awesome-researcher │ ⑂ feat/awesome-researcher                                                                          ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃ TASKS                                                                                  ┃ │ DETAIL                                                                                                │ │
+│ ┃ ◆ BACKLOG (4)                                                                          ┃ │ 001-tri- [BACKLOG]                                                                                    │ │
+│ ┃ ❯ 001-tri- ▽ Tri-state link verdict: alive / blocked-but-alive / dead                  ┃ │ Tri-state link verdict: alive / blocked-but-alive / dead                                              │ │
+│ ┃   002-per- ▽ Per-host politeness and Retry-After compliance in validation              ┃ │ progress ░░░░░░░░░░░░░░ 0%                                                                            │ │
+│ ┃   003-list ▽ List-health audit mode                                                    ┃ │ subtasks 0/0 complete                                                                                 │ │
+│ ┃   005-huma ▽ Human-in-the-loop candidate review with selective approval                ┃ │ phase -                                                                                               │ │
+│ ┃ ◆ DONE (1)                                                                             ┃ │ location main  spec 001-tri-state-link-verdict-alive-blocked-but-alive-dead                           │ │
+│ ┃   004-awes ▽ Awesome list parsing and category extraction (bs4 + httpx, byte-exact ro… ┃ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ ┃                                                                                        ┃                                                                                                           │
+│ ┃                                                                                        ┃ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃                                                                                        ┃ │ AGENT STREAM                                                                                          │ │
+│ ┃                                                                                        ┃ │ no recorded runs for this task                                                                        │ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ BOARD  j/k move · ⏎ focus · s start · x stop · H/L column · l logs                                                                                                                      : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

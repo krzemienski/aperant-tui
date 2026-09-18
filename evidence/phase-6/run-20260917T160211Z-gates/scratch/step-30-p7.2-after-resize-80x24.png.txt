@@ -1,0 +1,25 @@
+
+┌──────────────────────────────────────────────────────────────────────────────┐
+│APERAN│aperant-gate-scr/tmp/aperant-gate-sc│ ⑂    ◉ 0       ◆ 0      ● no     │
+│T      atch            ratch                 main running   review   profile  │
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents        │
+│ ┌────────────────────────────────┐ ┌───────────────────────────────────────┐ │
+│ │ THEME                          │ │ CONFIG                                │ │
+│ │ ❯      cyberpunk  ACTIVE       │ │ tui config    /Users/nick/.aperant/t… │ │
+│ │        matrix                  │ │ desktop     /Users/nick/.aperant/se…  │ │
+│ │        amber                   │ │ settings                              │ │
+│ │        synth                   │ │ provider          anthropic           │ │
+│ │        ice                     │ │ model         glm/glm-5 (env APERANT… │ │
+│ │                                │ │ queue       1 account → http://127.0… │ │
+│ │ tab focus · j/k select ·       │ └───────────────────────────────────────┘ │
+│ │ applies live · persists to     │                                           │
+│ │ tui.json                       │ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ │
+│ │                                │ ┃ ACCOUNTS                              ┃ │
+│ │                                │ ┃ ❯ anthropic Anthropic (operator rout… ┃ │
+│ │                                │ ┃ Anthropic (operator router) is the o… ┃ │
+│ │                                │ ┃ tab focus · j/k select · ⏎ activate · ┃ │
+│ │                                │ ┃  a add Anthropic · m add Moonshot     ┃ │
+│ └────────────────────────────────┘ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ │
+│ SET tab focus · j/k select · ⏎ persist theme / activate account · : cmd  ?   │
+│      add Anthropic · m add Moonshot                               help       │
+└──────────────────────────────────────────────────────────────────────────────┘

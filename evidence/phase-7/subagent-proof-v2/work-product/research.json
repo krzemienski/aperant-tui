@@ -1,0 +1,142 @@
+{
+  "capture_method": {
+    "summary": "C5 success (run-20260917T100943-p5-c5-spawn-name-fix) drove the real app via pty.fork(), prompt as CLI argv (no tmux, no composer keystrokes), ANSI-stripped the pty stream, regexed 'Depth: N'/'Active: N' off the live frame. Screenshots exported by the app itself via PROOFPUNK_AGENT_SHOT_DIR / PROOFPUNK_AGENT_SHOT_NAME -> app.save_screenshot() (app.py:790,1570-1625), SVG output. NOT Textual run_test()/pilot/export_screenshot -- zero pilot API usage in validation/e2e (grep 0 matches).",
+    "live_probe_pattern": {
+      "file": "e2e-evidence/run-20260917T100943-p5-c5-spawn-name-fix/step-04-c5-probe-source",
+      "mechanics": [
+        "pty.fork(); child: os.execvp('python3', ['python3','-m','proofpunk_agent','--project',WORK,'--proofpunk-path',PLUGIN,'--max-budget','10',PROMPT])",
+        "parent: TIOCSWINSZ 44x130; select() loop, 180s deadline",
+        "frame = ANSI-stripped buffer tail; regex Depth:/Active:",
+        "auto-approve permission: on 'PERMISSION REQUEST' write b'a' after 0.6s",
+        "success = best_depth>0 or best_active>1; write cleaned frames to output file; 'q' then SIGKILL"
+      ],
+      "duration_measured": "13.32s for one depth-1 spawn (rc=0)"
+    },
+    "evidence_run_lifecycle": {
+      "file": "validation/capture.py EvidenceRun (lines 251-306)",
+      "mechanics": [
+        "Every op is a subprocess call to the real fresh_evidence.py; --run always explicit (default target = most-recently-modified run dir, ambiguous)",
+        "invoke with cwd=repo root",
+        "next_step(slug): 'next-step <slug> --run <rel>' prints step-NN-<slug> path; numbering owned by the script",
+        "seal()/validate(); run dir must contain .run-meta (from init-run) or drivers refuse (scenario_session.py:453-460, perf/driver.py:457-463)"
+      ],
+      "thin_floor": "MIN_SIZE_BYTES=1024 mirrored at capture.py:46 (from fresh_evidence.py:46,216); size <= 1024 refused, artifacts must be strictly >1024 bytes; thin_artifacts() pre-checks"
+    },
+    "alternative_driver": "validation/e2e/scenario_session.py (tmux PtySession; steps boot/send_prompt/observe_stream/screenshot_mid_stream/interrupt/permission_modal/quit). C5 probe notes tmux launches killed the app seconds after submit; pty.fork+argv-prompt is the proven path here.",
+    "tools_export_jsonl": "tools-export-*.jsonl written by Screen 4 tools export (screens/tools.py; instance e2e-evidence/run-20260917T095141-screen23-evidence/tools-export-20260917T095901Z.jsonl). Line shape: {seq, subject 'toolu_*', tool_name, tier (4=UNATTRIBUTED for root calls), agent_id, key_arg, started_at, finished_at, duration_ms, status, cost_usd, input, result, error}. That session had zero Agent/Task calls; the Agent 6:0 Task measurement survives only as text in the C5 finding."
+  },
+  "spawn_prompting": {
+    "proven_single_child": {
+      "source": "step-04-c5-probe-source lines 37-41",
+      "prompt": "Use the Task tool to spawn exactly one subagent with subagent_type general-purpose. Tell that subagent to reply with the single word DEEPEST. Then report what it replied.",
+      "result": "Live SDK emitted 'Agent' x6 vs 'Task' x0 on 2026-09-17; prompt saying 'Task tool' still triggers the runtime's Agent tool. Depth 1 / Active 2 rendered live in 13.32s."
+    },
+    "two_concurrent_children": {
+      "status": "unproven on this host",
+      "prompt_sketch": "Spawn TWO subagents at the same time (both in one message, do not wait for the first to finish), subagent_type general-purpose; each replies with a distinct word; then report both.",
+      "verify": "Active >= 3 in live frame + >= 2 AGENT_SPAWNED under one parent in events export"
+    },
+    "nested_grandchild_depth_2": {
+      "basis": "PHASE0 Row 9 measured 3-level parent_tool_use_id chaining (sdk.py docstring lines 100-106)",
+      "prompt_sketch": "Spawn a subagent (subagent_type general-purpose). Tell it to itself spawn one sub-subagent (subagent_type general-purpose) whose reply is the word DEEPEST, return it to you, and you report it to me.",
+      "verify": "Depth: 2 in live frame + grandchild AGENT_SPAWNED.parent == child AGENT_SPAWNED.subject",
+      "risk": "Subagent may lack spawn permission or not comply; OQ2 fallback = concurrent children"
+    },
+    "errored_driving": {
+      "mechanism": "tree.py:269-273 ERRORED when data.error truthy or data.status in {'error','errored'}; sdk.py:781-791 sets data.error=bool(block.is_error) from ToolResultBlock.is_error",
+      "prompt_sketch": "Spawn a subagent and tell it to run the Bash command 'exit 7' (guaranteed to fail) and report only its failure.",
+      "cost": "one extra turn; cheap; FR3 allows COMPLETE-only with note"
+    },
+    "permission_handling": "C5 probe auto-approves 'PERMISSION REQUEST' with 'a' after 0.6s (step-04 lines 92-97); keep it."
+  },
+  "sdk_event_shapes": {
+    "sdk_version": "claude-agent-sdk==0.2.144",
+    "spawn_gate": {
+      "file": "proofpunk_agent/bridge/sdk.py:288",
+      "value": "_SPAWN_TOOL_NAMES = frozenset({'Agent','Task'})",
+      "measured_name": "'Agent' (6) vs 'Task' (0) in live traces 2026-09-17. PR5: re-verify at HEAD (007-runaway-loop-detector landed)."
+    },
+    "agent_spawned_event": {
+      "file": "sdk.py:761-779",
+      "trigger": "AssistantMessage ToolUseBlock with block.name in _SPAWN_TOOL_NAMES (sdk.py:684-688); block.id recorded in _task_tool_use_ids",
+      "fields": ["block.name", "block.id -> Event.subject", "block.input.get('subagent_type') or ('description'), fallback block.id -> data.name", "message.parent_tool_use_id via _attribution"],
+      "emits": "Event(AGENT_SPAWNED, subject=block.id, parent, tier, data={'name': name})"
+    },
+    "agent_finished_event": {
+      "file": "sdk.py:781-791",
+      "trigger": "UserMessage ToolResultBlock with tool_use_id in _task_tool_use_ids (sdk.py:728-732)",
+      "fields": ["block.tool_use_id", "block.is_error"],
+      "emits": "Event(AGENT_FINISHED, subject=tool_use_id, data={'error': bool(is_error)})"
+    },
+    "attribution": {
+      "file": "sdk.py:391-396; state/events.py:45-61",
+      "rule": "parent_tool_use_id non-empty str -> (value, PARENT_TOOL_USE_ID=3); else (None, UNATTRIBUTED=4). Tiers 1 HOOK_AGENT_ID and 2 PARENT_AGENT_ID absent on 0.2.144 (sdk.py:79-86). parent_tool_use_id confirmed on AssistantMessage/UserMessage/StreamEvent (sdk.py:1018)."
+    },
+    "tree_reducer": {
+      "file": "state/reducers/tree.py",
+      "spawn": "_handle_agent_spawned (229-261): attach under event.parent if id already a node, keep tier; else root+UNATTRIBUTED; node RUNNING, depth=parent.depth+1. FR2: child AGENT_SPAWNED must arrive after parent tool_use_id exists as node.",
+      "finish": "_handle_agent_finished (264-273): COMPLETE unless error -> ERRORED",
+      "figures": "active_count = RUNNING nodes (158-160); max_depth (163)",
+      "duplicate_spawn_ignored": "lines 235-238"
+    }
+  },
+  "validator_contract": {
+    "script": "/Users/nick/proofpunk/plugins/proofpunk/validators/fresh_evidence.py (outside readable project root; contract mirrored from validation/capture.py docstrings + call sites, citing fresh_evidence.py:46,216)",
+    "cli": [
+      "init-run -- allocates run dir + .run-meta",
+      "next-step <slug> --run <rel> -- prints step-NN-<slug> path",
+      "seal --run <rel>",
+      "validate --run <rel> -- rc=0 is ER4's seal condition"
+    ],
+    "conventions": [
+      "Run dirs e2e-evidence/run-YYYYMMDDTHHMMSS-<slug>/; invoke with cwd=repo root",
+      "Artifacts step-NN-<slug>; evidence-inventory.txt v2 'name size sha256' + 'sealed=... count=N total_bytes=N'",
+      "1024-byte floor: size <= 1024 refused; add real context (argv, rc, stdout/stderr, surrounding state), never padding",
+      "Secrets redacted before write (capture.py redact/live_secret_values incl. ~/.claude/settings.json env block)",
+      "--run always explicit",
+      "Inventory lists every step file; empty artifacts fail (ER5)"
+    ]
+  },
+  "budget_guard": {
+    "file": "validation/perf/driver.py:381-427 (_cost_refusal), 434-435 (max_budget default 3.0)",
+    "mechanism": "projected = (measured_session_cost/span) * window_s + max_observed_session_cost; refuse if projected > max_budget. Deliberately over-estimates; message says raise --max-budget.",
+    "v2_implication": "v2 probes are short pty launches via 'python3 -m proofpunk_agent --max-budget <N> PROMPT' (C5 used 10), not run_benchmark. Any perf/driver.py invocation needs explicit --max-budget large enough (R2: ~$250 projected for 30-min windows vs $3.00 default). Document flag in artifacts (PR2)."
+  },
+  "risks": [
+    "Depth-2 grandchild may not comply / lack spawn permission (OQ2) -- plan concurrent-children fallback; both satisfy FR4.",
+    "Attribution race: child AGENT_SPAWNED before parent node exists -> UNATTRIBUTED under root (tree.py:240-245), failing FR2; if real, C5-style silent gap and PR3 minimal-fix candidate.",
+    "ERRORED needs is_error=True on the subagent tool result; best-effort (OQ1).",
+    "HEAD moved since C5 (007-runaway-loop-detector); re-verify spawn gate/reducers first (PR5).",
+    "No surviving tools-export jsonl has an Agent/Task call; 6:0 measurement is text-only -- capture fresh events export (ER2).",
+    "App does not persist its event log (C5 step-02 caveat): tree frame and attribution record cannot come from the same session unless the probe captures both live or adds an export step.",
+    "Do not delete the three empty v1 runs (PR4); use distinct slug subagent-proof-v2 (ER3)."
+  ],
+  "recommended_plan_sketch": [
+    "Phase 0 (verify HEAD, no cost): re-read _SPAWN_TOOL_NAMES, spawn/finish projections, tree reducers at current HEAD vs C5 assumptions.",
+    "Phase 1 (scaffold): fresh_evidence.py init-run e2e-evidence/run-<ts>-subagent-proof-v2; write .debug/v2_probe.py modeled on c5_probe.py (pty.fork + argv prompt + Depth/Active regex + permission auto-approve 'a' + PROOFPUNK_AGENT_SHOT_DIR SVG frames); use validation/capture.py EvidenceRun.",
+    "Phase 2 (live spawn FR1/FR2/FR3a): proven single-child C5 prompt; capture live frame Depth:1/Active:2 with subagent_type label; wait past AGENT_FINISHED for COMPLETE glyph; export events AGENT_SPAWNED(subject=toolu_X,parent,tier=3) -> AGENT_FINISHED(toolu_X,error=false); cross-check figures vs events (ER6).",
+    "Phase 3 (fan-out FR4): depth-2 prompt first; if flaky after ~2 attempts, switch to 2-concurrent-children; capture Depth:2 or Active:3 + matching event chain.",
+    "Phase 4 (ERRORED, optional): fail-on-purpose subagent (Bash 'exit 7'); capture ERRORED node + AGENT_FINISHED error=true; skip with note if costly (OQ1).",
+    "Phase 5 (budget+seal): probes use --max-budget 10 as C5; any perf/driver.py use gets explicit --max-budget; pre-check thin_artifacts(); all artifacts >1024 bytes with real context; inventory complete; fresh_evidence.py seal + validate rc=0 (ER4).",
+    "Phase 6 (gap handling): if a silent-failure gap emerges (e.g. attribution race), minimal source fix per PR3/FR7 and re-run Phases 2-5 fresh."
+  ],
+  "unverified_claims": [
+    {"claim": "SDK 0.2.144 reliably emits depth-2 parent_tool_use_id chains in live sessions", "reason": "PHASE0 Row 9 measured 3-level chaining historically; not re-measured at current HEAD", "risk_level": "medium"},
+    {"claim": "Two concurrent subagents render as Active:3 in one live session", "reason": "Never attempted on this host; SDK may serialize spawns", "risk_level": "medium"},
+    {"claim": "ToolResultBlock.is_error=True reachable via fail-on-purpose subagent prompt", "reason": "Code path exists (sdk.py:790, tree.py:269) but no live ERRORED capture exists", "risk_level": "low"},
+    {"claim": "fresh_evidence.py exact CLI semantics (init-run/next-step/seal/validate; 1024 floor at :46,216)", "reason": "Script outside readable project root; contract mirrored from validation/capture.py docstrings and call sites", "risk_level": "low"}
+  ],
+  "sources_read": [
+    ".auto-claude/specs/999-subagent-proof-v2/requirements.json",
+    "validation/capture.py (full, 307 lines)",
+    "e2e-evidence/run-20260917T100943-p5-c5-spawn-name-fix/{evidence-inventory.txt, step-02, step-03 partial, step-04}",
+    "e2e-evidence/run-20260917T095141-screen23-evidence/tools-export-20260917T095901Z.jsonl",
+    "proofpunk_agent/bridge/sdk.py:270-330,388-396,630-800,1015-1021",
+    "proofpunk_agent/state/reducers/tree.py (grep + 225-330)",
+    "proofpunk_agent/state/events.py:45-82",
+    "validation/perf/driver.py:340-470",
+    "validation/e2e/scenario_session.py:400-520",
+    "proofpunk_agent/app.py:790,1552-1625 (grep, SHOT_DIR)"
+  ],
+  "created_at": "2026-09-18T00:00:00Z"
+}

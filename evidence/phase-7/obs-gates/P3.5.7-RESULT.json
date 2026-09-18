@@ -1,0 +1,60 @@
+{
+  "criterion": "P3.5.7",
+  "description": "Cache hit accounting: needs an endpoint that actually returns cache traffic; the prior endpoint returned cacheReadTokens: 0",
+  "verdict": "PASS",
+  "decisiveEvidence": {
+    "routeConfirmedLive": "glm/glm-4.7 (via local router http://127.0.0.1:20128/v1)",
+    "cacheReadTokensObserved": 2304,
+    "reproducibility": "Confirmed non-zero and stable across 3 independent process runs (9 total calls), each showing cache_read_input_tokens: 2304 once the ephemeral cache_control prefix was warm.",
+    "runArtifacts": [
+      "evidence/phase-7/obs-gates/p357-run3-final.json",
+      "evidence/phase-7/obs-gates/p357-run2.json",
+      "evidence/phase-7/obs-gates/p357-run1-run2-driver.mjs (the driver script used for all 3 runs)"
+    ],
+    "otherRoutesTriedAndTheirStatus": [
+      { "model": "cc/claude-sonnet-5", "status": 401, "note": "OAuth access token has been revoked -- real Anthropic route, currently broken auth on this router instance" },
+      { "model": "cc/claude-haiku-4-5-20251001", "status": 401, "note": "same revoked OAuth token" },
+      { "model": "cc/claude-opus-5", "status": 401, "note": "same revoked OAuth token" },
+      { "model": "kimi/kimi-k2.5", "status": 403, "note": "weekly usage quota exhausted" },
+      { "model": "minimax/MiniMax-M2.1", "status": 429, "note": "rate/token plan limit reached" }
+    ]
+  },
+  "pipelineVerification": {
+    "claim": "Non-zero cache_read_input_tokens from the raw Anthropic-format router response is correctly plumbed all the way to the TUI's cache-hit UI field, end to end, at the source level",
+    "chain": [
+      {
+        "step": "Router raw response (Anthropic Messages API shape)",
+        "field": "usage.cache_read_input_tokens",
+        "observedValue": 2304,
+        "evidence": "p357-run3-final.json rawBodySnippet"
+      },
+      {
+        "step": "@ai-sdk/anthropic provider internals map raw field to LanguageModelV2Usage",
+        "field": "usage.inputTokens.cacheRead",
+        "location": "node_modules/@ai-sdk/anthropic/dist/index.js:2008-2044 (cacheReadTokens = usage.cache_read_input_tokens ?? 0; returned as inputTokens.cacheRead)"
+      },
+      {
+        "step": "ai package's asLanguageModelUsage() normalizes provider usage to the public LanguageModelUsage shape",
+        "field": "usage.inputTokenDetails.cacheReadTokens",
+        "location": "node_modules/ai/dist/index.js:2630-2637 (inputTokenDetails.cacheReadTokens = usage.inputTokens.cacheRead)"
+      },
+      {
+        "step": "stream-handler.ts reads this exact field on step-finish and forwards it as a stream-event",
+        "field": "u?.inputTokenDetails?.cacheReadTokens ?? u?.cacheReadTokens",
+        "location": "apps/desktop/src/main/ai/session/stream-handler.ts:260, 268, 276"
+      },
+      {
+        "step": "observability.ts applyUsage() accumulates this field per-agent on every step-finish/usage-update event",
+        "field": "a.snap.usage.cacheReadTokens",
+        "location": "apps/tui/src/services/observability.ts:392"
+      },
+      {
+        "step": "AgentsView.tsx TokensView and InspectView compute the visible cache-hit percentage from this exact field",
+        "field": "cacheHit = round((cacheRead / (cacheRead + cacheCreate)) * 100)",
+        "location": "apps/tui/src/views/AgentsView.tsx:279-281 (InspectView), :374-376 (TokensView)"
+      }
+    ],
+    "verifiedByLiveDrive": "During the P3.5.5 investigation, a real driven session against model glm/glm-4.7 (task 001-ctx-test) showed the TOKENS sub-view rendering 'CACHE HIT ████████ 100%' with real climbing prompt-token totals -- confirming the UI field is not merely wired in source but actually renders non-zero/populated values from a real running session using the same route proven to emit cache_read_input_tokens."
+  },
+  "conclusion": "PASS. glm/glm-4.7 through the local router is a real, currently-live endpoint that returns non-zero cache_read_input_tokens (2304, reproduced 3x across independent process runs). The field-mapping chain from raw provider response through @ai-sdk/anthropic, the ai package's usage normalization, stream-handler.ts, observability.ts, and finally AgentsView.tsx's cache-hit percentage calculation is confirmed correct at every hop by source inspection, and a live driven TUI session against this exact model rendered a populated (100%) cache-hit figure in the TOKENS sub-view. This closes the P3.5.7 gap: an endpoint that actually returns cache traffic exists (glm/glm-4.7), and the UI's cache accounting correctly derives from it."
+}

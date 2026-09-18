@@ -1,0 +1,29 @@
+
+┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────│─roadmap generated─│┐
+│APERANT │ proofpunk-agent /Users/nick/proofpunk-agent │ ⑂ master                                                                                                 ◉ 0 running  ◆ 0└───────────────────┘│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ GENERATION                                                                                                                                                                                       │ │
+│ │ idle                                                                                                                                                                                             │ │
+│ │ Structure:                                                                                                                                                                                       │ │
+│ │ - **P12 Collaboration & Sharing**: N11 portable session bundle, N12 static HTML report, N13 replay a                                                                                             │ │
+│ │ - **P13 Policy & Autonomy Controls**: N14 `--policy` file, N15 tool allow/deny lists, N16 loop detec                                                                                             │ │
+│ │ - **P14 Scale & Ecosystem**: N17 multi-session dashboard, N18 remote machine execution, N19 screen p                                                                                             │ │
+│ │ Prioritization rationale: bundle export and policy file are MoSCoW "must" (unblock auditors and oper                                                                                             │ │
+│ │ Phase features completed                                                                                                                                                                         │ │
+│ └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓┌──────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃ PHASES                                                                                       ┃│ DETAIL                                                                                           │ │
+│ ┃   ○ PHASE P12 Collaboration & Sharing                                                        ┃│ Scale & Ecosystem                                                                                │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/3 features                                                            ┃│  · Multi-Session Dashboard [planned · must]                                                      │ │
+│ ┃                                                                                              ┃│    c → convert to task spec                                                                      │ │
+│ ┃   ○ PHASE P13 Policy & Autonomy Controls                                                     ┃│  · Remote Machine Execution [planned · could]                                                    │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/3 features                                                            ┃│    c → convert to task spec                                                                      │ │
+│ ┃                                                                                              ┃│  · Custom Screen Plugin API [planned · could]                                                    │ │
+│ ┃ ❯ ○ PHASE P14 Scale & Ecosystem                                                              ┃│    c → convert to task spec                                                                      │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/4 features                                                            ┃│  · Headless HTTP API [planned · could]                                                           │ │
+│ ┃                                                                                              ┃│    c → convert to task spec                                                                      │ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛└──────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│  g generate · G refresh · j/k phase · c convert→spec                                                                                                                                                 │
+│ ROAD  g generate (G force regen) · c convert→spec                                                                                                                                       : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

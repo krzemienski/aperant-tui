@@ -1,0 +1,8 @@
+{
+  "question": "Which file defines the Textual App entry point class for this project?",
+  "cited_file": "proofpunk_agent/app.py",
+  "cited_line": 194,
+  "answer_verbatim": "`proofpunk_agent/app.py` \u2014 defines `ProofpunkAgentApp(App)` at line 194. Launched via `proofpunk_agent/_...` (truncated on screen)",
+  "verified_on_disk": true,
+  "verification_method": "Read tool confirmed proofpunk_agent/app.py:194 == 'class ProofpunkAgentApp(App):' exactly"
+}

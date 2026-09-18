@@ -1,0 +1,22 @@
+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ hunter-seed /Users/nick/dev/hunter-seed │ ⑂ main                                                                                                       ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┌──────────────────────────────────────────────────────────────────────────────┐┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ PHASES                                                                       ││ DETAIL                                                                                                           │ │
+│ │   ○ PHASE P1 Trust & Signal Quality                                          ││ Language & Target Portability                                                                                    │ │
+│ │   ░░░░░░░░░░░░░░░░░░ 0/3 features                                            ││  · Memory-safety language target packs (Rust, Go) [planned · Should]                                             │ │
+│ │                                                                              ││    c → convert to task spec                                                                                      │ │
+│ │ ❯ ○ PHASE P2 Language & Target Portability                                   ││  · Web vulnerability class extension (SSRF, injection, authZ) [planned · Could]                                  │ │
+│ │   ░░░░░░░░░░░░░░░░░░ 0/3 features                                            ││    c → convert to task spec                                                                                      │ │
+│ │                                                                              ││  · Cross-language dependency scanning mode [planned · Could]                                                     │ │
+│ │   ○ PHASE P3 Operational Integration                                         ││    c → convert to task spec                                                                                      │ │
+│ │   ░░░░░░░░░░░░░░░░░░ 0/3 features                                            ││                                                                                                                  │ │
+│ │                                                                              ││                                                                                                                  │ │
+│ │   ○ PHASE P4 Scale & Ecosystem                                               ││                                                                                                                  │ │
+│ │   ░░░░░░░░░░░░░░░░░░ 0/4 features                                            ││                                                                                                                  │ │
+│ │                                                                              ││                                                                                                                  │ │
+│ └──────────────────────────────────────────────────────────────────────────────┘└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│  g generate · G refresh · j/k phase · c convert→spec                                                                                                                                                 │
+│ ROAD  g generate (G force regen) · c convert→spec                                                                                                                                       : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
