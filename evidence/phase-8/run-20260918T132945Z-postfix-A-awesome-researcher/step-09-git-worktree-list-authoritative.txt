@@ -1,0 +1,4 @@
+worktree /Users/nick/awesome-researcher  branch refs/heads/feat/awesome-researcher
+worktree /Users/nick/awesome-researcher/.auto-claude/worktrees/tasks/003-list-health-audit-mode  branch refs/heads/auto-claude/003-list-health-audit-mode
+worktree /Users/nick/awesome-researcher/.auto-claude/worktrees/tasks/004-awesome-list-parsing-and-category-extraction  branch refs/heads/auto-claude/004-awesome-list-parsing-and-category-extraction
+worktree /Users/nick/awesome-researcher/.auto-claude/worktrees/tasks/005-human-in-the-loop-candidate-review-with-selective-  branch refs/heads/auto-claude/005-human-in-the-loop-candidate-review-with-selective-

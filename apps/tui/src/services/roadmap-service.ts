@@ -13,6 +13,7 @@
  */
 import type { Project } from '@shared/types';
 import { getManager, applyAccountEnv, type AgentManagerLike } from './agent-start-service';
+import { observability } from './observability';
 
 export interface RoadmapProgress {
   phase: string;
@@ -47,6 +48,9 @@ export async function startGeneration(project: Project, opts: { refresh?: boolea
   // before the manager resolves auth — see agent-start-service.applyAccountEnv.
   applyAccountEnv();
   const am = await getManager();
+  // D-C: arm the shared observability tap for roadmap runs; previously these
+  // runs produced no observability state, leaving the agents view empty.
+  observability.attachToManager(am);
   am.startRoadmapGeneration(project.id, project.path, opts.refresh ?? false, false, false,
     opts.model ? { model: opts.model, thinkingLevel: 'medium' } : undefined);
 }

@@ -9,8 +9,10 @@ import React from 'react';
 import { render } from 'ink';
 import path from 'node:path';
 import fs from 'node:fs';
+import { format } from 'node:util';
 import { fileURLToPath } from 'node:url';
 import { App } from './App';
+import { getAgentEventLogPath } from './services/agent-start-service';
 
 // The vendored pty-manager spawns process.env.SHELL || '/bin/zsh' on Unix.
 // Headless/minimal environments often have SHELL unset and no zsh — which
@@ -67,8 +69,74 @@ if (!process.stdout.isTTY) {
 const sdkGlobals = globalThis as typeof globalThis & { AI_SDK_LOG_WARNINGS?: boolean };
 sdkGlobals.AI_SDK_LOG_WARNINGS = false;
 
+// D22: vendored runtime logging writes directly to console.* during a run,
+// but in a TUI the terminal IS the render target — those writes paint over
+// Ink's frame. Preserve every call in the same append-only flight recorder
+// instead of deleting or weakening the vendored diagnostics. `util.format`
+// matches Node console formatting, including useful object inspection for
+// multi-argument calls. Set APERANT_RAW_CONSOLE to bypass this guard while
+// debugging; Ink's console patching is disabled in that mode as well.
+function installConsoleInterceptor(): () => void {
+  const originals = {
+    log: console.log, info: console.info, warn: console.warn,
+    debug: console.debug, error: console.error,
+  };
+  const levels = ['log', 'info', 'warn', 'debug', 'error'] as const;
+  let writing = false;
+  for (const level of levels) {
+    console[level] = (...args: unknown[]) => {
+      // A custom object inspector may itself log while util.format runs.
+      if (writing) return;
+      writing = true;
+      try {
+        const message = format(...args);
+        const record = JSON.stringify({
+          ts: new Date().toISOString(), event: 'console', taskId: null,
+          level, message, payload: [message],
+        }) + '\n';
+        const logPath = getAgentEventLogPath();
+        fs.mkdirSync(path.dirname(logPath), { recursive: true });
+        fs.appendFileSync(logPath, record);
+      } catch {
+        /* logging must never crash the app or recurse into console */
+      } finally {
+        writing = false;
+      }
+    };
+  }
+  return () => {
+    for (const level of levels) console[level] = originals[level];
+  };
+}
+
 const positional = args.filter((a) => !a.startsWith('-'));
 const projectPath = path.resolve(positional[0] ?? process.cwd());
 
-const { waitUntilExit } = render(<App projectPath={projectPath} />, { exitOnCtrlC: false });
-waitUntilExit().then(() => process.exit(0));
+const rawConsole = process.env.APERANT_RAW_CONSOLE !== undefined;
+const restoreConsole = rawConsole ? undefined : installConsoleInterceptor();
+let waitUntilExit: () => Promise<void>;
+try {
+  // Ink's own console patch would replace the interceptor and write to the
+  // terminal again. The entrypoint owns console routing in both modes.
+  ({ waitUntilExit } = render(<App projectPath={projectPath} />, {
+    exitOnCtrlC: false, patchConsole: false,
+  }));
+} catch (error) {
+  // Restore before reporting a synchronous render failure or fatal Ink exit;
+  // ordinary runtime diagnostics stay in the log while the frame is alive.
+  restoreConsole?.();
+  console.error(error);
+  process.exit(1);
+}
+
+waitUntilExit().then(
+  () => {
+    restoreConsole?.();
+    process.exit(0);
+  },
+  (error: unknown) => {
+    restoreConsole?.();
+    console.error(error);
+    process.exit(1);
+  },
+);

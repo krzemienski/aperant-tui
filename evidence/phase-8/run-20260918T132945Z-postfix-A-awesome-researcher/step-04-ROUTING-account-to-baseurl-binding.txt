@@ -1,0 +1,3 @@
+account=anthropic-mu6zlcfu provider=anthropic baseUrl=http://127.0.0.1:20219/v1 hasKey=True
+globalPriorityOrder= ['anthropic-mu6zlcfu']
+NOTE: resolver log line said account=anthropic-mu6zlcfu -> this account -> baseUrl above

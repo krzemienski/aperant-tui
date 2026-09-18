@@ -1,0 +1,50 @@
+      'content-type': 'application/json',
+      date: 'Fri, 18 Sep 2026 16:55:46 GMT',
+      nel: '{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}',
+      'permissions-policy': 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), serial=()',
+      'referrer-policy': 'strict-origin-when-cross-origin',
+      'report-to': '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=1U5u0lNth%2B2uRlzEk7Z9GeV7HJBFY43a0N8F53kJDKmE29kzvySogTlG9jMTf79SdyyxPuzzFW5k3znKA
+WJmKnppGLj7mHMWaepJ1TRQQHXF6VSww75YgVnJUkC4hi1e%2Fvs%3D"}]}',
+      'retry-after': '688',
+      server: 'cloudflare',
+┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────│─agent started: 005-secr─│┐
+│APERANT │ vigil /Users/nick/Desktop/vigil │ ⑂ main                                                                                                               ◉ 0 runnin└─────────────────────────┘│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃ TASKS                                                                                  ┃ │ DETAIL                                                                                                │ │
+│ ┃ ◆ BACKLOG (5)                                                                          ┃ │ 005-secr [BACKLOG]                                                                                    │ │
+│ ┃   001-neut ▽ Neutral default rails with environment profiles                           ┃ │ Secret redaction in run artifacts                                                                     │ │
+│ ┃   002-vigi ▽ `vigil init` config and plan scaffolding                                  ┃ │ progress ░░░░░░░░░░░░░░ 0%                                                                            │ │
+│ ┃   003-cont ▽ Content-aware evidence assertions with hash recording                     ┃ │ subtasks 0/0 complete                                                                                 │ │
+│ ┃   004-enfo ▽ Enforced budget and turn guards                                           ┃ │ phase planning                                                                                        │ │
+│ ┃ ❯ 005-secr ▽ Secret redaction in run artifacts                                         ┃ │ location main  spec 005-secret-redaction-in-run-artifacts                                             │ │
+│ ┃                                                                                        ┃ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ ┃                                                                                        ┃                                                                                                           │
+│ ┃                                                                                        ┃ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃                                                                                        ┃ │ AGENT STREAM                                                                                          │ │
+│ ┃                                                                                        ┃ │ 16:55:26 start 005-secr → vendored AgentManager…                                                      │ │
+│ ┃                                                                                        ┃ │ 16:55:27 started 005-secr: agent started — phase planning                                             │ │
+│ ┃                                                                                        ┃ │ 17:10:25 start 005-secr → vendored AgentManager…                                                      │ │
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ vigil /Users/nick/Desktop/vigil │ ⑂ main                                                                                                               ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃ TASKS                                                                                  ┃ │ DETAIL                                                                                                │ │
+│ ┃ ◆ BACKLOG (5)                                                                          ┃ │ 005-secr [BACKLOG]                                                                                    │ │
+│ ┃   001-neut ▽ Neutral default rails with environment profiles                           ┃ │ Secret redaction in run artifacts                                                                     │ │
+│ ┃   002-vigi ▽ `vigil init` config and plan scaffolding                                  ┃ │ progress ░░░░░░░░░░░░░░ 0%                                                                            │ │
+│ ┃   003-cont ▽ Content-aware evidence assertions with hash recording                     ┃ │ subtasks 0/0 complete                                                                                 │ │
+│ ┃   004-enfo ▽ Enforced budget and turn guards                                           ┃ │ phase planning                                                                                        │ │
+│ ┃ ❯ 005-secr ▽ Secret redaction in run artifacts                                         ┃ │ location main  spec 005-secret-redaction-in-run-artifacts                                             │ │
+│ ┃                                                                                        ┃ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ ┃                                                                                        ┃                                                                                                           │
+│ ┃                                                                                        ┃ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃                                                                                        ┃ │ AGENT STREAM                                                                                          │ │
+│ ┃                                                                                        ┃ │ 16:55:26 start 005-secr → vendored AgentManager…                                                      │ │
+│ ┃                                                                                        ┃ │ 16:55:27 started 005-secr: agent started — phase planning                                             │ │
+│ ┃                                                                                        ┃ │ 17:10:25 start 005-secr → vendored AgentManager…                                                      │ │
+│ ┃                                                                                        ┃ │ 17:10:25 started 005-secr: agent started — phase planning                                             │ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ BOARD  j/k move · ⏎ focus · s start · x stop · H/L column · l logs                                                                                                                      : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+

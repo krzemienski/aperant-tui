@@ -1,0 +1,3 @@
+[AgentManager] Resolved auth from provider queue: account=anthropic-mu6zlcfu provider=anthropic model=claude-sonnet-4-6
+[WorktreeManager] Created worktree: 006-automatic-pr-draft-generation-from-approved-candid on branch auto-claude/006-automatic-pr-draft-generation-from-approved-candid
+┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────│─agent started: 006-auto─│┐

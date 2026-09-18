@@ -1069,6 +1069,14 @@ export class AgentManager extends EventEmitter {
     }
 
     // Default: resolve 'sonnet' (Anthropic fallback)
+    // [APERANT-PATCH env-model-default]: APERANT_MODEL pins the default to a
+    // router-native id (e.g. 'cc/claude-opus-5'). Roadmap-converted specs carry
+    // no model in task_metadata, so without this the default resolved to a raw
+    // 'claude-sonnet-4-6' id that the operator router serves through a
+    // credential-less backend (401 auth_failure), even though the queue head
+    // account is the router itself. Explicit metadata models still win above.
+    const envModel = process.env.APERANT_MODEL?.trim();
+    if (envModel) return envModel;
     return resolveModelId('sonnet');
   }
 

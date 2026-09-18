@@ -1,0 +1,50 @@
+    system: [ [Object] ],
+    messages: [ [Object] ],
+    tools: [
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object],
+      [Object], [Object]
+    ],
+    tool_choice: { type: 'auto', disable_parallel_tool_use: undefined },
+    stream: true
+  },
+  statusCode: 401,
+  responseHeaders: {
+    'access-control-allow-headers': 'Content-Type, Authorization, x-api-key, anthropic-version, x-omniroute-connection, X-OmniRoute-Lease-Owner, X-OmniRoute-Lease-Generation, x-internal-test, accept',
+    'access-control-allow-methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+    'access-control-allow-origin': '*',
+    'alt-svc': 'h3=":443"; ma=86400',
+    'cf-cache-status': 'DYNAMIC',
+    'cf-ray': 'a3d1cdef3902b3aa-EWR',
+    connection: 'keep-alive',
+    'content-security-policy': "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://static
+.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; media-src 'self' data: blob:
+; connect-src 'self' http://localhost:* http://127.0.0.1:* ws://localhost:* ws://127.0.0.1:* https: ws: wss:; worker-src 'self' blob:; manifest-src 'self'",
+    'content-type': 'application/json',
+    date: 'Fri, 18 Sep 2026 16:42:32 GMT',
+    nel: '{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}',
+    'permissions-policy': 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), serial=()',
+    'referrer-policy': 'strict-origin-when-cross-origin',
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ vigil /Users/nick/Desktop/vigil │ ⑂ main                                                                                                               ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃ TASKS                                                                                  ┃ │ DETAIL                                                                                                │ │
+│ ┃ ◆ BACKLOG (5)                                                                          ┃ │ 005-secr [BACKLOG]                                                                                    │ │
+│ ┃   001-neut ▽ Neutral default rails with environment profiles                           ┃ │ Secret redaction in run artifacts                                                                     │ │
+│ ┃   002-vigi ▽ `vigil init` config and plan scaffolding                                  ┃ │ progress ░░░░░░░░░░░░░░ 0%                                                                            │ │
+│ ┃   003-cont ▽ Content-aware evidence assertions with hash recording                     ┃ │ subtasks 0/0 complete                                                                                 │ │
+│ ┃   004-enfo ▽ Enforced budget and turn guards                                           ┃ │ phase failed                                                                                          │ │
+│ ┃ ❯ 005-secr ▽ Secret redaction in run artifacts                                         ┃ │ location main  spec 005-secret-redaction-in-run-artifacts                                             │ │
+│ ┃                                                                                        ┃ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ ┃                                                                                        ┃                                                                                                           │
+│ ┃                                                                                        ┃ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃                                                                                        ┃ │ AGENT STREAM                                                                                          │ │
+│ ┃                                                                                        ┃ │ 16:42:30 start 005-secr → vendored AgentManager…                                                      │ │
+│ ┃                                                                                        ┃ │ 16:42:30 started 005-secr: agent started — phase planning                                             │ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ BOARD  j/k move · ⏎ focus · s start · x stop · H/L column · l logs                                                                                                                      : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+

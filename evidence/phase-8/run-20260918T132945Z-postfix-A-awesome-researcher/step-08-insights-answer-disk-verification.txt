@@ -1,0 +1,15 @@
+INSIGHTS ANSWER -> DISK VERIFICATION (project A: awesome-researcher)
+Question asked in TUI (tab 4, key a): "Which file implements the link
+validation logic and what is its main function name?"
+
+Answer cited: awesome_researcher/agents/validator.py
+  disk: -rw-r--r-- 14374 bytes  EXISTS
+
+Claims cross-checked against real source (grep):
+  validator.py:40   from awesome_researcher.utils.concurrency import bounded_gather   MATCH
+  validator.py:64   _HTTP_ERROR_FLOOR = 400                                           MATCH
+  validator.py:123  if method == "HEAD" and status in (403, 405, 501):                MATCH
+  validator.py:266  probes = await bounded_gather(limit, ...)                         MATCH
+
+VERDICT: PASS - answer is factually correct against real source, not hallucinated.
+Routed via omniroute account anthropic-mu6zlcfu -> http://127.0.0.1:20219/v1

@@ -1,0 +1,1 @@
+[AgentManager] Resolved auth from provider queue: account=anthropic-mu6zlcfu provider=anthropic model=claude-sonnet-4-6

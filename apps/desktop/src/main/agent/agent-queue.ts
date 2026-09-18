@@ -441,6 +441,11 @@ export class AgentQueueManager {
               this.emitter.emit('roadmap-log', projectId, event.text);
               break;
             }
+            case 'tool-use': {
+              // [APERANT-PATCH roadmap-tool-log]: flush tool activity as a complete log line.
+              this.emitter.emit('roadmap-log', projectId, `Tool: ${event.name.replace(/[\r\n]+/g, ' ').slice(0, 80)}\n`);
+              break;
+            }
             case 'error': {
               this.emitter.emit('roadmap-log', projectId, `Error: ${event.error}`);
               break;

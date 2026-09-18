@@ -19,6 +19,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Box, Text } from 'ink';
 import type { Theme } from '../theme/themes';
 import type { Project } from '@shared/types';
+import { PHASE_ORDER_INDEX } from '@shared/constants/phase-protocol';
 import { Panel } from '../components/Panel';
 import { useKeymap } from '../hooks/useKeymap';
 import { observability, overallProgress, type AgentSnapshot, type TraceEvent, type WaitState } from '../services/observability';
@@ -293,6 +294,11 @@ function GraphView({ c, agents }: { c: Theme; agents: AgentSnapshot[] }) {
         {roots.length === 0 && <Text color={c.faint}>no orchestration topology — agents appear here when spawned</Text>}
       </Panel>
       <Panel title={`PHASE PIPELINE${primary ? ` · ${primary.id.slice(0, 12)}` : ''}`} theme={c} flexGrow={1}>
+        {primary && (primary.phase === 'rate_limit_paused' || primary.phase === 'auth_failure_paused') && (
+          <Text color={c.warn}>
+            ⏸ {primary.phase.padEnd(18)} <Text color={c.faint}>{primary.phase === 'rate_limit_paused' ? '429 — resumes to coding' : '401 — re-authenticate to resume'}</Text>
+          </Text>
+        )}
         {(['planning', 'coding', 'qa_review', 'qa_fixing', 'complete'] as const).map((p) => {
           const range = { planning: '0→20%', coding: '20→80%', qa_review: '80→95%', qa_fixing: '80→95%', complete: '100%' }[p];
           const active = primary?.phase === p;
@@ -313,7 +319,7 @@ function GraphView({ c, agents }: { c: Theme; agents: AgentSnapshot[] }) {
 }
 
 function phaseIndex(p: string): number {
-  return { idle: -1, planning: 0, coding: 1, rate_limit_paused: 1, auth_failure_paused: 1, qa_review: 2, qa_fixing: 3, complete: 4, failed: 99 }[p] ?? -1;
+  return PHASE_ORDER_INDEX[p as keyof typeof PHASE_ORDER_INDEX] ?? -1;
 }
 
 // ── INSPECT ──────────────────────────────────────────────────────────────────
@@ -453,7 +459,7 @@ function TokensView({ c, agents }: { c: Theme; agents: AgentSnapshot[] }) {
         {byPressure.filter((a) => a.contextWindowLimit > 0 && a.usage.promptTokens / a.contextWindowLimit > 0.9).map((a) => (
           <Text key={a.id} color={c.warn}>⚠ {a.id.slice(0, 16)} &gt;90% → continuation will fire</Text>
         ))}
-        <Text color={c.faint}>thinking: coder=low by design; planner/qa/spec_writer=high</Text>
+        <Text color={c.faint}>thinking: coder=low; qa_fixer=medium; planner/qa_reviewer/spec_writer=high</Text>
       </Panel>
     </Box>
   );

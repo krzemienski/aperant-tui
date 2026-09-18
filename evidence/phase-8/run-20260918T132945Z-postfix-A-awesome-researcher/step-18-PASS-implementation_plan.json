@@ -1,0 +1,411 @@
+{
+  "feature": "Automatic PR draft generation from approved candidates",
+  "workflow_type": "feature",
+  "phases": [
+    {
+      "id": "phase-1-github-client",
+      "name": "GitHub API Client",
+      "subtasks": [
+        {
+          "id": "subtask-1-1",
+          "title": "Create integrations package and GitHub client",
+          "description": "Create awesome_researcher/integrations/__init__.py and awesome_researcher/integrations/github_client.py. Implement a `GitHubAPIError(RuntimeError)` exception (carrying an optional `status_code`) and a `GitHubClient` class constructed with `(token: str, api_base: str, *, client: httpx.AsyncClient | None = None)` — when `client` is None, build a real `httpx.AsyncClient(base_url=api_base, headers={'Authorization': f'Bearer {token}', 'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'}, timeout=config.http_timeout_seconds)` exactly mirroring config.github_api_base from config.py. Implement async methods: `get_repo(owner, repo) -> dict` (GET /repos/{owner}/{repo}, raises GitHubAPIError on non-2xx with the response body's 'message' field folded into the exception text), `get_ref(owner, repo, branch) -> str` (GET /repos/{owner}/{repo}/git/ref/heads/{branch}, returns the ref's sha), `create_branch(owner, repo, new_branch, base_sha) -> None` (POST /repos/{owner}/{repo}/git/refs with ref=refs/heads/{new_branch}; if the branch already exists (422), treat as success/no-op rather than raising), `get_file_sha(owner, repo, path, ref) -> str | None` (GET /repos/{owner}/{repo}/contents/{path}?ref={ref}; return None on 404, the 'sha' field on 200), `upsert_file(owner, repo, path, content_text, message, branch, sha=None) -> dict` (PUT /repos/{owner}/{repo}/contents/{path} with base64-encoded content, the commit message, target branch, and 'sha' included only when updating an existing file), and `create_pull_request(owner, repo, *, title, body, head, base, draft=True) -> dict` (POST /repos/{owner}/{repo}/pulls; returns the parsed JSON including 'html_url' and 'number'). Every method raises GitHubAPIError with a clear, actionable message (including the GitHub error message body when present) on any non-2xx/3xx response or httpx.HTTPError — never lets a raw httpx exception leak to callers. Add a small module docstring explaining the injectable-client testing pattern, matching the header style of awesome_parser.py.",
+          "status": "pending",
+          "files_to_create": [
+            "awesome_researcher/integrations/__init__.py",
+            "awesome_researcher/integrations/github_client.py"
+          ],
+          "files_to_modify": [],
+          "verification": {
+            "type": "command"
+          },
+          "service": "backend",
+          "patterns_from": [
+            "awesome_researcher/parsers/awesome_parser.py",
+            "awesome_researcher/agents/validator.py",
+            "awesome_researcher/config.py"
+          ]
+        },
+        {
+          "id": "subtask-1-2",
+          "title": "Add GitHub token/PR settings to Config",
+          "description": "Extend awesome_researcher/config.py's `Config` dataclass with three new fields, read via the existing `_env_str`/`_env_bool` helpers (no secrets ever hardcoded, matching the module's existing 'no secrets stored' contract): `github_token: str = field(default_factory=lambda: _env_str('GITHUB_TOKEN', ''))` (the PAT/App token used to authenticate PR creation — read directly from the environment, never logged), `pr_draft_default: bool = field(default_factory=lambda: _env_bool('AR_PR_DRAFT', True))` (whether opened PRs default to draft status), and `pr_branch_prefix: str = field(default_factory=lambda: _env_str('AR_PR_BRANCH_PREFIX', 'awesome-researcher'))` (prefix used when generating the new branch name from a run id). Do not add github_token to any dataclass __repr__/logging path beyond what dataclasses already do by default — verify utils/logging.py's redact_secrets() would redact a field literally named 'github_token' or 'token' if it ever appears in an event payload (read the function; if it pattern-matches key names, no change needed — just confirm and note it in a comment).",
+          "status": "pending",
+          "files_to_create": [],
+          "files_to_modify": [
+            "awesome_researcher/config.py"
+          ],
+          "verification": {
+            "type": "command"
+          },
+          "service": "backend",
+          "patterns_from": [
+            "awesome_researcher/config.py",
+            "awesome_researcher/utils/logging.py"
+          ]
+        },
+        {
+          "id": "subtask-1-3",
+          "title": "Unit test the GitHub client with MockTransport",
+          "description": "Create tests/test_phase10_pr_draft.py (this file will accumulate all PR-draft-feature tests across phases). Add a TestGitHubClient class covering, using httpx.MockTransport(handler) injected exactly like the existing validator tests inject a transport: (1) get_repo returns parsed JSON on 200 and raises GitHubAPIError with the GitHub message on 404; (2) get_ref returns the sha string on 200 and raises GitHubAPIError on 404 (missing base branch); (3) create_branch succeeds on 201 and is a silent no-op on 422 'Reference already exists'; (4) get_file_sha returns None on 404 and the sha string on 200; (5) upsert_file sends base64-encoded content and includes 'sha' only when passed, asserting on the outgoing request JSON body via the mock handler; (6) create_pull_request returns a dict with 'html_url' and 'number' on 201, and raises GitHubAPIError with a clear message on 403/422 (e.g. no commits between base and head, or insufficient permissions). No real network access anywhere in this test class.",
+          "status": "pending",
+          "files_to_create": [
+            "tests/test_phase10_pr_draft.py"
+          ],
+          "files_to_modify": [
+            "tests/test_phase10_pr_draft.py"
+          ],
+          "verification": {
+            "type": "command"
+          },
+          "service": "backend",
+          "patterns_from": [
+            "tests/test_phase8_validation.py",
+            "awesome_researcher/integrations/github_client.py"
+          ]
+        }
+      ],
+      "depends_on": [],
+      "type": "implementation",
+      "description": "Build a minimal, injectable-transport httpx-based GitHub REST API v3 client capable of: verifying a token/repo, resolving the default branch, creating a branch ref from a base SHA, upserting a single file's contents (README) via the Contents API, and opening a pull request (draft by default). Follow the exact httpx.AsyncClient injection pattern already used in awesome_parser.py and validator.py so the client is testable with httpx.MockTransport and never needs network access in unit tests.",
+      "parallel_safe": true
+    },
+    {
+      "id": "phase-2-pr-composer",
+      "name": "PR Draft Composer",
+      "subtasks": [
+        {
+          "id": "subtask-2-1",
+          "title": "Load and join approved candidates from run artifacts",
+          "description": "Create awesome_researcher/integrations/pr_composer.py. Add a `NoApprovedCandidatesError(RuntimeError)` exception. Add a dataclass `ApprovedCandidate` with fields title, url, category, score (float, default 0.0), rationale (str — the validator's acceptance_reason or decision reason), decided_at (str). Add a pure function `load_approved_candidates(run_dir: Path) -> list[ApprovedCandidate]` that: reads review_decisions.json via utils.helpers.read_json (default []), filters records where decision == 'accepted'; reads validated_links.json (default []) and scored_candidates.json (default []) and builds url->record lookup dicts for both; for each accepted decision, joins by url to pull category/description/acceptance_reason from validated_links.json and score from scored_candidates.json (falling back gracefully — 0.0 score, empty category/rationale — when a join misses, never raising on missing joins, only on a completely absent/empty accepted set); returns candidates sorted by score descending then title. If the accepted list is empty after filtering, raise `NoApprovedCandidatesError('no candidates approved in <run_dir>/review_decisions.json — nothing to draft a PR for')` — this is the function the CLI layer catches to satisfy the spec's 'fails gracefully with clear error if no candidates approved' acceptance criterion.",
+          "status": "pending",
+          "files_to_create": [
+            "awesome_researcher/integrations/pr_composer.py"
+          ],
+          "files_to_modify": [],
+          "verification": {
+            "type": "command"
+          },
+          "service": "backend",
+          "patterns_from": [
+            "awesome_researcher/renderers/report_generator.py",
+            "awesome_researcher/main.py"
+          ]
+        },
+        {
+          "id": "subtask-2-2",
+          "title": "Compose PR title and Markdown body",
+          "description": "In awesome_researcher/integrations/pr_composer.py add pure functions modeled on report_generator.py's section builders: `_pr_title(run_manifest: dict, approved: list[ApprovedCandidate]) -> str` (e.g. 'Add N new resources via awesome-researcher (<repo-short-name>)'), `_candidate_table(approved: list[ApprovedCandidate]) -> str` (Markdown table: Title | URL | Category | Score | Rationale, using the same `_md_escape`/`_short`-style helpers — duplicate the two tiny helpers locally rather than importing report_generator internals, to keep the modules decoupled), `_summary_section(run_manifest: dict, approved: list[ApprovedCandidate], rejected_count: int) -> str` (counts: approved/rejected/total reviewed, total run cost, elapsed time — reuse the same _format_usd/_format_seconds style formatting, duplicated locally), and `_traceability_section(run_id: str, run_dir: Path) -> str` (bullet list linking back to research_report.md, review_decisions.json, scored_candidates.json, insertion_manifest.json — relative paths, plus the run_id, so a reviewer can trace every score/rationale back to source). Add a `build_pr_body(run_manifest: dict, run_dir: Path, approved: list[ApprovedCandidate], rejected_count: int) -> str` that assembles all sections into one Markdown document with clear `##` headers (Summary, Candidates, Traceability), and a `build_pr_title(run_manifest: dict, approved: list[ApprovedCandidate]) -> str` wrapper. Every function must degrade to a placeholder string rather than raising when a field is missing (same contract as report_generator.py).",
+          "status": "pending",
+          "files_to_create": [],
+          "files_to_modify": [
+            "awesome_researcher/integrations/pr_composer.py"
+          ],
+          "verification": {
+            "type": "command"
+          },
+          "service": "backend",
+          "patterns_from": [
+            "awesome_researcher/renderers/report_generator.py"
+          ]
+        },
+        {
+          "id": "subtask-2-3",
+          "title": "Add PRDraftComposer class with disk write",
+          "description": "In awesome_researcher/integrations/pr_composer.py add a `PRDraftComposer` class (constructed with an optional `event_bus: EventBus | None` and `run_id: str = ''`, mirroring ReportGenerator's constructor) exposing a sync `compose(run_dir: Path) -> tuple[str, str, list[ApprovedCandidate]]` returning (title, body, approved_candidates) — internally calls load_approved_candidates, read_json for run_manifest.json and rejected_links.json, then build_pr_title/build_pr_body — and an async `write(run_dir: Path) -> Path` that composes and writes the body to `run_dir / 'pr_draft.md'`, emitting an ARTIFACT_WRITTEN event when an event bus is present (identical shape to ReportGenerator.write). `compose()` propagates NoApprovedCandidatesError unchanged so callers can catch it once at the CLI boundary.",
+          "status": "pending",
+          "files_to_create": [],
+          "files_to_modify": [
+            "awesome_researcher/integrations/pr_composer.py"
+          ],
+          "verification": {
+            "type": "command"
+          },
+          "service": "backend",
+          "patterns_from": [
+            "awesome_researcher/renderers/report_generator.py"
+          ]
+        },
+        {
+          "id": "subtask-2-4",
+          "title": "Unit test the PR composer against fixture run dirs",
+          "description": "In tests/test_phase10_pr_draft.py add a TestPRComposer class that builds a temporary run directory (tmp_path fixture) with hand-written review_decisions.json, validated_links.json, scored_candidates.json, rejected_links.json, and run_manifest.json (small, realistic synthetic data — no network, no SDK). Assert: (1) load_approved_candidates returns only 'accepted' decisions, correctly joined to score + category + rationale, sorted by score descending; (2) load_approved_candidates raises NoApprovedCandidatesError when every decision is 'rejected' or review_decisions.json is empty/missing; (3) build_pr_title includes the approved count; (4) build_pr_body contains each approved candidate's URL, its score formatted to a fixed precision, and a Traceability section referencing the run_id; (5) PRDraftComposer.write() (run via asyncio) creates pr_draft.md on disk with the same content compose() would produce, and — with an EventBus supplied — publishes exactly one ARTIFACT_WRITTEN event for it.",
+          "status": "pending",
+          "files_to_create": [],
+          "files_to_modify": [
+            "tests/test_phase10_pr_draft.py"
+          ],
+          "verification": {
+            "type": "command"
+          },
+          "service": "backend",
+          "patterns_from": [
+            "tests/test_phase8_validation.py",
+            "awesome_researcher/integrations/pr_composer.py"
+          ]
+        }
+      ],
+      "depends_on": [],
+      "type": "implementation",
+      "description": "Build the pure, offline-testable logic that reads a completed run directory's artifacts, determines the approved-candidate set, and composes the PR title and Markdown body (per-candidate rationale + quality scores + traceability links back to the run). This phase has no network dependency and mirrors renderers/report_generator.py's builder-function-then-wrapper-class shape.",
+      "parallel_safe": true
+    },
+    {
+      "id": "phase-3-orchestration",
+      "name": "PR Draft Orchestration + CLI",
+      "subtasks": [
+        {
+          "id": "subtask-3-1",
+          "title": "Implement create_pr_draft coordinator",
+          "description": "Create awesome_researcher/integrations/pr_draft.py. Add a dataclass `PRDraftResult` with fields exit_code, run_id, pr_url (str, empty when --dry-run or on failure), pr_number (int | None), branch (str), approved_count (int), message (str — human-readable outcome for CLI echo). Add an async coroutine `create_pr_draft(run_dir: Path, config: Config, *, target_repo_url: str | None, base_branch: str | None, dry_run: bool, draft: bool | None, bus: EventBus | None = None, run_id: str = '') -> PRDraftResult` that: (1) validates run_dir exists and has a run_manifest.json, else returns exit_code=EXIT_CONFIG with a clear message; (2) calls `PRDraftComposer(bus, run_id).compose(run_dir)`, catching NoApprovedCandidatesError and returning exit_code=EXIT_VALIDATION with message 'no candidates approved — nothing to publish' (never raises up to the CLI — this satisfies the spec's graceful-failure acceptance criterion); (3) writes pr_draft.md via composer.write(); (4) resolves target_repo_url (explicit override, else run_manifest['config']['repo_url']) via parsers.awesome_parser.parse_repo_url to get (owner, repo); (5) when dry_run is True, writes pr_draft.json with branch/title/candidate-count metadata and pr_url='' and returns exit_code=EXIT_OK without any network call; (6) otherwise requires config.github_token (else exit_code=EXIT_CONFIG, message naming the GITHUB_TOKEN env var), constructs a GitHubClient, resolves the base branch (explicit override, else the repo's default_branch from get_repo), computes a deterministic branch name `f'{config.pr_branch_prefix}/{run_id}'`, creates the branch from the base sha, upserts README.md on that branch with the run's updated_list.md content (read via read text, existing sha fetched first), opens the pull request with draft=(draft if draft is not None else config.pr_draft_default), and on GitHubAPIError returns exit_code=EXIT_NETWORK with the exception's message surfaced verbatim (no stack trace swallowing of the reason); (7) on full success writes pr_draft.json (title, branch, base, pr_number, pr_url, approved_count, generated_at) into run_dir and returns exit_code=EXIT_OK with pr_url populated. Emit an ARTIFACT_WRITTEN event for pr_draft.json when a bus is present, matching existing artifact-write conventions.",
+          "status": "pending",
+          "files_to_create": [
+            "awesome_researcher/integrations/pr_draft.py"
+          ],
+          "files_to_modify": [],
+          "verification": {
+            "type": "command"
+          },
+          "service": "backend",
+          "patterns_from": [
+            "awesome_researcher/main.py",
+            "awesome_researcher/integrations/pr_composer.py",
+            "awesome_researcher/integrations/github_client.py"
+          ]
+        },
+        {
+          "id": "subtask-3-2",
+          "title": "Add pr-draft CLI command and register console script",
+          "description": "In awesome_researcher/main.py add a new `@click.command(...)` function `cli_main_pr_draft(**kwargs)` (placed near cli_main_tui, imports awesome_researcher.integrations.pr_draft lazily inside the function body to avoid adding a hard import to the module's top-level import graph, matching how cli_main_tui lazily imports the TUI app) with options: `--run-id` (required), `--output-dir` (default 'runs', matching existing --output-dir semantics), `--target-repo-url` (optional override), `--base-branch` (optional override), `--dry-run/--no-dry-run` (default: --dry-run is False), `--draft/--no-draft` (default None = defer to config.pr_draft_default). The function builds `run_dir = Path(output_dir) / run_id`, builds `Config.from_env()`, runs `asyncio.run(create_pr_draft(...))`, echoes `result.message` (and `result.pr_url` when non-empty) to stdout, and calls `sys.exit(result.exit_code)`. Add `awesome-researcher-pr-draft = \"awesome_researcher.main:cli_main_pr_draft\"` to pyproject.toml's `[tool.poetry.scripts]`. Add `cli_main_pr_draft` to main.py's `__all__` re-export list alongside the other CLI entry points.",
+          "status": "pending",
+          "files_to_create": [],
+          "files_to_modify": [
+            "awesome_researcher/main.py",
+            "pyproject.toml"
+          ],
+          "verification": {
+            "type": "command"
+          },
+          "service": "backend",
+          "patterns_from": [
+            "awesome_researcher/main.py"
+          ]
+        },
+        {
+          "id": "subtask-3-3",
+          "title": "Register pr_draft artifacts in the run manifest",
+          "description": "In awesome_researcher/main.py's `_refresh_artifacts_manifest()` function, add `'pr_draft': 'pr_draft.md'` and `'pr_draft_meta': 'pr_draft.json'` to the `expected` dict so a run directory that has had a PR drafted reflects both files in run_manifest.json['artifacts'] the same way every other pipeline artifact is tracked.",
+          "status": "pending",
+          "files_to_create": [],
+          "files_to_modify": [
+            "awesome_researcher/main.py"
+          ],
+          "verification": {
+            "type": "command"
+          },
+          "service": "backend",
+          "patterns_from": [
+            "awesome_researcher/main.py"
+          ]
+        },
+        {
+          "id": "subtask-3-4",
+          "title": "Unit test the orchestration coordinator with a fake GitHub client",
+          "description": "In tests/test_phase10_pr_draft.py add a TestCreatePRDraft class using a fixture run_dir (same shape as TestPRComposer's fixture, plus a run_manifest.json['config']['repo_url'] and an updated_list.md file) and httpx.MockTransport to simulate the full GitHub API surface (repo lookup, ref lookup, branch creation, file upsert, PR creation) so create_pr_draft's success path is exercised end-to-end without real network access. Cover: (1) no candidates approved -> exit_code == EXIT_VALIDATION, pr_url == '', message mentions 'approved'; (2) dry_run=True -> exit_code == EXIT_OK, pr_url == '', pr_draft.json and pr_draft.md both exist on disk, and the mock transport recorded zero GitHub API requests; (3) missing GITHUB_TOKEN with dry_run=False -> exit_code == EXIT_CONFIG; (4) full success path with a mocked 201 pull-request response -> exit_code == EXIT_OK, pr_url matches the mocked html_url, pr_draft.json on disk with the right pr_number; (5) GitHubAPIError raised mid-flow (e.g. 403 on create_pull_request) -> exit_code == EXIT_NETWORK and the exception's message is present in result.message.",
+          "status": "pending",
+          "files_to_create": [],
+          "files_to_modify": [
+            "tests/test_phase10_pr_draft.py"
+          ],
+          "verification": {
+            "type": "command"
+          },
+          "service": "backend",
+          "patterns_from": [
+            "tests/test_phase8_validation.py",
+            "awesome_researcher/integrations/pr_draft.py"
+          ]
+        }
+      ],
+      "depends_on": [
+        "phase-1-github-client",
+        "phase-2-pr-composer"
+      ],
+      "type": "implementation",
+      "description": "Wire the GitHub client and PR composer together into a single review-gated coordinator function, expose it as a new CLI command (mirroring cli_main/cli_main_tui's coexistence pattern), and register a new console script — all while leaving the existing `awesome-researcher` and `awesome-researcher-tui` commands completely unmodified.",
+      "parallel_safe": false
+    },
+    {
+      "id": "phase-4-integration",
+      "name": "End-to-End Verification and Docs",
+      "subtasks": [
+        {
+          "id": "subtask-4-1",
+          "title": "CLI end-to-end dry-run smoke test",
+          "description": "Add a test (in tests/test_phase10_pr_draft.py, TestCLIEndToEnd, or a small functional test if pytest CliRunner from click.testing is more appropriate — follow whichever pattern existing CLI tests in the repo use, checking tests/test_phase1_core.py or similar for a click.testing.CliRunner precedent first) that: (a) builds a full synthetic run directory on disk (review_decisions.json with >=1 accepted, validated_links.json, scored_candidates.json, rejected_links.json, run_manifest.json with a repo_url, updated_list.md); (b) invokes the `awesome-researcher-pr-draft` command via CliRunner with `--run-id <id> --output-dir <tmp> --dry-run`; (c) asserts exit code 0, that pr_draft.md and pr_draft.json now exist under the run dir, and that stdout mentions the approved candidate count. Also add a second invocation against a run dir whose review_decisions.json has zero accepted candidates and assert a nonzero exit code with a clear 'no candidates approved' message on output — this is the literal acceptance criterion 'Fails gracefully with clear error if no candidates approved'.",
+          "status": "pending",
+          "files_to_create": [],
+          "files_to_modify": [
+            "tests/test_phase10_pr_draft.py"
+          ],
+          "verification": {
+            "type": "command"
+          },
+          "service": "backend",
+          "patterns_from": [
+            "awesome_researcher/main.py",
+            "tests/test_phase1_core.py"
+          ]
+        },
+        {
+          "id": "subtask-4-2",
+          "title": "Full test suite regression check",
+          "description": "Run the full non-e2e, non-functional test suite to confirm the new integrations package, the new Config fields, and the two edits to main.py (_refresh_artifacts_manifest, __all__) have not broken any existing test (parsers, agents, TUI, rendering, phase1-9 suites). Fix any regression before considering this phase complete.",
+          "status": "pending",
+          "files_to_create": [],
+          "files_to_modify": [],
+          "verification": {
+            "type": "command"
+          },
+          "service": "backend",
+          "patterns_from": []
+        },
+        {
+          "id": "subtask-4-3",
+          "title": "Document the pr-draft command",
+          "description": "Update docs/API.md to add a new section documenting the `awesome-researcher-pr-draft` command: its flags (--run-id, --output-dir, --target-repo-url, --base-branch, --dry-run/--no-dry-run, --draft/--no-draft), required environment variable GITHUB_TOKEN, the exit codes it can return (EXIT_OK, EXIT_CONFIG, EXIT_VALIDATION, EXIT_NETWORK) and what each means for this command specifically, and a short usage example (`awesome-researcher-pr-draft --run-id 20260615-... --dry-run` then without --dry-run). Update docs/TRACEABILITY.md to add a row mapping this feature (F-102 / 'Automatic PR draft generation from approved candidates') to the new files: awesome_researcher/integrations/github_client.py, pr_composer.py, pr_draft.py, and the CLI command in main.py. Update README.md's 'Console scripts after install' bullet list to add `awesome-researcher-pr-draft` alongside the two existing scripts, with a one-line description.",
+          "status": "pending",
+          "files_to_create": [],
+          "files_to_modify": [
+            "docs/API.md",
+            "docs/TRACEABILITY.md",
+            "README.md"
+          ],
+          "verification": {
+            "type": "manual"
+          },
+          "service": "backend",
+          "patterns_from": [
+            "docs/API.md",
+            "docs/TRACEABILITY.md",
+            "README.md"
+          ]
+        }
+      ],
+      "depends_on": [
+        "phase-3-orchestration"
+      ],
+      "type": "integration",
+      "description": "Verify the full happy path and both graceful-failure paths from the command line against a synthetic run directory, and update the two documentation sources of truth (API.md, TRACEABILITY.md) so the new command is discoverable and traceable, matching the acceptance criteria in spec.md verbatim.",
+      "parallel_safe": false
+    }
+  ],
+  "workflow_rationale": "This adds a new, self-contained capability (GitHub PR drafting) on top of an existing single-service Python pipeline. There is no existing PR integration in the codebase to extend (despite the spec's reference to 'F-012' — investigation found none), so the work is purely additive: a new low-level GitHub API client, a new pure PR-body composer, and a new CLI entry point that wires them together and reads already-produced run artifacts. Phases are ordered by dependency (client before composer-that-may-call-it, composer before CLI orchestration, CLI before end-to-end integration) rather than by 'service' since this is a single Python package.",
+  "summary": {
+    "total_phases": 4,
+    "total_subtasks": 14,
+    "services_involved": [
+      "backend"
+    ],
+    "parallelism": {
+      "max_parallel_phases": 2,
+      "parallel_groups": [
+        {
+          "phases": [
+            "phase-1-github-client",
+            "phase-2-pr-composer"
+          ],
+          "reason": "Both depend on nothing else and touch disjoint new files (github_client.py vs pr_composer.py); they share only the same new test file (tests/test_phase10_pr_draft.py) via different test classes, which is a soft ordering risk rather than a hard conflict — a single worker can also do them sequentially with no loss of correctness."
+        }
+      ],
+      "recommended_workers": 1,
+      "speedup_estimate": "Marginal (~1.2x) — the two independent phases are small and share one test file, so sequential execution is the safer default for a single coder agent."
+    },
+    "startup_command": "source auto-claude/.venv/bin/activate && python auto-claude/run.py --spec 006 --parallel 1"
+  },
+  "verification_strategy": {
+    "risk_level": "medium",
+    "skip_validation": false,
+    "test_creation_phase": "inline_with_implementation",
+    "test_types_required": [
+      "unit",
+      "integration"
+    ],
+    "security_scanning_required": true,
+    "staging_deployment_required": false,
+    "acceptance_criteria": [
+      "Single command (awesome-researcher-pr-draft) produces a draft PR on the target repo",
+      "PR description includes per-candidate rationale and scores",
+      "Fails gracefully with clear error and nonzero exit code if no candidates approved",
+      "No GitHub token or other secret is ever written to a run artifact, log, or PR body",
+      "All existing tests continue to pass (no regression in parsers/agents/TUI/rendering suites)"
+    ],
+    "verification_steps": [
+      {
+        "name": "Unit Tests — GitHub client, PR composer, orchestrator",
+        "command": "poetry run pytest tests/test_phase10_pr_draft.py -q",
+        "expected_outcome": "All tests pass with zero network access (httpx.MockTransport only)",
+        "type": "test",
+        "required": true,
+        "blocking": true
+      },
+      {
+        "name": "Full regression suite",
+        "command": "poetry run pytest -m \"not e2e and not functional\" -q",
+        "expected_outcome": "All existing and new tests pass",
+        "type": "test",
+        "required": true,
+        "blocking": true
+      },
+      {
+        "name": "Secrets scan",
+        "command": "python auto-claude/scan_secrets.py --all-files --json",
+        "expected_outcome": "No secrets detected (GITHUB_TOKEN must only ever be read from os.environ, never hardcoded)",
+        "type": "security",
+        "required": true,
+        "blocking": true
+      },
+      {
+        "name": "CLI smoke test (dry-run, no network)",
+        "command": "poetry run awesome-researcher-pr-draft --help",
+        "expected_outcome": "Prints usage with --run-id, --dry-run, --draft flags; exits 0",
+        "type": "manual",
+        "required": true,
+        "blocking": false
+      }
+    ],
+    "reasoning": "Medium risk: this feature performs a real write-capable GitHub API integration (branch creation, file commit, PR open) gated behind an opt-in token and a --dry-run default-safe flag, and it must never leak credentials or crash ungracefully on the documented empty-approval case. Unit + integration coverage via httpx.MockTransport is sufficient (no live GitHub calls are made in CI); a secrets scan is warranted given a new token-handling code path; full staging/E2E deployment is unnecessary since no live network call is exercised by the automated test suite."
+  },
+  "qa_acceptance": {
+    "unit_tests": {
+      "required": true,
+      "commands": [
+        "poetry run pytest tests/test_phase10_pr_draft.py -q"
+      ],
+      "minimum_coverage": null
+    },
+    "integration_tests": {
+      "required": true,
+      "commands": [
+        "poetry run pytest -m \"not e2e and not functional\" -q"
+      ],
+      "services_to_test": [
+        "backend"
+      ]
+    },
+    "e2e_tests": {
+      "required": false,
+      "commands": [],
+      "flows": []
+    },
+    "browser_verification": {
+      "required": false,
+      "pages": []
+    },
+    "database_verification": {
+      "required": false,
+      "checks": []
+    }
+  },
+  "qa_signoff": null
+}

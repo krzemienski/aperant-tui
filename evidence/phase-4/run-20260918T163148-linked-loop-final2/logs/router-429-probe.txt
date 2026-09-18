@@ -1,0 +1,6 @@
+router 429 probe 2026-09-18T16:40Z (direct /v1/messages, x-api-key from env)
+cc/claude-opus-5 -> 429 "This request would exceed your account's rate limit"
+cc/claude-sonnet-5 -> 429 same
+cc/claude-haiku-4-5-20251001 -> 429 same
+=> account-wide upstream rate limit; roadmap refresh (2 attempts, 60s backoff) and
+   both phases 429'd. Fresh generation this run: UNVERIFIED (rate limit), not simulated.

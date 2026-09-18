@@ -142,7 +142,8 @@ export function BoardView({ theme: c, project, tasks, onOpenLogs, onTasksChanged
   const startingRef = useRef(false);
   // Real lifecycle events, newest last — rendered in AGENT STREAM.
   const [stream, setStream] = useState<string[]>([]);
-  const flat = tasks;
+  const groups = useMemo(() => groupByStatus(tasks), [tasks]);
+  const flat = useMemo(() => groups.flatMap(([, items]) => items), [groups]);
   const clamped = Math.min(sel, Math.max(0, flat.length - 1));
   const task = flat[clamped];
   const flash = useAppStore((s) => s.flash);
@@ -191,6 +192,9 @@ export function BoardView({ theme: c, project, tasks, onOpenLogs, onTasksChanged
     if (r.ok) {
       flash(`${task.id.slice(0, 8)}: ${r.from} → ${r.to}`);
       log(`${new Date().toISOString().slice(11, 19)} move ${task.id.slice(0, 8)} ${r.from} → ${r.to} (persisted)`);
+      // Follow the moved task to its new row rather than selecting its old neighbor.
+      const moved = tasks.map((t) => t.id === task.id ? { ...t, status: r.to } : t);
+      setSel(groupByStatus(moved).flatMap(([, items]) => items).findIndex((t) => t.id === task.id));
       onTasksChanged();
     } else {
       flash(r.reason);
@@ -248,8 +252,6 @@ export function BoardView({ theme: c, project, tasks, onOpenLogs, onTasksChanged
     // ref-based reentrancy guard above for why a naive split would have been
     // unsafe for `s` specifically.
   }, { isActive, splittableKeys: ['j', 'k'] });
-
-  const groups = useMemo(() => groupByStatus(tasks), [tasks]);
 
   // P7.1 fix: BoardView used to .map() every task in every column
   // unconditionally on every render — with 200 tasks that meant Ink had to
