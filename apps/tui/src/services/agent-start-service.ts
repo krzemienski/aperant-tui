@@ -12,7 +12,7 @@
  * SDK set; a resolution failure is itself a real, reportable error.
  */
 import type { Project, Task, ImplementationPlan } from '@shared/types';
-import { appendFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { getSpecsDir, AUTO_BUILD_PATHS } from '@shared/constants';
@@ -21,6 +21,7 @@ import { buildDefaultQueueConfig } from '@main/ai/auth/resolver';
 import { PROVIDER_ENV_VARS, PROVIDER_BASE_URL_ENV } from '@main/ai/auth/types';
 import type { SupportedProvider } from '@main/ai/providers/types';
 import { observability } from './observability';
+import { appendEventLine } from './event-log';
 import { findTaskWorktree } from '@main/worktree-paths';
 import { getPlanPath, syncPlanPhasesToMainSync } from '@main/ipc-handlers/task/plan-file-utils';
 import { safeParseJson } from '@main/utils/json-repair';
@@ -94,13 +95,7 @@ function appendEvent(event: string, args: unknown[]): void {
     taskId: args[0] ?? null,
     payload: args.slice(1).map(safePayload),
   }) + '\n';
-  try {
-    const p = getAgentEventLogPath();
-    mkdirSync(path.dirname(p), { recursive: true });
-    appendFileSync(p, line);
-  } catch {
-    /* logging must never crash the app */
-  }
+  appendEventLine(getAgentEventLogPath(), line);
 }
 
 function attachEventLog(am: AgentManagerLike): void {

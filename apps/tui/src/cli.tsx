@@ -13,6 +13,7 @@ import { format } from 'node:util';
 import { fileURLToPath } from 'node:url';
 import { App } from './App';
 import { getAgentEventLogPath } from './services/agent-start-service';
+import { appendEventLine } from './services/event-log';
 
 // The vendored pty-manager spawns process.env.SHELL || '/bin/zsh' on Unix.
 // Headless/minimal environments often have SHELL unset and no zsh — which
@@ -95,8 +96,7 @@ function installConsoleInterceptor(): () => void {
           level, message, payload: [message],
         }) + '\n';
         const logPath = getAgentEventLogPath();
-        fs.mkdirSync(path.dirname(logPath), { recursive: true });
-        fs.appendFileSync(logPath, record);
+        appendEventLine(logPath, record);
       } catch {
         /* logging must never crash the app or recurse into console */
       } finally {

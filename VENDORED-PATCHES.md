@@ -6,6 +6,25 @@ downstream patches exist. Every one is marked inline with
 `[APERANT-PATCH <name>]` and is additive-only: no upstream behavior changes
 when the patch's trigger is absent.
 
+## What `apps/DESKTOP-SHA256SUMS.txt` means
+
+It is the **upstream baseline**, not a checksum of the working tree, and it is
+deliberately never regenerated. Drift against it is the signal the contract
+depends on: a file whose hash differs is a file we changed.
+
+`tools/audit-vendored-drift.mjs` enforces the rule mechanically and runs in CI:
+
+- hash matches baseline → untouched upstream code;
+- hash differs **and** the file carries an `[APERANT-PATCH]` marker (or is in
+  the script's `MARKERLESS_ALLOWLIST` for formats with no comment syntax, i.e.
+  `package.json`) → an intentional, documented patch, listed below;
+- hash differs with **no** marker → **build fails**. That is an unrecorded
+  edit to vendored code, and it must either be marked and documented here or
+  reverted.
+
+Current state: 1288 entries — 1267 byte-identical to upstream, 21 drifted and
+all documented. Regenerating the manifest would destroy this signal.
+
 ## moonshot-provider (2026-08-12)
 
 Adds Moonshot AI (Kimi) as a first-class provider via the workspace package
