@@ -1,0 +1,50 @@
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ vigil /Users/nick/Desktop/vigil │ ⑂ main                                                                                                               ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ │
+│ ┃ GENERATION                                                                                                                                                                                       ┃ │
+│ ┃ RUNNING · discovery 30% — Running discovery phase...                                                                                                                                             ┃ │
+│ ┃  ███████░░░░░░░░░░░░░░░░░ discovery                                                                                                                                                              ┃ │
+│ ┃ Tool: Read                                                                                                                                                                                       ┃ │
+│ ┃ Tool: Read                                                                                                                                                                                       ┃ │
+│ ┃ Tool: Bash                                                                                                                                                                                       ┃ │
+│ ┃ Note: the project index file doesn't exist. Let me explore further.Tool: Bash                                                                                                                    ┃ │
+│ ┃ Tool: Read                                                                                                                                                                                       ┃ │
+│ ┃ Tool: Read                                                                                                                                                                                       ┃ │
+│ ┃ Tool: Read                                                                                                                                                                                       ┃ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ │
+│ ┌───────────────────────────────────────────────────────────────────────────┐┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ PHASES                                                                    ││ DETAIL                                                                                                              │ │
+│ │ ❯ ○ PHASE phase-1 Escape Velocity                                         ││ Escape Velocity                                                                                                     │ │
+│ │   ░░░░░░░░░░░░░░░░░░ 0/5 features                                         ││  ⇒ Neutral default rails with environment profiles [planned · must_have]                                            │ │
+│ │                                                                           ││    spec 001-neutral-default-rails-with-environment-profiles                                                         │ │
+│ │   ○ PHASE phase-2 Hardened Boundary                                       ││  ⇒ `vigil init` config and plan scaffolding [planned · must_have]                                                   │ │
+│ │   ░░░░░░░░░░░░░░░░░░ 0/7 features                                         ││    spec 002-vigil-init-config-and-plan-scaffolding                                                                  │ │
+│ │                                                                           ││  ⇒ Content-aware evidence assertions with hash recording [planned · must_have]                                      │ │
+│ │   ○ PHASE phase-3 CI Native                                               ││    spec 003-content-aware-evidence-assertions-with-hash-record                                                      │ │
+│ │   ░░░░░░░░░░░░░░░░░░ 0/4 features                                         ││  ⇒ Enforced budget and turn guards [planned · must_have]                                                            │ │
+│ │                                                                           ││    spec 004-enforced-budget-and-turn-guards                                                                         │ │
+│ │   ○ PHASE phase-4 Resume & Compare                                        ││  ⇒ Secret redaction in run artifacts [planned · must_have]                                                          │ │
+│ │   ░░░░░░░░░░░░░░░░░░ 0/4 features                                         ││    spec 005-secret-redaction-in-run-artifacts                                                                       │ │
+│ │                                                                           ││                                                                                                                     │ │
+│ │   ○ PHASE phase-5 Open Platform                                           ││                                                                                                                     │ │
+│ │   ░░░░░░░░░░░░░░░░░░ 0/6 features                                         ││                                                                                                                     │ │
+│ │                                                                           ││                                                                                                                     │ │
+│ └───────────────────────────────────────────────────────────────────────────┘└─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│  generating… x stop                                                                                                                                                                                  │
+│ ROAD  g generate (G force regen) · x stop · j/k phase · c convert→spec                                                                                                                  : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+
+
+
+
+
+
+
+
+
+
+
+

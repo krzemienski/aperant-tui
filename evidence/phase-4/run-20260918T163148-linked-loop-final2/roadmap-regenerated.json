@@ -1,0 +1,2153 @@
+{
+  "project_name": "vigil",
+  "current_version": "0.1.0",
+  "generated_at": "2026-09-19T00:23:56.821026Z",
+  "roadmap_horizon": "5 phases to v1.0.0",
+  "vision": "Vigil is the trustworthy cockpit for autonomous agent work: nothing an agent claims is accepted without evidence, nothing destructive happens without a rail, and every run is fully replayable and auditable from disk. The road to v1.0 turns that promise from something that works on one engineer's laptop into something any operator can install, trust, and prove — where the evidence check inspects content rather than byte counts, the rails ship neutral and resist evasion, the SDK boundary is validated rather than cast, the budget guard actually stops the run, and the artifacts are safe to hand to an auditor.",
+  "north_star": "An operator can hand Vigil a multi-phase validation plan, walk away, and afterwards prove — from artifacts alone, without trusting a single sentence the agent wrote — exactly what was done, what passed, what it cost, and what was blocked.",
+  "strategic_themes": [
+    {
+      "id": "theme-portability",
+      "name": "Escape the author's machine",
+      "description": "DEFAULT_RAILS and the example config encode /Users/nick, the OmniRoute checkout, ports 20128/20219/20239 and a launchd label, and install is `npm link` from a Desktop checkout. Until defaults are neutral, a scaffold exists and the package is published, the tool has exactly one possible user."
+    },
+    {
+      "id": "theme-trust",
+      "name": "Make the trust claims literally true",
+      "description": "The differentiator is 'verdicts are evidence-checked, not trusted'. Today the check is existence plus non-zero bytes, maxBudgetUsd is accepted but never enforced, unreached gates vanish into an empty branch, and a re-run happily accepts stale evidence. Close every gap between the claim and the code."
+    },
+    {
+      "id": "theme-durability",
+      "name": "Survive the SDK and survive the author",
+      "description": "Unchecked `as unknown as {...}` casts against an exactly-pinned SDK, no CI, untested artifact and config layers, and a bus factor of one. Harden the boundary, test the integration, and make regressions fail before runtime rather than mid-deployment."
+    },
+    {
+      "id": "theme-ci-native",
+      "name": "First-class non-TTY operation",
+      "description": "--plain exists but auto-denies approvals and emits prose. CI and SSH consumers need structured versioned output, a machine-readable exit summary, and an approval channel that is not a TTY overlay."
+    },
+    {
+      "id": "theme-lifecycle",
+      "name": "Runs as a managed corpus",
+      "description": "runs/ captures full tool inputs and outputs verbatim, is never pruned, and can contain secrets. Treat the run corpus as a first-class artifact with retention, resume, comparison and export rather than an ever-growing pile of JSONL."
+    },
+    {
+      "id": "theme-extensibility",
+      "name": "Serve environments Vigil did not anticipate",
+      "description": "One plan format, regex-only rails and two probe types encode the author's workflow. Adapter and extension seams let the valuable machinery — evidence checking, rails, reports — serve plans, policies and health checks Vigil did not invent."
+    }
+  ],
+  "target_audience": {
+    "primary": "The author/operator — a solo engineer running high-risk, multi-phase deployment and migration work through a Claude Code agent, who needs hard proof that each step actually happened rather than agent prose claiming it did.",
+    "secondary": [
+      "AI-assisted engineering leads auditing what an autonomous coding agent did on a production-adjacent machine",
+      "Platform/DevOps engineers running gated validation plans in CI or over SSH via --plain and --json modes",
+      "Teams adopting the Claude Agent SDK who need observability, safety rails and cost visibility around agent runs",
+      "Reviewers/auditors who read run artifacts (events.jsonl, gates.json, cost.json, summary.json) after the fact without the TUI"
+    ],
+    "user_sophistication": "Expert. Assumes familiarity with Claude Code, the Agent SDK, terminal TUIs, JSONL log analysis and authoring gated validation plans. Phases 1 and 5 deliberately lower this bar for installation and configuration without lowering it for plan authoring.",
+    "adoption_blocker": "A second user cannot run Vigil usefully without rewriting rails and config, because the defaults encode one machine's filesystem, ports and services — and cannot install it at all, because there is no license and no published package."
+  },
+  "phases": [
+    {
+      "id": "phase-1",
+      "name": "Escape Velocity",
+      "target_version": "0.2.0",
+      "sequence": 1,
+      "theme_ids": [
+        "theme-portability",
+        "theme-trust"
+      ],
+      "goal": "A second engineer can install Vigil, run `vigil init`, and get a safe, neutral, honest run on their own machine — where a PASS means the evidence was actually inspected, a budget cap actually stops the run, and the artifacts are safe to share.",
+      "success_criteria": [
+        "Zero occurrences of `/Users/nick`, `OmniRoute`, `.omp` or author-specific ports in shipped default configuration",
+        "A clean-machine install to first successful gated run takes under 10 minutes with no manual config editing",
+        "A gate whose Capture artifact exists but contains the wrong content is recorded as FAIL",
+        "A run that exceeds maxBudgetUsd halts and exits non-zero",
+        "No raw secret appears in run artifacts across the redaction test corpus"
+      ],
+      "exit_gate": "An external operator completes a full 3-phase validation plan run on a machine that has never seen the author's environment."
+    },
+    {
+      "id": "phase-2",
+      "name": "Hardened Boundary",
+      "target_version": "0.3.0",
+      "sequence": 2,
+      "theme_ids": [
+        "theme-durability",
+        "theme-trust"
+      ],
+      "goal": "Regressions in SDK integration, rails or artifacts fail in CI rather than mid-run on a production-adjacent machine, the SDK version can be upgraded without fear, and the safety rails resist deliberate evasion.",
+      "success_criteria": [
+        "SDK messages are schema-validated at the boundary; malformed shapes raise a visible diagnostic instead of undefined values",
+        "Typecheck, test, build and coverage run on every push, and a deliberate regression fails the pipeline",
+        "Contract tests replay recorded SDK streams, allowing the exact version pin to be relaxed to a range",
+        "A documented corpus of shell-indirection bypass attempts is denied by the rail engine",
+        "RunStore, config and probe layers have direct test coverage",
+        "A 10,000-event run stays responsive and flushes completely on interrupt"
+      ],
+      "exit_gate": "The SDK dependency is upgraded to a newer version with contract tests green and no source changes required beyond the schema layer."
+    },
+    {
+      "id": "phase-3",
+      "name": "CI Native",
+      "target_version": "0.4.0",
+      "sequence": 3,
+      "theme_ids": [
+        "theme-ci-native",
+        "theme-lifecycle",
+        "theme-trust"
+      ],
+      "goal": "Vigil is a first-class citizen in pipelines and over SSH: structured output for machines, an approval path without a TTY, reports for every run, and a run corpus that does not grow without bound.",
+      "success_criteria": [
+        "`--json` emits a stable, versioned schema consumable by a CI step, validated against a committed JSON Schema",
+        "Approvals can be answered from outside the TUI and every decision is recorded",
+        "Retention policy bounds the size and age of runs/ without deleting failed runs",
+        "Every executed plan produces a report, including mid-phase and interrupted runs",
+        "gates.json distinguishes passed, failed, not_reached and evidence-downgraded gates"
+      ],
+      "exit_gate": "A CI pipeline runs a gated plan set end to end, gates its own outcome on Vigil's JSON summary, and requires no TTY at any point."
+    },
+    {
+      "id": "phase-4",
+      "name": "Resume & Compare",
+      "target_version": "0.5.0",
+      "sequence": 4,
+      "theme_ids": [
+        "theme-lifecycle",
+        "theme-trust"
+      ],
+      "goal": "Long multi-phase runs recover intelligently from failure without re-spending budget or trusting stale evidence, and the value locked in the run corpus is unlocked through comparison, diffing and shareable summaries.",
+      "success_criteria": [
+        "A failed run resumes from the failing plan rather than restarting the whole set",
+        "Stale evidence from a prior attempt can never satisfy a gate on re-run",
+        "Two runs can be diffed by gate verdict, evidence hash and cost",
+        "A single self-contained file summarizes a run for a reviewer who has never installed Vigil",
+        "The Ink layer has snapshot coverage and the transcript is scrollable"
+      ],
+      "exit_gate": "A deliberately failed 3-phase run is resumed to completion, and the resulting runs are diffed and exported without re-running any passed plan."
+    },
+    {
+      "id": "phase-5",
+      "name": "Open Platform",
+      "target_version": "1.0.0",
+      "sequence": 5,
+      "theme_ids": [
+        "theme-portability",
+        "theme-durability",
+        "theme-extensibility"
+      ],
+      "goal": "Vigil is publicly installable, extensible beyond the one plan format and rail syntax it understands, and no longer dependent on a single author's attention or environment.",
+      "success_criteria": [
+        "`npm i -g vigil` installs a working binary on a clean machine",
+        "A non-XML plan format can be gated through the same evidence, rail and report machinery",
+        "Users can supply rails, hooks and probes as modules without forking",
+        "External tools can consume the event stream through a documented, versioned API",
+        "Releases are tagged, changelogged and published automatically from a green pipeline"
+      ],
+      "exit_gate": "An external contributor installs from npm, adds a custom rail and a custom plan adapter without modifying Vigil's source, and ships a change through the documented contribution process."
+    }
+  ],
+  "features": [
+    {
+      "id": "VG-001",
+      "title": "Neutral default rails with environment profiles",
+      "description": "Replace DEFAULT_RAILS' author-specific content with a portable, generic deny/warn set (destructive git operations, pattern kills, home-directory deletion, agent-instruction file edits) that contains no absolute user paths, hostnames or ports. Move the OmniRoute-specific rails (warn-real-omp-config, warn-live-db, no-checkout-main's Desktop/OmniRoute path) into a shipped example profile under profiles/, loadable via config. Introduce path-token interpolation (${HOME}, ${planRoot}, ${cwd}) so rails can express machine-relative intent portably.",
+      "rationale": "This is the single hardest adoption blocker. Five of seven default rails reference the author's machine; one silently fails to protect anyone else's repo because it hardcodes a Desktop/OmniRoute path. Without this, every other feature is invisible to every other user.",
+      "priority": "must_have",
+      "complexity": "medium",
+      "impact": "critical",
+      "effort_estimate": "3-4 days",
+      "phase_id": "phase-1",
+      "status": "planned",
+      "dependencies": [],
+      "tags": [
+        "portability",
+        "safety",
+        "config"
+      ],
+      "source_pain_points": [
+        "DEFAULT_RAILS and vigil.config.example.json encode the author's personal OmniRoute environment",
+        "Environment-specific defaults make the tool effectively unusable by anyone else without rewriting rails and config"
+      ],
+      "affected_files": [
+        "src/engine/rails.ts",
+        "src/config.ts",
+        "vigil.config.example.json"
+      ],
+      "acceptance_criteria": [
+        "A grep for '/Users/nick', 'OmniRoute', '.omp', '20128', '20219', '20239' and 'launchctl' across src/ and shipped config returns zero matches",
+        "DEFAULT_RAILS protects against git stash, git checkout/switch outside a worktree, pkill -f/killall, rm -rf on any home directory, and edits to CLAUDE/AGENTS/GEMINI.md using patterns that contain no absolute user paths",
+        "Rail match strings support ${HOME}, ${planRoot} and ${cwd} interpolation, resolved at config load and unit-tested for each token",
+        "profiles/omniroute.json reproduces the previous author-specific rail behaviour and is loadable via config.profile or --profile",
+        "Existing tests in verdict-rails.test.ts pass unmodified against the neutral rail set, with added cases proving the checkout rail now fires for an arbitrary repo path",
+        "Loading an unknown profile name fails config validation with a named error listing available profiles"
+      ],
+      "user_stories": [
+        {
+          "id": "VG-001-US1",
+          "as_a": "engineer installing Vigil for the first time",
+          "i_want": "default safety rails that protect my repository rather than someone else's",
+          "so_that": "I get real blast-radius protection without reading and rewriting the rail source"
+        },
+        {
+          "id": "VG-001-US2",
+          "as_a": "operator with a specific production environment",
+          "i_want": "to layer an environment profile of extra rails on top of the neutral defaults",
+          "so_that": "I can encode my own live databases and config files as warn/deny targets without forking the tool"
+        }
+      ],
+      "linked_spec_id": "001-neutral-default-rails-with-environment-profiles"
+    },
+    {
+      "id": "VG-002",
+      "title": "`vigil init` config and plan scaffolding",
+      "description": "An interactive and --yes-scriptable init command that detects the environment (Claude Code binary location, git root, whether a worktree is in use), writes a validated vigil.config.json with sensible neutral defaults, optionally scaffolds a phases/ skeleton with an example PLAN.md and ROADMAP.md, and prints the resolved configuration including which rails are active and where runs will be written.",
+      "rationale": "Discovery shows install is `npm link` from a Desktop checkout with no documented path from zero to a first run. Pairing a neutral rail set with a scaffold turns a two-hour archaeology session into a single command.",
+      "priority": "must_have",
+      "complexity": "small",
+      "impact": "high",
+      "effort_estimate": "2-3 days",
+      "phase_id": "phase-1",
+      "status": "planned",
+      "dependencies": [
+        "VG-001"
+      ],
+      "tags": [
+        "portability",
+        "onboarding",
+        "cli"
+      ],
+      "source_pain_points": [
+        "README install instructions target ~/Desktop/vigil and npm link for personal PATH use",
+        "No published npm package — install is npm link from a Desktop checkout"
+      ],
+      "affected_files": [
+        "src/cli.ts",
+        "src/config.ts",
+        "README.md"
+      ],
+      "acceptance_criteria": [
+        "`vigil init` in an empty directory writes a vigil.config.json that passes ConfigSchema.parse without edits",
+        "`vigil init --yes` runs non-interactively with zero prompts and is safe to invoke in a script",
+        "Init resolves and reports the Claude Code executable using the existing --claude-bin → CLAUDE_CODE_EXECPATH → which claude → SDK default chain, and warns clearly if none is found",
+        "`vigil init --with-plans` scaffolds phases/01-example/01-01-PLAN.md plus ROADMAP.md that parse cleanly through the existing plan parser and produce at least one validation gate",
+        "Init refuses to overwrite an existing vigil.config.json unless --force is passed",
+        "Post-init output lists active rail ids, the resolved runs/ directory, the model, and whether settingSources is empty (clean agent)"
+      ],
+      "user_stories": [
+        {
+          "id": "VG-002-US1",
+          "as_a": "new operator",
+          "i_want": "one command that produces a working configuration",
+          "so_that": "I can run my first gated plan without reverse-engineering the Zod schema"
+        },
+        {
+          "id": "VG-002-US2",
+          "as_a": "plan author",
+          "i_want": "a scaffolded example plan that already satisfies the runner contract",
+          "so_that": "I learn the Capture and verdict-line format by example rather than by failed runs"
+        }
+      ],
+      "linked_spec_id": "002-vigil-init-config-and-plan-scaffolding"
+    },
+    {
+      "id": "VG-003",
+      "title": "Content-aware evidence assertions with hash recording",
+      "description": "Extend Capture targets from existence-plus-non-zero-bytes to declarative content assertions: minimum byte size, regex match, JSON-path existence or value comparison, and expected line count. Record a SHA-256 hash and byte size of every verified artifact into gates.json. A PASS whose assertion fails is downgraded to FAIL with the specific failing assertion injected back into the live session, reusing the existing evidence-downgrade path.",
+      "rationale": "The product's core differentiator is that verdicts are evidence-checked rather than trusted, but the check is currently satisfied by any non-empty file. An agent that writes one byte of garbage to the Capture path passes the gate — the exact failure mode Vigil exists to prevent. Hashes also unlock run comparison in Phase 4.",
+      "priority": "must_have",
+      "complexity": "medium",
+      "impact": "critical",
+      "effort_estimate": "4-5 days",
+      "phase_id": "phase-1",
+      "status": "planned",
+      "dependencies": [],
+      "tags": [
+        "trust",
+        "evidence",
+        "parser"
+      ],
+      "source_pain_points": [
+        "Evidence verification is existence + non-zero bytes only — a truncated or wrong-content artifact still passes",
+        "Validation reports written by the agent are self-graded",
+        "Agent prose is unverifiable: PASS claims are not backed by artifacts on disk"
+      ],
+      "affected_files": [
+        "src/plan/parser.ts",
+        "src/engine/session.ts",
+        "src/engine/store.ts",
+        "src/engine/events.ts"
+      ],
+      "acceptance_criteria": [
+        "The plan parser accepts assertion syntax on Capture lines covering at minimum: minBytes, matches (regex), jsonPath, and equals/contains for the resolved value",
+        "A Capture target with no assertion retains today's existence + non-zero-bytes semantics, so all existing fixture plans pass unchanged",
+        "A gate claiming PASS whose artifact exists but fails its regex assertion is recorded as FAIL in gates.json with a reason naming the assertion and the artifact path",
+        "The failing-assertion instruction is injected into the live session via the existing inject path and appears in events.jsonl",
+        "GateRecord.evidence entries gain sha256 and bytes fields, populated for every verified artifact including glob/brace expansions",
+        "Assertion evaluation is bounded: files above a configurable maxAssertBytes are streamed or rejected rather than read wholly into memory",
+        "Unit tests cover each assertion type passing and failing, plus malformed assertion syntax producing a parse-time error rather than a silent skip"
+      ],
+      "user_stories": [
+        {
+          "id": "VG-003-US1",
+          "as_a": "operator running a deployment validation plan",
+          "i_want": "gates to verify that evidence files contain what they should, not merely that they exist",
+          "so_that": "an agent cannot satisfy a gate by touching an empty or garbage file"
+        },
+        {
+          "id": "VG-003-US2",
+          "as_a": "auditor reading gates.json after the fact",
+          "i_want": "a cryptographic hash of every artifact that backed a PASS",
+          "so_that": "I can prove the evidence on disk today is the evidence the gate actually accepted"
+        }
+      ],
+      "linked_spec_id": "003-content-aware-evidence-assertions-with-hash-record"
+    },
+    {
+      "id": "VG-004",
+      "title": "Enforced budget and turn guards",
+      "description": "Implement Vigil-side enforcement of maxBudgetUsd and maxTurns: track cumulative cost across plans in a run, emit a budget.warn RunEvent at configurable thresholds (default 75% and 90%), and hard-stop the run at 100% by interrupting the turn, writing a terminal budget.exceeded event and exiting non-zero. Surface remaining budget as a live header element in the cockpit and in --plain output.",
+      "rationale": "maxBudgetUsd is accepted in config and handed to the SDK but never enforced locally, and cost is reported by the SDK rather than independently guarded. For a tool whose premise is walking away from an autonomous run, an unenforced spend cap is a direct financial risk.",
+      "priority": "must_have",
+      "complexity": "small",
+      "impact": "high",
+      "effort_estimate": "2-3 days",
+      "phase_id": "phase-1",
+      "status": "planned",
+      "dependencies": [],
+      "tags": [
+        "safety",
+        "cost",
+        "guardrails"
+      ],
+      "source_pain_points": [
+        "maxBudgetUsd is accepted in config and passed to the SDK, but there is no Vigil-side budget guard, warning or hard stop",
+        "Cost accounting is reported by the SDK, not independently verified; maxBudgetUsd is unenforced locally"
+      ],
+      "affected_files": [
+        "src/engine/runner.ts",
+        "src/engine/session.ts",
+        "src/engine/events.ts",
+        "src/ui/panes.tsx",
+        "src/cli.ts"
+      ],
+      "acceptance_criteria": [
+        "Cumulative run cost is accumulated from session.result events across all plans and persisted to cost.json as a run-level total",
+        "Crossing a warn threshold emits a budget.warn RunEvent exactly once per threshold and renders visibly in both the TUI header and --plain output",
+        "Reaching maxBudgetUsd interrupts the active turn, halts plan sequencing, writes a budget.exceeded event and exits with a distinct non-zero code",
+        "maxTurns is enforced with the same warn-then-stop semantics",
+        "When no maxBudgetUsd is configured, behaviour is unchanged and no budget events are emitted",
+        "A unit test drives synthetic session.result events past the cap and asserts the run halts before the next plan starts",
+        "The cockpit header shows spend against cap as an absolute and percentage value when a cap is set"
+      ],
+      "user_stories": [
+        {
+          "id": "VG-004-US1",
+          "as_a": "operator starting a long autonomous run and walking away",
+          "i_want": "a spend cap that actually stops the run",
+          "so_that": "a runaway loop cannot cost me hundreds of dollars overnight"
+        },
+        {
+          "id": "VG-004-US2",
+          "as_a": "operator watching the cockpit",
+          "i_want": "to see remaining budget live",
+          "so_that": "I can intervene before a cap forces an abrupt halt mid-phase"
+        }
+      ],
+      "linked_spec_id": "004-enforced-budget-and-turn-guards"
+    },
+    {
+      "id": "VG-005",
+      "title": "Secret redaction in run artifacts",
+      "description": "Redact secrets before they reach disk. Apply a configurable redaction pass to tool inputs/outputs and event payloads covering known token shapes (ANTHROPIC_AUTH_TOKEN and the configured authTokenEnv value, sk- prefixed keys, bearer headers, AWS keys, private key blocks, .env assignments) plus user-supplied redact patterns. Replace matches with a stable placeholder that preserves a hash prefix so distinct secrets remain distinguishable in an audit without being recoverable.",
+      "rationale": "Tool artifacts store full inputs and outputs verbatim, and runs/ is never pruned. Every run that reads a .env or echoes a header writes a live credential to disk permanently — an audit trail that is itself a liability, which blocks sharing run artifacts with the auditors the product targets.",
+      "priority": "must_have",
+      "complexity": "medium",
+      "impact": "high",
+      "effort_estimate": "3-4 days",
+      "phase_id": "phase-1",
+      "status": "planned",
+      "dependencies": [],
+      "tags": [
+        "security",
+        "artifacts",
+        "compliance"
+      ],
+      "source_pain_points": [
+        "Tool artifacts store full inputs and outputs verbatim: runs/ can contain secrets",
+        "Auth token read from an env var or plaintext config field — no keychain/secret-manager integration"
+      ],
+      "affected_files": [
+        "src/engine/store.ts",
+        "src/config.ts",
+        "src/engine/events.ts"
+      ],
+      "acceptance_criteria": [
+        "Redaction is applied in RunStore.append before any write, so events.jsonl, tools/*.txt, gates.json and cost.json are all covered by a single chokepoint",
+        "The resolved auth token value is redacted by exact match regardless of pattern coverage",
+        "Built-in patterns detect sk-* keys, Authorization/Bearer headers, AWS access key ids and secrets, PEM private key blocks, and KEY=value assignments for names matching /TOKEN|SECRET|PASSWORD|KEY/",
+        "config.redact accepts additional user regex patterns, validated at config load with a clear error on an invalid pattern",
+        "Redacted values render as [redacted:<8-char-hash>] so two different secrets remain distinguishable across a run",
+        "Redaction throughput is benchmarked and adds under 10% overhead on a synthetic 10k-event run",
+        "A test writes a fixture tool output containing each supported secret shape and asserts no raw secret survives to disk"
+      ],
+      "user_stories": [
+        {
+          "id": "VG-005-US1",
+          "as_a": "operator whose agent reads .env files during a run",
+          "i_want": "credentials scrubbed from run artifacts automatically",
+          "so_that": "my audit trail is not a permanent plaintext secret store"
+        },
+        {
+          "id": "VG-005-US2",
+          "as_a": "engineering lead reviewing an agent run",
+          "i_want": "to share a runs/ directory with a colleague or auditor",
+          "so_that": "the evidence can be reviewed without leaking production credentials"
+        }
+      ],
+      "linked_spec_id": "005-secret-redaction-in-run-artifacts"
+    },
+    {
+      "id": "VG-006",
+      "title": "Schema-validated SDK message boundary",
+      "description": "Replace every `as unknown as {...}` cast in the session handlers with Zod schemas that parse incoming Claude Agent SDK messages (assistant/partial/result/rate_limit/tool_use/tool_result) at the boundary. Unknown or malformed shapes are surfaced as a typed `diagnostic` RunEvent naming the offending message type and failing path, and written to disk, rather than throwing deep inside a handler or silently yielding undefined. Parsing is permissive on unknown extra fields and strict on the fields Vigil actually reads.",
+      "rationale": "The tool's entire observability claim rests on correctly reading SDK messages, yet every read goes through an unchecked cast against an exactly-pinned SDK version. A schema change today produces undefined tokens, missing verdicts and silently wrong cost accounting mid-run on a production-adjacent machine. This is the highest-severity technical risk in the repository and it blocks upgrading the SDK at all.",
+      "priority": "must_have",
+      "complexity": "medium",
+      "impact": "critical",
+      "effort_estimate": "4-5 days",
+      "phase_id": "phase-2",
+      "status": "planned",
+      "dependencies": [],
+      "tags": [
+        "durability",
+        "sdk",
+        "reliability",
+        "observability"
+      ],
+      "source_pain_points": [
+        "Hard dependency on Claude Agent SDK message shapes; handlers cast through `as unknown as {...}` with no runtime validation and will break silently on SDK schema changes",
+        "No CI, so regressions in the TUI or SDK integration surface only at runtime"
+      ],
+      "affected_files": [
+        "src/engine/session.ts",
+        "src/engine/events.ts",
+        "src/engine/schemas.ts"
+      ],
+      "acceptance_criteria": [
+        "Zero `as unknown as` casts remain in src/engine/session.ts, enforced by a test that greps the source",
+        "Every SDK message consumed by Vigil has a named Zod schema whose parse-failure path is unit-tested with a malformed fixture",
+        "A malformed message produces a `diagnostic` RunEvent containing the message type and the failing field path, is appended to events.jsonl, and does not abort the run",
+        "Unknown additional fields on an SDK message are tolerated without a diagnostic; missing required fields always produce one",
+        "Cost, token and rate-limit values are read only through validated schemas; a missing total_cost_usd yields an explicit unknown rather than NaN or 0",
+        "A recorded real-session message corpus parses with zero diagnostics"
+      ],
+      "user_stories": [
+        {
+          "id": "VG-006-US1",
+          "as_a": "operator running a long autonomous session",
+          "i_want": "malformed agent messages to surface as visible diagnostics instead of silent undefined values",
+          "so_that": "I can trust that a quiet cockpit means nothing went wrong rather than that parsing failed"
+        },
+        {
+          "id": "VG-006-US2",
+          "as_a": "maintainer upgrading the Agent SDK",
+          "i_want": "a validated boundary that tells me exactly which message shape changed",
+          "so_that": "I can upgrade without auditing every cast by hand"
+        }
+      ],
+      "linked_spec_id": null
+    },
+    {
+      "id": "VG-007",
+      "title": "Continuous integration pipeline with coverage reporting",
+      "description": "Add a GitHub Actions workflow running typecheck (`tsc --noEmit`), the full vitest suite and the build on every push and pull request against Node 20 and 22. Publish coverage via vitest's v8 provider with a floor that fails the job on regression, and surface a status badge in the README. Keep the workflow dependency-light and under two minutes so it never becomes a reason to skip it.",
+      "rationale": "There are 27 tests covering the risky pure logic and no automation that runs them. With a bus factor of one, two commits of history and no issue tracker, CI is the cheapest possible substitute for a second reviewer, and it is a prerequisite for safely widening the SDK version range or accepting any outside contribution.",
+      "priority": "must_have",
+      "complexity": "small",
+      "impact": "high",
+      "effort_estimate": "1-2 days",
+      "phase_id": "phase-2",
+      "status": "planned",
+      "dependencies": [],
+      "tags": [
+        "durability",
+        "ci",
+        "testing",
+        "process"
+      ],
+      "source_pain_points": [
+        "No CI configuration, no release automation, no changelog",
+        "No CI, so regressions in the TUI or SDK integration surface only at runtime",
+        "Solo author, 2 commits of history, v0.1.0 — bus factor of one"
+      ],
+      "affected_files": [
+        ".github/workflows/ci.yml",
+        "package.json",
+        "vitest.config.ts",
+        "README.md"
+      ],
+      "acceptance_criteria": [
+        "Push and pull_request events trigger typecheck, test and build jobs on Node 20 and Node 22",
+        "A deliberately introduced type error or failing test fails the workflow",
+        "Coverage is collected and reported as a job summary, with a configured minimum that fails the job when line coverage drops below the committed floor",
+        "The full workflow completes in under two minutes on a cold cache",
+        "README displays a CI status badge reflecting the default branch"
+      ],
+      "user_stories": [
+        {
+          "id": "VG-007-US1",
+          "as_a": "solo maintainer",
+          "i_want": "every push to be typechecked, tested and built automatically",
+          "so_that": "I find regressions before a run on a production-adjacent machine finds them"
+        },
+        {
+          "id": "VG-007-US2",
+          "as_a": "potential contributor",
+          "i_want": "a visible green pipeline and coverage figure",
+          "so_that": "I can trust the project is maintained and see whether my change broke anything"
+        }
+      ],
+      "linked_spec_id": null
+    },
+    {
+      "id": "VG-008",
+      "title": "SDK contract fixtures and widened version range",
+      "description": "Capture a corpus of real Claude Agent SDK message streams as committed JSONL fixtures and add contract tests that replay them through PlanSession against a stubbed SDK, asserting the resulting RunEvent sequence, gate verdicts and cost totals. With that safety net in place, relax the exact version pin to a caret range and add a CI job that runs the contract suite against the newest satisfying SDK release.",
+      "rationale": "The SDK version is pinned exactly because nobody can tell whether an upgrade breaks anything — which means the project is permanently frozen on 0.3.261 and will accumulate an unpayable upgrade debt. Recorded fixtures turn 'we cannot upgrade' into a two-minute check, and they are the only way to get end-to-end coverage of the runner without burning tokens.",
+      "priority": "must_have",
+      "complexity": "medium",
+      "impact": "high",
+      "effort_estimate": "4-5 days",
+      "phase_id": "phase-2",
+      "status": "planned",
+      "dependencies": [
+        "VG-006",
+        "VG-007"
+      ],
+      "tags": [
+        "durability",
+        "sdk",
+        "testing"
+      ],
+      "source_pain_points": [
+        "Hard dependency on Claude Agent SDK message shapes; version pinned exactly, which also blocks upgrades",
+        "no end-to-end runner test against a stubbed SDK"
+      ],
+      "affected_files": [
+        "tests/fixtures/sdk-streams/",
+        "tests/contract/session-contract.test.ts",
+        "src/engine/session.ts",
+        "package.json",
+        ".github/workflows/ci.yml"
+      ],
+      "acceptance_criteria": [
+        "A committed fixture corpus covers at least a passing gate, a failing gate, an evidence-downgraded PASS, a rail deny, a tool approval and a rate-limit event",
+        "Replaying each fixture through a stubbed SDK produces a deterministic RunEvent sequence asserted in full",
+        "An end-to-end test runs a multi-plan fixture plan set through Runner against the stub and asserts final verdicts, generated reports and on-disk artifacts",
+        "The @anthropic-ai/claude-agent-sdk dependency uses a caret range rather than an exact pin",
+        "A scheduled or matrix CI job installs the newest satisfying SDK version and runs the contract suite, failing loudly on a shape change",
+        "Contract tests execute without network access or API credentials"
+      ],
+      "user_stories": [
+        {
+          "id": "VG-008-US1",
+          "as_a": "maintainer",
+          "i_want": "contract tests over recorded SDK streams",
+          "so_that": "I can upgrade the SDK confidently instead of freezing on a pinned version forever"
+        },
+        {
+          "id": "VG-008-US2",
+          "as_a": "contributor changing session logic",
+          "i_want": "an end-to-end test against a stubbed SDK",
+          "so_that": "I can verify my change without spending tokens or touching a real agent"
+        }
+      ],
+      "linked_spec_id": null
+    },
+    {
+      "id": "VG-009",
+      "title": "Rail evaluation over resolved command semantics",
+      "description": "Upgrade rails from regex matching on a flattened `<tool> <primary> <json input>` string to evaluation over a parsed shell command: tokenize the command, expand simple variable assignments, resolve quoting, and evaluate rails against each resolved argv plus the normalized absolute paths it touches. Flag known obfuscation vectors (base64 pipes into a shell, `eval`, `sh -c` with a constructed string) as a deny-by-default `unanalyzable` category, and keep the raw-regex path available for user rails that want it.",
+      "rationale": "Rails are the only thing standing between the agent and the filesystem in the default `auto` mode, which runs with bypassPermissions. Today they can be defeated by `X=stash; git $X` or a base64 pipe, and they simultaneously produce false positives on innocent strings that merely mention a pattern. A safety control that is trivially bypassable is worse than none because it creates false confidence.",
+      "priority": "should_have",
+      "complexity": "large",
+      "impact": "high",
+      "effort_estimate": "1-1.5 weeks",
+      "phase_id": "phase-2",
+      "status": "planned",
+      "dependencies": [
+        "VG-001"
+      ],
+      "tags": [
+        "safety",
+        "rails",
+        "security"
+      ],
+      "source_pain_points": [
+        "Rails are regex over a flattened tool-input string: bypassable via shell indirection (variables, base64, aliases, eval) and prone to false positives",
+        "approvals auto/gates run with bypassPermissions — rails are the only gate on tool execution in the default mode",
+        "Destructive shell commands in a shared repo/worktree have real blast radius"
+      ],
+      "affected_files": [
+        "src/engine/rails.ts",
+        "src/engine/session.ts",
+        "tests/verdict-rails.test.ts"
+      ],
+      "acceptance_criteria": [
+        "Bash commands are tokenized and simple variable indirection is resolved before rail evaluation; `X=stash; git $X` is denied by the git-stash rail",
+        "Paths in resolved arguments are normalized to absolute form before path rails are evaluated, so `../../` traversal and `~` expansion are matched",
+        "Commands containing eval, base64-to-shell pipes or `sh -c` with a non-literal argument are classified unanalyzable and denied by default, with the classification configurable",
+        "A documented false-positive corpus (commands merely mentioning rail keywords in strings, comments or filenames) produces zero denies",
+        "A documented bypass corpus of at least ten obfuscation attempts is denied, each covered by a test",
+        "Deny-wins-over-warn precedence and existing rail configuration syntax remain backward compatible"
+      ],
+      "user_stories": [
+        {
+          "id": "VG-009-US1",
+          "as_a": "operator running in auto approval mode",
+          "i_want": "rails that evaluate what a command will actually do rather than how it is spelled",
+          "so_that": "an agent cannot defeat my blast-radius protection with a shell variable"
+        },
+        {
+          "id": "VG-009-US2",
+          "as_a": "operator writing custom rails",
+          "i_want": "matching against resolved arguments and absolute paths",
+          "so_that": "my rails stop firing on harmless commands that merely mention a keyword"
+        }
+      ],
+      "linked_spec_id": null
+    },
+    {
+      "id": "VG-010",
+      "title": "Rail lint and dry-run command",
+      "description": "Add `vigil rails check` to validate the active rail set (compile every pattern, report unreachable or duplicate rails, flag patterns containing absolute user paths) and `vigil rails test '<command>'` to show which rails a candidate command would hit and the resulting verdict, without starting a session. Include an `--explain` mode that prints the resolved argv and normalized paths the rail engine actually evaluated.",
+      "rationale": "Rails are safety-critical configuration authored by hand as regular expressions, and today the only way to discover that a rail is wrong is to have it fail to fire during a live destructive command. A dry-run makes safety configuration verifiable before the blast radius is real, and it is what makes VG-009's semantic engine legible.",
+      "priority": "should_have",
+      "complexity": "small",
+      "impact": "medium",
+      "effort_estimate": "2-3 days",
+      "phase_id": "phase-2",
+      "status": "planned",
+      "dependencies": [
+        "VG-009"
+      ],
+      "tags": [
+        "safety",
+        "rails",
+        "dx",
+        "cli"
+      ],
+      "source_pain_points": [
+        "Rails are regex over a flattened tool-input string: prone to false positives",
+        "Environment-specific defaults make the tool effectively unusable by anyone else without rewriting rails and config"
+      ],
+      "affected_files": [
+        "src/cli.ts",
+        "src/engine/rails.ts"
+      ],
+      "acceptance_criteria": [
+        "`vigil rails check` exits non-zero and names each offending rail when a pattern fails to compile, duplicates another, or embeds an absolute home-directory path",
+        "`vigil rails test '<command>'` prints every matching rail, its action, and the final deny/warn/allow verdict",
+        "`--explain` prints the resolved argv and normalized absolute paths the engine evaluated for the command",
+        "Both subcommands work without a plan root, a Claude binary or network access",
+        "Output is available as JSON via `--json` for scripted verification of a rail set"
+      ],
+      "user_stories": [
+        {
+          "id": "VG-010-US1",
+          "as_a": "operator onboarding to Vigil",
+          "i_want": "to test a dangerous command against my rails before any agent runs",
+          "so_that": "I learn my rails are wrong from a dry run rather than from a deleted branch"
+        },
+        {
+          "id": "VG-010-US2",
+          "as_a": "platform engineer managing shared rail profiles",
+          "i_want": "a lint command I can run in CI over our rail config",
+          "so_that": "a broken rail set cannot be merged"
+        }
+      ],
+      "linked_spec_id": null
+    },
+    {
+      "id": "VG-011",
+      "title": "Artifact, config and probe test coverage",
+      "description": "Close the named testing gaps outside the pure logic: RunStore artifact tests (events.jsonl append ordering and JSON validity, tools/NNNN naming and collision behaviour, gates.json and cost.json shape, session.json round-trip), config tests (file discovery precedence, CLI override merging, unsetEnv and env building, base URL and token routing), and probe tests (HTTP and shell probes with regex expectation, timeout and failure paths) against a local stub server.",
+      "rationale": "The disk artifacts are the product's source of truth and its audit evidence, yet nothing tests that they are written correctly; config and env building decide whether a run is reproducible and whether a token reaches the right endpoint. These are exactly the untested layers where a silent defect destroys the audit trail rather than announcing itself.",
+      "priority": "should_have",
+      "complexity": "medium",
+      "impact": "medium",
+      "effort_estimate": "4-5 days",
+      "phase_id": "phase-2",
+      "status": "planned",
+      "dependencies": [
+        "VG-007"
+      ],
+      "tags": [
+        "durability",
+        "testing",
+        "observability"
+      ],
+      "source_pain_points": [
+        "no RunStore/artifact tests",
+        "no probes tests",
+        "no config/env-building tests",
+        "no coverage reporting",
+        "Local Claude Code settings (plugins, hooks, skills, env overrides) leak into runs and make them irreproducible"
+      ],
+      "affected_files": [
+        "tests/store.test.ts",
+        "tests/config.test.ts",
+        "tests/probes.test.ts",
+        "src/engine/store.ts",
+        "src/config.ts",
+        "src/engine/probes.ts"
+      ],
+      "acceptance_criteria": [
+        "Every line written to events.jsonl is asserted to be valid standalone JSON parsing back to the originating RunEvent, in order, for a synthetic run of at least 200 events",
+        "Tool artifact filenames are asserted for zero-padded ordering and collision-free naming across concurrent tool calls",
+        "gates.json, cost.json and session.json are asserted against their documented shapes, including the per-model and cache-token cost split",
+        "Config precedence is tested across CLI override, ./vigil.config.json and ~/.config/vigil/config.json, including the settingSources default of []",
+        "Child env building is tested for unsetEnv removal, env overrides, and ANTHROPIC_BASE_URL/AUTH_TOKEN routing, asserting no token leaks into an unrelated variable",
+        "HTTP and shell probes are tested against a local stub for success, regex-expectation mismatch, non-zero exit and timeout, each emitting the expected probe RunEvent"
+      ],
+      "user_stories": [
+        {
+          "id": "VG-011-US1",
+          "as_a": "auditor reading run artifacts",
+          "i_want": "guaranteed well-formed and complete on-disk artifacts",
+          "so_that": "my post-hoc analysis is not defeated by a truncated or malformed log line"
+        },
+        {
+          "id": "VG-011-US2",
+          "as_a": "maintainer",
+          "i_want": "coverage of config and env building",
+          "so_that": "a refactor cannot silently reintroduce leaked local Claude Code settings"
+        }
+      ],
+      "linked_spec_id": null
+    },
+    {
+      "id": "VG-012",
+      "title": "Non-blocking buffered event writer",
+      "description": "Replace the per-event `appendFileSync` on the hot path with a buffered, backpressure-aware async writer that batches RunEvents and tool artifacts, flushes on an interval and on size, and always flushes synchronously on process exit, SIGINT and crash. Preserve the disk-first guarantee by acknowledging an event to the UI only once it is durably queued, and emit a diagnostic if the queue ever grows beyond a configured bound.",
+      "rationale": "Synchronous filesystem calls on every event throttle chatty runs, which is precisely when observability matters most, and the TUI renders on the same thread. Buffering makes long autonomous runs smooth without weakening the disk-first principle that the event log — not the cockpit — is the source of truth.",
+      "priority": "should_have",
+      "complexity": "medium",
+      "impact": "medium",
+      "effort_estimate": "3-4 days",
+      "phase_id": "phase-2",
+      "status": "planned",
+      "dependencies": [
+        "VG-011"
+      ],
+      "tags": [
+        "performance",
+        "observability",
+        "reliability"
+      ],
+      "source_pain_points": [
+        "Synchronous fs calls (appendFileSync per event) on the hot path can throttle very chatty runs",
+        "Long autonomous runs are opaque — no live view of tool calls, hook decisions, token burn or dollar cost"
+      ],
+      "affected_files": [
+        "src/engine/store.ts",
+        "src/engine/runner.ts",
+        "src/cli.ts"
+      ],
+      "acceptance_criteria": [
+        "A synthetic 10,000-event run completes with no dropped or reordered events and measurably lower wall-clock time than the synchronous implementation, asserted by a benchmark test",
+        "SIGINT, uncaught exception and normal exit each flush all buffered events and tool artifacts before the process terminates, verified by a subprocess test",
+        "Event ordering in events.jsonl matches emission order exactly under concurrent tool-artifact writes",
+        "Queue depth beyond a configured bound emits a diagnostic RunEvent and applies backpressure rather than growing unbounded",
+        "`vigil tail` continues to follow a live run with no more than one flush interval of added latency"
+      ],
+      "user_stories": [
+        {
+          "id": "VG-012-US1",
+          "as_a": "operator running a chatty multi-hour plan",
+          "i_want": "a cockpit that stays responsive under heavy tool output",
+          "so_that": "the observability layer does not become the bottleneck"
+        },
+        {
+          "id": "VG-012-US2",
+          "as_a": "auditor",
+          "i_want": "a guarantee that an interrupted run still flushed its events",
+          "so_that": "I can audit runs that were killed mid-flight"
+        }
+      ],
+      "linked_spec_id": null
+    },
+    {
+      "id": "VG-013",
+      "title": "Versioned structured output and machine-readable exit summary",
+      "description": "Add `--json` to `run` and `prompt`, emitting newline-delimited JSON of the same RunEvent stream to stdout, plus a final versioned summary object (schema_version, run id, per-plan verdicts, gate table with evidence hashes, cost, rate-limit utilization, rail hits, exit reason). Write the identical summary to runs/<id>/summary.json, and document the schema as a committed JSON Schema so consumers can validate it.",
+      "rationale": "The CI and SSH audience is explicitly a target, but --plain emits human prose that a pipeline has to scrape. A stable versioned contract is what turns Vigil from a tool an operator watches into a step a pipeline can gate on, and summary.json makes the auditor persona work without the TUI or a JSONL parser.",
+      "priority": "must_have",
+      "complexity": "medium",
+      "impact": "high",
+      "effort_estimate": "4-5 days",
+      "phase_id": "phase-3",
+      "status": "planned",
+      "dependencies": [
+        "VG-003",
+        "VG-006"
+      ],
+      "tags": [
+        "ci-native",
+        "integration",
+        "observability"
+      ],
+      "source_pain_points": [
+        "Post-hoc auditing requires reconstructing what happened from scrollback that is already gone",
+        "Reviewers/auditors who read run artifacts after the fact without the TUI"
+      ],
+      "affected_files": [
+        "src/cli.ts",
+        "src/engine/store.ts",
+        "schemas/run-summary.schema.json",
+        "src/engine/events.ts"
+      ],
+      "acceptance_criteria": [
+        "`vigil run --json` writes only newline-delimited JSON to stdout; all human-readable logging goes to stderr",
+        "The final summary object includes schema_version, run id, per-plan verdicts, a gate table with evidence paths and hashes, total and per-model cost, rail hits and a typed exit reason",
+        "runs/<id>/summary.json contains a byte-identical summary object and is written even when the run fails or is interrupted",
+        "A committed JSON Schema validates the summary, and a test asserts emitted summaries validate against it",
+        "Exit codes are documented and distinct for success, gate failure, budget halt, rail-blocked halt and internal error",
+        "--json implies non-interactive operation and is compatible with --plain"
+      ],
+      "user_stories": [
+        {
+          "id": "VG-013-US1",
+          "as_a": "platform engineer running Vigil in CI",
+          "i_want": "a stable versioned JSON summary of the run",
+          "so_that": "my pipeline can gate on gate results without scraping prose"
+        },
+        {
+          "id": "VG-013-US2",
+          "as_a": "auditor",
+          "i_want": "a single summary.json per run",
+          "so_that": "I can review what happened without replaying the TUI or parsing events.jsonl"
+        }
+      ],
+      "linked_spec_id": null
+    },
+    {
+      "id": "VG-014",
+      "title": "Non-TTY approval channel",
+      "description": "Give plain and JSON modes a real approval path instead of auto-denying: a configurable policy (deny-all, allow-listed tools, or external) plus an external mode that writes a pending approval request to runs/<id>/approvals/ and to the JSON stream, then waits with a configurable timeout for a decision file or a `vigil approve <runId> <requestId> --allow|--deny` invocation from another terminal or a pipeline step.",
+      "rationale": "Plain mode currently auto-denies approvals, which silently makes the `gates` and `all` approval modes useless over SSH and in CI — the exact environments --plain exists to serve. An operator tailing a run from another terminal has no way to answer a question the cockpit would have asked.",
+      "priority": "should_have",
+      "complexity": "medium",
+      "impact": "high",
+      "effort_estimate": "5-6 days",
+      "phase_id": "phase-3",
+      "status": "planned",
+      "dependencies": [
+        "VG-013"
+      ],
+      "tags": [
+        "ci-native",
+        "approvals",
+        "operator-control"
+      ],
+      "source_pain_points": [
+        "Plain mode auto-denies tool approvals rather than offering a non-TTY approval channel",
+        "Long autonomous runs are opaque — no live view of tool calls, hook decisions, token burn or dollar cost"
+      ],
+      "affected_files": [
+        "src/cli.ts",
+        "src/engine/session.ts",
+        "src/engine/store.ts",
+        "src/config.ts"
+      ],
+      "acceptance_criteria": [
+        "An approval policy of deny-all, allow-list or external is configurable per run and defaults to the current deny-all behaviour",
+        "In external mode a pending request appears in runs/<id>/approvals/ and on the --json stream with a request id, tool name and full input",
+        "`vigil approve <runId> <requestId> --allow|--deny [--reason]` resolves a pending request from another terminal and the session proceeds accordingly",
+        "An unanswered request times out after a configurable interval and applies the configured default decision, recording the timeout as the reason",
+        "Gate approvals in `gates` mode use the same channel, and a rejection re-injects the operator's reason exactly as the TUI overlay does",
+        "All approval decisions, their source and their latency are recorded as RunEvents in events.jsonl"
+      ],
+      "user_stories": [
+        {
+          "id": "VG-014-US1",
+          "as_a": "operator running Vigil over SSH",
+          "i_want": "to answer approval prompts from a second terminal",
+          "so_that": "I can use gate approvals without a TTY cockpit"
+        },
+        {
+          "id": "VG-014-US2",
+          "as_a": "platform engineer",
+          "i_want": "an allow-list approval policy in CI",
+          "so_that": "a pipeline run proceeds for safe tools and blocks on everything else instead of dying on the first prompt"
+        }
+      ],
+      "linked_spec_id": null
+    },
+    {
+      "id": "VG-015",
+      "title": "Run retention, pruning and size policy",
+      "description": "Introduce a retention policy (keep last N runs, keep runs newer than D days, cap total run-directory bytes, always keep failed runs) applied automatically at run start and exposed as `vigil prune [--dry-run]`. Add per-artifact truncation limits for oversized tool outputs, recording the original byte count and a hash of the full payload so truncation is visible and verifiable rather than silent.",
+      "rationale": "runs/ captures full tool inputs and outputs verbatim under the plan root, is never pruned, and grows without bound. On a long-lived plan root this is both a disk problem and a compliance problem, since the same directory can contain secrets. Retention makes the run corpus a managed artifact rather than an accumulating liability.",
+      "priority": "should_have",
+      "complexity": "small",
+      "impact": "medium",
+      "effort_estimate": "3-4 days",
+      "phase_id": "phase-3",
+      "status": "planned",
+      "dependencies": [
+        "VG-005"
+      ],
+      "tags": [
+        "lifecycle",
+        "storage",
+        "operations"
+      ],
+      "source_pain_points": [
+        "runs/ is written under the plan root (or <cwd>/.vigil/runs) and is never pruned",
+        "Tool artifacts store full inputs and outputs verbatim: runs/ can contain secrets and grows without rotation or retention policy"
+      ],
+      "affected_files": [
+        "src/engine/store.ts",
+        "src/cli.ts",
+        "src/config.ts"
+      ],
+      "acceptance_criteria": [
+        "Retention is configurable by run count, age and total bytes, with failed runs exempt by default",
+        "Policy is applied at run start and logged as a diagnostic naming every pruned run directory",
+        "`vigil prune --dry-run` lists exactly what would be deleted and removes nothing; without the flag it deletes and reports reclaimed bytes",
+        "Pruning never deletes the run currently in progress and never follows symlinks outside the runs root",
+        "Tool artifacts exceeding a configured byte cap are truncated with a recorded original size and a hash of the full payload, and the truncation is marked in both the artifact and the event",
+        "Default retention is documented and conservative enough that no data is lost without explicit configuration"
+      ],
+      "user_stories": [
+        {
+          "id": "VG-015-US1",
+          "as_a": "operator with a long-lived plan root",
+          "i_want": "automatic pruning of old runs",
+          "so_that": "my repository does not accumulate gigabytes of agent transcripts"
+        },
+        {
+          "id": "VG-015-US2",
+          "as_a": "security-conscious operator",
+          "i_want": "a bounded retention window for artifacts that may contain sensitive output",
+          "so_that": "stale run data does not sit on disk indefinitely"
+        }
+      ],
+      "linked_spec_id": null
+    },
+    {
+      "id": "VG-016",
+      "title": "Report coverage for mid-phase and partial runs",
+      "description": "Generate VALIDATION reports for every run rather than only for plans that contain a phase gate or that fail. Produce a per-plan report for mid-phase runs, mark partial and interrupted runs explicitly as incomplete with the set of gates never reached, and make the ROADMAP status rewrite idempotent and non-destructive — preserving unrelated rows, writing atomically, and refusing to clobber a file that changed on disk since the run started.",
+      "rationale": "Reports generated from observed GateRecords are the product's answer to self-graded agent validation, but they only fire for phase-gate plans, so `--only` and `--from/--to` runs produce nothing. Meanwhile the report writer rewrites ROADMAP.md in place, which is an unreviewed mutation of a user's source-controlled file.",
+      "priority": "should_have",
+      "complexity": "small",
+      "impact": "medium",
+      "effort_estimate": "3-4 days",
+      "phase_id": "phase-3",
+      "status": "planned",
+      "dependencies": [],
+      "tags": [
+        "reporting",
+        "trust",
+        "correctness"
+      ],
+      "source_pain_points": [
+        "Reports only fire for plans containing a phase gate (or on failure), so mid-phase runs produce no report",
+        "Reports rewrite ROADMAP.md and <phase>-VALIDATION.md in place",
+        "Validation reports written by the agent are self-graded"
+      ],
+      "affected_files": [
+        "src/plan/reports.ts",
+        "src/engine/runner.ts",
+        "tests/reports.test.ts"
+      ],
+      "acceptance_criteria": [
+        "Every completed plan produces a report regardless of whether it contains a phase gate",
+        "A run selected with --only or --from/--to produces a report scoped to the plans actually executed",
+        "Interrupted, budget-halted and partial runs produce a report explicitly marked incomplete, listing gates that were never reached",
+        "ROADMAP.md rewriting is idempotent: running the same report twice leaves the file byte-identical",
+        "Rows and content unrelated to the executed plans are preserved exactly, asserted by a fixture test",
+        "Report writes are atomic (write-temp-then-rename) and abort with a clear error if the target file changed on disk after the run began"
+      ],
+      "user_stories": [
+        {
+          "id": "VG-016-US1",
+          "as_a": "operator running a single mid-phase plan",
+          "i_want": "a validation report for that plan",
+          "so_that": "I get evidence-backed output from partial runs, not just full phases"
+        },
+        {
+          "id": "VG-016-US2",
+          "as_a": "operator whose ROADMAP.md is source-controlled",
+          "i_want": "idempotent, non-destructive status rewriting",
+          "so_that": "Vigil never produces a surprise diff in my repository"
+        }
+      ],
+      "linked_spec_id": null
+    },
+    {
+      "id": "VG-017",
+      "title": "Verdict de-duplication correctness and pending-gate resolution",
+      "description": "Replace the 30-second window heuristic for verdict de-duplication with content-and-identity-aware suppression keyed on gate id plus verdict plus reason hash, so a genuine rapid re-verdict is recorded while true duplicates from partial-stream and final-text scanning are collapsed. Resolve the empty pending-gate branch in Runner.runOne by assigning every unreached gate an explicit `not_reached` state that flows into gates.json, the reports and the run summary.",
+      "rationale": "Two known correctness defects sit directly on the trust path: a legitimate re-verdict can be silently suppressed by a timing heuristic, and gates left pending after a failure vanish into an empty branch. An auditor reading gates.json cannot currently distinguish 'never ran' from 'not recorded', which undermines the claim that artifacts tell the whole story.",
+      "priority": "should_have",
+      "complexity": "small",
+      "impact": "medium",
+      "effort_estimate": "2-3 days",
+      "phase_id": "phase-3",
+      "status": "planned",
+      "dependencies": [
+        "VG-008"
+      ],
+      "tags": [
+        "trust",
+        "correctness",
+        "reporting"
+      ],
+      "source_pain_points": [
+        "Verdict de-duplication uses a 30s window heuristic that could suppress a legitimate rapid re-verdict",
+        "Pending gates after a failure are explicitly left pending (empty branch in Runner.runOne)",
+        "Agent prose is unverifiable: PASS claims are not backed by artifacts on disk"
+      ],
+      "affected_files": [
+        "src/engine/session.ts",
+        "src/plan/verdict.ts",
+        "src/engine/runner.ts",
+        "src/plan/reports.ts"
+      ],
+      "acceptance_criteria": [
+        "De-duplication is keyed on gate id, verdict and a hash of the reason rather than elapsed time",
+        "A genuine re-verdict for the same gate with a different verdict or reason is recorded as a distinct GateRecord, covered by a test that emits both within one second",
+        "Duplicate verdicts arriving via both partial-stream and final-text scanning collapse to a single record, covered by a test",
+        "Gates never reached are recorded with an explicit not_reached state in gates.json rather than omitted",
+        "Reports and the run summary distinguish passed, failed, not_reached and evidence-downgraded gates",
+        "No empty conditional branches remain in Runner.runOne"
+      ],
+      "user_stories": [
+        {
+          "id": "VG-017-US1",
+          "as_a": "auditor",
+          "i_want": "gates.json that distinguishes a gate that failed from one that never ran",
+          "so_that": "I can tell an incomplete run from a bad one"
+        },
+        {
+          "id": "VG-017-US2",
+          "as_a": "operator",
+          "i_want": "every genuine gate verdict to be recorded",
+          "so_that": "a fast agent correction is not silently swallowed by a timing heuristic"
+        }
+      ],
+      "linked_spec_id": null
+    },
+    {
+      "id": "VG-018",
+      "title": "Aggregate cost and usage reporting",
+      "description": "Add `vigil cost <planRoot>` summarizing spend across the run corpus: totals and trends by day, plan, phase and model, cache-hit token ratio, average cost per gate, most expensive plans and runs, and budget-halt frequency. Support `--since`, `--json` and a per-run breakdown, reading exclusively from committed cost.json and summary.json artifacts.",
+      "rationale": "Cost visibility today is per-run and ephemeral; there is no way to answer whether a plan set is getting more expensive, which phase burns the budget, or whether cache usage is working. The run corpus already contains the data — this makes it answerable and turns budget caps from a guess into a measurement.",
+      "priority": "could_have",
+      "complexity": "small",
+      "impact": "medium",
+      "effort_estimate": "2-3 days",
+      "phase_id": "phase-3",
+      "status": "planned",
+      "dependencies": [
+        "VG-004",
+        "VG-013"
+      ],
+      "tags": [
+        "observability",
+        "cost",
+        "reporting"
+      ],
+      "source_pain_points": [
+        "Cost accounting is reported by the SDK, not independently verified; maxBudgetUsd is unenforced locally",
+        "Long autonomous runs are opaque — no live view of tool calls, hook decisions, token burn or dollar cost"
+      ],
+      "affected_files": [
+        "src/cli.ts",
+        "src/engine/store.ts"
+      ],
+      "acceptance_criteria": [
+        "`vigil cost <planRoot>` prints totals and breakdowns by day, plan, phase and model from on-disk artifacts only",
+        "Cache-read versus input token ratio and average cost per gate are reported",
+        "`--since <date>` filters the corpus and `--json` emits the same data as a structured object",
+        "Runs with missing or malformed cost.json are skipped with a counted warning rather than aborting the report",
+        "Budget-halted runs are identified and counted separately",
+        "The command completes in under two seconds over a corpus of 500 runs"
+      ],
+      "user_stories": [
+        {
+          "id": "VG-018-US1",
+          "as_a": "operator",
+          "i_want": "aggregate spend across all my runs",
+          "so_that": "I can set a realistic budget cap and see whether a plan set is getting more expensive"
+        },
+        {
+          "id": "VG-018-US2",
+          "as_a": "engineering lead",
+          "i_want": "cost broken down by phase and model",
+          "so_that": "I can justify or optimize agent spend with data"
+        }
+      ],
+      "linked_spec_id": null
+    },
+    {
+      "id": "VG-019",
+      "title": "Per-plan resume and resume-from-failed-gate",
+      "description": "Replace single-id resume with full resumption state: record an SDK session id per plan in session.json alongside the gate cursor, and support `vigil run --resume <runId>` to continue a halted run from the first unsatisfied plan, plus `--resume-gate` to re-enter the failing plan's session at the failed gate with prior context rather than restarting it. Print a resume plan before executing and require confirmation when the plan files have changed since the original run.",
+      "rationale": "Resume is plumbed but only one session id applies to the first plan, so a multi-phase run that fails in phase three restarts from phase one, re-spending the budget and re-running side effects. For long high-risk deployment plans — the primary use case — this is the difference between a recoverable failure and an abandoned run.",
+      "priority": "should_have",
+      "complexity": "large",
+      "impact": "high",
+      "effort_estimate": "1-1.5 weeks",
+      "phase_id": "phase-4",
+      "status": "planned",
+      "dependencies": [
+        "VG-017"
+      ],
+      "tags": [
+        "lifecycle",
+        "resume",
+        "reliability"
+      ],
+      "source_pain_points": [
+        "Session resume: ids are recorded and --resume is plumbed, but only a single id applies to the first plan — no per-plan resume UX",
+        "Re-run after failure (`r`) does not reconcile state or evidence from the prior attempt"
+      ],
+      "affected_files": [
+        "src/engine/runner.ts",
+        "src/engine/store.ts",
+        "src/cli.ts",
+        "src/engine/session.ts"
+      ],
+      "acceptance_criteria": [
+        "session.json records an SDK session id and gate cursor per plan, not per run",
+        "`vigil run --resume <runId>` continues from the first plan that did not pass, skipping already-passed plans and reporting exactly what was skipped and why",
+        "`--resume-gate` re-enters the failing plan's session at the failed gate using the recorded session id",
+        "A resumed run appends to a new run directory that references its parent run id, leaving the original artifacts immutable",
+        "Resuming when plan files changed since the original run warns with a content hash comparison and requires an explicit --force",
+        "Cost and gate records from the parent run are carried into the resumed run's summary so total spend across attempts is visible"
+      ],
+      "user_stories": [
+        {
+          "id": "VG-019-US1",
+          "as_a": "operator whose phase-3 plan failed",
+          "i_want": "to resume from the failing plan rather than the beginning",
+          "so_that": "I do not re-spend budget and re-run side effects for work that already passed"
+        },
+        {
+          "id": "VG-019-US2",
+          "as_a": "operator",
+          "i_want": "a printed resume plan before anything executes",
+          "so_that": "I can confirm Vigil will skip exactly the plans I expect"
+        }
+      ],
+      "linked_spec_id": null
+    },
+    {
+      "id": "VG-020",
+      "title": "Evidence reconciliation on re-run",
+      "description": "Make the in-TUI `r` re-run and CLI resume reconcile against the prior attempt: hash existing evidence artifacts, classify each as unchanged, modified or missing relative to the failed run, and present the reconciliation before re-execution. Offer policies to reuse verified-unchanged evidence, require re-capture for modified or stale artifacts, and always re-capture anything tied to a failed gate, recording the chosen policy in the run summary.",
+      "rationale": "Re-running after a failure currently ignores everything the previous attempt produced, so stale evidence from the failed run sits in evidence/ and can satisfy an existence check on the retry — precisely the false-PASS the product exists to prevent. Content hashing from VG-003 makes reconciliation possible; without it the re-run path quietly weakens the trust guarantee.",
+      "priority": "should_have",
+      "complexity": "medium",
+      "impact": "medium",
+      "effort_estimate": "5-6 days",
+      "phase_id": "phase-4",
+      "status": "planned",
+      "dependencies": [
+        "VG-003",
+        "VG-019"
+      ],
+      "tags": [
+        "trust",
+        "lifecycle",
+        "resume"
+      ],
+      "source_pain_points": [
+        "Re-run after failure (`r`) does not reconcile state or evidence from the prior attempt",
+        "Evidence verification is existence + non-zero bytes only — a truncated or wrong-content artifact still passes"
+      ],
+      "affected_files": [
+        "src/engine/runner.ts",
+        "src/engine/session.ts",
+        "src/ui/overlays.tsx",
+        "src/engine/store.ts"
+      ],
+      "acceptance_criteria": [
+        "Before re-execution, every evidence artifact is hashed and classified as unchanged, modified or missing relative to the prior run",
+        "The reconciliation summary is shown in the TUI overlay and printed in plain mode before anything runs",
+        "Evidence attached to a failed gate is always re-captured regardless of policy",
+        "A reuse policy of strict (re-capture everything), verified (reuse unchanged hashes) or permissive is configurable and recorded in the run summary",
+        "Stale evidence carried from a prior attempt can never satisfy a gate under the strict or verified policy, asserted by a test",
+        "The reconciliation result is written to the run directory as a first-class artifact"
+      ],
+      "user_stories": [
+        {
+          "id": "VG-020-US1",
+          "as_a": "operator re-running a failed plan",
+          "i_want": "Vigil to tell me which evidence survived from the last attempt",
+          "so_that": "stale artifacts cannot fake a PASS on the retry"
+        },
+        {
+          "id": "VG-020-US2",
+          "as_a": "auditor",
+          "i_want": "a recorded reconciliation decision per re-run",
+          "so_that": "I can see exactly which evidence was reused versus freshly captured"
+        }
+      ],
+      "linked_spec_id": null
+    },
+    {
+      "id": "VG-021",
+      "title": "Run comparison and evidence diff",
+      "description": "Add `vigil diff <runA> <runB>` comparing two runs across gate verdicts (newly passing, newly failing, changed reason), evidence artifacts by hash with a textual diff for text content, cost and token deltas, rail hits gained or lost, and duration by plan. Support `--json` and a `--gates-only` fast mode, operating entirely on recorded artifacts.",
+      "rationale": "The run corpus accumulates the complete history of every attempt but offers no way to answer the most common question after a change: what is different now? Comparison converts stored artifacts from an archive into a regression-detection tool, and hash-recorded evidence from VG-003 makes it exact rather than heuristic.",
+      "priority": "could_have",
+      "complexity": "medium",
+      "impact": "medium",
+      "effort_estimate": "5-6 days",
+      "phase_id": "phase-4",
+      "status": "planned",
+      "dependencies": [
+        "VG-003",
+        "VG-013"
+      ],
+      "tags": [
+        "lifecycle",
+        "analysis",
+        "cli"
+      ],
+      "source_pain_points": [
+        "Post-hoc auditing requires reconstructing what happened from scrollback that is already gone",
+        "Validation reports written by the agent are self-graded"
+      ],
+      "affected_files": [
+        "src/cli.ts",
+        "src/engine/store.ts",
+        "src/plan/reports.ts"
+      ],
+      "acceptance_criteria": [
+        "`vigil diff <runA> <runB>` reports gates that newly pass, newly fail, or changed reason, from gates.json alone",
+        "Evidence artifacts are compared by recorded hash, with a unified textual diff shown for text content and a size/hash summary for binary content",
+        "Cost, token and duration deltas are reported per plan and in total",
+        "Rail hits present in one run and absent in the other are listed",
+        "`--json` emits a structured diff validated against a committed schema; `--gates-only` completes in under 500ms",
+        "Comparing runs from different plan sets fails with a clear error naming the mismatch"
+      ],
+      "user_stories": [
+        {
+          "id": "VG-021-US1",
+          "as_a": "operator who just changed a plan",
+          "i_want": "a diff between this run and the last green one",
+          "so_that": "I can see immediately what my change broke or fixed"
+        },
+        {
+          "id": "VG-021-US2",
+          "as_a": "auditor",
+          "i_want": "an exact hash-based evidence comparison between two runs",
+          "so_that": "I can prove whether the artifacts actually differ"
+        }
+      ],
+      "linked_spec_id": null
+    },
+    {
+      "id": "VG-022",
+      "title": "Shareable run summary export",
+      "description": "Add `vigil export <runDir> --format md|html` producing a single self-contained summary: header with verdict, cost and duration; the full gate table with evidence links and hashes; rail hits and blocked commands; a cost breakdown; and a collapsible timeline of tool calls. HTML output embeds all assets in one file with no network dependencies, and redaction from VG-005 is applied to every exported payload.",
+      "rationale": "The auditor persona currently has to read JSONL or re-animate a replay in a terminal they may not have. A single file that can be attached to a pull request, a change ticket or an incident review is how a run's evidence travels to people who will never install Vigil — which is the whole point of disk-first observability.",
+      "priority": "could_have",
+      "complexity": "small",
+      "impact": "medium",
+      "effort_estimate": "3-4 days",
+      "phase_id": "phase-4",
+      "status": "planned",
+      "dependencies": [
+        "VG-005",
+        "VG-013"
+      ],
+      "tags": [
+        "reporting",
+        "audit",
+        "distribution"
+      ],
+      "source_pain_points": [
+        "Reviewers/auditors who read run artifacts after the fact without the TUI",
+        "Post-hoc auditing requires reconstructing what happened from scrollback that is already gone"
+      ],
+      "affected_files": [
+        "src/cli.ts",
+        "src/plan/reports.ts",
+        "src/engine/store.ts"
+      ],
+      "acceptance_criteria": [
+        "`vigil export <runDir> --format md` and `--format html` each produce a single file summarizing verdict, cost, duration, gates, evidence hashes and rail hits",
+        "HTML output is fully self-contained with inlined CSS and no external network requests, and renders correctly offline",
+        "Redaction rules are applied to every exported value; a test asserts no secret from the redaction corpus appears in an export",
+        "The tool-call timeline is collapsible in HTML and rendered as a summarized table in Markdown",
+        "Export works on an interrupted or partial run without error",
+        "Exporting a run directory missing optional artifacts degrades gracefully with noted omissions"
+      ],
+      "user_stories": [
+        {
+          "id": "VG-022-US1",
+          "as_a": "operator closing out a deployment",
+          "i_want": "a single file proving what the agent did",
+          "so_that": "I can attach it to the change ticket without asking reviewers to install anything"
+        },
+        {
+          "id": "VG-022-US2",
+          "as_a": "engineering lead",
+          "i_want": "a readable HTML run summary",
+          "so_that": "I can review agent work without a terminal"
+        }
+      ],
+      "linked_spec_id": null
+    },
+    {
+      "id": "VG-023",
+      "title": "TUI test harness, scrollable transcript and diagnostics search",
+      "description": "Establish rendering tests for the Ink layer using ink-testing-library: snapshot every pane and overlay at representative widths including the sub-110-column stacked layout, and assert reducer-to-render behaviour for the key interaction paths. Alongside the harness, add a scrollable agent transcript with keyboard paging, incremental search within the diagnostics pane, and removal of the global process.stderr.write monkey-patch in favour of a scoped writer.",
+      "rationale": "The TUI is the largest untested surface and the most fragile under terminal resize, yet it is the operator's only live view. Content today is truncated with no way to scroll back, so information that was rendered is simply lost, and a global stderr patch makes any library that writes to stderr behave unpredictably while mounted.",
+      "priority": "could_have",
+      "complexity": "medium",
+      "impact": "medium",
+      "effort_estimate": "1 week",
+      "phase_id": "phase-4",
+      "status": "planned",
+      "dependencies": [
+        "VG-007"
+      ],
+      "tags": [
+        "ui",
+        "testing",
+        "operator-control"
+      ],
+      "source_pain_points": [
+        "no Ink/TUI rendering tests",
+        "TUI requires a TTY; below ~110 columns the layout stacks and content is heavily truncated",
+        "process.stderr.write is monkey-patched globally while the TUI is mounted"
+      ],
+      "affected_files": [
+        "tests/ui/panes.test.tsx",
+        "tests/ui/overlays.test.tsx",
+        "src/ui/App.tsx",
+        "src/ui/panes.tsx",
+        "src/ui/overlays.tsx",
+        "src/cli.ts"
+      ],
+      "acceptance_criteria": [
+        "Snapshot tests cover every pane and overlay at wide, narrow and sub-110-column widths",
+        "Interaction tests assert pause, inject, interrupt, approval-cycle and evidence-overlay paths produce the expected rendered state",
+        "The agent transcript is scrollable with keyboard paging and an explicit indicator when scrolled away from the live tail",
+        "The diagnostics pane supports incremental search with match highlighting and next/previous navigation",
+        "process.stderr.write is no longer globally monkey-patched; stderr redirection is scoped to the render lifetime and restored on unmount and on crash",
+        "All TUI tests run headlessly in CI without a real TTY"
+      ],
+      "user_stories": [
+        {
+          "id": "VG-023-US1",
+          "as_a": "operator watching a long run",
+          "i_want": "to scroll back through the transcript and search diagnostics",
+          "so_that": "I can investigate something I saw thirty seconds ago without replaying the run"
+        },
+        {
+          "id": "VG-023-US2",
+          "as_a": "maintainer",
+          "i_want": "snapshot tests over the Ink layer",
+          "so_that": "a layout regression fails in CI rather than mid-run"
+        }
+      ],
+      "linked_spec_id": null
+    },
+    {
+      "id": "VG-024",
+      "title": "Public distribution: license, docs, npm release and changelog",
+      "description": "Make Vigil publicly installable: add an OSI license and CONTRIBUTING guide, restructure the README into install/quickstart/configuration/CLI-reference sections that no longer assume a Desktop checkout, publish to npm with a proper bin entry and files allow-list, and automate releases with semantic versioning, a generated changelog and a CI publish job gated on a green pipeline and a version tag.",
+      "rationale": "Install today is `npm link` from a Desktop checkout of an unlicensed repository. Without a license the project is legally unusable by anyone else, and without a published package every adoption gain from Phase 1's portability work stops at the door. This is the final gate between a personal tool and a product.",
+      "priority": "must_have",
+      "complexity": "medium",
+      "impact": "high",
+      "effort_estimate": "4-5 days",
+      "phase_id": "phase-5",
+      "status": "planned",
+      "dependencies": [
+        "VG-001",
+        "VG-002",
+        "VG-007"
+      ],
+      "tags": [
+        "distribution",
+        "docs",
+        "process",
+        "portability"
+      ],
+      "source_pain_points": [
+        "No LICENSE, no CONTRIBUTING, no published npm package — install is `npm link` from a Desktop checkout",
+        "No CI configuration, no release automation, no changelog",
+        "No issue tracker, no documented public API in-repo"
+      ],
+      "affected_files": [
+        "LICENSE",
+        "CONTRIBUTING.md",
+        "README.md",
+        "CHANGELOG.md",
+        "package.json",
+        ".github/workflows/release.yml"
+      ],
+      "acceptance_criteria": [
+        "An OSI-approved LICENSE file is present and referenced in package.json",
+        "`npm i -g vigil` on a clean machine installs a working `vigil` binary that runs `vigil --help` and `vigil init` successfully",
+        "package.json declares a files allow-list that excludes tests, fixtures and .auto-claude from the published tarball",
+        "README documents install, quickstart, configuration reference and full CLI reference with no reference to ~/Desktop, npm link or the author's environment",
+        "A version tag on a green pipeline publishes to npm automatically and appends a generated changelog entry",
+        "CONTRIBUTING documents the test, typecheck and rail-lint commands a contributor must pass",
+        "A dry-run install from the packed tarball is verified in CI on Node 20 and 22"
+      ],
+      "user_stories": [
+        {
+          "id": "VG-024-US1",
+          "as_a": "engineer who heard about Vigil",
+          "i_want": "to install it with a single npm command",
+          "so_that": "I can evaluate it without cloning and linking a repository"
+        },
+        {
+          "id": "VG-024-US2",
+          "as_a": "maintainer",
+          "i_want": "automated tagged releases with a changelog",
+          "so_that": "publishing is not a manual ritual I get wrong"
+        }
+      ],
+      "linked_spec_id": null
+    },
+    {
+      "id": "VG-025",
+      "title": "Pluggable plan adapters",
+      "description": "Extract plan understanding behind a PlanAdapter interface (discover, parse to PlanModel, contribute a runner contract, extract Capture targets and pass criteria) so the current XML-ish format becomes one built-in adapter among several. Ship a second adapter — front-matter Markdown with checklist gates — to prove the seam, and allow a config-specified adapter module so users can gate plans Vigil's own format does not understand.",
+      "rationale": "Vigil is opinionated on exactly one plan format produced by one generator; any team with existing runbooks, checklists or task files cannot use it at all without rewriting them. An adapter seam is what lets the evidence-checking and rails machinery — the actually valuable parts — serve plans Vigil did not invent.",
+      "priority": "could_have",
+      "complexity": "large",
+      "impact": "medium",
+      "effort_estimate": "1.5-2 weeks",
+      "phase_id": "phase-5",
+      "status": "planned",
+      "dependencies": [
+        "VG-008",
+        "VG-017"
+      ],
+      "tags": [
+        "extensibility",
+        "architecture",
+        "adoption"
+      ],
+      "source_pain_points": [
+        "Opinionated on one plan format (create-validation-plan XML-ish blocks) — arbitrary markdown plans are not understood"
+      ],
+      "affected_files": [
+        "src/plan/adapter.ts",
+        "src/plan/parser.ts",
+        "src/plan/discover.ts",
+        "src/engine/runner.ts",
+        "src/config.ts"
+      ],
+      "acceptance_criteria": [
+        "A documented PlanAdapter interface covers discovery, parsing to PlanModel, contract contribution and evidence-target extraction",
+        "The existing XML-ish parser is refactored into a built-in adapter with all existing parser tests passing unmodified",
+        "A second built-in adapter parses front-matter Markdown with checklist gates and runs end-to-end against a new fixture plan set",
+        "An adapter is selectable per run via config or --adapter, and an unknown adapter name fails validation listing available adapters",
+        "Evidence verification, rails, reports and the run summary behave identically across both adapters, asserted by a shared conformance test suite",
+        "Adapter authoring is documented with a worked example"
+      ],
+      "user_stories": [
+        {
+          "id": "VG-025-US1",
+          "as_a": "team with existing runbooks",
+          "i_want": "to point Vigil at plans in my own format",
+          "so_that": "I get evidence-checked agent runs without rewriting every plan"
+        },
+        {
+          "id": "VG-025-US2",
+          "as_a": "maintainer",
+          "i_want": "plan parsing behind an interface with a conformance suite",
+          "so_that": "adding a format does not risk the core runner"
+        }
+      ],
+      "linked_spec_id": null
+    },
+    {
+      "id": "VG-026",
+      "title": "Extension points for rails, hooks and probes",
+      "description": "Allow users to supply their own logic as ESM modules resolved from config: custom rail evaluators receiving the resolved command and returning allow/warn/deny with a reason, additional lifecycle hooks, and custom probe types beyond HTTP and shell. Modules load in-process behind an explicit opt-in flag, with a documented stable interface, load-time validation, and failures isolated so a broken extension disables itself with a diagnostic instead of killing the run.",
+      "rationale": "Rails as regular expressions and probes limited to HTTP and shell cover the author's environment but cannot express organization-specific safety policy — 'never touch a resource tagged production', 'block writes outside this worktree' — or health checks against a queue or database. Extension points let Vigil serve environments its built-ins cannot anticipate.",
+      "priority": "could_have",
+      "complexity": "large",
+      "impact": "medium",
+      "effort_estimate": "1-1.5 weeks",
+      "phase_id": "phase-5",
+      "status": "planned",
+      "dependencies": [
+        "VG-009",
+        "VG-025"
+      ],
+      "tags": [
+        "extensibility",
+        "safety",
+        "architecture"
+      ],
+      "source_pain_points": [
+        "Rails are regex over a flattened tool-input string: bypassable via shell indirection and prone to false positives",
+        "Single-operator, single-machine tool: no multi-user, no server, no remote control plane",
+        "Environment-specific defaults make the tool effectively unusable by anyone else without rewriting rails and config"
+      ],
+      "affected_files": [
+        "src/engine/rails.ts",
+        "src/engine/probes.ts",
+        "src/engine/session.ts",
+        "src/config.ts"
+      ],
+      "acceptance_criteria": [
+        "Custom rail evaluator, hook and probe modules are loadable from config paths behind an explicit opt-in flag",
+        "Extension interfaces are documented, versioned and validated at load time, with a clear error naming a module that does not conform",
+        "A custom rail evaluator receives the resolved command and normalized paths from VG-009 and can return allow, warn or deny with a reason surfaced to the agent",
+        "Built-in deny rails cannot be weakened by an extension; deny still wins over warn and over any extension allow",
+        "An extension that throws or exceeds a time budget is disabled for the remainder of the run with a diagnostic RunEvent, and the run continues",
+        "Worked examples for a custom rail and a custom probe ship in the repository with tests"
+      ],
+      "user_stories": [
+        {
+          "id": "VG-026-US1",
+          "as_a": "platform engineer",
+          "i_want": "to express my organization's safety policy as code rather than regex",
+          "so_that": "Vigil enforces rules my environment actually needs"
+        },
+        {
+          "id": "VG-026-US2",
+          "as_a": "operator with a queue-backed service",
+          "i_want": "a custom probe type",
+          "so_that": "I can health-check the systems my plan actually depends on"
+        }
+      ],
+      "linked_spec_id": null
+    },
+    {
+      "id": "VG-027",
+      "title": "Event stream consumer API",
+      "description": "Publish a small, documented, dependency-light consumer surface that reads events.jsonl (live tail or completed run), validates events against the RunEvent schema, and exposes both the pure reducer and a typed async iterator — the same primitives the TUI and replay already use. Version the on-disk event format explicitly with a documented compatibility policy so external consumers can rely on it.",
+      "rationale": "The disk-first design already makes every run a machine-readable stream, but consuming it today means reimplementing an 18-variant union and the reducer by hand. A published consumer turns Vigil's artifacts into a platform other dashboards and pipelines can build on, at very low marginal cost since the reducer is already pure and shared.",
+      "priority": "could_have",
+      "complexity": "medium",
+      "impact": "medium",
+      "effort_estimate": "4-5 days",
+      "phase_id": "phase-5",
+      "status": "planned",
+      "dependencies": [
+        "VG-006",
+        "VG-013",
+        "VG-024"
+      ],
+      "tags": [
+        "extensibility",
+        "integration",
+        "observability"
+      ],
+      "source_pain_points": [
+        "No issue tracker, no documented public API in-repo",
+        "Teams adopting the Claude Agent SDK who need observability, safety rails and cost visibility around agent runs"
+      ],
+      "affected_files": [
+        "src/engine/events.ts",
+        "src/state/reducer.ts",
+        "src/replay.ts",
+        "package.json",
+        "docs/event-stream.md"
+      ],
+      "acceptance_criteria": [
+        "A documented public entry point exports the RunEvent type, its schema, the pure reducer and a typed async iterator over events.jsonl",
+        "The iterator supports both a completed run and a live tail, with graceful handling of partially written trailing lines",
+        "The on-disk event format carries an explicit version with a documented compatibility and deprecation policy",
+        "A worked example consumer under 50 lines computes live gate status and cost from a run directory",
+        "The consumer surface has no dependency on Ink, React or the Agent SDK, asserted by an import-graph test",
+        "Every RunEvent variant is covered by the published schema and round-trips through parse and serialize in a test"
+      ],
+      "user_stories": [
+        {
+          "id": "VG-027-US1",
+          "as_a": "team running Vigil across many plans",
+          "i_want": "a supported library for reading the event stream",
+          "so_that": "I can build a dashboard without reverse-engineering the log format"
+        },
+        {
+          "id": "VG-027-US2",
+          "as_a": "maintainer",
+          "i_want": "an explicitly versioned event format",
+          "so_that": "I can evolve events without silently breaking downstream consumers"
+        }
+      ],
+      "linked_spec_id": null
+    },
+    {
+      "id": "VG-028",
+      "title": "Hosted multi-user control plane",
+      "description": "A server-side deployment with multi-user accounts, remote run orchestration, a web cockpit and centralized artifact storage across machines and teams.",
+      "rationale": "Explicitly out of scope through v1.0. Vigil's stated product boundary is a single-operator, single-machine tool whose source of truth is the local filesystem, and the disk-first design plus the event consumer API (VG-027) already let anyone build a dashboard externally. Introducing a server would add authentication, multi-tenancy, transport security and hosting obligations to a project with a bus factor of one, competing for the attention that portability, trust and durability work still needs. Revisit only after v1.0 if sustained multi-team demand appears.",
+      "priority": "wont_have",
+      "complexity": "large",
+      "impact": "low",
+      "effort_estimate": "not scheduled",
+      "phase_id": "phase-5",
+      "status": "deferred",
+      "dependencies": [],
+      "tags": [
+        "out-of-scope",
+        "platform"
+      ],
+      "source_pain_points": [
+        "Single-operator, single-machine tool: no multi-user, no server, no remote control plane"
+      ],
+      "affected_files": [
+        "README.md"
+      ],
+      "acceptance_criteria": [
+        "Documented as out of scope in the README's non-goals section",
+        "The event stream consumer API (VG-027) is documented as the supported integration path for external dashboards",
+        "Revisit criterion recorded: reconsider only post-1.0 with sustained demand from more than one team"
+      ],
+      "user_stories": [
+        {
+          "id": "VG-028-US1",
+          "as_a": "maintainer",
+          "i_want": "an explicit non-goal for a hosted control plane",
+          "so_that": "scope creep does not divert effort from the single-operator product that actually works"
+        }
+      ],
+      "linked_spec_id": null
+    },
+    {
+      "id": "VG-029",
+      "title": "First-class Windows support",
+      "description": "Full Windows parity: PowerShell and cmd command parsing for rails, Windows path semantics throughout, native console rendering for the Ink cockpit, and CI coverage on windows-latest.",
+      "rationale": "Deferred beyond v1.0. The tool assumes POSIX end to end — /bin/sh for probe commands, `which` for binary resolution, POSIX home paths in rails, and a shell tokenizer (VG-009) built for sh semantics. The vestigial `where` branch in resolveClaudeBin is untested and should be removed or clearly marked unsupported rather than implying coverage that does not exist. The target audience is macOS/Linux operators, and proper Windows support is a multi-week effort touching rails, probes, paths and the TUI that would compete directly with trust and durability work.",
+      "priority": "wont_have",
+      "complexity": "large",
+      "impact": "low",
+      "effort_estimate": "not scheduled",
+      "phase_id": "phase-5",
+      "status": "deferred",
+      "dependencies": [],
+      "tags": [
+        "out-of-scope",
+        "platform",
+        "portability"
+      ],
+      "source_pain_points": [
+        "Windows `where` branch exists in resolveClaudeBin but is otherwise untested; the rest of the tool assumes POSIX",
+        "macOS/POSIX — /bin/sh for probe commands, launchctl in the example config, `which` for binary resolution"
+      ],
+      "affected_files": [
+        "src/engine/runner.ts",
+        "README.md",
+        "package.json"
+      ],
+      "acceptance_criteria": [
+        "README documents macOS and Linux as the supported platforms and Windows as unsupported",
+        "package.json declares supported operating systems via the `os` field",
+        "The untested Windows branch in resolveClaudeBin is either removed or guarded with an explicit unsupported-platform error rather than failing obscurely",
+        "Revisit criterion recorded: reconsider only if Windows demand is evidenced post-1.0"
+      ],
+      "user_stories": [
+        {
+          "id": "VG-029-US1",
+          "as_a": "maintainer",
+          "i_want": "an honest declaration of supported platforms",
+          "so_that": "Windows users get a clear message instead of an obscure runtime failure"
+        }
+      ],
+      "linked_spec_id": null
+    }
+  ],
+  "milestones": [
+    {
+      "id": "M1",
+      "name": "Second User",
+      "phase_id": "phase-1",
+      "target_version": "0.2.0",
+      "sequence": 1,
+      "description": "Vigil is installable and safe on a machine that is not the author's, and its central trust claim — evidence-checked verdicts — holds against wrong content rather than only empty files.",
+      "feature_ids": [
+        "VG-001",
+        "VG-002",
+        "VG-003",
+        "VG-004",
+        "VG-005"
+      ],
+      "success_metrics": [
+        "An external operator completes a full gated run with no manual config editing",
+        "Zero author-specific identifiers in shipped defaults",
+        "A wrong-content evidence artifact produces FAIL in an automated test",
+        "A run exceeding its budget cap halts and exits non-zero",
+        "No raw secret appears in run artifacts across the redaction test corpus"
+      ],
+      "exit_criteria": "All five features complete with acceptance criteria met; clean-machine install to first successful run under 10 minutes."
+    },
+    {
+      "id": "M2",
+      "name": "Unbreakable Boundary",
+      "phase_id": "phase-2",
+      "target_version": "0.3.0",
+      "sequence": 2,
+      "description": "The SDK integration is validated and contract-tested, CI runs on every push, and the rails resist deliberate evasion — removing the two highest-severity risks in the repository.",
+      "feature_ids": [
+        "VG-006",
+        "VG-007",
+        "VG-008",
+        "VG-009",
+        "VG-010",
+        "VG-011",
+        "VG-012"
+      ],
+      "success_metrics": [
+        "Zero unchecked SDK casts remain in src/engine",
+        "CI green on Node 20 and 22 with a coverage floor enforced",
+        "The SDK version pin is relaxed to a range with contract tests passing against the latest release",
+        "Ten documented shell-indirection bypass attempts are denied and zero false positives fire on the innocent corpus",
+        "A 10,000-event benchmark run flushes completely on SIGINT"
+      ],
+      "exit_criteria": "An SDK upgrade is performed and merged on a green pipeline with no changes outside the schema layer."
+    },
+    {
+      "id": "M3",
+      "name": "Pipeline Citizen",
+      "phase_id": "phase-3",
+      "target_version": "0.4.0",
+      "sequence": 3,
+      "description": "Vigil runs headlessly end to end: machines consume its output, operators approve without a TTY, every run reports, and the corpus is bounded.",
+      "feature_ids": [
+        "VG-013",
+        "VG-014",
+        "VG-015",
+        "VG-016",
+        "VG-017",
+        "VG-018"
+      ],
+      "success_metrics": [
+        "A CI job gates on Vigil's summary.json with no prose scraping",
+        "An approval is answered from a second terminal and recorded as a RunEvent",
+        "Retention keeps runs/ under a configured byte cap while preserving all failed runs",
+        "Every executed plan produces a report, including --only runs",
+        "Aggregate cost across 500 runs reports in under two seconds"
+      ],
+      "exit_criteria": "A full gated plan set runs in a pipeline with no TTY, gates the pipeline on its JSON summary, and prunes itself within policy."
+    },
+    {
+      "id": "M4",
+      "name": "Recoverable Runs",
+      "phase_id": "phase-4",
+      "target_version": "0.5.0",
+      "sequence": 4,
+      "description": "Failure stops being expensive: runs resume from where they broke, stale evidence cannot fake a pass, and the accumulated corpus becomes a comparison and reporting asset.",
+      "feature_ids": [
+        "VG-019",
+        "VG-020",
+        "VG-021",
+        "VG-022",
+        "VG-023"
+      ],
+      "success_metrics": [
+        "A phase-3 failure resumes without re-running phases 1 and 2",
+        "Stale evidence from a failed attempt is re-captured under the default policy in an automated test",
+        "Two runs diff by gate verdict, evidence hash and cost",
+        "A self-contained HTML summary renders offline with redaction applied",
+        "Ink panes and overlays have snapshot coverage at three widths"
+      ],
+      "exit_criteria": "A deliberately failed 3-phase run is resumed to green, then diffed and exported, entirely from recorded artifacts."
+    },
+    {
+      "id": "M5",
+      "name": "Public 1.0",
+      "phase_id": "phase-5",
+      "target_version": "1.0.0",
+      "sequence": 5,
+      "description": "Vigil ships as a licensed, published, documented and extensible product that outlives its author's machine and its author's plan format.",
+      "feature_ids": [
+        "VG-024",
+        "VG-025",
+        "VG-026",
+        "VG-027"
+      ],
+      "success_metrics": [
+        "`npm i -g vigil` works on a clean Node 20 and Node 22 machine",
+        "A second plan format passes the adapter conformance suite",
+        "A custom rail and a custom probe load from config without forking",
+        "An external consumer computes live gate status from events.jsonl in under 50 lines",
+        "A tagged release publishes and changelogs automatically from a green pipeline"
+      ],
+      "exit_criteria": "An external contributor installs from npm, extends Vigil without touching its source, and merges a change through the documented process."
+    }
+  ],
+  "dependency_graph": {
+    "notes": "Edges point from prerequisite to dependent. VG-001, VG-003, VG-006, VG-007 and VG-013 are the five roots that unblock the widest downstream surface: VG-001 gates all portability and distribution work, VG-003 gates every hash-dependent capability in Phases 3 and 4, VG-006 gates the structured-output and consumer-API surface, VG-007 gates everything whose value depends on being enforced, and VG-013 gates the entire CI-native and analysis line.",
+    "edges": [
+      {
+        "from": "VG-001",
+        "to": "VG-002",
+        "reason": "Scaffolding must emit neutral rails, not author-specific ones"
+      },
+      {
+        "from": "VG-001",
+        "to": "VG-009",
+        "reason": "Semantic rail hardening is applied to the neutral rail set to avoid reworking author-specific patterns"
+      },
+      {
+        "from": "VG-001",
+        "to": "VG-024",
+        "reason": "A package cannot be published publicly while its defaults encode one machine"
+      },
+      {
+        "from": "VG-002",
+        "to": "VG-024",
+        "reason": "Public install is only useful if `vigil init` scaffolds a working config"
+      },
+      {
+        "from": "VG-003",
+        "to": "VG-013",
+        "reason": "The JSON summary's gate table carries the evidence hashes introduced by content assertions"
+      },
+      {
+        "from": "VG-003",
+        "to": "VG-020",
+        "reason": "Evidence reconciliation classifies artifacts by recorded hash"
+      },
+      {
+        "from": "VG-003",
+        "to": "VG-021",
+        "reason": "Run diffing compares evidence by recorded hash"
+      },
+      {
+        "from": "VG-004",
+        "to": "VG-018",
+        "reason": "Aggregate cost reporting counts budget-halt events produced by the enforced guard"
+      },
+      {
+        "from": "VG-005",
+        "to": "VG-015",
+        "reason": "Retention and truncation must apply redaction before artifacts are trimmed or archived"
+      },
+      {
+        "from": "VG-005",
+        "to": "VG-022",
+        "reason": "Exported summaries must apply the same redaction rules as run artifacts"
+      },
+      {
+        "from": "VG-006",
+        "to": "VG-008",
+        "reason": "Contract fixtures assert against validated schemas rather than casts"
+      },
+      {
+        "from": "VG-006",
+        "to": "VG-013",
+        "reason": "Structured output can only be stable if the values it reports are schema-validated"
+      },
+      {
+        "from": "VG-006",
+        "to": "VG-027",
+        "reason": "A published consumer API requires a validated, versioned event schema"
+      },
+      {
+        "from": "VG-007",
+        "to": "VG-008",
+        "reason": "Contract tests need a pipeline to run them against new SDK versions"
+      },
+      {
+        "from": "VG-007",
+        "to": "VG-011",
+        "reason": "Added coverage is only protective once CI enforces it"
+      },
+      {
+        "from": "VG-007",
+        "to": "VG-023",
+        "reason": "TUI snapshot tests need a headless CI runner to be worth writing"
+      },
+      {
+        "from": "VG-007",
+        "to": "VG-024",
+        "reason": "Release automation publishes only from a green pipeline"
+      },
+      {
+        "from": "VG-008",
+        "to": "VG-017",
+        "reason": "Verdict de-duplication changes are verified against recorded dual-path message streams"
+      },
+      {
+        "from": "VG-008",
+        "to": "VG-025",
+        "reason": "The adapter conformance suite builds on the stubbed-SDK end-to-end harness"
+      },
+      {
+        "from": "VG-009",
+        "to": "VG-010",
+        "reason": "Rail lint and dry-run explain the resolved argv produced by the semantic engine"
+      },
+      {
+        "from": "VG-009",
+        "to": "VG-026",
+        "reason": "Custom rail evaluators receive the resolved command and normalized paths"
+      },
+      {
+        "from": "VG-011",
+        "to": "VG-012",
+        "reason": "Artifact tests must exist before the write path is made asynchronous"
+      },
+      {
+        "from": "VG-013",
+        "to": "VG-014",
+        "reason": "Pending approval requests are surfaced on the structured output stream"
+      },
+      {
+        "from": "VG-013",
+        "to": "VG-018",
+        "reason": "Aggregate reporting reads the versioned summary.json artifact"
+      },
+      {
+        "from": "VG-013",
+        "to": "VG-021",
+        "reason": "Run diffing consumes the versioned summary schema"
+      },
+      {
+        "from": "VG-013",
+        "to": "VG-022",
+        "reason": "Export renders from the same summary object emitted by --json"
+      },
+      {
+        "from": "VG-013",
+        "to": "VG-027",
+        "reason": "The consumer API publishes the same versioned event and summary schemas"
+      },
+      {
+        "from": "VG-017",
+        "to": "VG-019",
+        "reason": "Resume requires an explicit not_reached gate state to know where to restart"
+      },
+      {
+        "from": "VG-019",
+        "to": "VG-020",
+        "reason": "Reconciliation runs as part of the resume and re-run path"
+      },
+      {
+        "from": "VG-024",
+        "to": "VG-027",
+        "reason": "A consumer package is only meaningful once Vigil is published"
+      },
+      {
+        "from": "VG-025",
+        "to": "VG-026",
+        "reason": "Extension loading reuses the module resolution and validation introduced for adapters"
+      }
+    ],
+    "critical_path": [
+      "VG-001",
+      "VG-002",
+      "VG-003",
+      "VG-006",
+      "VG-007",
+      "VG-008",
+      "VG-013",
+      "VG-017",
+      "VG-019",
+      "VG-024"
+    ]
+  },
+  "prioritization_summary": {
+    "framework": "MoSCoW",
+    "must_have": [
+      "VG-001",
+      "VG-002",
+      "VG-003",
+      "VG-004",
+      "VG-005",
+      "VG-006",
+      "VG-007",
+      "VG-008",
+      "VG-013",
+      "VG-024"
+    ],
+    "should_have": [
+      "VG-009",
+      "VG-010",
+      "VG-011",
+      "VG-012",
+      "VG-014",
+      "VG-015",
+      "VG-016",
+      "VG-017",
+      "VG-019",
+      "VG-020"
+    ],
+    "could_have": [
+      "VG-018",
+      "VG-021",
+      "VG-022",
+      "VG-023",
+      "VG-025",
+      "VG-026",
+      "VG-027"
+    ],
+    "wont_have": [
+      "VG-028",
+      "VG-029"
+    ],
+    "rationale": "Must-haves are the features without which Vigil's stated promise is false, unusable or unshippable: the five in-flight Phase-1 items that make the tool installable by anyone and make the evidence, budget and redaction guarantees real; the Phase-2 durability trio (VG-006/007/008) that stops silent SDK breakage and unreviewed regressions on a bus-factor-of-one project; structured output (VG-013), the prerequisite for the explicitly targeted CI audience; and public distribution (VG-024), without which a license-less Desktop checkout cannot reach any of the secondary audiences. Should-haves materially improve safety, correctness and recoverability but have viable manual workarounds — an operator can hand-audit rails, re-run from scratch, or prune runs/ manually. Could-haves are leverage on work already done: analysis, export, TUI polish and the extension seams that broaden reach after the core is trustworthy. Won't-haves are explicit scope boundaries recorded so they stop being reconsidered — a hosted control plane contradicts the single-operator product definition, and Windows parity would consume multi-week effort across rails, probes, paths and the TUI for an audience the project does not have."
+  },
+  "risks": [
+    {
+      "id": "R1",
+      "risk": "SDK coupling via unchecked casts against an exactly-pinned version breaks silently on any upstream schema change",
+      "severity": "high",
+      "likelihood": "high",
+      "mitigation": "VG-006 replaces every cast with validated schemas that emit diagnostics; VG-008 adds recorded-stream contract tests and relaxes the pin behind them",
+      "mitigated_by": [
+        "VG-006",
+        "VG-008"
+      ]
+    },
+    {
+      "id": "R2",
+      "risk": "Environment-specific defaults and the absence of a license keep the effective user count at one, invalidating every adoption assumption in the roadmap",
+      "severity": "high",
+      "likelihood": "high",
+      "mitigation": "VG-001 and VG-002 neutralize defaults and scaffold config in Phase 1; VG-024 licenses and publishes the package in Phase 5",
+      "mitigated_by": [
+        "VG-001",
+        "VG-002",
+        "VG-024"
+      ]
+    },
+    {
+      "id": "R3",
+      "risk": "The core trust claim is weaker than advertised — evidence checking is existence plus non-zero bytes, budget caps are unenforced, unreached gates disappear, and re-runs accept stale artifacts",
+      "severity": "high",
+      "likelihood": "high",
+      "mitigation": "VG-003 adds content assertions and hashes, VG-004 enforces budget and turn guards, VG-017 makes gate state explicit, VG-020 reconciles evidence on re-run",
+      "mitigated_by": [
+        "VG-003",
+        "VG-004",
+        "VG-017",
+        "VG-020"
+      ]
+    },
+    {
+      "id": "R4",
+      "risk": "Rails are the only control on tool execution in the default bypassPermissions mode, yet are defeatable by trivial shell indirection — creating false confidence that is worse than no protection",
+      "severity": "high",
+      "likelihood": "medium",
+      "mitigation": "VG-009 evaluates resolved command semantics and denies unanalyzable commands; VG-010 makes rail sets verifiable before a run; VG-026 allows organization-specific policy as code",
+      "mitigated_by": [
+        "VG-009",
+        "VG-010",
+        "VG-026"
+      ]
+    },
+    {
+      "id": "R5",
+      "risk": "Run artifacts capture inputs and outputs verbatim, can contain secrets, and are never pruned — a compliance and disk liability that grows with every run",
+      "severity": "medium",
+      "likelihood": "high",
+      "mitigation": "VG-005 redacts secrets at write time; VG-015 adds retention, size caps and visible truncation; VG-022 applies redaction to everything exported",
+      "mitigated_by": [
+        "VG-005",
+        "VG-015",
+        "VG-022"
+      ]
+    },
+    {
+      "id": "R6",
+      "risk": "Bus factor of one with no CI, no issue tracker and dense single-line source: any interruption to the author's attention strands the project",
+      "severity": "medium",
+      "likelihood": "medium",
+      "mitigation": "VG-007 automates verification, VG-011 and VG-023 cover the untested artifact and UI layers, VG-024 adds CONTRIBUTING and automated releases so a second person can ship",
+      "mitigated_by": [
+        "VG-007",
+        "VG-011",
+        "VG-023",
+        "VG-024"
+      ]
+    },
+    {
+      "id": "R7",
+      "risk": "Scope expansion into adapters, extensions and a consumer API fragments a 1.7k-LOC codebase before its core is trustworthy",
+      "severity": "medium",
+      "likelihood": "medium",
+      "mitigation": "All extensibility work is confined to Phase 5 and gated on the conformance suite and stubbed-SDK harness from Phases 2-3; VG-028 and VG-029 are recorded as explicit non-goals",
+      "mitigated_by": [
+        "VG-025",
+        "VG-028",
+        "VG-029"
+      ]
+    },
+    {
+      "id": "R8",
+      "risk": "The TUI is the largest untested surface and the operator's only live view; a layout or render regression surfaces only mid-run",
+      "severity": "medium",
+      "likelihood": "medium",
+      "mitigation": "VG-023 adds headless snapshot and interaction tests at three widths and removes the global stderr monkey-patch; VG-013 provides a non-TUI path that remains usable if rendering fails",
+      "mitigated_by": [
+        "VG-023",
+        "VG-013"
+      ]
+    },
+    {
+      "id": "R9",
+      "risk": "Synchronous per-event disk writes throttle exactly the chatty, high-stakes runs where observability matters most",
+      "severity": "low",
+      "likelihood": "medium",
+      "mitigation": "VG-012 introduces a buffered, backpressure-aware writer with guaranteed flush on exit, landing only after VG-011 makes artifact correctness testable",
+      "mitigated_by": [
+        "VG-011",
+        "VG-012"
+      ]
+    }
+  ],
+  "sequencing_rationale": "Sequencing optimizes for de-risking rather than delivery dates, matching a solo author with flexible time and no external deadline. Phase 1 is already committed work (specs 001-005) and is left untouched: it removes the adoption blocker and makes the product's headline trust claims literally true, because every later feature is worthless if the tool has one possible user and its PASS verdicts are only byte-count deep. Phase 2 follows immediately rather than later because the two highest-severity risks — unchecked SDK casts against a frozen pin, and no automation running the 27 existing tests — compound with every feature added on top; hardening the boundary and turning on CI before building breadth means later phases land on tested ground, and rail hardening arrives here so it applies to Phase 1's neutral rail set rather than requiring rework. Phase 3 converts the now-reliable core into something machines consume, because the CI and SSH audience is an explicit target that today's prose-only --plain mode cannot serve; structured output is deliberately placed before resume and diffing since both consume its versioned summary schema. Phase 4 spends the accumulated artifacts: resume and reconciliation depend on the explicit gate states from VG-017 and the evidence hashes from VG-003, so they could not have come earlier without being built twice. Phase 5 is last on purpose — publishing, adapters and extension points widen the contract surface, and widening a contract before it is stable is how a small codebase acquires permanent compatibility debt. Within each phase, foundational items (VG-006 before VG-008, VG-011 before VG-012, VG-009 before VG-010, VG-019 before VG-020) are ordered so no feature is implemented against a surface that is about to change.",
+  "metadata": {
+    "updated_at": "2026-09-19T00:23:56.821026Z",
+    "preserved_feature_ids": [
+      "VG-001",
+      "VG-002",
+      "VG-003",
+      "VG-004",
+      "VG-005"
+    ],
+    "new_feature_ids": [
+      "VG-006",
+      "VG-007",
+      "VG-008",
+      "VG-009",
+      "VG-010",
+      "VG-011",
+      "VG-012",
+      "VG-013",
+      "VG-014",
+      "VG-015",
+      "VG-016",
+      "VG-017",
+      "VG-018",
+      "VG-019",
+      "VG-020",
+      "VG-021",
+      "VG-022",
+      "VG-023",
+      "VG-024",
+      "VG-025",
+      "VG-026",
+      "VG-027",
+      "VG-028",
+      "VG-029"
+    ],
+    "total_features": 29,
+    "discovery_source": ".auto-claude/roadmap/roadmap_discovery.json (analyzed 2026-09-19)",
+    "project_index_status": "not found at configured path; feature scoping derived from the discovery file plus direct inspection of src/, tests/ and repository metadata"
+  }
+}

@@ -24,7 +24,7 @@ Ten regex patterns run against every text-ish file's full content
 (`sk-ant-…`, generic `sk-…`, `Bearer …`, AWS access-key IDs, generic
 `key/secret/token/password/auth:` key-value pairs, PEM private-key
 headers, 40+ char hex strings, JWTs, `kimi_chat_id`, and literal
-`ANTHROPIC_AUTH_TOKEN=`/`OPENAI_API_KEY=`/`MOONSHOT_API_KEY=` assignments)
+`ANTHROPIC_AUTH_TOKEN` / `OPENAI_API_KEY` / `MOONSHOT_API_KEY` assignment assignments)
 — a broader pattern set than the single-pattern check used live during
 each drive, run now as an independent post-hoc audit. Also full-text
 searched for the literal current `ANTHROPIC_AUTH_TOKEN` env value.

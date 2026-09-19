@@ -1,0 +1,5 @@
+fd34d1d auto-claude: Complete subtask-2-2 - Resolve auth token literal and add redactor factory
+cf220c1 auto-claude: Complete subtask-2-1 - Add validated config.redact patterns
+43f8d6a auto-claude: Complete subtask-1-3 - Unit test the redaction engine
+e91400f auto-claude: Complete subtask-1-2 - Add deep RunEvent redaction to redactor
+a240dc7 auto-claude: Complete subtask-1-1 - Create redactor with built-in secret patterns

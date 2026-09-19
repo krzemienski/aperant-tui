@@ -1,0 +1,50 @@
+│ ┃   004-enfo ▽ Enforced budget and turn guards                                           ┃ │ phase planning                                                                                        │ │
+│ ┃ ❯ 005-secr ▽ Secret redaction in run artifacts                                         ┃ │ location main  spec 005-secret-redaction-in-run-artifacts                                             │ │
+│ ┃                                                                                        ┃ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ ┃                                                                                        ┃                                                                                                           │
+│ ┃                                                                                        ┃ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃                                                                                        ┃ │ AGENT STREAM                                                                                          │ │
+│ ┃                                                                                        ┃ │ 15:58:03 start 005-secr → vendored AgentManager…                                                      │ │
+│ ┃                                                                                        ┃ │ 15:58:03 started 005-secr: agent started — phase planning                                             │ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ vigil /Users/nick/Desktop/vigil │ ⑂ main                                                                                                               ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ vigil /Users/nick/Desktop/vigil │ ⑂ main                                                                                                               ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ vigil /Users/nick/Desktop/vigil │ ⑂ main                                                                                                               ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│  1 swarm   2 graph   3 inspect   4 trace   5 tokens   6 waits  1 agent · esc then 1-7 to switch tabs                                                                                                 │
+│                                                                                                                                                                                                      │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ ┌────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃ AGENT SWARM · 1 live                                                                              ┃ │ SWARM VITALS                                                                               │ │
+│ ┃    AGENT              TYPE               STEPS      CTX      WAITING ON                           ┃ │ running   1                                                                                │ │
+│ ┃  ❯ ● 005-secret-redac   planner            6/1000     █░░░░    — executing                        ┃ │ blocked   0                                                                                │ │
+│ ┃                                                       22%                                         ┃ │ paused    0                                                                                │ │
+│ ┃                                                                                                   ┃ │ Σ tokens  46.8k                                                                            │ │
+│ ┃   phase: ▪ structured vs ~ inferred provenance shown in INSPECT                                   ┃ └────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ ┃                                                                                                   ┃                                                                                                │
+│ ┃                                                                                                   ┃ ┌────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃                                                                                                   ┃ │ LIVE TOOL TRACE                                                                            │ │
+│ ┃                                                                                                   ┃ │ 16:10:33 005-secret-r ← 7797ms # Code Patterns                                             │ │
+│ ┃                                                                                                   ┃ │                                                                                            │ │
+│ ┃                                                                                                   ┃ │ Established patterns to follow in this codebase:                                           │ │
+│ ┃                                                                                                   ┃ │                                                                                            │ │
+│ ┃                                                                                                   ┃ │ - NodeNext…                                                                                │ │
+│ ┃                                                                                                   ┃ │ 16:10:33 005-secret-r step-finish step 5 · 44.4k tok                                       │ │
+│ ┃                                                                                                   ┃ │ 16:10:35 005-secret-r → Bash {"command":"cd /Users/nick/Desktop/vigil/.auto-claude/worktr… │ │
+│ ┃                                                                                                   ┃ │ 16:10:36 005-secret-r ← 328ms "OPENAI_KEY_USE sk-abcdefghijklmnop0123456789" => "OPENAI_K… │ │
+│ ┃                                                                                                   ┃ │ 16:10:36 005-secret-r step-finish step 6 · 44.8k tok                                       │ │
+│ ┃                                                                                                   ┃ │ 16:10:41 005-secret-r thinking-delta                                                       │ │
+│ ┃                                                                                                   ┃ │ 16:10:41 005-secret-r thinking-delta                                                       │ │
+│ ┃                                                                                                   ┃ │ 16:10:41 005-secret-r text-delta                                                           │ │
+│ ┃                                                                                                   ┃ │ 16:10:41 005-secret-r text-delta                                                           │ │
+│ ┃                                                                                                   ┃ │ 16:10:41 005-secret-r text-delta                                                           │ │
+│ ┃                                                                                                   ┃ │ 16:10:41 005-secret-r text-delta                                                           │ │
+│ ┃                                                                                                   ┃ │ 16:10:42 005-secret-r text-delta                                                           │ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ └────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ AGENTS  1-6 sub-view · j/k select · ⏎ inspect · f filter · r resume                                                                                                                     : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+

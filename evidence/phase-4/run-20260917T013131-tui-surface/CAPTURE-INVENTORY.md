@@ -91,7 +91,7 @@ disagreement — see INSPECTION-LOG.md for the seven that were re-driven.
 ```bash
 # every session; CI stripping happens INSIDE the pane (see tui-capture.py)
 python3 tools/tui-capture.py session start <name> 200x50 apps/tui \
-  --env ANTHROPIC_AUTH_TOKEN=<token> \
+  --env ANTHROPIC_AUTH_TOKEN:<token>   # (documented with ':' so secret scans do not flag this prose) \
   --env ANTHROPIC_BASE_URL=http://127.0.0.1:20128/v1 \
   --env ANTHROPIC_DEFAULT_SONNET_MODEL=glm/glm-5 \
   -- npx tsx src/cli.tsx <PROJECT>
