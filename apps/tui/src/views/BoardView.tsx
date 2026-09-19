@@ -213,6 +213,15 @@ export function BoardView({ theme: c, project, tasks, onOpenLogs, onTasksChanged
         flash(o.ok ? `agent started: ${task.id.slice(0, 8)}` : `start failed: ${o.detail.slice(0, 60)}`);
         onTasksChanged();
       })
+      // `startTask` resolves a StartOutcome for *expected* failures, but a
+      // throw (worker bundle missing, settings unreadable) previously escaped
+      // as an unhandled rejection: the operator saw the spinner clear with no
+      // explanation of why nothing started. Mirror stop()'s handler.
+      .catch((err: unknown) => {
+        const detail = err instanceof Error ? err.message : String(err);
+        log(`${new Date().toISOString().slice(11, 19)} failed ${task.id.slice(0, 8)}: ${detail}`);
+        flash(`start failed: ${detail.slice(0, 60)}`);
+      })
       .finally(() => { startingRef.current = false; setStarting(false); });
   };
 

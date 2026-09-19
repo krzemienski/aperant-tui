@@ -73,9 +73,15 @@ export function convertFeatureToSpec(project: Project, featureId: string): Conve
   const existing = existsSync(specsDir)
     ? readdirSync(specsDir, { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name)
     : [];
+  // `RegExp.$1` is process-global mutable state: any regex evaluated between
+  // the `exec()` and the read clobbers it, yielding NaN here and a spec dir
+  // literally named `NaN-<slug>`. Capture from the match object instead.
   const numbers = existing
-    .map((n) => (/^(\d+)/.exec(n) ? parseInt(RegExp.$1, 10) : 0))
-    .filter((n) => n > 0);
+    .map((n) => {
+      const match = /^(\d+)/.exec(n);
+      return match ? parseInt(match[1], 10) : 0;
+    })
+    .filter((n) => Number.isFinite(n) && n > 0);
   const specNumber = numbers.length ? Math.max(...numbers) + 1 : 1;
 
   const slug = feature.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 50);

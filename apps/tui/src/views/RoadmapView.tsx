@@ -131,7 +131,17 @@ export function RoadmapView({ theme: c, project, isActive }: Props) {
         setRunning(false);
         setReloadKey((k) => k + 1);
       }
-    }).then((unsub) => { if (alive) off = unsub; else unsub(); });
+    }).then(
+      (unsub) => { if (alive) off = unsub; else unsub(); },
+      // Without this the manager import/attach rejecting left the view with no
+      // subscription AND no error: roadmap events silently never arrived and
+      // the panel sat at its last state forever.
+      (err: unknown) => {
+        if (!alive) return;
+        setErrorMsg(`roadmap events unavailable: ${err instanceof Error ? err.message : String(err)}`);
+        setRunning(false);
+      },
+    );
     return () => { alive = false; off?.(); };
   }, [project.id]);
 

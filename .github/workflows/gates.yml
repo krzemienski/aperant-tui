@@ -1,0 +1,49 @@
+name: gates
+
+# The repo's two proof gates (typecheck + tests) already exist and are green;
+# before this workflow they ran only when a human remembered. Nothing here
+# weakens them: no `continue-on-error`, no `|| true`, no skipped suites.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: gates-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Tests
+        run: npm test -w @aperant/tui
+
+      # Vendored desktop runtime is governed by a 1288-entry hash manifest.
+      # Drift is legitimate ONLY for files covered by a documented
+      # [APERANT-PATCH] family; anything else is an unrecorded upstream edit.
+      - name: Vendored manifest drift audit
+        run: node tools/audit-vendored-drift.mjs
+
+      # The provider token is env-only by contract. This fails the build if a
+      # real credential shape ever lands in the tree.
+      - name: Credential scan
+        run: node tools/audit-credentials.mjs

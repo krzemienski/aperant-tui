@@ -28,6 +28,21 @@ Adds Moonshot AI (Kimi) as a first-class provider via the workspace package
 |---|---|
 | `main/ai/agent/worker-bridge.ts` | `resolveWorkerPath()` honors `APERANT_WORKER_PATH` when set — the TUI bundles the worker with esbuild (`tools/build-worker.mjs` → `apps/tui/dist/agent-worker.cjs`) because the electron-vite output tree the default path expects does not exist outside Electron. |
 
+## queue-shorthand-resolution (D16, 2026-09-17)
+
+| File | Change |
+|---|---|
+| `main/ai/client/factory.ts` | `buildDefaultQueueConfig()` receives the model SHORTHAND rather than the env-resolved id, and `ANTHROPIC_MODEL_ENV_OVERRIDES` re-applies an explicit `ANTHROPIC_DEFAULT_*_MODEL` override only after queue resolution. Pre-resolving handed the queue a concrete id (e.g. `glm/glm-5`) that matches no entry in `resolveModelEquivalent()`'s shorthand-keyed table, so every account was skipped with "No available account in priority queue". Anthropic-only by construction: these env vars name Anthropic defaults and must never rewrite an id the queue resolved for another provider. |
+
+## sdk-v7-dependencies (2026-08-12)
+
+Dependency half of the `sdk-v7-usage` patch. JSON carries no inline marker, so
+it is recorded here for the `DESKTOP-SHA256SUMS.txt` drift audit.
+
+| File | Change |
+|---|---|
+| `package.json` | AI SDK v6 → v7 major upgrade (`ai` ^6.0.116 → ^7.0.62 and every `@ai-sdk/*` provider major), `@anthropic-ai/sdk` ^0.78 → ^0.116, `@openrouter/ai-sdk-provider` ^2 → ^3, plus the `@aperant/moonshot-provider` workspace link. The usage-shape consequences are handled inline by `[APERANT-PATCH sdk-v7-usage]` in `main/ai/session/stream-handler.ts`. |
+
 ## observability-tap (2026-08-12)
 
 Spec: `aperant-agent-observability-spec.md` §7.1–7.2 ("needs no new

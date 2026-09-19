@@ -43,7 +43,7 @@ import type {
 const DEFAULT_MAX_STEPS = 200;
 
 /**
- * D16 (aperant patch): shorthand → env var carrying an operator's model
+ * [APERANT-PATCH queue-shorthand-resolution] (D16): shorthand → env var carrying an operator's model
  * override, mirroring ENV_VAR_MAP in ../config/phase-config.ts. Used ONLY to
  * re-apply an explicitly-set override after queue resolution, which otherwise
  * hardcodes vendor ids from DEFAULT_MODEL_EQUIVALENCES. Kept local (the
@@ -239,7 +239,7 @@ export async function createSimpleClient(
 
   // Auto-build queue config from settings if none was explicitly provided.
   //
-  // D16 (aperant patch): pass the SHORTHAND to the queue, not the resolved id.
+  // [APERANT-PATCH queue-shorthand-resolution] (D16): pass the SHORTHAND to the queue, not the resolved id.
   // resolveModelId() applies the ANTHROPIC_DEFAULT_*_MODEL env overrides, so
   // pre-resolving here handed the queue a concrete id like 'glm/glm-5'. The
   // queue matches accounts via resolveModelEquivalent(), whose table is keyed by

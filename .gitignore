@@ -21,3 +21,15 @@ banks/
 # generated build/scan artifacts
 *.tsbuildinfo
 repomix-output.xml
+
+# Credential-bearing files. The provider token is env-only by contract
+# (VENDORED-PATCHES.md / phase-4 verdict criterion 6) and this repo commits
+# with `git add -A`, so an untracked .env would otherwise be swept in.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+secrets.json
+# Real desktop settings carry a live apiKey; only redacted copies belong in git.
+settings.local.json
