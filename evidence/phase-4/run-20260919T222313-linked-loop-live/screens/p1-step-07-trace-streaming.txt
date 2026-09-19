@@ -1,0 +1,113 @@
+unset CI CONTINUOUS_INTEGRATION BUILD_NUMBER RUN_ID GITHUB_ACTIONS GITLAB_CI CIRCLECI TRAVIS APPVEYOR BUILDKITE DRONE TEAMCITY_VERSION TF_BUILD
+export APERANT_MODEL=cc/claude-opus-5
+cd /Users/nick/dev/aperant-tui && npm run dev -w @aperant/tui -- /Users/nick/proofpunk-agent
+nick@m4-max-959 ~/dev/aperant-tui
+❯ unset CI CONTINUOUS_INTEGRATION BUILD_NUMBER RUN_ID GITHUB_ACTIONS GITLAB_CI CIRCLECI TRAVIS APPVEYOR BUILDKITE DRONE TEAMCITY_VERSION TF_BUILD
+export APERANT_MODEL=cc/claude-opus-5
+cd /Users/nick/dev/aperant-tui && npm run dev -w @aperant/tui -- /Users/nick/proofpunk-agent
+nick@m4-max-959 ~/dev/aperant-tui
+❯ export APERANT_MODEL=cc/claude-opus-5
+cd /Users/nick/dev/aperant-tui && npm run dev -w @aperant/tui -- /Users/nick/proofpunk-agent
+nick@m4-max-959 ~/dev/aperant-tui
+❯ cd /Users/nick/dev/aperant-tui && npm run dev -w @aperant/tui -- /Users/nick/proofpunk-agent
+
+> @aperant/tui@0.1.0 dev
+> tsx src/cli.tsx /Users/nick/proofpunk-agent
+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────│─agent started: 009-tamp─│┐
+│APERANT │ proofpunk-agent /Users/nick/proofpunk-agent │ ⑂ master                                                                                                 ◉ 0 runnin└─────────────────────────┘│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃ TASKS                                                                                  ┃ │ DETAIL                                                                                                │ │
+│ ┃ ◆ BACKLOG (8)                                                                          ┃ │ 009-tamp [BACKLOG]                                                                                    │ │
+│ ┃   001-scre ▽ Screens 2-5 beyond the P1 shell placeholder                               ┃ │ Tamper-Evident Evidence Hash Chain                                                                    │ │
+│ ┃   002-prom ▽ Promote n/w from roadmap-honesty stubs to real bindings                   ┃ │ progress ░░░░░░░░░░░░░░ 0%                                                                            │ │
+│ ┃   003-term ▽ Terminal floor 100x28 blocking-resize overlay coverage                    ┃ │ subtasks 0/0 complete                                                                                 │ │
+│ ┃   004-evid ▽ Evidence Run Diff & Lineage                                               ┃ │ phase planning                                                                                        │ │
+│ ┃   006-tool ▽ Tool Allow/Deny Lists                                                     ┃ │ location main  spec 009-tamper-evident-evidence-hash-chain                                            │ │
+│ ┃   007-runa ▽ Runaway Loop Detector                                                     ┃ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ ┃   008-full ▽ Full Session Transcript Export (Markdown/Plain)                           ┃                                                                                                           │
+│ ┃ ❯ 009-tamp ▽ Tamper-Evident Evidence Hash Chain                                        ┃ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃ ◆ HUMAN (1)                                                                            ┃ │ AGENT STREAM                                                                                          │ │
+│ ┃   005-poli ▽ Policy File (--policy): declarative YAML/JSON session constraints, fail-… ┃ │ 22:39:35 start 009-tamp → vendored AgentManager…                                                      │ │
+│ ┃                                                                                        ┃ │ 22:39:35 started 009-tamp: agent started — phase planning                                             │ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ proofpunk-agent /Users/nick/proofpunk-agent │ ⑂ master                                                                                                 ◉ 0 running  ◆ 1 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ proofpunk-agent /Users/nick/proofpunk-agent │ ⑂ master                                                                                                 ◉ 0 running  ◆ 1 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ proofpunk-agent /Users/nick/proofpunk-agent │ ⑂ master                                                                                                 ◉ 0 running  ◆ 1 review  ● no profile│
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ proofpunk-agent /Users/nick/proofpunk-agent │ ⑂ master                                                                                                 ◉ 0 running  ◆ 1 review  ● no profile│
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ proofpunk-agent /Users/nick/proofpunk-agent │ ⑂ master                                                                                                 ◉ 0 running  ◆ 1 review  ● no profile│
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ proofpunk-agent /Users/nick/proofpunk-agent │ ⑂ master                                                                                                 ◉ 0 running  ◆ 1 review  ● no profile│
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ proofpunk-agent /Users/nick/proofpunk-agent │ ⑂ master                                                                                                 ◉ 0 running  ◆ 1 review  ● no profile│
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ proofpunk-agent /Users/nick/proofpunk-agent │ ⑂ master                                                                                                 ◉ 0 running  ◆ 1 review  ● no profile│
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ proofpunk-agent /Users/nick/proofpunk-agent │ ⑂ master                                                                                                 ◉ 0 running  ◆ 1 review  ● no profile│
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ proofpunk-agent /Users/nick/proofpunk-agent │ ⑂ master                                                                                                 ◉ 0 running  ◆ 1 review  ● no profile│
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ proofpunk-agent /Users/nick/proofpunk-agent │ ⑂ master                                                                                                 ◉ 0 running  ◆ 1 review  ● no profile│
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ proofpunk-agent /Users/nick/proofpunk-agent │ ⑂ master                                                                                                 ◉ 0 running  ◆ 1 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│  1 swarm   2 graph   3 inspect   4 trace   5 tokens   6 waits  1 agent · esc then 1-7 to switch tabs                                                                                                 │
+│                                                                                                                                                                                                      │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ │
+│ ┃ EVENT TRACE · all agents · 90 events                                                                                                                                                             ┃ │
+│ ┃   TIME      AGENT         EVENT          TOOL                DUR     PAYLOAD                                                                                                                     ┃ │
+│ ┃ 22:41:17.828 009-tamper-e tool-result   Bash               113ms     return str(run_dir / f"step-{n + 1:02d}-{slug}")                                                                            ┃ │
+│ ┃                                                                                                                                                                                                  ┃ │
+│ ┃                                                                                                                                                                                                  ┃ │
+│ ┃ def cmd_seal(run: str …                                                                                                                                                                          ┃ │
+│ ┃ 22:41:17.855 009-tamper-e step-finish   —                  —       step 11 · 76.3k tok                                                                                                           ┃ │
+│ ┃ 22:42:30.535 009-tamper-e thinking-delta—                  —                                                                                                                                     ┃ │
+│ ┃ 22:42:30.542 009-tamper-e thinking-delta—                  —                                                                                                                                     ┃ │
+│ ┃ 22:42:30.545 009-tamper-e text-delta    —                  —       Now let                                                                                                                       ┃ │
+│ ┃ 22:42:30.571 009-tamper-e text-delta    —                  —       me check git                                                                                                                  ┃ │
+│ ┃ 22:42:30.615 009-tamper-e text-delta    —                  —       state and the README                                                                                                          ┃ │
+│ ┃ 22:42:30.673 009-tamper-e text-delta    —                  —       con                                                                                                                           ┃ │
+│ ┃ 22:42:30.729 009-tamper-e text-delta    —                  —       ventions:                                                                                                                     ┃ │
+│ ┃ 22:42:32.700 009-tamper-e tool-call     Bash               —       {"command":"cd /Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/009-t…                                                ┃ │
+│ ┃ 22:42:32.760 009-tamper-e tool-result   Bash               58ms auto-claude/009-tamper-evident-evidence-hash-chain                                                                               ┃ │
+│ ┃ 656fd1a wip                                                                                                                                                                                      ┃ │
+│ ┃ a424a9c Locate…                                                                                                                                                                                  ┃ │
+│ ┃ 22:42:32.760 009-tamper-e step-finish   —                  —       step 12 · 84.5k tok                                                                                                           ┃ │
+│ ┃ 22:42:34.466 009-tamper-e thinking-delta—                  —                                                                                                                                     ┃ │
+│ ┃ 22:42:34.467 009-tamper-e thinking-delta—                  —                                                                                                                                     ┃ │
+│ ┃ 22:42:35.456 009-tamper-e tool-call     Bash               —       {"command":"cd /Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/009-t…                                                ┃ │
+│ ┃ 22:42:35.486 009-tamper-e tool-result   Bash               32ms ## Evidence doctrine                                                                                                             ┃ │
+│ ┃                                                                                                                                                                                                  ┃ │
+│ ┃ This project treats "it works" as a claim that needs a …                                                                                                                                         ┃ │
+│ ┃ 22:42:35.495 009-tamper-e step-finish   —                  —       step 13 · 85.1k tok                                                                                                           ┃ │
+│ ┃ 22:42:37.918 009-tamper-e thinking-delta—                  —                                                                                                                                     ┃ │
+│ ┃ 22:42:37.919 009-tamper-e thinking-delta—                  —                                                                                                                                     ┃ │
+│ ┃ 22:42:37.919 009-tamper-e text-delta    —                  —       Invest                                                                                                                        ┃ │
+│ ┃ 22:42:37.978 009-tamper-e text-delta    —                  —       igation complete. Now writ                                                                                                    ┃ │
+│ ┃ 22:42:38.034 009-tamper-e text-delta    —                  —       ing the context                                                                                                               ┃ │
+│ ┃ 22:42:38.094 009-tamper-e text-delta    —                  —       files:                                                                                                                        ┃ │
+│ ┃ 22:42:51.691 009-tamper-e tool-call     Write              —       {"file_path":"/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/009-ta…                                                ┃ │
+│ ┃ f toggles agent filter · ring buffer 10k · outlier >3000ms highlighted                                                                                                                           ┃ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ │
+│ AGENTS  1-6 sub-view · j/k select · ⏎ inspect · f filter · r resume                                                                                                                     : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+
+
+

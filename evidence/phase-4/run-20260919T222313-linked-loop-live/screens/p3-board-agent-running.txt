@@ -1,0 +1,50 @@
+cd /Users/nick/dev/aperant-tui && npm run dev -w @aperant/tui -- /Users/nick/dev/hunter-seed
+nick@m4-max-959 ~/dev/aperant-tui
+❯ export APERANT_MODEL=cc/claude-opus-5
+cd /Users/nick/dev/aperant-tui && npm run dev -w @aperant/tui -- /Users/nick/dev/hunter-seed
+nick@m4-max-959 ~/dev/aperant-tui
+❯ cd /Users/nick/dev/aperant-tui && npm run dev -w @aperant/tui -- /Users/nick/dev/hunter-seed
+
+> @aperant/tui@0.1.0 dev
+> tsx src/cli.tsx /Users/nick/dev/hunter-seed
+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────│─agent started: 004-fals─│┐
+│APERANT │ hunter-seed /Users/nick/dev/hunter-seed │ ⑂ main                                                                                                       ◉ 0 runnin└─────────────────────────┘│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃ TASKS                                                                                  ┃ │ DETAIL                                                                                                │ │
+│ ┃ ◆ BACKLOG (2)                                                                          ┃ │ 004-fals [BACKLOG]                                                                                    │ │
+│ ┃   003-patc ▽ Patch regression and differential test harness                            ┃ │ False-positive feedback loop                                                                          │ │
+│ ┃ ❯ 004-fals ▽ False-positive feedback loop                                              ┃ │ progress ░░░░░░░░░░░░░░ 0%                                                                            │ │
+│ ┃ ◆ HUMAN (2)                                                                            ┃ │ subtasks 0/0 complete                                                                                 │ │
+│ ┃   001-guid ▽ Guided quickstart skill: env checks, sandbox provisioning, first canary … ┃ │ phase planning                                                                                        │ │
+│ ┃   002-symb ▽ Symbolized crash triage with rich sanitizer telemetry  50%                ┃ │ location main  spec 004-false-positive-feedback-loop                                                  │ │
+│ ┃                                                                                        ┃ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ ┃                                                                                        ┃                                                                                                           │
+│ ┃                                                                                        ┃ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃                                                                                        ┃ │ AGENT STREAM                                                                                          │ │
+│ ┃                                                                                        ┃ │ 22:47:09 start 004-fals → vendored AgentManager…                                                      │ │
+│ ┃                                                                                        ┃ │ 22:47:10 started 004-fals: agent started — phase planning                                             │ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ hunter-seed /Users/nick/dev/hunter-seed │ ⑂ main                                                                                                       ◉ 0 running  ◆ 2 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃ TASKS                                                                                  ┃ │ DETAIL                                                                                                │ │
+│ ┃ ◆ BACKLOG (2)                                                                          ┃ │ 004-fals [BACKLOG]                                                                                    │ │
+│ ┃   003-patc ▽ Patch regression and differential test harness                            ┃ │ False-positive feedback loop                                                                          │ │
+│ ┃ ❯ 004-fals ▽ False-positive feedback loop                                              ┃ │ progress ░░░░░░░░░░░░░░ 0%                                                                            │ │
+│ ┃ ◆ HUMAN (2)                                                                            ┃ │ subtasks 0/0 complete                                                                                 │ │
+│ ┃   001-guid ▽ Guided quickstart skill: env checks, sandbox provisioning, first canary … ┃ │ phase -                                                                                               │ │
+│ ┃   002-symb ▽ Symbolized crash triage with rich sanitizer telemetry  50%                ┃ │ location main  spec 004-false-positive-feedback-loop                                                  │ │
+│ ┃                                                                                        ┃ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ ┃                                                                                        ┃                                                                                                           │
+│ ┃                                                                                        ┃ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃                                                                                        ┃ │ AGENT STREAM                                                                                          │ │
+│ ┃                                                                                        ┃ │ 22:47:09 start 004-fals → vendored AgentManager…                                                      │ │
+│ ┃                                                                                        ┃ │ 22:47:10 started 004-fals: agent started — phase planning                                             │ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ BOARD  j/k move · ⏎ focus · s start · x stop · H/L column · l logs                                                                                                                      : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+

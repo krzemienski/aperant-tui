@@ -1,0 +1,30 @@
+{
+  "providerAccounts": [
+    {
+      "id": "anthropic-mu6zlcfu",
+      "provider": "anthropic",
+      "name": "Anthropic (operator router)",
+      "authType": "<REDACTED>",
+      "billingModel": "pay-per-use",
+      "apiKey": "<REDACTED>",
+      "baseUrl": "http://127.0.0.1:20219/v1",
+      "createdAt": 1789737659706,
+      "updatedAt": 1789737659706
+    },
+    {
+      "id": "anthropic-mu76gy5z",
+      "provider": "anthropic",
+      "name": "Anthropic (operator router)",
+      "authType": "<REDACTED>",
+      "billingModel": "pay-per-use",
+      "apiKey": "<REDACTED>",
+      "baseUrl": "https://router.hack.ski/v1",
+      "createdAt": 1789749211895,
+      "updatedAt": 1789749211895
+    }
+  ],
+  "globalPriorityOrder": [
+    "anthropic-mu76gy5z",
+    "anthropic-mu6zlcfu"
+  ]
+}

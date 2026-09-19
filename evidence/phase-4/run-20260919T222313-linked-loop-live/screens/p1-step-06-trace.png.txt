@@ -1,0 +1,50 @@
+│APERANT │ proofpunk-agent /Users/nick/proofpunk-agent │ ⑂ master                                                                                                 ◉ 0 running  ◆ 1 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│  1 swarm   2 graph   3 inspect   4 trace   5 tokens   6 waits  1 agent · esc then 1-7 to switch tabs                                                                                                 │
+│                                                                                                                                                                                                      │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ │
+│ ┃ EVENT TRACE · all agents · 68 events                                                                                                                                                             ┃ │
+│ ┃   TIME      AGENT         EVENT          TOOL                DUR     PAYLOAD                                                                                                                     ┃ │
+│ ┃ 22:40:10.946 009-tamper-e tool-call     Bash               —       {"command":"cd /Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/009-t…                                                ┃ │
+│ ┃ 22:40:10.961 009-tamper-e tool-result   Read               2062ms   1	"""CLI entry point — flag surface and plugin-root resolution
+   ┃ │
+│ ┃   2                                                                                                                                                                                              ┃ │
+│ ┃   3	Pl                                                                                                                                                                                           ┃ │
+│ ┃ 22:40:11.001 009-tamper-e tool-result   Bash               58ms proofpunk_agent/bridge/evidence.py:612:    target.write_text(json.dumps(paylo…                                                   ┃ │
+│ ┃ 22:40:11.002 009-tamper-e step-finish   —                  —       step 7 · 51.3k tok                                                                                                            ┃ │
+│ ┃ 22:40:13.256 009-tamper-e thinking-delta—                  —                                                                                                                                     ┃ │
+│ ┃ 22:40:13.257 009-tamper-e thinking-delta—                  —                                                                                                                                     ┃ │
+│ ┃ 22:40:14.926 009-tamper-e tool-call     Read               —       {"file_path":"/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/009-ta…                                                ┃ │
+│ ┃ 22:40:15.639 009-tamper-e tool-call     Read               —       {"file_path":"/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/009-ta…                                                ┃ │
+│ ┃ 22:40:15.670 009-tamper-e tool-result   Read               744ms   1	"""Screen 4 -- EVIDENCE VIEW (§7 Screen 4): the evidence run, as it is on
+    ┃ │
+│ ┃ 22:40:15.672 009-tamper-e tool-result   Read               34ms   1	"""Evidence capture helper — artifacts that carry their own claim                                                            ┃ │
+│ ┃   2                                                                                                                                                                                              ┃ │
+│ ┃  …                                                                                                                                                                                               ┃ │
+│ ┃ 22:40:15.676 009-tamper-e step-finish   —                  —       step 8 · 60.5k tok                                                                                                            ┃ │
+│ ┃ 22:41:08.253 009-tamper-e thinking-delta—                  —                                                                                                                                     ┃ │
+│ ┃ 22:41:08.258 009-tamper-e thinking-delta—                  —                                                                                                                                     ┃ │
+│ ┃ 22:41:10.799 009-tamper-e tool-call     Bash               —       {"command":"cd /Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/009-t…                                                ┃ │
+│ ┃ 22:41:10.941 009-tamper-e tool-result   Bash               144ms Python 3.11.6                                                                                                                   ┃ │
+│ ┃ SCRIPT: /Users/nick/.claude/plugins/cache/proofpunk-marketplace…                                                                                                                                 ┃ │
+│ ┃ 22:41:10.941 009-tamper-e step-finish   —                  —       step 9 · 73.8k tok                                                                                                            ┃ │
+│ ┃ 22:41:13.696 009-tamper-e thinking-delta—                  —                                                                                                                                     ┃ │
+│ ┃ 22:41:13.696 009-tamper-e thinking-delta—                  —                                                                                                                                     ┃ │
+│ ┃ 22:41:14.785 009-tamper-e tool-call     Bash               —       {"command":"ls /Users/nick/proofpunk/plugins/proofpunk/validators/ 2>/dev/nul…                                                ┃ │
+│ ┃ 22:41:14.819 009-tamper-e tool-result   Bash               33ms __pycache__                                                                                                                      ┃ │
+│ ┃ activation_event.py                                                                                                                                                                              ┃ │
+│ ┃ agent_state.py                                                                                                                                                                                   ┃ │
+│ ┃ completion_gate.py                                                                                                                                                                               ┃ │
+│ ┃ fresh_evide…                                                                                                                                                                                     ┃ │
+│ ┃ 22:41:14.819 009-tamper-e step-finish   —                  —       step 10 · 74.3k tok                                                                                                           ┃ │
+│ ┃ 22:41:17.718 009-tamper-e tool-call     Bash               —       {"command":"sed -n '120,280p' /Users/nick/proofpunk/plugins/proofpunk/validat…                                                ┃ │
+│ ┃ 22:41:17.828 009-tamper-e tool-result   Bash               113ms     return str(run_dir / f"step-{n + 1:02d}-{slug}")                                                                            ┃ │
+│ ┃                                                                                                                                                                                                  ┃ │
+│ ┃                                                                                                                                                                                                  ┃ │
+│ ┃ def cmd_seal(run: str …                                                                                                                                                                          ┃ │
+│ ┃ 22:41:17.855 009-tamper-e step-finish   —                  —       step 11 · 76.3k tok                                                                                                           ┃ │
+│ ┃ f toggles agent filter · ring buffer 10k · outlier >3000ms highlighted                                                                                                                           ┃ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ │
+│ AGENTS  1-6 sub-view · j/k select · ⏎ inspect · f filter · r resume                                                                                                                     : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+

@@ -28,16 +28,11 @@ export const ROTATE_CHECK_INTERVAL = 500;
 
 let appendsSinceSizeCheck = ROTATE_CHECK_INTERVAL;
 
-/** Test seam: forces the next append to perform its size check. */
-export function resetRotationCounterForTests(): void {
-  appendsSinceSizeCheck = ROTATE_CHECK_INTERVAL;
-}
-
-function rotateIfOversized(logPath: string, rotateBytes: number): void {
+function rotateIfOversized(logPath: string): void {
   if (++appendsSinceSizeCheck < ROTATE_CHECK_INTERVAL) return;
   appendsSinceSizeCheck = 0;
   try {
-    if (statSync(logPath).size < rotateBytes) return;
+    if (statSync(logPath).size < LOG_ROTATE_BYTES) return;
     // Replaces any previous generation; bounded at two files by construction.
     renameSync(logPath, `${logPath}.1`);
   } catch {
@@ -49,14 +44,10 @@ function rotateIfOversized(logPath: string, rotateBytes: number): void {
  * Append one already-serialized line, rotating first if the file has grown past
  * the threshold. Never throws: logging must not be able to crash the app.
  */
-export function appendEventLine(
-  logPath: string,
-  line: string,
-  rotateBytes: number = LOG_ROTATE_BYTES,
-): void {
+export function appendEventLine(logPath: string, line: string): void {
   try {
     mkdirSync(path.dirname(logPath), { recursive: true });
-    rotateIfOversized(logPath, rotateBytes);
+    rotateIfOversized(logPath);
     appendFileSync(logPath, line);
   } catch {
     /* logging must never crash the app */

@@ -1,0 +1,434 @@
+{
+  "feature": "Link-rot audit of existing list entries",
+  "workflow_type": "feature",
+  "phases": [
+    {
+      "id": "phase-1-core",
+      "name": "Rot audit core (parser line index, config, probe, classify, audit orchestration)",
+      "subtasks": [
+        {
+          "id": "subtask-1-1",
+          "title": "Add source line index to ParsedItem",
+          "description": "Add a `line_no: int = -1` field to `ParsedItem` in awesome_researcher/parsers/markdown_parser.py (0-based index into `ParsedList.source_lines`, matching the existing `Category.heading_line` / `Category.last_item_line` convention) and set it from the `lineno` already available in the `parse_markdown` loop. Include it in `ParsedItem.to_dict()` as `\"line_no\"`. The field MUST be defaulted and appended last so existing positional/keyword constructions in tests/test_phase5_agents.py and tests/test_phase9_concurrency.py keep working. Update the module docstring to mention that items carry their source line so a source-preserving patcher can edit exactly one line. Rationale: the rot patcher needs line-precise removal/annotation of a rotten bullet; today only categories carry line anchors.",
+          "status": "pending",
+          "files_to_create": [],
+          "files_to_modify": [
+            "awesome_researcher/parsers/markdown_parser.py"
+          ],
+          "verification": {
+            "type": "command"
+          },
+          "service": "backend",
+          "patterns_from": [
+            "awesome_researcher/parsers/markdown_parser.py",
+            "awesome_researcher/renderers/list_renderer.py"
+          ]
+        },
+        {
+          "id": "subtask-1-2",
+          "title": "Add rot-audit config knobs",
+          "description": "Add rot-audit fields to `Config` in awesome_researcher/config.py using the existing `field(default_factory=lambda: _env_bool/_env_int(...))` style, each with a comment explaining the default: `audit_rot: bool` (AR_AUDIT_ROT, default True - the audit is free, so it runs every run), `rot_check_github: bool` (AR_ROT_CHECK_GITHUB, default True - query api.github.com for archived/pushed_at), `rot_stale_days: int` (AR_ROT_STALE_DAYS, default 730 - a GitHub repo with no push in this many days is flagged `stale`), `rot_concurrency: int` (AR_ROT_CONCURRENCY, default 16 - HTTP-only fan-out, independent of the paid `max_concurrency`), `rot_max_links: int` (AR_ROT_MAX_LINKS, default 0 = unlimited - safety cap for very large lists). Do NOT add any secret-bearing field; a GitHub token is read directly from the environment (GITHUB_TOKEN) at request time in the auditor and never stored on Config (config.py docstring forbids storing auth).",
+          "status": "pending",
+          "files_to_create": [],
+          "files_to_modify": [
+            "awesome_researcher/config.py"
+          ],
+          "verification": {
+            "type": "command"
+          },
+          "service": "backend",
+          "patterns_from": [
+            "awesome_researcher/config.py"
+          ]
+        },
+        {
+          "id": "subtask-1-3",
+          "title": "Create rot auditor probe and pure classifier",
+          "description": "Create awesome_researcher/agents/rot_auditor.py following the structure of agents/validator.py (module prose docstring explaining WHY, dataclasses, probe that reports only what the network said, then a PURE decision function). Define: `@dataclass(slots=True) RotProbe` (ok, status_code, final_url, redirect_status, redirect_location, error, archived: bool | None, last_pushed: str, github_checked: bool) and `@dataclass(slots=True) RotFinding` (url, title, category, status: one of 'ok'|'dead'|'permanent_redirect'|'archived'|'stale'|'unknown', reason, status_code, final_url, line_no, archived, last_pushed, checked_at) with `to_dict()`. Implement `async def probe_url(url, *, client: httpx.AsyncClient) -> RotProbe` that: (1) issues HEAD with follow_redirects=False to capture a 301/308 permanent redirect plus its Location header, retrying with GET when HEAD answers 403/405/501 (same fallback rule as Validator.check_reachable), (2) re-issues the request with follow_redirects=True to record the final status and final URL, (3) records httpx.HTTPError as `error` (DNS/timeout/TLS) instead of raising. The client MUST be injected so tests supply httpx.MockTransport. Implement the PURE `classify(probe: RotProbe, *, stale_days: int, now: datetime | None = None) -> tuple[str, str]` returning (status, reason) with this precedence: network error or final status >= 400 -> 'dead'; archived is True -> 'archived'; permanent redirect (301/308) with a different canonical target (compare via helpers.canonicalize_url) -> 'permanent_redirect'; GitHub last_pushed older than stale_days -> 'stale'; otherwise 'ok'. Temporary redirects (302/303/307) are NEVER flagged. Export RotAuditor-related names from awesome_researcher/agents/__init__.py in the existing alphabetical style. No Claude SDK import, no cost tracker use - this phase must cost $0.00.",
+          "status": "pending",
+          "files_to_create": [
+            "awesome_researcher/agents/rot_auditor.py"
+          ],
+          "files_to_modify": [
+            "awesome_researcher/agents/__init__.py"
+          ],
+          "verification": {
+            "type": "command"
+          },
+          "service": "backend",
+          "patterns_from": [
+            "awesome_researcher/agents/validator.py",
+            "awesome_researcher/utils/helpers.py"
+          ]
+        },
+        {
+          "id": "subtask-1-4",
+          "title": "Add GitHub metadata check and audit orchestration",
+          "description": "In awesome_researcher/agents/rot_auditor.py add `class RotAuditor` mirroring Validator's shape (`__init__(*, config, event_bus=None, run_id='')`). Implement: (a) `async def check_github_repo(url, *, client) -> tuple[bool | None, str]` that recognises a github.com/<owner>/<repo> URL (reuse the `_REPO_RE` idea from parsers/awesome_parser.py - extract/import rather than duplicate if practical), GETs `{config.github_api_base}/repos/{owner}/{repo}` with Accept: application/vnd.github+json and an Authorization: Bearer header ONLY when os.environ['GITHUB_TOKEN'] is set, returning (archived, pushed_at); a 404 leaves archived=None and lets the HTTP probe's 404 drive the 'dead' verdict; a 403/429 (rate limit) returns (None, '') and emits ONE EventType.WARNING event (never raises, never spams). (b) `async def audit(parsed: ParsedList, *, run_dir, client: httpx.AsyncClient | None = None) -> list[RotFinding]` that collects every item from `parsed.categories` (skipping empty URLs, de-duplicating by helpers.canonicalize_url so the same URL is probed once but every occurrence yields a finding), caps at `config.rot_max_links` when non-zero, runs `bounded_gather(config.rot_concurrency, factories)` exactly like Validator.validate PHASE A, then in a sequential PHASE B (original document order) builds one RotFinding per item via `classify`, treating a crashed probe as status 'unknown'. Write `rot_findings.json` with helpers.write_json (a dict: {\"checked_at\", \"total_checked\", \"counts\": {status: n}, \"findings\": [...]}) and emit EventType.ARTIFACT_WRITTEN. Emit EventType.PHASE_PROGRESS per non-'ok' finding with metadata {\"kind\": \"rot_finding\", \"status\":..., \"url\":...}. IMPORTANT: do NOT add new members to core/events.py::EventType - the TUI state machine keys off the existing set; reuse PHASE_STARTED/PHASE_PROGRESS/ARTIFACT_WRITTEN/WARNING only. Timeouts come from config.http_timeout_seconds; when `client` is None build `httpx.AsyncClient(timeout=..., headers={'User-Agent': 'awesome-researcher'})` in an `async with`, exactly like awesome_parser.fetch_and_parse.",
+          "status": "pending",
+          "files_to_create": [],
+          "files_to_modify": [
+            "awesome_researcher/agents/rot_auditor.py"
+          ],
+          "verification": {
+            "type": "command"
+          },
+          "service": "backend",
+          "patterns_from": [
+            "awesome_researcher/agents/validator.py",
+            "awesome_researcher/parsers/awesome_parser.py",
+            "awesome_researcher/utils/concurrency.py"
+          ]
+        }
+      ],
+      "depends_on": [],
+      "type": "implementation",
+      "description": "Build the zero-cost (no Claude SDK) link-rot auditing core: give parsed items a source line index, add the AR_* config knobs, implement the redirect-aware HTTP probe + GitHub repo-metadata probe, the PURE classifier, and the audit() orchestration that writes rot_findings.json.",
+      "parallel_safe": true
+    },
+    {
+      "id": "phase-2-report",
+      "name": "rot_report.md renderer",
+      "subtasks": [
+        {
+          "id": "subtask-2-1",
+          "title": "Create RotReportGenerator producing rot_report.md",
+          "description": "Create awesome_researcher/renderers/rot_report.py modelled on renderers/report_generator.py: reuse its pure helpers by importing `_md_escape`, `_short`, `_table` (they are already exported in report_generator.__all__ - import them rather than re-implementing). Define `@dataclass RotReportData` with `from_run_dir(run_dir)` reading `rot_findings.json` (via helpers.read_json with a `{}` default) and `run_manifest.json` so the report can always be regenerated from disk and degrades to a placeholder when the artifact is missing. Define `class RotReportGenerator(config=None, event_bus=None, run_id='')` with a PURE `build(data) -> str` and an `async write(run_dir, data=None) -> Path` writing `rot_report.md` and emitting ARTIFACT_WRITTEN (phase=\"audit\"). Report sections: `# Link Rot Report - <run_id>`, `_Generated: <iso>Z_`, `## 1. Summary` (table: total checked / dead / permanent redirects / archived / stale / unknown / ok, plus the repo URL from run_manifest.config), `## 2. Dead Links` (table: Category | Title | URL | Status | Reason), `## 3. Permanent Redirects` (Category | Title | Old URL | New URL), `## 4. Archived Repositories` (Category | Title | URL | Last pushed), `## 5. Stale Resources` (Category | Title | URL | Last pushed), `## 6. Suggested Actions` (prose describing --fix-rot and what each class implies). Every section renders `_(none)_` / `_(no rot_findings.json found)_` instead of raising. Export RotReportData + RotReportGenerator from awesome_researcher/renderers/__init__.py in the existing alphabetical style.",
+          "status": "pending",
+          "files_to_create": [
+            "awesome_researcher/renderers/rot_report.py"
+          ],
+          "files_to_modify": [
+            "awesome_researcher/renderers/__init__.py"
+          ],
+          "verification": {
+            "type": "command"
+          },
+          "service": "backend",
+          "patterns_from": [
+            "awesome_researcher/renderers/report_generator.py"
+          ]
+        }
+      ],
+      "depends_on": [
+        "phase-1-core"
+      ],
+      "type": "implementation",
+      "description": "Render the human-readable rot report artifact from the findings on disk, following the ReportGenerator pattern (from_run_dir reader + pure build + async write + ARTIFACT_WRITTEN).",
+      "parallel_safe": true
+    },
+    {
+      "id": "phase-3-fix",
+      "name": "--fix-rot cleanup artifacts (patched list, diff, PR body)",
+      "subtasks": [
+        {
+          "id": "subtask-3-1",
+          "title": "Create RotPatcher for source-preserving cleanup",
+          "description": "Create awesome_researcher/renderers/rot_patcher.py modelled on `SourcePatcher` in renderers/list_renderer.py. Define `@dataclass(slots=True, frozen=True) RotEdit` (line_no, url, status, action: 'removed'|'annotated'|'redirected', before, after) and `@dataclass(slots=True, frozen=True) RotPatchResult` (markdown, edits, skipped) with `manifest(*, source_bytes)` mirroring PatchResult.manifest(). Implement `class RotPatcher` with `patch(parsed: ParsedList, findings: list[dict|RotFinding], *, mode: str = 'annotate') -> RotPatchResult`. Rules (deterministic, line-precise via the new `ParsedItem.line_no`): 'permanent_redirect' -> rewrite ONLY the URL substring on that line to the final URL in BOTH modes (action='redirected'); 'dead' -> mode 'remove' deletes that single line (action='removed'), mode 'annotate' appends ` <!-- rot: dead (HTTP <code>, checked <date>) -->` (action='annotated'); 'archived' and 'stale' -> annotate only in BOTH modes, never removed; 'ok'/'unknown' -> untouched. A finding whose `line_no` is < 0, out of range, or whose line no longer contains the URL is recorded in `skipped` and never edited (fail-closed). INVARIANT (must be asserted in the tests phase): with zero actionable findings the returned markdown is BYTE-IDENTICAL to `parsed.source_text`, including its trailing-newline shape - same guarantee SourcePatcher gives. Export RotPatcher from awesome_researcher/renderers/__init__.py.",
+          "status": "pending",
+          "files_to_create": [
+            "awesome_researcher/renderers/rot_patcher.py"
+          ],
+          "files_to_modify": [
+            "awesome_researcher/renderers/__init__.py"
+          ],
+          "verification": {
+            "type": "command"
+          },
+          "service": "backend",
+          "patterns_from": [
+            "awesome_researcher/renderers/list_renderer.py"
+          ]
+        },
+        {
+          "id": "subtask-3-2",
+          "title": "Add unified diff and PR body builders",
+          "description": "In awesome_researcher/renderers/rot_patcher.py add two PURE builders plus one writer. (a) `build_unified_diff(original: str, patched: str, *, from_name='original.md', to_name='rot_fixed_list.md') -> str` using stdlib `difflib.unified_diff` over `splitlines(keepends=True)` with `lineterm=''`; returns '' when the texts are equal. (b) `build_pr_body(result: RotPatchResult, findings, *, repo_url: str = '', mode: str = 'annotate') -> str` returning a Markdown PR description: title line, one-paragraph summary of what was checked and found, a per-class bullet summary (dead removed/annotated, redirects rewritten, archived annotated), a table of every edit (Line | URL | Action | Reason), and a trailing note that the audit is automated and each change should be reviewed. (c) `async def write_fix_artifacts(run_dir, parsed, findings, *, mode, repo_url='', event_bus=None, run_id='') -> dict[str, Path]` that runs RotPatcher, then writes `rot_fixed_list.md`, `rot_fix.patch` (the unified diff), `rot_pr_body.md`, and `rot_fix_manifest.json` (via helpers.write_json, from `RotPatchResult.manifest(source_bytes=len(parsed.source_text.encode('utf-8')))` plus the mode), emitting one ARTIFACT_WRITTEN per file (phase=\"audit\") exactly like ListRenderer.write. Document in the module docstring WHY no GitHub PR is opened: the pipeline is fetch-only against upstream (docs/TRACEABILITY.md live-acceptance note) and has no push credentials, so it emits a ready-to-open PR bundle a maintainer applies with `git apply rot_fix.patch`.",
+          "status": "pending",
+          "files_to_create": [],
+          "files_to_modify": [
+            "awesome_researcher/renderers/rot_patcher.py"
+          ],
+          "verification": {
+            "type": "command"
+          },
+          "service": "backend",
+          "patterns_from": [
+            "awesome_researcher/renderers/list_renderer.py",
+            "awesome_researcher/renderers/report_generator.py"
+          ]
+        }
+      ],
+      "depends_on": [
+        "phase-1-core"
+      ],
+      "type": "implementation",
+      "description": "Produce PR-ready cleanup artifacts from the findings: a source-preserving patched markdown that removes or annotates rotten links and rewrites permanent redirects, a unified diff, and a PR body. The pipeline never mutates the upstream repo, so the deliverable is a ready-to-open PR bundle, not a GitHub API call.",
+      "parallel_safe": true
+    },
+    {
+      "id": "phase-4-cli",
+      "name": "CLI flags and pipeline wiring",
+      "subtasks": [
+        {
+          "id": "subtask-4-1",
+          "title": "Add audit CLI flags across all declaration sites",
+          "description": "Add four flags to awesome_researcher/main.py at EVERY declaration site the codebase requires (this is the established 5-site pattern; missing one silently breaks the TUI or the programmatic API): `_build_parser` argparse group, the `@click.option` block on `cli_main`, `_CLICK_TO_ARGNAME`, `AwesomeResearcher._namespace` defaults, and `_merge_args_into_config`. Flags: `--audit-rot/--no-audit-rot` (BooleanOptionalAction in argparse, `--audit-rot/--no-audit-rot` click pair, default None so Config/AR_AUDIT_ROT wins) mapping to `config.audit_rot`; `--audit-only` (flag, default False) which runs parse + rot audit + rot report and exits 0 without any paid phase; `--fix-rot` (flag, default False) which additionally emits the cleanup bundle; `--fix-rot-mode` (choice `annotate|remove`, default `annotate`). `--audit-only` and `--fix-rot` stay on the Namespace (they are run-shape switches, not Config knobs) - keep them off Config, following how `review_mode`/`attach` are handled. Reject the nonsensical combination `--no-audit-rot --fix-rot` with a clear message and EXIT_CONFIG (2) in cli_main, matching the existing `--tui` rejection style.",
+          "status": "pending",
+          "files_to_create": [],
+          "files_to_modify": [
+            "awesome_researcher/main.py"
+          ],
+          "verification": {
+            "type": "command"
+          },
+          "service": "backend",
+          "patterns_from": [
+            "awesome_researcher/main.py"
+          ]
+        },
+        {
+          "id": "subtask-4-2",
+          "title": "Wire the rot audit phase into run_pipeline",
+          "description": "In awesome_researcher/main.py::run_pipeline insert an `audit` phase immediately AFTER the parse phase (the audit needs `parsed`, costs nothing, and must run even when the paid phases later fail): publish PHASE_STARTED with phase='audit', then when `config.audit_rot` run `RotAuditor(config=config, event_bus=bus, run_id=run_id).audit(parsed, run_dir=run_dir)`, then always `await RotReportGenerator(config, event_bus=bus, run_id=run_id).write(run_dir)` so `rot_report.md` exists for EVERY run (acceptance criterion), then when `args.fix_rot` call `write_fix_artifacts(run_dir, parsed, findings, mode=args.fix_rot_mode, repo_url=args.repo_url, event_bus=bus, run_id=run_id)`. Wrap the whole phase in try/except so a network hiccup during the audit degrades to a WARNING event + empty findings and NEVER fails the run (the audit is advisory). Respect governance: call `_enforce_governance(...)` and check `shutdown.is_set()` after the phase like every other phase does. When `getattr(args, 'audit_only', False)` is true, skip phases 2-9 and return `_finalize(..., EXIT_OK)` right after the audit (still publishing RUN_FINISHED). Extend `_refresh_artifacts_manifest`'s `expected` map with `rot_findings: rot_findings.json`, `rot_report: rot_report.md`, `rot_fixed_list: rot_fixed_list.md`, `rot_fix_patch: rot_fix.patch`, `rot_pr_body: rot_pr_body.md`, `rot_fix_manifest: rot_fix_manifest.json`, and add rot counters (`rot_checked`, `rot_dead`, `rot_redirects`, `rot_archived`, `rot_stale`) to the summary block built in BOTH `_refresh_summary_in_place` and `_finalize` by reading `rot_findings.json` counts with a small `_read_rot_counts(run_dir)` helper that returns zeros when the file is absent (same defensive style as `_read_summary_count`). Also add the new names to `main.__all__` if they need to be test-visible.",
+          "status": "pending",
+          "files_to_create": [],
+          "files_to_modify": [
+            "awesome_researcher/main.py"
+          ],
+          "verification": {
+            "type": "command"
+          },
+          "service": "backend",
+          "patterns_from": [
+            "awesome_researcher/main.py",
+            "awesome_researcher/agents/validator.py"
+          ]
+        }
+      ],
+      "depends_on": [
+        "phase-2-report",
+        "phase-3-fix"
+      ],
+      "type": "implementation",
+      "description": "Expose the audit through the CLI/programmatic API and run it as a real pipeline phase, registering every new artifact in run_manifest.json.",
+      "parallel_safe": false
+    },
+    {
+      "id": "phase-5-tests-docs",
+      "name": "Offline test suite and documentation",
+      "subtasks": [
+        {
+          "id": "subtask-5-1",
+          "title": "Add offline tests for the rot audit",
+          "description": "Create tests/test_rot_audit.py in the Tier-A offline style of tests/test_phase8_validation.py (module docstring stating no live SDK / no real network; real production code driven by httpx.MockTransport and real markdown snippets, never fabricated stand-ins). Cover: (1) `probe_url` records 301 + Location without following, and records the followed final status/URL; (2) `probe_url` falls back to GET when HEAD answers 405; (3) `classify` precedence table - dead (4xx/5xx), dead (network error), archived beats redirect, permanent_redirect vs. ignored temporary 302/307, stale via rot_stale_days boundary (exactly at the boundary is NOT stale), ok; (4) `RotAuditor.audit` writes rot_findings.json with per-status counts, preserves document order, probes a repeated URL once but reports every occurrence, honours rot_max_links, and survives a probe that raises (status 'unknown'); (5) GitHub 403 rate-limit degrades to archived=None + a WARNING event rather than raising; (6) RotReportGenerator.build renders each section and degrades to placeholders with no artifact; (7) RotPatcher: no-op byte-identical invariant, remove vs annotate modes, redirect rewrite, skipped when line_no is stale/out of range; (8) build_unified_diff round-trips through `git apply --check`-shaped content (assert '---'/'+++'/'@@' hunk headers present) and is '' for identical input; (9) CLI: `_build_parser` exposes the four flags with the documented defaults and `_merge_args_into_config` maps `--no-audit-rot` onto Config; (10) `_refresh_artifacts_manifest` registers all six rot artifacts. Keep every test synchronous or rely on the repo's `asyncio_mode = auto` (do NOT add a custom event-loop fixture).",
+          "status": "pending",
+          "files_to_create": [
+            "tests/test_rot_audit.py"
+          ],
+          "files_to_modify": [],
+          "verification": {
+            "type": "command"
+          },
+          "service": "backend",
+          "patterns_from": [
+            "tests/test_phase8_validation.py",
+            "tests/test_phase3_parsers.py"
+          ]
+        },
+        {
+          "id": "subtask-5-2",
+          "title": "Document the audit mode and artifacts",
+          "description": "Update the three contract docs plus the README. README.md: add the rot artifacts (`rot_findings.json`, `rot_report.md`, `rot_fixed_list.md`, `rot_fix.patch`, `rot_pr_body.md`, `rot_fix_manifest.json`) to the run-output tree and add a short '### Link-rot audit' section showing `awesome-researcher --repo-url ... --audit-only` (free, no SDK cost) and `--fix-rot --fix-rot-mode remove`, and state plainly that no PR is opened for you - the bundle is applied with `git apply rot_fix.patch`. docs/API.md: add the four flags to the CLI options table and `AR_AUDIT_ROT` / `AR_ROT_CHECK_GITHUB` / `AR_ROT_STALE_DAYS` / `AR_ROT_CONCURRENCY` / `AR_ROT_MAX_LINKS` (+ the optional `GITHUB_TOKEN` used only to raise the api.github.com rate limit) to the env-var table. docs/TRACEABILITY.md: add an FR-28 row (link-rot audit -> `agents/rot_auditor.py::RotAuditor.audit`, evidence `rot_findings.json` + `rot_report.md`) and the six artifact rows under §18.5 with their writer. Keep the existing table formatting exactly.",
+          "status": "pending",
+          "files_to_create": [],
+          "files_to_modify": [
+            "README.md",
+            "docs/API.md",
+            "docs/TRACEABILITY.md"
+          ],
+          "verification": {
+            "type": "command"
+          },
+          "service": "backend",
+          "patterns_from": [
+            "README.md",
+            "docs/API.md",
+            "docs/TRACEABILITY.md"
+          ]
+        }
+      ],
+      "depends_on": [
+        "phase-4-cli"
+      ],
+      "type": "implementation",
+      "description": "Lock the behaviour down with credential-free offline tests (httpx.MockTransport) and update the docs that the repo treats as contracts (README output tree, API.md flag/env tables, TRACEABILITY.md FR + artifact rows).",
+      "parallel_safe": false
+    },
+    {
+      "id": "phase-6-integration",
+      "name": "End-to-end verification and quality gates",
+      "subtasks": [
+        {
+          "id": "subtask-6-1",
+          "title": "End-to-end audit against a real fixture",
+          "description": "Verify the full audit chain end to end using the committed fixture tests/fixtures/awesome-go.README.md (2,970 real items): parse it, run RotAuditor with an httpx.MockTransport that returns 404 for a chosen subset, 301+Location for another, api.github.com archived=true for a third, and 200 otherwise, then render rot_report.md and write the --fix-rot bundle in both modes into a temp run dir. Assert all three acceptance criteria: (AC1) findings flag HTTP errors, permanent redirects and GitHub-archived repos; (AC2) rot_report.md exists and names each flagged URL; (AC3) the fix bundle removes (remove mode) or annotates (annotate mode) the dead links while leaving every untouched line byte-identical to the fixture. Add this as a test in tests/test_rot_audit.py (a `test_end_to_end_*` case) rather than a throwaway script, so the gate stays in CI. Also confirm no paid path is exercised: assert `claude_agent_sdk` is not imported by awesome_researcher.agents.rot_auditor (check `inspect.getsource` has no `BaseAgent`/`sdk` import and that no CostTracker is constructed).",
+          "status": "pending",
+          "files_to_create": [],
+          "files_to_modify": [
+            "tests/test_rot_audit.py"
+          ],
+          "verification": {
+            "type": "e2e"
+          },
+          "service": "backend",
+          "patterns_from": [
+            "tests/test_phase8_validation.py"
+          ]
+        },
+        {
+          "id": "subtask-6-2",
+          "title": "Run lint, format, type and full test gates",
+          "description": "Run the repository's quality gates over the changed and new files and fix anything they report: ruff (line-length 100, rules E,F,I,W,UP,B), black --check (line-length 100), mypy on the new modules, and the full offline pytest suite. No new dependency may be introduced - the audit uses only httpx (already a runtime dep) and the stdlib (difflib, datetime, os, re).",
+          "status": "pending",
+          "files_to_create": [],
+          "files_to_modify": [],
+          "verification": {
+            "type": "command"
+          },
+          "service": "backend",
+          "patterns_from": [
+            "pyproject.toml"
+          ]
+        }
+      ],
+      "depends_on": [
+        "phase-5-tests-docs"
+      ],
+      "type": "integration",
+      "description": "Prove the three acceptance criteria end to end against a real committed fixture with a mocked network, and run the repo's lint/format/type/test gates.",
+      "parallel_safe": false
+    }
+  ],
+  "workflow_rationale": "This adds a new, self-contained pipeline capability (audit existing links -> rot_report.md -> optional PR-ready cleanup artifacts) on top of an existing Python pipeline. It has a clear dependency chain: core probe/classify must exist before the report renderer and the fix/patcher can consume findings, and both must exist before the CLI/pipeline wiring, tests and docs. That is the FEATURE shape (build producer, then consumers, then integration), not a refactor/investigation/migration.",
+  "summary": {
+    "total_phases": 6,
+    "total_subtasks": 13,
+    "services_involved": [
+      "backend"
+    ],
+    "parallelism": {
+      "max_parallel_phases": 2,
+      "parallel_groups": [
+        {
+          "phases": [
+            "phase-2-report",
+            "phase-3-fix"
+          ],
+          "reason": "Both depend only on phase-1-core and touch disjoint new files (renderers/rot_report.py vs renderers/rot_patcher.py). The only shared file is renderers/__init__.py (a one-line export each) - a trivial, non-overlapping edit."
+        }
+      ],
+      "recommended_workers": 2,
+      "speedup_estimate": "~1.2x faster than sequential (only one parallel pair; phases 1, 4, 5, 6 are strictly sequential)"
+    },
+    "startup_command": "source auto-claude/.venv/bin/activate && python auto-claude/run.py --spec 007 --parallel 2"
+  },
+  "verification_strategy": {
+    "risk_level": "medium",
+    "skip_validation": false,
+    "test_creation_phase": "post_implementation",
+    "test_types_required": [
+      "unit",
+      "integration"
+    ],
+    "security_scanning_required": false,
+    "staging_deployment_required": false,
+    "acceptance_criteria": [
+      "Audit mode flags HTTP errors (4xx/5xx + network failures), permanent redirects (301/308 only) and GitHub-archived repositories",
+      "rot_report.md is generated for every run (and degrades to a placeholder report when no findings artifact exists)",
+      "--fix-rot emits a PR-ready bundle (rot_fixed_list.md + rot_fix.patch + rot_pr_body.md) that removes or annotates dead links",
+      "All existing tests pass (baseline: 200 passed, 1 skipped, 2 deselected)",
+      "New code is covered by credential-free offline tests using httpx.MockTransport",
+      "No new runtime dependency; the audit makes zero Claude SDK calls (costs $0.00)",
+      "Zero actionable findings leave the patched markdown byte-identical to the source README"
+    ],
+    "verification_steps": [
+      {
+        "name": "Unit + Integration Tests (offline)",
+        "command": "python3 -m pytest -q -m \"not e2e and not functional\"",
+        "expected_outcome": "All tests pass, including tests/test_rot_audit.py",
+        "type": "test",
+        "required": true,
+        "blocking": true
+      },
+      {
+        "name": "Rot audit test module",
+        "command": "python3 -m pytest -q tests/test_rot_audit.py",
+        "expected_outcome": "All rot-audit tests pass",
+        "type": "test",
+        "required": true,
+        "blocking": true
+      },
+      {
+        "name": "Lint",
+        "command": "python3 -m ruff check awesome_researcher tests",
+        "expected_outcome": "No lint errors",
+        "type": "lint",
+        "required": true,
+        "blocking": true
+      },
+      {
+        "name": "Format check",
+        "command": "python3 -m black --check awesome_researcher tests",
+        "expected_outcome": "All files already formatted",
+        "type": "lint",
+        "required": true,
+        "blocking": false
+      },
+      {
+        "name": "CLI surface",
+        "command": "python3 -m awesome_researcher.main --help | grep -E -- '--audit-rot|--audit-only|--fix-rot'",
+        "expected_outcome": "All four audit flags listed in --help",
+        "type": "test",
+        "required": true,
+        "blocking": true
+      }
+    ],
+    "reasoning": "Medium risk: additive feature in an existing, well-tested Python pipeline. It touches two shared files (main.py, markdown_parser.py) whose contracts other phases rely on, so the full offline suite must stay green; but it adds no dependency, makes no paid SDK call, and never mutates a remote repository. Unit + integration coverage with mocked HTTP is sufficient; no security scan or staging deployment is warranted."
+  },
+  "qa_acceptance": {
+    "unit_tests": {
+      "required": true,
+      "commands": [
+        "python3 -m pytest -q -m \"not e2e and not functional\"",
+        "python3 -m pytest -q tests/test_rot_audit.py"
+      ],
+      "minimum_coverage": null
+    },
+    "integration_tests": {
+      "required": true,
+      "commands": [
+        "python3 -m pytest -q tests/test_rot_audit.py -k end_to_end"
+      ],
+      "services_to_test": [
+        "backend"
+      ]
+    },
+    "e2e_tests": {
+      "required": false,
+      "commands": [],
+      "flows": [
+        "parse-fixture -> audit -> rot_report.md -> fix bundle"
+      ]
+    },
+    "browser_verification": {
+      "required": false,
+      "pages": []
+    },
+    "database_verification": {
+      "required": false,
+      "checks": []
+    }
+  },
+  "qa_signoff": null
+}

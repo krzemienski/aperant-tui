@@ -202,6 +202,20 @@ export class ObservabilityService extends EventEmitter {
     on('error', (taskId, error: string) => this.onError(taskId, String(error)));
     on('exit', (taskId, code: number | null) => this.onExit(taskId, code));
 
+    // Roadmap generation is a real agent run, but it emits its own event names
+    // and none of the six above — so every agents sub-view rendered "no agent
+    // has started" while a roadmap was actively generating. These map the
+    // roadmap lifecycle onto the same agent record the task path uses.
+    on('roadmap-progress', (projectId, progress: { phase?: string; progress?: number; message?: string }) =>
+      this.onProgress(String(projectId), {
+        phase: progress?.phase ?? 'roadmap',
+        message: progress?.message,
+      }));
+    on('roadmap-log', (projectId, message: string) => this.onLog(String(projectId), String(message)));
+    on('roadmap-error', (projectId, error: string) => this.onError(String(projectId), String(error)));
+    on('roadmap-complete', (projectId) => this.onExit(String(projectId), 0));
+    on('roadmap-stopped', (projectId) => this.onExit(String(projectId), null));
+
     // Sentinel polling (spec §4.1 — pause state lives on the filesystem)
     this.sentinelTimer = setInterval(() => this.pollSentinels(), SENTINEL_POLL_MS);
     this.sentinelTimer.unref?.();
@@ -405,10 +419,13 @@ export class ObservabilityService extends EventEmitter {
     switch (type) {
       case 'text-delta':
         // high-frequency: trace only, no wait-state recompute (spec §7.3)
-        this.pushTrace(taskId, 'text-delta');
+        // The chunk text IS the streaming surface — dropping it left the trace
+        // view rendering an empty payload column for every delta. Truncated
+        // because a single delta can be arbitrarily long and the row is one line.
+        this.pushTrace(taskId, 'text-delta', undefined, undefined, false, summarizeDelta(event.text));
         break;
       case 'thinking-delta':
-        this.pushTrace(taskId, 'thinking-delta');
+        this.pushTrace(taskId, 'thinking-delta', undefined, undefined, false, summarizeDelta(event.text));
         break;
       case 'tool-call': {
         const toolName = String(event.toolName ?? '?');
@@ -581,6 +598,17 @@ function summarizeArgs(args: unknown): string {
 
 function fmtK(n: number): string {
   return n >= 1000 ? `${(n / 1000).toFixed(1)}k` : String(n);
+}
+
+/**
+ * Render one streamed delta as a single trace row. Newlines and tabs are
+ * collapsed because the trace is a one-line-per-event table — a raw chunk
+ * containing newlines would break the row alignment of every row after it.
+ */
+function summarizeDelta(text: unknown): string {
+  if (typeof text !== 'string' || text.length === 0) return '';
+  const flat = text.replace(/\s+/g, ' ').trim();
+  return flat.length > 80 ? `${flat.slice(0, 77)}…` : flat;
 }
 
 /** Singleton — the TUI's one observability tap. */

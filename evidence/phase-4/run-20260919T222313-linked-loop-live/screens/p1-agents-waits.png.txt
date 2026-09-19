@@ -1,0 +1,50 @@
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ proofpunk-agent /Users/nick/proofpunk-agent │ ⑂ master                                                                                                 ◉ 0 running  ◆ 1 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│  1 swarm   2 graph   3 inspect   4 trace   5 tokens   6 waits  1 agent · esc then 1-7 to switch tabs                                                                                                 │
+│                                                                                                                                                                                                      │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ ┌────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃ BLOCKING ANALYSIS · 0 blocked                                                                     ┃ │ ESCALATION THRESHOLDS                                                                      │ │
+│ ┃ nothing blocked — no wait states detected                                                         ┃ │ MAX_QA_ITERATIONS           50    qa-loop                                                  │ │
+│ ┃ r writes RESUME sentinel for the selected agent (spec §4.1)                                       ┃ │ MAX_CONSECUTIVE_ERRORS      3     qa-loop                                                  │ │
+│ ┃                                                                                                   ┃ │ RECURRING_ISSUE_THRESHOLD   3     qa-loop                                                  │ │
+│ ┃                                                                                                   ┃ │ MAX_SUBTASK_RETRIES         3     build-orch                                               │ │
+│ ┃                                                                                                   ┃ │ CIRCULAR_FIX_THRESHOLD      3     recovery                                                 │ │
+│ ┃                                                                                                   ┃ │ MAX_ATTEMPTS_PER_SUBTASK    50    recovery                                                 │ │
+│ ┃                                                                                                   ┃ │ DEFAULT_MAX_CONCURRENCY     3     parallel                                                 │ │
+│ ┃                                                                                                   ┃ │ STAGGER_DELAY_MS            1s    parallel                                                 │ │
+│ ┃                                                                                                   ┃ │ MAX_RATE_LIMIT_WAIT         2h    pause                                                    │ │
+│ ┃                                                                                                   ┃ │ AUTH_RESUME_MAX_WAIT        24h   pause                                                    │ │
+│ ┃                                                                                                   ┃ │ MAX_CONTINUATIONS           5     continuation                                             │ │
+│ ┃                                                                                                   ┃ │ SUBAGENT_MAX_STEPS          100   subagent                                                 │ │
+│ ┃                                                                                                   ┃ │ recovery actions: rollback │ retry │ skip │ escalate                                       │ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ └────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ AGENTS  1-6 sub-view · j/k select · ⏎ inspect · f filter · r resume                                                                                                                     : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

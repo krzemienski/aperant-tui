@@ -1,0 +1,86 @@
+ M PHASE0.md
+ M README.md
+ M RELEASE.md
+ M e2e-evidence/run-20260917T054640-screen5-perf/evidence-inventory.txt
+ D e2e-evidence/run-20260917T054640-screen5-perf/perf-driver-summary.txt
+ D e2e-evidence/run-20260917T054640-screen5-perf/perf-snapshot-20260917T055456Z.json
+ M e2e-evidence/run-20260917T055852-p8-screen5-performance/evidence-inventory.txt
+ D e2e-evidence/run-20260917T055852-p8-screen5-performance/perf-driver-summary.txt
+ D e2e-evidence/run-20260917T055852-p8-screen5-performance/perf-render-capacity.json
+ D e2e-evidence/run-20260917T055852-p8-screen5-performance/perf-rss-series.json
+ D e2e-evidence/run-20260917T055852-p8-screen5-performance/perf-snapshot-20260917T055921Z.json
+ M e2e-evidence/run-20260917T094208-p8-screen5-30min/evidence-inventory.txt
+ D e2e-evidence/run-20260917T094208-p8-screen5-30min/perf-driver-summary.txt
+ D e2e-evidence/run-20260917T094208-p8-screen5-30min/perf-render-capacity.json
+ M e2e-evidence/run-20260917T094529-p8-screen5-30min-2/evidence-inventory.txt
+ D e2e-evidence/run-20260917T094529-p8-screen5-30min-2/perf-driver-summary.txt
+ D e2e-evidence/run-20260917T094529-p8-screen5-30min-2/perf-render-capacity.json
+ M e2e-evidence/run-20260917T094858-p8-probe-short/evidence-inventory.txt
+ D e2e-evidence/run-20260917T094858-p8-probe-short/perf-driver-summary.txt
+ D e2e-evidence/run-20260917T094858-p8-probe-short/perf-render-capacity.json
+ D e2e-evidence/run-20260917T094858-p8-probe-short/perf-rss-series.json
+ D e2e-evidence/run-20260917T094858-p8-probe-short/perf-snapshot-20260917T094936Z.json
+ D e2e-evidence/run-20260917T094858-p8-probe-short/perf-snapshot-20260917T095007Z.json
+ M e2e-evidence/run-20260917T095019-p8-screen5-30min-final/evidence-inventory.txt
+ D e2e-evidence/run-20260917T095019-p8-screen5-30min-final/perf-driver-summary.txt
+ D e2e-evidence/run-20260917T095019-p8-screen5-30min-final/perf-render-capacity.json
+ M e2e-evidence/run-20260917T110136-screen4-pinned-probe/evidence-inventory.txt
+ M e2e-evidence/run-20260917T113536-quit-modal-probe/evidence-inventory.txt
+ M e2e-evidence/run-20260917T113625-quit-warn-probe/evidence-inventory.txt
+ M e2e-evidence/run-20260917T120621-p8-30min-after-preload/evidence-inventory.txt
+ D e2e-evidence/run-20260917T120621-p8-30min-after-preload/perf-render-capacity.json
+ M proofpunk_agent/app.py
+ M proofpunk_agent/bridge/evidence.py
+ M proofpunk_agent/bridge/sdk.py
+ M proofpunk_agent/screens/evidence.py
+ M proofpunk_agent/screens/tools.py
+ M proofpunk_agent/widgets/__init__.py
+ M validation/e2e/scenario_session.py
+ M validation/e2e/screen23_live.py
+ M validation/e2e/terminal_matrix.py
+ M validation/perf/c4_c5_closeout.py
+ M validation/perf/driver.py
+?? .planning/
+?? e2e-evidence/run-20260917T054640-screen5-perf/step-01-perf-snapshot-20260917T055456Z.json
+?? e2e-evidence/run-20260917T054640-screen5-perf/step-02-perf-driver-summary.txt
+?? e2e-evidence/run-20260917T055852-p8-screen5-performance/step-01-perf-render-capacity.json
+?? e2e-evidence/run-20260917T055852-p8-screen5-performance/step-02-perf-snapshot-20260917T055921Z.json
+?? e2e-evidence/run-20260917T055852-p8-screen5-performance/step-03-perf-rss-series.json
+?? e2e-evidence/run-20260917T055852-p8-screen5-performance/step-04-perf-driver-summary.txt
+?? e2e-evidence/run-20260917T094208-p8-screen5-30min/step-01-perf-render-capacity.json
+?? e2e-evidence/run-20260917T094208-p8-screen5-30min/step-02-perf-driver-summary.txt
+?? e2e-evidence/run-20260917T094529-p8-screen5-30min-2/step-01-perf-render-capacity.json
+?? e2e-evidence/run-20260917T094529-p8-screen5-30min-2/step-02-perf-driver-summary.txt
+?? e2e-evidence/run-20260917T094858-p8-probe-short/step-01-perf-render-capacity.json
+?? e2e-evidence/run-20260917T094858-p8-probe-short/step-02-perf-snapshot-20260917T094936Z.json
+?? e2e-evidence/run-20260917T094858-p8-probe-short/step-03-perf-snapshot-20260917T095007Z.json
+?? e2e-evidence/run-20260917T094858-p8-probe-short/step-04-perf-rss-series.json
+?? e2e-evidence/run-20260917T094858-p8-probe-short/step-05-perf-driver-summary.txt
+?? e2e-evidence/run-20260917T095019-p8-screen5-30min-final/step-01-perf-render-capacity.json
+?? e2e-evidence/run-20260917T095019-p8-screen5-30min-final/step-02-perf-driver-summary.txt
+?? e2e-evidence/run-20260917T120621-p8-30min-after-preload/step-01-perf-render-capacity.json
+?? e2e-evidence/run-20260917T150127-p8-30min-post-preload/
+?? e2e-evidence/run-20260917T151647-p0-recapture-selfhost/
+?? e2e-evidence/run-20260917T152752-p8-free-boot-post-preload/
+?? e2e-evidence/run-20260917T154135-live-session-rows/
+?? e2e-evidence/run-20260917T170548-regression-evidence/
+?? e2e-evidence/run-20260917T170548-regression-fuzz/
+?? e2e-evidence/run-20260917T170548-regression-hooks/
+?? e2e-evidence/run-20260917T170548-regression-keyboard/
+?? e2e-evidence/run-20260917T170548-regression-matrix/
+?? e2e-evidence/run-20260917T170548-regression-preflight/
+?? e2e-evidence/run-20260917T170548-regression-tools/
+?? e2e-evidence/run-20260917T171802-regression-matrix-fixed/
+?? e2e-evidence/run-20260917T172310-regression-fuzz-paste/
+?? e2e-evidence/run-20260917T172310-regression-fuzz-resize/
+?? e2e-evidence/run-20260917T180300-bindings-live-drive/
+?? e2e-evidence/run-20260917T211317-cost-refusal-fix/
+?? e2e-evidence/run-20260917T214007-cost-refusal-conservative/
+?? e2e-evidence/run-20260917T215329-budget-passthrough/
+?? e2e-evidence/run-20260917T222033-budget-e2e-passthrough/
+?? e2e-evidence/run-20260919T162529-gate-live-drive/
+?? e2e-evidence/run-20260919T163557-ui-selfhost/
+?? e2e-evidence/run-20260919T163844-evidence-floor-audit/
+?? e2e-evidence/run-20260919T164108-ledger-export/
+?? e2e-evidence/run-20260919T164655-cited-run-validation/
+?? proofpunk_agent/widgets/rewind_modal.py

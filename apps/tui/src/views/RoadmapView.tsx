@@ -84,6 +84,11 @@ export function RoadmapView({ theme: c, project, isActive }: Props) {
   const flash = useAppStore((s) => s.flash);
   const [reloadKey, setReloadKey] = useState(0);
   const [selected, setSelected] = useState(0);
+  // Feature cursor within the selected phase. `selected` walks phases; this
+  // walks the features inside one, so `c` converts the item the user is
+  // looking at. Without it the user could only ever convert a phase's first
+  // unlinked feature, making every later item unreachable.
+  const [selFeat, setSelFeat] = useState(0);
   const [running, setRunning] = useState(false);
   const [progress, setProgress] = useState<roadmapSvc.RoadmapProgress | null>(null);
   const [logBuf, setLogBuf] = useState<LogBuf>(EMPTY_LOG_BUF);
@@ -104,6 +109,11 @@ export function RoadmapView({ theme: c, project, isActive }: Props) {
     return roadmap.phases;
   }, [roadmap]);
   const selPhase = phases[Math.min(selected, Math.max(phases.length - 1, 0))];
+  const phaseFeats = selPhase?.features ?? [];
+  // Clamp rather than reset: a roadmap reload (poll during generation) must not
+  // silently move the cursor out from under the user.
+  const featIndex = Math.min(selFeat, Math.max(phaseFeats.length - 1, 0));
+  const selFeature = phaseFeats[featIndex];
 
   // Poll roadmap.json while a run is active so the phase list lands live.
   useEffect(() => {
@@ -162,13 +172,17 @@ export function RoadmapView({ theme: c, project, isActive }: Props) {
     g: () => generate(false),
     G: () => generate(true),
     x: () => { roadmapSvc.stopGeneration(project); setRunning(false); },
-    j: () => setSelected((s) => Math.min(s + 1, phases.length - 1)),
-    k: () => setSelected((s) => Math.max(s - 1, 0)),
+    j: () => { setSelected((s) => Math.min(s + 1, phases.length - 1)); setSelFeat(0); },
+    k: () => { setSelected((s) => Math.max(s - 1, 0)); setSelFeat(0); },
+    n: () => setSelFeat((f) => Math.min(f + 1, Math.max(phaseFeats.length - 1, 0))),
+    p: () => setSelFeat((f) => Math.max(f - 1, 0)),
     c: () => {
-      const feats = selPhase?.features ?? [];
-      const first = feats.find((f) => !f.linked_spec_id) ?? feats[0];
-      if (!first?.id) { flash('no feature to convert'); return; }
-      const r = convertFeatureToSpec(project, first.id);
+      if (!selFeature?.id) { flash('no feature to convert'); return; }
+      if (selFeature.linked_spec_id) {
+        flash(`already linked to spec ${selFeature.linked_spec_id}`);
+        return;
+      }
+      const r = convertFeatureToSpec(project, selFeature.id);
       if (r.ok) { flash(`spec ${r.specId} created`); setReloadKey((k) => k + 1); }
       else flash(r.reason);
     },
@@ -237,13 +251,13 @@ export function RoadmapView({ theme: c, project, isActive }: Props) {
               <Text color={c.text} bold>{selPhase.name ?? selPhase.title}</Text>
               {selPhase.features.map((f, i) => (
                 <Box key={f.id ?? i} flexDirection="column">
-                  <Text color={c.dim} wrap="truncate-end">
-                    {' '}{f.linked_spec_id ? '⇒' : '·'} {f.title ?? f.id} <Text color={c.faint}>[{f.status ?? 'planned'}{f.priority ? ` · ${f.priority}` : ''}]</Text>
+                  <Text color={i === featIndex ? c.text : c.dim} wrap="truncate-end">
+                    {i === featIndex ? '❯' : ' '}{f.linked_spec_id ? '⇒' : '·'} <Text color={i === featIndex ? c.accent : c.dim}>{f.title ?? f.id}</Text> <Text color={c.faint}>[{f.status ?? 'planned'}{f.priority ? ` · ${f.priority}` : ''}]</Text>
                   </Text>
                   {f.linked_spec_id ? (
                     <Text color={c.ok}>   spec {f.linked_spec_id}</Text>
                   ) : (
-                    <Text color={c.faint}>   c → convert to task spec</Text>
+                    <Text color={i === featIndex ? c.accent : c.faint}>   {i === featIndex ? 'c → convert this feature to a task spec' : 'n/p to select'}</Text>
                   )}
                 </Box>
               ))}
@@ -255,7 +269,7 @@ export function RoadmapView({ theme: c, project, isActive }: Props) {
       </Box>
       <Box paddingLeft={1}>
         <Text color={c.faint}>
-          {running ? 'generating… x stop' : 'g generate · G refresh · j/k phase · c convert→spec'}
+          {running ? 'generating… x stop' : 'g generate · G refresh · j/k phase · n/p feature · c convert→spec'}
         </Text>
       </Box>
     </Box>

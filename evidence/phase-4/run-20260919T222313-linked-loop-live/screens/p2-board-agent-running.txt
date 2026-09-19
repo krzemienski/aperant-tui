@@ -1,0 +1,50 @@
+cd /Users/nick/dev/aperant-tui && npm run dev -w @aperant/tui -- /Users/nick/awesome-researcher
+nick@m4-max-959 ~/dev/aperant-tui
+❯ export APERANT_MODEL=cc/claude-opus-5
+cd /Users/nick/dev/aperant-tui && npm run dev -w @aperant/tui -- /Users/nick/awesome-researcher
+nick@m4-max-959 ~/dev/aperant-tui
+❯ cd /Users/nick/dev/aperant-tui && npm run dev -w @aperant/tui -- /Users/nick/awesome-researcher
+
+> @aperant/tui@0.1.0 dev
+> tsx src/cli.tsx /Users/nick/awesome-researcher
+
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+┌───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────│─agent started: 007-link─│┐
+│APERANT │ awesome-researcher /Users/nick/awesome-researcher │ ⑂ feat/awesome-researcher                                                                          ◉ 0 runnin└─────────────────────────┘│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃ TASKS                                                                                  ┃ │ DETAIL                                                                                                │ │
+│ ┃ ◆ BACKLOG (4)                                                                          ┃ │ 007-link [BACKLOG]                                                                                    │ │
+│ ┃   001-tri- ▽ Tri-state link verdict: alive / blocked-but-alive / dead                  ┃ │ Link-rot audit of existing list entries                                                               │ │
+│ ┃   002-per- ▽ Per-host politeness and Retry-After compliance in validation              ┃ │ progress ░░░░░░░░░░░░░░ 0%                                                                            │ │
+│ ┃   006-auto ▽ Automatic PR draft generation from approved candidates                    ┃ │ subtasks 0/0 complete                                                                                 │ │
+│ ┃ ❯ 007-link ▽ Link-rot audit of existing list entries                                   ┃ │ phase planning                                                                                        │ │
+│ ┃ ◆ HUMAN (2)                                                                            ┃ │ location main  spec 007-link-rot-audit-of-existing-list-entries                                       │ │
+│ ┃   003-list ▽ List-health audit mode  50%                                               ┃ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ ┃   005-huma ▽ Human-in-the-loop candidate review with selective approval  50%           ┃                                                                                                           │
+│ ┃ ◆ DONE (1)                                                                             ┃ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃   004-awes ▽ Awesome list parsing and category extraction (bs4 + httpx, byte-exact ro… ┃ │ AGENT STREAM                                                                                          │ │
+│ ┃                                                                                        ┃ │ 22:45:17 start 007-link → vendored AgentManager…                                                      │ │
+│ ┃                                                                                        ┃ │ 22:45:18 started 007-link: agent started — phase planning                                             │ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ awesome-researcher /Users/nick/awesome-researcher │ ⑂ feat/awesome-researcher                                                                          ◉ 0 running  ◆ 2 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃ TASKS                                                                                  ┃ │ DETAIL                                                                                                │ │
+│ ┃ ◆ BACKLOG (4)                                                                          ┃ │ 007-link [BACKLOG]                                                                                    │ │
+│ ┃   001-tri- ▽ Tri-state link verdict: alive / blocked-but-alive / dead                  ┃ │ Link-rot audit of existing list entries                                                               │ │
+│ ┃   002-per- ▽ Per-host politeness and Retry-After compliance in validation              ┃ │ progress ░░░░░░░░░░░░░░ 0%                                                                            │ │
+│ ┃   006-auto ▽ Automatic PR draft generation from approved candidates                    ┃ │ subtasks 0/0 complete                                                                                 │ │
+│ ┃ ❯ 007-link ▽ Link-rot audit of existing list entries                                   ┃ │ phase -                                                                                               │ │
+│ ┃ ◆ HUMAN (2)                                                                            ┃ │ location main  spec 007-link-rot-audit-of-existing-list-entries                                       │ │
+│ ┃   003-list ▽ List-health audit mode  50%                                               ┃ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ ┃   005-huma ▽ Human-in-the-loop candidate review with selective approval  50%           ┃                                                                                                           │
+│ ┃ ◆ DONE (1)                                                                             ┃ ┌───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃   004-awes ▽ Awesome list parsing and category extraction (bs4 + httpx, byte-exact ro… ┃ │ AGENT STREAM                                                                                          │ │
+│ ┃                                                                                        ┃ │ 22:45:17 start 007-link → vendored AgentManager…                                                      │ │
+│ ┃                                                                                        ┃ │ 22:45:18 started 007-link: agent started — phase planning                                             │ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ └───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ BOARD  j/k move · ⏎ focus · s start · x stop · H/L column · l logs                                                                                                                      : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+

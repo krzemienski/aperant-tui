@@ -1,0 +1,50 @@
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ proofpunk-agent /Users/nick/proofpunk-agent │ ⑂ master                                                                                                 ◉ 0 running  ◆ 1 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│  1 swarm   2 graph   3 inspect   4 trace   5 tokens   6 waits  1 agent · esc then 1-7 to switch tabs                                                                                                 │
+│                                                                                                                                                                                                      │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ │
+│ ┃ EVENT TRACE · all agents · 489 events                                                                                                                                                            ┃ │
+│ ┃   TIME      AGENT         EVENT          TOOL                DUR     PAYLOAD                                                                                                                     ┃ │
+│ ┃ 22:49:29.026 009-tamper-e step-finish   —                  —       step 9 · 47.7k tok                                                                                                            ┃ │
+│ ┃ 22:49:31.711 009-tamper-e thinking-delta—                  —                                                                                                                                     ┃ │
+│ ┃ 22:49:31.712 009-tamper-e thinking-delta—                  —                                                                                                                                     ┃ │
+│ ┃ 22:49:33.591 009-tamper-e tool-call     Bash               —       {"command":"cd /Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/009-t…                                                ┃ │
+│ ┃ 22:49:33.690 009-tamper-e tool-result   Bash               101ms  proofpunk_agent/bridge/digest.py | 77 ++++++++++++++++++++++++++++++++++++++…                                                  ┃ │
+│ ┃ 22:49:33.690 009-tamper-e step-finish   —                  —       step 10 · 48.0k tok                                                                                                           ┃ │
+│ ┃ 22:49:37.995 009-tamper-e thinking-delta—                  —                                                                                                                                     ┃ │
+│ ┃ 22:49:37.997 009-tamper-e thinking-delta—                  —                                                                                                                                     ┃ │
+│ ┃ 22:49:37.998 009-tamper-e text-delta    —                  —       Self                                                                                                                          ┃ │
+│ ┃ 22:49:38.055 009-tamper-e text-delta    —                  —       -critique passes —                                                                                                            ┃ │
+│ ┃ 22:49:38.115 009-tamper-e text-delta    —                  —       only `digest.py` tou                                                                                                          ┃ │
+│ ┃ 22:49:38.188 009-tamper-e text-delta    —                  —       ched, additive                                                                                                                ┃ │
+│ ┃ 22:49:38.226 009-tamper-e text-delta    —                  —       , digest un                                                                                                                   ┃ │
+│ ┃ 22:49:38.290 009-tamper-e text-delta    —                  —       changed.                                                                                                                      ┃ │
+│ ┃ 22:49:38.347 009-tamper-e text-delta    —                  —       Upd                                                                                                                           ┃ │
+│ ┃ 22:49:38.403 009-tamper-e text-delta    —                  —       ating status                                                                                                                  ┃ │
+│ ┃ 22:49:38.463 009-tamper-e text-delta    —                  —       and                                                                                                                           ┃ │
+│ ┃ 22:49:38.525 009-tamper-e text-delta    —                  —       committing.                                                                                                                   ┃ │
+│ ┃ 22:49:40.399 009-tamper-e tool-call     Edit               —       {"file_path":"/Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/009-ta…                                                ┃ │
+│ ┃ 22:49:40.411 009-tamper-e tool-result   Edit               8ms Successfully edited /Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/…                                                    ┃ │
+│ ┃ 22:49:40.421 009-tamper-e step-finish   —                  —       step 11 · 48.7k tok                                                                                                           ┃ │
+│ ┃ 22:49:43.606 009-tamper-e tool-call     Bash               —       {"command":"cd /Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/009-t…                                                ┃ │
+│ ┃ 22:49:43.668 009-tamper-e tool-result   Bash               65ms /Users/nick/proofpunk-agent/.auto-claude/worktrees/tasks/009-tamper-evident-e…                                                   ┃ │
+│ ┃ 22:49:43.668 009-tamper-e step-finish   —                  —       step 12 · 49.0k tok                                                                                                           ┃ │
+│ ┃ f toggles agent filter · ring buffer 10k · outlier >3000ms highlighted                                                                                                                           ┃ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ │
+│ AGENTS  1-6 sub-view · j/k select · ⏎ inspect · f filter · r resume                                                                                                                     : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+
+
+
+
+
+
+
+
+
+
