@@ -298,6 +298,13 @@ returns `Array.from(taskMap.values())`, so the worktree twin never reaches the
 view and the lookup was dead code. Verified by driving the real board, not by
 reading — it typechecked clean and changed nothing on screen.
 
+Terminal statuses (`done`, `pr_created`) are returned verbatim: the first cut
+of this patch omitted that guard and a DONE task with a lingering 3/14
+worktree rendered **21%** instead of 100%, because `BoardView.progressOf()`
+falls back to the subtask ratio — re-opening a finished task, exactly the
+staleness this dedup branch exists to prevent. Found by testing the guarded
+scenario rather than trusting the claim.
+
 Strictly additive: `mergeWorktreePlanDetailImpl()` spreads the main entry and
 overrides a field only when main genuinely lacks it, so status, priority and
 every other user-facing field stay exactly as the pre-existing "prefer main"

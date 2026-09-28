@@ -289,6 +289,13 @@ export class ProjectStore {
    */
   private mergeWorktreePlanDetailImpl(main: Task, worktree: Task): Task {
     const merged: Task = { ...main };
+    // A finished task must never be re-opened by a worktree that lingered
+    // behind it — that is the exact staleness this dedup branch exists to
+    // prevent. Measured: a `done` main entry with a 3/14 worktree plan
+    // rendered 21% instead of 100%, because BoardView.progressOf() falls back
+    // to the subtask ratio when there is no executionProgress. Terminal
+    // statuses therefore keep the main entry verbatim.
+    if (main.status === 'done' || main.status === 'pr_created') return merged;
     if (!main.subtasks?.length && worktree.subtasks?.length) {
       merged.subtasks = worktree.subtasks;
       merged.location = worktree.location;

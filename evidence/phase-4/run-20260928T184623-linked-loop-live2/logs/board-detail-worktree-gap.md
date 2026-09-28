@@ -34,3 +34,27 @@ shipped. Only the store-level merge actually moves the numbers on screen.
 GATES: npm test 9/9 exit 0; npm run typecheck exit 0;
        node tools/audit-vendored-drift.mjs -> OK (patch marker + VENDORED-PATCHES.md entry);
        node tools/audit-credentials.mjs -> findings: 0.
+
+SELF-AUDIT: the first cut of this patch carried a regression
+
+My commit message claimed 'status and priority semantics are untouched'.
+That was an assertion, not a measurement. Testing the exact scenario the
+dedup branch exists to guard (a DONE main task with a lingering partial
+worktree) showed my merge broke it:
+
+  main status=done, no subtasks        -> upstream renders 100%
+  + worktree plan 3/14 adopted         -> rendered  21%
+
+Cause: BoardView.progressOf() falls back to the subtask ratio when there is
+no executionProgress, so adopting a half-finished worktree plan visibly
+re-opened a finished task — precisely the staleness the branch prevents.
+
+FIX: terminal statuses (done, pr_created) keep the main entry verbatim.
+Re-measured across statuses:
+  done         before=100% after=100%  guarded
+  pr_created   before=  0% after=  0%  guarded
+  in_progress  before=  0% after= 21%  plan adopted
+  backlog      before=  0% after= 21%  plan adopted
+
+Live re-drive after the guard, task 006 (BACKLOG): subtasks 3/14 complete,
+progress 50%, phase coding, location worktree — the fix still works.
