@@ -82,3 +82,34 @@ location worktree.
 
 Three bugs in three cuts of one patch, each found by testing the scenario
 the code was supposed to handle rather than re-reading the diff.
+
+THIRD CHECK: the two-worktree case, DRIVEN on the real board
+
+My first three cuts of this patch were each verified only by a Python
+simulation of the dedup loop. That is a model of the code, not the code.
+So the advisory's scenario was built for real in ~/Desktop/vigil:
+
+  worktree 1: 006-schema-validated-sdk-message-boundary  (live, 3/14)
+  worktree 2: 006-stale-twin                              (stale, 14/14,
+              executionPhase human_review) - both holding spec 006
+  main spec dir: no implementation_plan.json
+
+WITH THE FIX (driven, 200x50 PTY):
+  006-sche [BACKLOG]        <- main status survived
+  subtasks 3/14 complete    <- live worktree plan still adopted
+  phase coding
+  location worktree
+  wait: {"matched": true, "anchor": "006-sche [BACKLOG]"}
+
+IS THE FIXTURE DISCRIMINATING? Re-introduced ONLY the provenance bug
+(merged.location = worktree.location) and re-drove the same board:
+  006-sche [REVIEW]         <- main HIJACKED by the stale twin
+  subtasks 14/14 complete
+  phase complete
+  wait: {"matched": false, "anchor": "006-sche [BACKLOG]", "timedOut": true}
+
+So the check fails when the bug is present and passes when it is not — it
+is not vacuous. Probe line reverted immediately; fixture worktree and its
+branch removed (git worktree list back to 7).
+
+Screenshot: step-31-two-worktrees-no-status-hijack.png
