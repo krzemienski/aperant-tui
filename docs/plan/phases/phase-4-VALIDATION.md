@@ -1,7 +1,7 @@
 # Phase 4 VALIDATION — Linked loop (roadmap → board → agent execution → tracing)
 
 Run: `evidence/phase-4/run-20260928T184623-linked-loop-live2/`
-Drive window: 2026-09-28 18:46 → 19:30 UTC.
+Drive window: 2026-09-28 18:46 → 19:51 UTC.
 Target project: `/Users/nick/Desktop/vigil` — a real git repo with real TypeScript
 source, driven as the end user through the real TUI in a real 200x50 tmux PTY
 (`tools/tui-capture.py`). Every wait below is a `cmd_wait` whose exit code
@@ -18,8 +18,8 @@ points outside the repo, so the live `settings.json` (which holds a real
 
 ## Defects found by driving, and fixed this run
 
-All seven were found by driving the real TUI — none by reading code alone.
-`git diff --stat`: 5 files, +236/-10.
+All nine were found by driving the real TUI — none by reading code alone.
+Measured `git diff --stat a96ff53..HEAD -- apps/tui/src`: **7 files, +314/-14**.
 
 | # | Defect | Root cause | Fix |
 |---|---|---|---|
@@ -30,6 +30,8 @@ All seven were found by driving the real TUI — none by reading code alone.
 | D5 | App crashed at boot: `Rendered more hooks than during the previous render`, exit 1 | My own D4 fix called `useTerminalRows()` AFTER an early return | Hook hoisted above every early return |
 | D6 | DETAIL rows interleaved (`n/p to selecte feature 2 …`) once clipped | The pane rendered EVERY feature as a 2-row Box; a clip landing mid-Box merges two features' rows | Cursor-following window (`MAX_DETAIL_FEATURES`), with a `showing X-Y of N` affordance |
 | D7 | Root pinned to exactly `rows` still took the full-clear path | The Ink comparison is `>=`, not `>` | Reserve one row (`rows - 1`) |
+| D8 | `TASK LOGS` never rendered: rows overwrote each other mid-line | `LogsView` sliced a FIXED 200 rows into a ~45-row pane — the same `outputHeight >= stdout.rows` overflow as D4, in a second view | Window derived from `stdout.rows` |
+| D9 | The newest events of a 4,216-line task log were unreachable | The first D8 fix used a fixed 30-row window while `App` clips to `stdout.rows - 1`; on 80x24 only **14** rows render (TitleBar WRAPS at 80 cols), so `maxOffset = lines.length - 15` stranded the tail. Any fixed chrome count is a guess: chrome height depends on terminal WIDTH, not just height | Scroll limit runs to `lines.length - MIN_LOG_ROWS` (reachable under any miscount); added `g`/`G` start/end, since 4,216 rows cannot be crossed one keypress at a time |
 
 ## Per-criterion verdicts
 
