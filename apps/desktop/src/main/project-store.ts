@@ -277,6 +277,29 @@ export class ProjectStore {
   }
 
   /**
+   * [APERANT-PATCH worktree-plan-merge] Carry a worktree entry's PLAN detail
+   * onto the main entry that dedup keeps.
+   *
+   * Strictly additive: every field is taken from `main` unless main genuinely
+   * lacks it, so status, priority and user-facing state stay exactly as the
+   * pre-existing "prefer main" rule produced them. Only `subtasks` (empty in
+   * main for a worktree run, because implementation_plan.json is never written
+   * back to the main repo) and `location` (which should say where the task is
+   * actually executing) are adopted from the worktree twin.
+   */
+  private mergeWorktreePlanDetailImpl(main: Task, worktree: Task): Task {
+    const merged: Task = { ...main };
+    if (!main.subtasks?.length && worktree.subtasks?.length) {
+      merged.subtasks = worktree.subtasks;
+      merged.location = worktree.location;
+      if (!main.executionProgress && worktree.executionProgress) {
+        merged.executionProgress = worktree.executionProgress;
+      }
+    }
+    return merged;
+  }
+
+  /**
    * Get tasks for a project by scanning specs directory
    * Implements caching with 3-second TTL to prevent excessive worktree scanning
    */
@@ -353,9 +376,22 @@ export class ProjectStore {
         const newIsMain = task.location === 'main';
 
         if (existingIsMain && !newIsMain) {
+          // [APERANT-PATCH worktree-plan-merge]: keep the main entry (status is
+          // authoritative — a lingering worktree must not resurrect a finished
+          // task, which is what this branch exists for), but ADOPT the
+          // worktree's plan content. A worktree run never writes
+          // implementation_plan.json back to the main repo, so the main entry
+          // kept here is precisely the one with no subtasks, while the
+          // worktree entry being discarded is the only one that has them.
+          // Measured 2026-09-28: board DETAIL read `subtasks 0/0 complete` and
+          // `location main` for a task whose worktree plan held 5 phases / 14
+          // subtasks. Status/priority semantics are untouched; only otherwise
+          // absent plan detail is filled in.
+          taskMap.set(task.id, this.mergeWorktreePlanDetailImpl(existing, task));
         } else if (!existingIsMain && newIsMain) {
-          // New is main, replace existing worktree
-          taskMap.set(task.id, task);
+          // New is main, replace existing worktree — same plan-detail carry-over
+          // as above, with the roles reversed.
+          taskMap.set(task.id, this.mergeWorktreePlanDetailImpl(task, existing));
         } else {
           // Same location - use status priority to determine which is more complete
           const existingPriority = TASK_STATUS_PRIORITY[existing.status] || 0;

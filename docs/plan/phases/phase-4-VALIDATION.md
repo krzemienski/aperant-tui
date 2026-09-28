@@ -18,7 +18,7 @@ points outside the repo, so the live `settings.json` (which holds a real
 
 ## Defects found by driving, and fixed this run
 
-All nine were found by driving the real TUI — none by reading code alone.
+All ten were found by driving the real TUI — none by reading code alone.
 Measured `git diff --stat a96ff53..HEAD -- apps/tui/src`: **7 files, +314/-14**.
 
 | # | Defect | Root cause | Fix |
@@ -32,6 +32,7 @@ Measured `git diff --stat a96ff53..HEAD -- apps/tui/src`: **7 files, +314/-14**.
 | D7 | Root pinned to exactly `rows` still took the full-clear path | The Ink comparison is `>=`, not `>` | Reserve one row (`rows - 1`) |
 | D8 | `TASK LOGS` never rendered: rows overwrote each other mid-line | `LogsView` sliced a FIXED 200 rows into a ~45-row pane — the same `outputHeight >= stdout.rows` overflow as D4, in a second view | Window derived from `stdout.rows` |
 | D9 | The newest events of a 4,216-line task log were unreachable | The first D8 fix used a fixed 30-row window while `App` clips to `stdout.rows - 1`; on 80x24 only **14** rows render (TitleBar WRAPS at 80 cols), so `maxOffset = lines.length - 15` stranded the tail. Any fixed chrome count is a guess: chrome height depends on terminal WIDTH, not just height | Scroll limit runs to `lines.length - MIN_LOG_ROWS` (reachable under any miscount); added `g`/`G` start/end, since 4,216 rows cannot be crossed one keypress at a time |
+| D10 | Board DETAIL read `subtasks 0/0`, `progress 0%`, `phase -`, `location main` for a task whose worktree plan held 5 phases / 14 subtasks | `project-store.getTasks()` loads both the main and worktree copy but dedups to one entry per id, always keeping main (`:350-358`). Right for STATUS (a lingering worktree must not resurrect a finished task), wrong for PLAN CONTENT — main is exactly the copy with no `implementation_plan.json`, since a worktree run never writes it back | `[APERANT-PATCH worktree-plan-merge]` `mergeWorktreePlanDetailImpl()` carries subtasks/location/executionProgress onto the retained main entry, only where main lacks them. A first-party view-layer fix was tried first, typechecked clean, showed NO change when driven, and was reverted as dead code. Live after: `subtasks 3/14`, `progress 50%`, `phase coding`, `location worktree` — `step-30-board-detail-worktree-merged.png` |
 
 ## Per-criterion verdicts
 

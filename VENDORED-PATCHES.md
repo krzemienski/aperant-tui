@@ -275,6 +275,43 @@ were not touched.
 |---|---|
 | `main/ai/orchestration/subagent-executor.ts` | `SubagentExecutorImpl.spawn()`: `streamText()` instead of `generateText()`, branched into two statically-typed call shapes (with/without `output: Output.object(...)`) rather than a loosely-typed conditional-spread options object; consumes `result.fullStream` accumulating `text-delta` parts and catching any `error` part before it can surface as a rejected `.output`/`.steps` promise; awaits `result.output` (when structured output was requested) and `result.steps` only after the stream has fully drained with no transport error; `onSubagentEvent(..., 'completed', ...)` moved to fire only after both the stream-error check and the structured-output-parse check pass. Same `SubagentExecutorConfig`, `SubagentSpawnParams`, `SubagentResult` shapes throughout. |
 
+## worktree-plan-merge (2026-09-28)
+
+Board DETAIL reported `subtasks 0/0 complete` and `location main` for a task
+whose worktree plan held **5 phases / 14 subtasks**, for the task's entire live
+run. Driven, not inferred: the pane read `0/0` while
+`.auto-claude/worktrees/tasks/006-schema-validated-sdk-message-boundary/.auto-claude/specs/006-.../implementation_plan.json`
+held the real plan.
+
+Root cause: `getTasks()` loads BOTH the main and the worktree copy of every task
+(`:304`, `:322`) but deduplicates to one entry per id (`:343-371`), and the
+`existingIsMain && !newIsMain` branch discards the worktree entry wholesale.
+That rule is correct for **status** — a lingering worktree must not resurrect a
+finished task, which is exactly what its comment says it guards — but the main
+entry it keeps is precisely the one with NO `implementation_plan.json`, because
+a worktree run never writes that file back to the main repo (the desktop's own
+`syncSpecToSource` callback is optional and never supplied by `worker.ts`; see
+the `P-BOARD-LIVE` comment block in `apps/tui/src/views/BoardView.tsx`).
+
+A first-party view-layer fix was attempted first and **reverted**: `getTasks`
+returns `Array.from(taskMap.values())`, so the worktree twin never reaches the
+view and the lookup was dead code. Verified by driving the real board, not by
+reading — it typechecked clean and changed nothing on screen.
+
+Strictly additive: `mergeWorktreePlanDetailImpl()` spreads the main entry and
+overrides a field only when main genuinely lacks it, so status, priority and
+every other user-facing field stay exactly as the pre-existing "prefer main"
+rule produced them. When the trigger is absent (main already has subtasks, or
+there is no worktree twin) the result is byte-equivalent to upstream behavior.
+
+| File | Change |
+|---|---|
+| `main/project-store.ts` | New `mergeWorktreePlanDetailImpl(main, worktree)`; the two cross-location dedup branches now merge plan detail (`subtasks`, `location`, and `executionProgress` only when main has none) onto the main entry instead of discarding the worktree entry. Same-location status-priority resolution is untouched. |
+
+Proven live (200x50 tmux PTY, task 006): DETAIL went from
+`subtasks 0/0 complete` / `progress 0%` / `phase -` / `location main` to
+`subtasks 3/14 complete` / `progress 50%` / `phase coding` / `location worktree`.
+
 ## Upgrade note: AI SDK v7 (2026-08-12)
 
 The workspace runs `ai@^7`, `@ai-sdk/anthropic@^4`, `@ai-sdk/openai-compatible@^3`,

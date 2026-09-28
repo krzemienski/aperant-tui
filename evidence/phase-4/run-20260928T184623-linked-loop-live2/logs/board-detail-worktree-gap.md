@@ -1,35 +1,36 @@
-Board DETAIL under-reports worktree plan data — ROOT-CAUSED, NOT FIXED
+Board DETAIL worktree gap — FIXED (supersedes board-detail-worktree-gap.md)
 
-Observed, driving the real TUI: task 006 shows
-  subtasks 0/0 complete
-  location main
-while its worktree plan holds 5 phases / 14 subtasks and the task genuinely
-ran in .auto-claude/worktrees/tasks/006-schema-validated-sdk-message-boundary.
+BEFORE (driven, 200x50 PTY, task 006):
+  progress  0%
+  subtasks  0/0 complete
+  phase     -
+  location  main
 
-ROOT CAUSE (read, then confirmed by experiment):
-  project-store.getTasks() loads BOTH copies (main :304, worktree :322) but
-  its dedup keeps exactly one entry per task id (:343-371, taskMap), and
-  :350-358 unconditionally prefers the MAIN entry. That rule is correct for
-  STATUS — a lingering worktree must not resurrect a finished task — but the
-  main entry is precisely the one with no implementation_plan.json, because a
-  worktree run never writes that file back to the main repo (see the
-  P-BOARD-LIVE comment block in BoardView.tsx).
+AFTER the [APERANT-PATCH worktree-plan-merge] fix, same task, same drive:
+  progress  50%
+  subtasks  3/14 complete
+  phase     coding
+  location  worktree
 
-ATTEMPTED FIX, REVERTED:
-  A view-layer 'plan twin' lookup in BoardView that preferred whichever loaded
-  entry carried subtasks. Typechecked clean, then driven live against the real
-  board: STILL 'subtasks 0/0 / location main'. Reason: getTasks returns
-  Array.from(taskMap.values()) — the worktree twin is discarded INSIDE the
-  store, so it never reaches the view and there is nothing to look up.
-  The change was a no-op, so it was reverted rather than shipped as a fix.
+Screenshot: step-30-board-detail-worktree-merged.png
 
-WHERE THE REAL FIX BELONGS:
-  loadTasksFromSpecsDir/getTasks must MERGE the two entries — main wins for
-  status, worktree supplies plan content (subtasks, location) — instead of
-  discarding one wholesale. That is vendored desktop runtime, outside the
-  Phase 4 loop this run is scoped to prove, so it is recorded here and left
-  for a scoped change rather than smuggled in.
+WHAT CHANGED: project-store.getTasks() deduplicates main/worktree copies to
+one entry per task id and always kept MAIN. Correct for status (a lingering
+worktree must not resurrect a finished task) but wrong for plan content: the
+main copy is exactly the one with no implementation_plan.json, because a
+worktree run never writes that file back to the main repo.
 
-IMPACT ON THIS RUN'S CRITERIA: none. Criterion 4/4b is proven by the commit
-  and diff on disk (0b22b23, +197), and criterion 5 by the tracing views over
-  the real tap — neither reads the board DETAIL subtasks/location fields.
+mergeWorktreePlanDetailImpl() now carries subtasks/location/executionProgress
+from the worktree twin onto the retained main entry, and ONLY where main
+lacks them. Status and priority semantics are untouched, so the staleness
+guard that branch exists for still holds.
+
+PROCESS NOTE: a first-party BoardView 'plan twin' lookup was tried first. It
+typechecked clean, so it LOOKED fixed — driving the real board showed the
+pane unchanged at 0/0, because getTasks returns one entry per id and the twin
+never reaches the view. That attempt was reverted as dead code rather than
+shipped. Only the store-level merge actually moves the numbers on screen.
+
+GATES: npm test 9/9 exit 0; npm run typecheck exit 0;
+       node tools/audit-vendored-drift.mjs -> OK (patch marker + VENDORED-PATCHES.md entry);
+       node tools/audit-credentials.mjs -> findings: 0.
