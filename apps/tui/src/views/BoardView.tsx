@@ -390,7 +390,7 @@ export function BoardView({ theme: c, project, tasks, onOpenLogs, onTasksChanged
                 phase <Text color={displayPhase ? c.accent2 : c.faint}>{displayPhase ?? '-'}</Text>
               </Text>
               <Text color={c.dim} wrap="truncate-end">
-                location <Text color={c.info}>{task.location ?? 'main'}</Text>
+                location <Text color={c.info}>{task.executionLocation ?? task.location ?? 'main'}</Text>
                 {'  '}spec <Text color={c.faint}>{task.specId}</Text>
               </Text>
             </Box>

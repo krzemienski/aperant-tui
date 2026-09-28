@@ -298,7 +298,15 @@ export class ProjectStore {
     if (main.status === 'done' || main.status === 'pr_created') return merged;
     if (!main.subtasks?.length && worktree.subtasks?.length) {
       merged.subtasks = worktree.subtasks;
-      merged.location = worktree.location;
+      // NOTE: `location` is NOT overwritten here. It is the field the dedup
+      // loop uses to recognise the main entry on every later iteration
+      // (`existing.location === 'main'`). An earlier cut of this patch set it
+      // to 'worktree' and, with TWO worktree copies of one spec, the second
+      // copy then fell into the same-location status-priority branch and
+      // REPLACED the main entry outright — measured: main `backlog` was
+      // hijacked to a stale worktree's `human_review`. Provenance must survive
+      // dedup; the display location is derived separately below.
+      merged.executionLocation = worktree.location;
       if (!main.executionProgress && worktree.executionProgress) {
         merged.executionProgress = worktree.executionProgress;
       }

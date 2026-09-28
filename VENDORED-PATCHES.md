@@ -298,6 +298,14 @@ returns `Array.from(taskMap.values())`, so the worktree twin never reaches the
 view and the lookup was dead code. Verified by driving the real board, not by
 reading — it typechecked clean and changed nothing on screen.
 
+`location` is deliberately NOT overwritten. The dedup loop reads it to
+recognise the main entry on every later iteration, so setting it to
+`'worktree'` made a SECOND worktree copy fall into the same-location
+status-priority branch and replace main outright — measured: main `backlog`
+hijacked to a stale worktree's `human_review`. A new `Task.executionLocation`
+carries the display value instead; `BoardView` renders
+`executionLocation ?? location`.
+
 Terminal statuses (`done`, `pr_created`) are returned verbatim: the first cut
 of this patch omitted that guard and a DONE task with a lingering 3/14
 worktree rendered **21%** instead of 100%, because `BoardView.progressOf()`

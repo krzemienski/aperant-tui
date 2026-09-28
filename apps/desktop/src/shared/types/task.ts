@@ -268,6 +268,13 @@ export interface Task {
   stagedInMainProject?: boolean;  // True if changes were staged to main project (worktree merged with --no-commit)
   stagedAt?: string;  // ISO timestamp when changes were staged
   location?: 'main' | 'worktree';  // Where task was loaded from (main project or worktree)
+  // [APERANT-PATCH worktree-plan-merge] Where the task is actually EXECUTING,
+  // as opposed to which copy `location` was loaded from. These differ for a
+  // worktree run: dedup keeps the main entry (so `location` must stay 'main' —
+  // the dedup loop itself reads that field to recognise main on later
+  // iterations), while the plan and the running agent live in the worktree.
+  // Set only when a worktree twin's plan is merged onto the retained entry.
+  executionLocation?: 'main' | 'worktree';
   specsPath?: string;  // Full path to specs directory for this task
   createdAt: Date;
   updatedAt: Date;

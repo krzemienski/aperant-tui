@@ -58,3 +58,27 @@ Re-measured across statuses:
 
 Live re-drive after the guard, task 006 (BACKLOG): subtasks 3/14 complete,
 progress 50%, phase coding, location worktree — the fix still works.
+
+SECOND SELF-AUDIT: the guard fixed one bug and left another
+
+Setting merged.location = 'worktree' destroyed the provenance the dedup
+loop itself reads (existing.location === 'main') on every LATER iteration.
+With TWO worktree copies of one spec, the second copy then fell into the
+same-location status-priority branch and replaced the main entry outright:
+
+  main=backlog, wt1=in_progress(3/14), wt2=human_review(14/14)
+    my patch  -> status human_review   (main hijacked by a stale worktree)
+    upstream  -> status backlog        (main authoritative)
+
+FIX: location is no longer overwritten. A new Task.executionLocation field
+carries where the task is EXECUTING; location keeps saying which copy the
+entry was loaded from, so dedup can still recognise main. BoardView renders
+executionLocation ?? location.
+
+Re-measured, two worktrees: status backlog | location main | displayed
+worktree | subtasks 14 — main authoritative, display still correct.
+Live re-drive of 006: subtasks 3/14, progress 50%, phase coding,
+location worktree.
+
+Three bugs in three cuts of one patch, each found by testing the scenario
+the code was supposed to handle rather than re-reading the diff.
