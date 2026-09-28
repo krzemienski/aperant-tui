@@ -1,0 +1,50 @@
+│ ┃ AGENT SWARM · 1 live                                                                               ┃ │ SWARM VITALS                                                                              │ │
+│ ┃    AGENT              TYPE               STEPS      CTX      WAITING ON                            ┃ │ running   1                                                                               │ │
+│ ┃  ❯ ● 006-schema-valid   planner            5/1000     █░░░░    — executing                         ┃ │ blocked   0                                                                               │ │
+│ ┃                                                       26%                                          ┃ │ paused    0                                                                               │ │
+│ ┃                                                                                                    ┃ │ Σ tokens  54.6k                                                                           │ │
+│ ┃   phase: ▪ structured vs ~ inferred provenance shown in INSPECT                                    ┃ └───────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ ┃                                                                                                    ┃                                                                                               │
+│ ┃                                                                                                    ┃ ┌───────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃                                                                                                    ┃ │ LIVE TOOL TRACE                                                                           │ │
+│ ┃                                                                                                    ┃ │ 20:19:21 006-schema-v → Read {"file_path":"/Users/nick/Desktop/vigil/.auto-claude/worktre…│ │
+│ ┃                                                                                                    ┃ │ 20:19:22 006-schema-v → Read {"file_path":"/Users/nick/Desktop/vigil/.auto-claude/worktre…│ │
+│ ┃                                                                                                    ┃ │ 20:19:23 006-schema-v → Read {"file_path":"/Users/nick/Desktop/vigil/.auto-claude/worktre…│ │
+│ ┃                                                                                                    ┃ │ 20:19:23 006-schema-v ← 1823ms 31	      <Box
+│ │
+│ ┃                                                                                                    ┃ │ 32	        <Text bold color={C.accent}>VIGIL</Text                                        │
+ │
+│ ┃                                                                                                    ┃ │ 33	                                                                                       │
+ │
+│ ┃                                                                                                    ┃ │ 20:19:23 006-schema-v ← 708ms  71	  process.stderr.write = ((chunk: string | Uint8Array)
+│ │
+│ ┃                                                                                                    ┃ │ 20:19:23 006-schema-v ← 24ms  1	import { describe, it, expect } from "vitest"
+  │ │
+│ ┃                                                                                                    ┃ │  2	import { initialState, r                                                               │
+ │
+│ ┃                                                                                                    ┃ │ 20:19:23 006-schema-v step-finish step 4 · 47.5k tok                                      │ │
+│ ┃                                                                                                    ┃ │ 20:19:25 006-schema-v thinking-delta                                                      │ │
+│ ┃                                                                                                    ┃ │ 20:19:25 006-schema-v thinking-delta                                                      │ │
+│ ┃                                                                                                    ┃ │ 20:19:26 006-schema-v → Bash {"command":"cd /Users/nick/Desktop/vigil/.auto-claude/worktr…│ │
+│ ┃                                                                                                    ┃ │ 20:19:26 006-schema-v ← 32ms src/engine/store.ts:6: *   runs/<id>/cost.json      per-plan…│ │
+│ ┃                                                                                                    ┃ │ 20:19:26 006-schema-v step-finish step 5 · 52.8k tok                                      │ │
+│ ┃                                                                                                    ┃ │                                                                                           │ │
+│ ┃                                                                                                    ┃ │                                                                                           │ │
+│ ┃                                                                                                    ┃ │                                                                                           │ │
+│ ┃                                                                                                    ┃ │                                                                                           │ │
+│ ┃                                                                                                    ┃ │                                                                                           │ │
+│ ┃                                                                                                    ┃ │                                                                                           │ │
+│ ┃                                                                                                    ┃ │                                                                                           │ │
+│ ┃                                                                                                    ┃ │                                                                                           │ │
+│ ┃                                                                                                    ┃ │                                                                                           │ │
+│ ┃                                                                                                    ┃ │                                                                                           │ │
+│ ┃                                                                                                    ┃ │                                                                                           │ │
+│ ┃                                                                                                    ┃ │                                                                                           │ │
+│ ┃                                                                                                    ┃ │                                                                                           │ │
+│ ┃                                                                                                    ┃ │                                                                                           │ │
+│ ┃                                                                                                    ┃ │                                                                                           │ │
+│ ┃                                                                                                    ┃ │                                                                                           │ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ └───────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ AGENTS  1-6 sub-view · j/k select · ⏎ inspect · f filter · r resume                                                                                                                     : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
