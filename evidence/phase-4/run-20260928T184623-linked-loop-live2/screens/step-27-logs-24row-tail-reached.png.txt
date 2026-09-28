@@ -1,0 +1,24 @@
+┌──────────────────────────────────────────────────────────────────────────────┐
+│APERANT│ vigil/Users/nick/Desktop/vig│ ⑂ main◉ 0 running◆ 0 review ● no       │
+│              il                                                   profile    │
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents        │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ │
+│ ┃ TASK LOGS · 006-sche · 4216 lines                                        ┃ │
+│ ┃ 2026-09-28T19:36:55.367Z stream-event {"type":"step-finish","stepNumber… ┃ │
+│ ┃ 2026-09-28T19:36:55.367Z execution-progress {"phase":"planning","phaseP… ┃ │
+│ ┃ 2026-09-28T19:36:55.367Z stream-event {"type":"usage-update","usage":{"… ┃ │
+│ ┃                                                                          ┃ │
+│ ┃                                                                          ┃ │
+│ ┃                                                                          ┃ │
+│ ┃                                                                          ┃ │
+│ ┃                                                                          ┃ │
+│ ┃                                                                          ┃ │
+│ ┃                                                                          ┃ │
+│ ┃                                                                          ┃ │
+│ ┃                                                                          ┃ │
+│ ┃                                                                          ┃ │
+│ ┃                                                                          ┃ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ │
+│ LOGS  j/k scroll · g/G start/end · esc back                     : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────┘
+

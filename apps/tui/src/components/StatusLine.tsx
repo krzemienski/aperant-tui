@@ -28,7 +28,7 @@ const HINTS: Record<ViewName, string> = {
   tree: 'tab focus · j/k select/scroll · m merge · p PR · R AI-resolve',
   set: 'tab focus · j/k select · ⏎ persist theme / activate account · a add Anthropic · m add Moonshot',
   agents: '1-6 sub-view · j/k select · ⏎ inspect · f filter · r resume',
-  logs: 'j/k scroll · esc back',
+  logs: 'j/k scroll · g/G start/end · esc back',
 };
 
 function StatusLineImpl({ view, theme: c, mode }: { view: ViewName; theme: Theme; mode?: string }) {

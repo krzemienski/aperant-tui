@@ -20,10 +20,17 @@ type EventLogState = {
 /**
  * Rows the app consumes around this panel: the root border (2), TitleBar,
  * TabBar, StatusLine, this Panel's own border (2) and its title row, plus the
- * optional malformed-line notice. Subtracting them from the terminal height
- * gives the rows actually available for log lines.
+ * optional malformed-line notice.
+ *
+ * This is deliberately an OVER-estimate. It was 9, derived by counting the
+ * chrome elements — but TitleBar WRAPS to a second line on a narrow terminal,
+ * so on 80x24 only 14 rows rendered where 9 predicted 15. Measured against the
+ * committed capture `screens/step-26-logs-24row-terminal.png.txt` (log rows
+ * occupy capture lines 7-20). Chrome height depends on terminal WIDTH, not
+ * just height, so any fixed count is a guess; over-estimating costs one blank
+ * row and guarantees the window never exceeds what actually renders.
  */
-const CHROME_ROWS = 9;
+const CHROME_ROWS = 10;
 /** Always draw at least a few rows, even on an absurdly short terminal. */
 const MIN_LOG_ROWS = 3;
 
@@ -47,6 +54,18 @@ const MIN_LOG_ROWS = 3;
 function logRowsFor(terminalRows: number): number {
   return Math.max(MIN_LOG_ROWS, terminalRows - CHROME_ROWS);
 }
+
+/**
+ * Extra offset allowed beyond `lines.length - window`.
+ *
+ * The scroll limit and the rendered window can still disagree by a row or two
+ * whenever chrome wraps unpredictably, and when they do the FINAL events
+ * become unreachable — the whole point of the view. Permitting the offset to
+ * run to `lines.length - MIN_LOG_ROWS` makes the tail reachable under every
+ * miscount: over-scrolling merely shows fewer rows (the slice runs off the
+ * end), which is recoverable with `k`, whereas a stranded tail is not
+ * recoverable at all.
+ */
 
 /**
  * The flight recorder is append-only and unbounded — it was measured at 146 MB
@@ -149,14 +168,23 @@ export function LogsView({ theme: c, task, isActive, onBack }: { theme: Theme; t
 
   // Keep the historical task.logs source in the display if a producer ever populates it.
   const lines = task?.logs.length ? [...eventLog.lines, ...task.logs] : eventLog.lines;
-  // One bound for both the slice and the scroll limit: if they disagree, the
-  // tail becomes unreachable (the `- 30` vs `stdout.rows - 1` mismatch above).
-  const maxOffset = Math.max(0, lines.length - maxRows);
+  // The scroll limit is deliberately LOOSER than the render window. A window
+  // computed from a fixed chrome count can over-estimate by a row whenever
+  // chrome wraps (measured: 80x24 renders 14 rows, the count predicted 15),
+  // and when it does, `lines.length - window` leaves the final events
+  // permanently unreachable. Allowing the offset to reach
+  // `lines.length - MIN_LOG_ROWS` makes the tail reachable under any
+  // miscount; the cost is that the last few presses show fewer rows.
+  const maxOffset = Math.max(0, lines.length - MIN_LOG_ROWS);
   useKeymap({
-    // Stop scrolling once the last row is on screen — derived from the SAME
-    // window the renderer uses, so the final event is always reachable.
+    // Scroll to the true end of the log, not to a computed window edge.
     j: () => setOffset((o) => Math.min(o + 1, maxOffset)),
     k: () => setOffset((o) => Math.max(o - 1, 0)),
+    // A task log runs to thousands of lines; one-row-at-a-time is not a usable
+    // way to reach the newest events. G jumps to the end, g to the start —
+    // the same pair the roadmap/board views use for coarse movement.
+    G: () => setOffset(maxOffset),
+    g: () => setOffset(0),
     escape: onBack,
   }, { isActive });
   return (

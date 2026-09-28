@@ -1,0 +1,26 @@
+LogsView tail reachability — MEASURED, not computed
+
+The advisory was right: my previous claim rested on arithmetic plus 60
+scroll presses, neither of which tests reachability.
+
+MEASURED from the committed 80x24 capture step-26-...png.txt:
+  log rows actually rendered : 14  (capture lines 7-20)
+  CHROME_ROWS=9 predicted    : 15
+  error                      : 1 row — TitleBar WRAPS to 2 lines at 80 cols
+  => maxOffset = 4216-15 = 4201 stranded the final line.
+
+Two further findings while testing:
+  * tmux 'send-keys -N <count>' exits 0 but does NOT repeat — every earlier
+    burst was a silent no-op, so 'I scrolled 60 rows' proved nothing.
+  * 4,216 lines is not reachable one keypress at a time regardless.
+
+FIX: the scroll limit no longer derives from the render window (any fixed
+chrome count is a guess, since wrapping makes it width-dependent). It runs
+to lines.length - MIN_LOG_ROWS, so the tail is reachable under any
+miscount; over-scroll merely shows fewer rows and is undone with k.
+Added g/G (start/end) because scrolling thousands of rows needs it.
+
+PROOF (80x24, real PTY, this run):
+  target = last 006 event in the tap: 2026-09-28T19:36:55.367Z
+  wait result: {"matched": true, "anchor": "2026-09-28T19:36:55.367Z"}
+  onscreen: step-27-logs-24row-tail-reached.png (frame intact, 1 box-top)
