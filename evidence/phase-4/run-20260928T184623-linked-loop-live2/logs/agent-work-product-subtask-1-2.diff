@@ -1,0 +1,42 @@
+diff --git a/src/engine/events.ts b/src/engine/events.ts
+index d8f654f..9405c22 100644
+--- a/src/engine/events.ts
++++ b/src/engine/events.ts
+@@ -31,6 +31,7 @@ export type RunEvent =
+   | { t: number; kind: "approval.resolve"; planId: string; requestId: string; behavior: "allow" | "deny"; by: "user" | "auto" | "rail" }
+   | { t: number; kind: "probe"; name: string; ok: boolean; detail: string; latencyMs: number }
+   | { t: number; kind: "log"; level: "debug" | "info" | "warn" | "error"; source: string; message: string }
++  | { t: number; kind: "diagnostic"; planId: string; source: "sdk-schema"; messageType: string; schema: string; issues: { path: string; code: string; message: string }[]; sample?: string }
+   | { t: number; kind: "control"; action: "pause" | "resume" | "inject" | "interrupt" | "mode"; detail?: string };
+ 
+ export type RunEventKind = RunEvent["kind"];
+diff --git a/src/state/reducer.ts b/src/state/reducer.ts
+index 2a72493..474483c 100644
+--- a/src/state/reducer.ts
++++ b/src/state/reducer.ts
+@@ -13,7 +13,7 @@ export interface UIState {
+   plans: PlanView[]; activePlan?: string;
+   stream: StreamBlock[]; tools: Record<string, ToolCard>; toolOrder: string[];
+   toolCounts: Record<string, number>; latencies: number[];
+-  diag: DiagRow[];
++  diag: DiagRow[]; diagnostics: number;
+   costUsd: number; usage: TokenUsage; turns: number; modelUsage: Record<string, { costUSD: number; inputTokens: number; outputTokens: number }>;
+   pendingApproval?: { requestId: string; tool: string; input: unknown };
+   paused: boolean; probes: Record<string, { ok: boolean; detail: string; t: number }>;
+@@ -25,7 +25,7 @@ export const MAX_DIAG = 400;
+ export const MAX_STREAM = 600;
+ 
+ export function initialState(): UIState {
+-  return { runId: "", label: "", model: "", cwd: "", mode: "plan", startedAt: Date.now(), plans: [], stream: [], tools: {}, toolOrder: [], toolCounts: {}, latencies: [], diag: [], costUsd: 0, usage: { input: 0, output: 0, cacheRead: 0, cacheCreate: 0 }, turns: 0, modelUsage: {}, paused: false, probes: {}, hookCounts: { allow: 0, deny: 0, warn: 0 } };
++  return { runId: "", label: "", model: "", cwd: "", mode: "plan", startedAt: Date.now(), plans: [], stream: [], tools: {}, toolOrder: [], toolCounts: {}, latencies: [], diag: [], diagnostics: 0, costUsd: 0, usage: { input: 0, output: 0, cacheRead: 0, cacheCreate: 0 }, turns: 0, modelUsage: {}, paused: false, probes: {}, hookCounts: { allow: 0, deny: 0, warn: 0 } };
+ }
+ 
+ export function summarizeInput(name: string, input: unknown): string {
+@@ -96,6 +96,7 @@ export function reduce(prev: UIState, ev: RunEvent): UIState {
+     case "approval.resolve": if (s.pendingApproval?.requestId === ev.requestId) s.pendingApproval = undefined; diag(s, { t: ev.t, source: "approval", level: "info", text: `${ev.behavior} by ${ev.by}` }); break;
+     case "probe": s.probes = { ...s.probes, [ev.name]: { ok: ev.ok, detail: ev.detail, t: ev.t } }; if (!ev.ok) diag(s, { t: ev.t, source: "sys", level: "warn", text: `${ev.name} ✗ ${ev.detail}` }); break;
+     case "log": diag(s, { t: ev.t, source: ev.source, level: ev.level, text: ev.message }); break;
++    case "diagnostic": s.diagnostics = s.diagnostics + 1; diag(s, { t: ev.t, source: "schema", level: "warn", text: `${ev.messageType} failed ${ev.schema}: ${ev.issues.map((i) => i.path).join(", ")} — ${ev.issues[0]?.message ?? ""}` }); break;
+     case "control": s.paused = ev.action === "pause" ? true : ev.action === "resume" ? false : s.paused; diag(s, { t: ev.t, source: "ctl", level: "info", text: `${ev.action}${ev.detail ? ": " + ev.detail.slice(0, 120) : ""}` }); break;
+   }
+   if (s.stream.length > MAX_STREAM) s.stream = s.stream.slice(-MAX_STREAM);

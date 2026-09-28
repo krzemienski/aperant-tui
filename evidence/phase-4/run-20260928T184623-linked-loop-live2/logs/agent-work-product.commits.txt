@@ -1,4 +1,8 @@
+388f69e auto-claude: Complete subtask-1-2 - Add diagnostic RunEvent kind end to end
 0b22b23 auto-claude: Complete subtask-1-1 - Create SDK message zod schema module
 
+ src/cli.ts               |   1 +
+ src/engine/events.ts     |   1 +
  src/engine/sdk-schema.ts | 197 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 197 insertions(+)
+ src/state/reducer.ts     |   5 +-
+ 4 files changed, 202 insertions(+), 2 deletions(-)
