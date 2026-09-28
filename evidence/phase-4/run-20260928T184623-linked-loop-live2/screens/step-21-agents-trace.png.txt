@@ -1,0 +1,50 @@
+│ ┃ 19:20:32.874 006-schema-v tool-result   Read               15ms  1	/*                                                                                                                            ┃
+│
+│ ┃  2	 * RunEvent — the single vocabulary Vigil uses for everything it ob                                                                                                                           ┃
+│
+│ ┃ 19:20:32.881 006-schema-v step-finish   —                  —       step 4 · 24.3k tok                                                                                                            ┃ │
+│ ┃ 19:20:34.634 006-schema-v thinking-delta—                  —                                                                                                                                     ┃ │
+│ ┃ 19:20:34.634 006-schema-v thinking-delta—                  —                                                                                                                                     ┃ │
+│ ┃ 19:20:36.517 006-schema-v tool-call     Read               —       {"file_path":"/Users/nick/Desktop/vigil/.auto-claude/worktrees/tasks/006-sche…                                                ┃ │
+│ ┃ 19:20:36.739 006-schema-v tool-call     Read               —       {"file_path":"/Users/nick/Desktop/vigil/.auto-claude/worktrees/tasks/006-sche…                                                ┃ │
+│ ┃ 19:20:36.748 006-schema-v tool-result   Read               232ms  1	/*                                                                                                                           ┃ │
+│ ┃  2	 * RunStore — everything a run observes goes to disk                                                                                                                                          ┃
+│
+│ ┃  3	 *   runs/                                                                                                                                                                                    ┃
+│
+│ ┃ 19:20:36.750 006-schema-v tool-result   Read               11ms  1	import { z } from "zod"                                                                                                       ┃
+│
+│ ┃  2	import { readFileSync, existsSync } from "node                                                                                                                                                ┃
+│
+│ ┃ 19:20:36.751 006-schema-v step-finish   —                  —       step 5 · 34.1k tok                                                                                                            ┃ │
+│ ┃ 19:20:38.559 006-schema-v tool-call     Read               —       {"file_path":"/Users/nick/Desktop/vigil/.auto-claude/worktrees/tasks/006-sche…                                                ┃ │
+│ ┃ 19:20:39.207 006-schema-v tool-call     Read               —       {"file_path":"/Users/nick/Desktop/vigil/.auto-claude/worktrees/tasks/006-sche…                                                ┃ │
+│ ┃ 19:20:39.233 006-schema-v tool-result   Read               655ms  1	import { describe, it, expect } from "vitest"                                                                                ┃ │
+│ ┃  2	import { mkdtempSync, wr                                                                                                                                                                      ┃
+│
+│ ┃ 19:20:39.233 006-schema-v tool-result   Read               11ms   1	/** Reduces RunEvents into the UI state the cockpit renders. Pure; testab                                                    ┃ │
+│ ┃ 19:20:39.234 006-schema-v step-finish   —                  —       step 6 · 37.4k tok                                                                                                            ┃ │
+│ ┃ 19:20:42.248 006-schema-v thinking-delta—                  —                                                                                                                                     ┃ │
+│ ┃ 19:20:42.250 006-schema-v thinking-delta—                  —                                                                                                                                     ┃ │
+│ ┃ 19:20:43.837 006-schema-v tool-call     Read               —       {"file_path":"/Users/nick/Desktop/vigil/.auto-claude/worktrees/tasks/006-sche…                                                ┃ │
+│ ┃ 19:20:45.093 006-schema-v tool-call     Bash               —       {"command":"cd /Users/nick/Desktop/vigil/.auto-claude/worktrees/tasks/006-sch…                                                ┃ │
+│ ┃ 19:20:45.107 006-schema-v tool-result   Read               1275ms   1	/*
+   ┃ │
+│ ┃   2	 * Runner — sequences plans (or a single prompt) through PlanSess                                                                                                                            ┃ │
+│ ┃ 19:20:45.113 006-schema-v tool-result   Bash               19ms src/ui/panes.tsx:26:  const cacheTotal = s.usage.input + s.usage.cacheRead + …                                                   ┃ │
+│ ┃ 19:20:45.125 006-schema-v step-finish   —                  —       step 7 · 44.4k tok                                                                                                            ┃ │
+│ ┃ 19:20:48.403 006-schema-v thinking-delta—                  —                                                                                                                                     ┃ │
+│ ┃ 19:20:48.403 006-schema-v thinking-delta—                  —                                                                                                                                     ┃ │
+│ ┃ 19:20:49.714 006-schema-v tool-call     Bash               —       {"command":"cd /Users/nick/Desktop/vigil/.auto-claude/worktrees/tasks/006-sch…                                                ┃ │
+│ ┃ f toggles agent filter · ring buffer 10k · outlier >3000ms highlighted                                                                                                                           ┃ │
+│ ┃                                                                                                                                                                                                  ┃ │
+│ ┃                                                                                                                                                                                                  ┃ │
+│ ┃                                                                                                                                                                                                  ┃ │
+│ ┃                                                                                                                                                                                                  ┃ │
+│ ┃                                                                                                                                                                                                  ┃ │
+│ ┃                                                                                                                                                                                                  ┃ │
+│ ┃                                                                                                                                                                                                  ┃ │
+│ ┃                                                                                                                                                                                                  ┃ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ │
+│ AGENTS  1-6 sub-view · j/k select · ⏎ inspect · f filter · r resume                                                                                                                     : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

@@ -1,0 +1,4 @@
+0b22b23 auto-claude: Complete subtask-1-1 - Create SDK message zod schema module
+
+ src/engine/sdk-schema.ts | 197 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 197 insertions(+)

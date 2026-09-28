@@ -18,6 +18,21 @@ type EventLogState = {
 };
 
 /**
+ * How many log rows the panel draws at once.
+ *
+ * It used to slice 200. A task's flight recorder holds thousands of events, so
+ * the panel asked for ~200 rows inside a pane that has roughly 45 — the frame
+ * then exceeded the terminal's row count and Ink switched from incremental
+ * repaint to a full clearTerminal on every frame
+ * (node_modules/ink/build/ink.js:121, `outputHeight >= stdout.rows`), which in
+ * a real PTY renders as rows overwriting each other mid-line. Measured
+ * 2026-09-28 driving task 006: `TASK LOGS` never became matchable because the
+ * frame was corrupt. 30 rows leaves room for the panel border, the title, the
+ * malformed-line notice and the surrounding app chrome.
+ */
+const MAX_LOG_ROWS = 30;
+
+/**
  * The flight recorder is append-only and unbounded — it was measured at 146 MB
  * (617k lines) on a working machine. Reading it whole on every 1s tick cost
  * 526 ms of blocking work per tick (140 ms read + 386 ms parse) and 335 MB of
@@ -109,7 +124,10 @@ export function LogsView({ theme: c, task, isActive, onBack }: { theme: Theme; t
   // Keep the historical task.logs source in the display if a producer ever populates it.
   const lines = task?.logs.length ? [...eventLog.lines, ...task.logs] : eventLog.lines;
   useKeymap({
-    j: () => setOffset((o) => Math.min(o + 1, Math.max(0, lines.length - 10))),
+    // Stop scrolling once the last row is on screen. The old `- 10` bound was
+    // unrelated to how many rows actually render, so the tail could be scrolled
+    // past into a blank panel.
+    j: () => setOffset((o) => Math.min(o + 1, Math.max(0, lines.length - MAX_LOG_ROWS))),
     k: () => setOffset((o) => Math.max(o - 1, 0)),
     escape: onBack,
   }, { isActive });
@@ -140,7 +158,7 @@ export function LogsView({ theme: c, task, isActive, onBack }: { theme: Theme; t
           {eventLog.malformedLines > 0 && (
             <Text color={c.faint}>{eventLog.malformedLines} malformed event log line{eventLog.malformedLines === 1 ? '' : 's'} skipped</Text>
           )}
-          {lines.slice(offset, offset + 200).map((l, i) => (
+          {lines.slice(offset, offset + MAX_LOG_ROWS).map((l, i) => (
             <Text key={offset + i} color={c.dim} wrap="truncate-end">{l}</Text>
           ))}
         </Box>

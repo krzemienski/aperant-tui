@@ -1,0 +1,50 @@
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ vigil /Users/nick/Desktop/vigil │ ⑂ main                                                                                                               ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│  1 swarm   2 graph   3 inspect   4 trace   5 tokens   6 waits  1 agent · esc then 1-7 to switch tabs                                                                                                 │
+│                                                                                                                                                                                                      │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ ┌───────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃ AGENT SWARM · 1 live                                                                               ┃ │ SWARM VITALS                                                                              │ │
+│ ┃    AGENT              TYPE               STEPS      CTX      WAITING ON                            ┃ │ running   1                                                                               │ │
+│ ┃  ❯ ● 006-schema-valid   planner            20/1000    ██░░░    — executing                         ┃ │ blocked   0                                                                               │ │
+│ ┃                                                       37%                                          ┃ │ paused    0                                                                               │ │
+│ ┃                                                                                                    ┃ │ Σ tokens  82.6k                                                                           │ │
+│ ┃   phase: ▪ structured vs ~ inferred provenance shown in INSPECT                                    ┃ └───────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ ┃                                                                                                    ┃                                                                                               │
+│ ┃                                                                                                    ┃ ┌───────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃                                                                                                    ┃ │ LIVE TOOL TRACE                                                                           │ │
+│ ┃                                                                                                    ┃ │ 19:27:42 006-schema-v step-finish step 19 · 74.6k tok                                     │ │
+│ ┃                                                                                                    ┃ │ 19:27:45 006-schema-v thinking-delta                                                      │ │
+│ ┃                                                                                                    ┃ │ 19:27:45 006-schema-v thinking-delta                                                      │ │
+│ ┃                                                                                                    ┃ │ 19:27:48 006-schema-v → Bash {"command":"cd /Users/nick/Desktop/vigil/.auto-claude/worktr…│ │
+│ ┃                                                                                                    ┃ │ 19:27:48 006-schema-v ← 94ms export interface ToolResultBlockParam {                      │ │
+│ ┃                                                                                                    ┃ │     tool_use_id: string;                                                                  │ │
+│ ┃                                                                                                    ┃ │     type: 't…                                                                             │ │
+│ ┃                                                                                                    ┃ │ 19:27:48 006-schema-v step-finish step 20 · 75.2k tok                                     │ │
+│ ┃                                                                                                    ┃ │ 19:27:52 006-schema-v thinking-delta                                                      │ │
+│ ┃                                                                                                    ┃ │ 19:27:52 006-schema-v thinking-delta                                                      │ │
+│ ┃                                                                                                    ┃ │ 19:27:52 006-schema-v text-delta All                                                      │ │
+│ ┃                                                                                                    ┃ │ 19:27:52 006-schema-v text-delta shapes g                                                 │ │
+│ ┃                                                                                                    ┃ │ 19:27:52 006-schema-v text-delta athered. Now writing the                                 │ │
+│ ┃                                                                                                    ┃ │ 19:27:52 006-schema-v text-delta findings note.                                           │ │
+│ ┃                                                                                                    ┃ │                                                                                           │ │
+│ ┃                                                                                                    ┃ │                                                                                           │ │
+│ ┃                                                                                                    ┃ │                                                                                           │ │
+│ ┃                                                                                                    ┃ │                                                                                           │ │
+│ ┃                                                                                                    ┃ │                                                                                           │ │
+│ ┃                                                                                                    ┃ │                                                                                           │ │
+│ ┃                                                                                                    ┃ │                                                                                           │ │
+│ ┃                                                                                                    ┃ │                                                                                           │ │
+│ ┃                                                                                                    ┃ │                                                                                           │ │
+│ ┃                                                                                                    ┃ │                                                                                           │ │
+│ ┃                                                                                                    ┃ │                                                                                           │ │
+│ ┃                                                                                                    ┃ │                                                                                           │ │
+│ ┃                                                                                                    ┃ │                                                                                           │ │
+│ ┃                                                                                                    ┃ │                                                                                           │ │
+│ ┃                                                                                                    ┃ │                                                                                           │ │
+│ ┃                                                                                                    ┃ │                                                                                           │ │
+│ ┃                                                                                                    ┃ │                                                                                           │ │
+│ ┃                                                                                                    ┃ │                                                                                           │ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ └───────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ AGENTS  1-6 sub-view · j/k select · ⏎ inspect · f filter · r resume                                                                                                                     : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

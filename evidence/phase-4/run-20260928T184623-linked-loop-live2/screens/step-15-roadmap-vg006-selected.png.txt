@@ -1,0 +1,50 @@
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ vigil /Users/nick/Desktop/vigil │ ⑂ main                                                                                                               ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓┌─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃ PHASES                                                                ┃│ DETAIL                                                                                                                  │ │
+│ ┃   ○ PHASE phase-1 Escape Velocity                                     ┃│ Hardened Boundary                                                                                                       │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/9 features                                     ┃│ ❯· Schema-validated SDK message boundary [planned · must_have]                                                          │ │
+│ ┃                                                                       ┃│    c → convert this feature to a task spec                                                                              │ │
+│ ┃ ❯ ○ PHASE phase-2 Hardened Boundary                                   ┃│  · Continuous integration pipeline with coverage reporting [planned · must_have]                                        │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/11 features                                    ┃│    n/p to select                                                                                                        │ │
+│ ┃                                                                       ┃│  · SDK contract fixtures and widened version range [planned · must_have]                                                │ │
+│ ┃   ○ PHASE phase-3 CI Native                                           ┃│    n/p to select                                                                                                        │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/8 features                                     ┃│  · Rail evaluation over resolved command semantics [planned · should_have]                                              │ │
+│ ┃                                                                       ┃│    n/p to select                                                                                                        │ │
+│ ┃   ○ PHASE phase-4 Resume & Compare                                    ┃│  · Rail lint and dry-run command [planned · should_have]                                                                │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/5 features                                     ┃│    n/p to select                                                                                                        │ │
+│ ┃                                                                       ┃│  · Artifact, config and probe test coverage [planned · should_have]                                                     │ │
+│ ┃   ○ PHASE phase-5 Open Platform                                       ┃│    n/p to select                                                                                                        │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/6 features                                     ┃│  · Non-blocking buffered event writer [planned · should_have]                                                           │ │
+│ ┃                                                                       ┃│    n/p to select                                                                                                        │ │
+│ ┃                                                                       ┃│  · Exhaustive event spine and a genuinely pure reducer [planned · should_have]                                          │ │
+│ ┃                                                                       ┃│    n/p to select                                                                                                        │ │
+│ ┃                                                                       ┃│  · Validated CLI flag boundary [planned · should_have]                                                                  │ │
+│ ┃                                                                       ┃│    n/p to select                                                                                                        │ │
+│ ┃                                                                       ┃│  · Layered config resolution with provenance reporting [planned · should_have]                                          │ │
+│ ┃                                                                       ┃│    n/p to select                                                                                                        │ │
+│ ┃                                                                       ┃│  · Verdict contract conformance suite and compliance telemetry [planned · should_have]                                  │ │
+│ ┃                                                                       ┃│    n/p to select                                                                                                        │ │
+│ ┃                                                                       ┃│                                                                                                                         │ │
+│ ┃                                                                       ┃│                                                                                                                         │ │
+│ ┃                                                                       ┃│                                                                                                                         │ │
+│ ┃                                                                       ┃│                                                                                                                         │ │
+│ ┃                                                                       ┃│                                                                                                                         │ │
+│ ┃                                                                       ┃│                                                                                                                         │ │
+│ ┃                                                                       ┃│                                                                                                                         │ │
+│ ┃                                                                       ┃│                                                                                                                         │ │
+│ ┃                                                                       ┃│                                                                                                                         │ │
+│ ┃                                                                       ┃│                                                                                                                         │ │
+│ ┃                                                                       ┃│                                                                                                                         │ │
+│ ┃                                                                       ┃│                                                                                                                         │ │
+│ ┃                                                                       ┃│                                                                                                                         │ │
+│ ┃                                                                       ┃│                                                                                                                         │ │
+│ ┃                                                                       ┃│                                                                                                                         │ │
+│ ┃                                                                       ┃│                                                                                                                         │ │
+│ ┃                                                                       ┃│                                                                                                                         │ │
+│ ┃                                                                       ┃│                                                                                                                         │ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛└─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│  g generate · G refresh · j/k phase · n/p feature · c convert→spec                                                                                                                                   │
+│ ROAD  g generate (G force regen) · x stop · j/k phase · c convert→spec                                                                                                                  : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

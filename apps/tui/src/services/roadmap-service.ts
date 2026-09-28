@@ -12,7 +12,7 @@
  * `roadmap-error`) exactly as the desktop IPC layer consumed it.
  */
 import type { Project } from '@shared/types';
-import { getManager, applyAccountEnv, type AgentManagerLike } from './agent-start-service';
+import { getManager, applyAccountEnv, ensureEventLogAttached, type AgentManagerLike } from './agent-start-service';
 import { observability } from './observability';
 
 export interface RoadmapProgress {
@@ -51,6 +51,12 @@ export async function startGeneration(project: Project, opts: { refresh?: boolea
   // D-C: arm the shared observability tap for roadmap runs; previously these
   // runs produced no observability state, leaving the agents view empty.
   observability.attachToManager(am);
+  // The durable JSONL flight recorder was armed ONLY from startTask(), so a
+  // roadmap generation — a real provider run with real tool calls — wrote
+  // nothing to agent-events.jsonl and left LogsView with no record of it.
+  // roadmap-* events are already in OBSERVED_EVENTS; this attaches the
+  // listener that persists them.
+  ensureEventLogAttached(am);
   am.startRoadmapGeneration(project.id, project.path, opts.refresh ?? false, false, false,
     opts.model ? { model: opts.model, thinkingLevel: 'medium' } : undefined);
 }

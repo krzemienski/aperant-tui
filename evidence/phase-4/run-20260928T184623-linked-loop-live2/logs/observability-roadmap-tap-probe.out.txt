@@ -1,0 +1,19 @@
+{
+  "traceRows": 6,
+  "types": [
+    "roadmap:discovery",
+    "text-delta",
+    "tool-call",
+    "tool-call",
+    "roadmap:discovery",
+    "text-delta"
+  ],
+  "tools": [
+    "Read",
+    "Bash"
+  ],
+  "stepsExecuted": 2,
+  "waiting": null,
+  "state": "running",
+  "model": "cc/claude-opus-5"
+}

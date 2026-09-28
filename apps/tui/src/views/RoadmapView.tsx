@@ -47,6 +47,32 @@ interface Props {
 
 const MAX_LOG_LINES = 8;
 
+/**
+ * Hard height for the GENERATION panel: 2 border rows + title + status +
+ * progress bar + MAX_LOG_LINES. Without a fixed height the panel grows with
+ * the streamed log and the whole view can exceed the terminal's row count —
+ * at which point Ink stops doing incremental repaints and issues a full
+ * clearTerminal on EVERY frame (node_modules/ink/build/ink.js: `if
+ * (outputHeight >= stdout.rows)`). Measured 2026-09-28 in a real 200x50 tmux
+ * PTY during a live roadmap run: the pane filled with 34 stacked, never-cleared
+ * frame repaints and the TUI became unreadable and unwaitable
+ * (logs/frame-overflow-scrollback-ap6.txt). Bounding the one panel that grows
+ * keeps the view inside the frame; Panel already clips with overflow="hidden".
+ */
+const GENERATION_PANEL_HEIGHT = MAX_LOG_LINES + 5;
+
+/**
+ * How many features the DETAIL pane draws at once. The pane used to render
+ * EVERY feature in the selected phase (2 rows each), so a phase with ~14+
+ * features pushed the frame past a 50-row terminal. Clipping alone is not
+ * enough: each feature is a 2-row Box, and a clip that lands mid-Box
+ * interleaves the title row of one feature with the hint row of another
+ * ("n/p to selecte feature 2 …" — measured 2026-09-28 against a 30-feature
+ * phase). Drawing a bounded window whose rows always fit keeps every Box
+ * whole and makes long phases navigable with n/p instead of invisible.
+ */
+const MAX_DETAIL_FEATURES = 12;
+
 // F-07: agent-queue.ts emits `roadmap-log` once per raw AI-SDK text-delta
 // chunk (agent-queue.ts:440-443 — one emit per part of result.fullStream),
 // not once per logical line. The same channel also carries whole synthesized
@@ -61,6 +87,47 @@ const DISCRETE_LOG_RE = /^(Running .+ phase\.\.\.|Phase .+ (?:completed|failed)|
 
 interface LogBuf { lines: string[]; partial: string; }
 const EMPTY_LOG_BUF: LogBuf = { lines: [], partial: '' };
+
+/**
+ * The generation panel's state used to live ONLY in this component's
+ * useState. App.tsx mounts views conditionally (`view === 'road' &&
+ * <RoadmapView …>`), so switching to any other tab UNMOUNTS this view and
+ * throws that state away: coming back mid-run showed an idle roadmap with no
+ * GENERATION panel while the runner was still streaming — and, because the
+ * panel only renders when running/errorMsg/logs are set, a matched wait on
+ * `RUNNING · ` could never re-arm after a tab switch.
+ *
+ * The runner already persists the authoritative run state to
+ * `<project>/.auto-claude/roadmap/generation_progress.json` (agent-queue.ts
+ * persistRoadmapProgress) and DELETES that file when the run ends
+ * (clearRoadmapProgress). Reading it at mount rehydrates the real state —
+ * no synthesis: when the file is absent, the view is correctly idle.
+ *
+ * CAUTION (measured 2026-09-28): the file is NOT a liveness oracle. If the
+ * process hosting the run dies, clearRoadmapProgress never runs and the file
+ * is left behind — a later launch would then show a permanent phantom
+ * `RUNNING ·` panel for a run that no longer exists. So disk supplies
+ * phase/progress/message ONLY; liveness is confirmed against the manager
+ * itself via roadmapSvc.isRunning() (agent-queue's own
+ * isRoadmapRunning), and a stale file resolves to idle.
+ */
+export function readGenerationProgress(project: Project): roadmapSvc.RoadmapProgress | null {
+  const p = path.join(project.path, '.auto-claude', 'roadmap', 'generation_progress.json');
+  try {
+    const d = JSON.parse(fs.readFileSync(p, 'utf8')) as {
+      phase?: string; progress?: number; message?: string; is_running?: boolean;
+    };
+    if (!d || d.is_running !== true) return null;
+    return {
+      phase: String(d.phase ?? 'roadmap'),
+      progress: typeof d.progress === 'number' ? d.progress : 0,
+      message: String(d.message ?? ''),
+    };
+  } catch {
+    // absent (run finished/never started) or unreadable → idle
+    return null;
+  }
+}
 
 function pushLogChunk(buf: LogBuf, raw: string): LogBuf {
   if (DISCRETE_LOG_RE.test(raw)) {
@@ -89,10 +156,30 @@ export function RoadmapView({ theme: c, project, isActive }: Props) {
   // looking at. Without it the user could only ever convert a phase's first
   // unlinked feature, making every later item unreachable.
   const [selFeat, setSelFeat] = useState(0);
+  // Rehydrate from the runner's on-disk progress file so a tab switch (which
+  // unmounts this view) cannot lose a live run. `running` starts false and is
+  // promoted only once the manager confirms the run is actually alive.
+  const [progress, setProgress] = useState<roadmapSvc.RoadmapProgress | null>(
+    () => readGenerationProgress(project));
   const [running, setRunning] = useState(false);
-  const [progress, setProgress] = useState<roadmapSvc.RoadmapProgress | null>(null);
   const [logBuf, setLogBuf] = useState<LogBuf>(EMPTY_LOG_BUF);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  // Confirm liveness with the manager on mount: a progress file alone can be
+  // an orphan left by a killed process.
+  useEffect(() => {
+    let alive = true;
+    if (!readGenerationProgress(project)) return;
+    roadmapSvc.isRunning(project).then(
+      (live) => {
+        if (!alive) return;
+        setRunning(live);
+        if (!live) setProgress(null); // stale file → idle, not a phantom run
+      },
+      () => { /* manager unavailable → stay idle rather than claim a live run */ },
+    );
+    return () => { alive = false; };
+  }, [project]);
 
   const { roadmap, path: rp, error } = useMemo(
     () => loadRoadmap(project), [project.path, reloadKey]);
@@ -115,12 +202,28 @@ export function RoadmapView({ theme: c, project, isActive }: Props) {
   const featIndex = Math.min(selFeat, Math.max(phaseFeats.length - 1, 0));
   const selFeature = phaseFeats[featIndex];
 
+  // Window the DETAIL list around the cursor so it never exceeds the frame.
+  const detailStart = Math.max(0, Math.min(
+    featIndex - Math.floor(MAX_DETAIL_FEATURES / 2),
+    phaseFeats.length - MAX_DETAIL_FEATURES,
+  ));
+  const detailFeats = phaseFeats.slice(detailStart, detailStart + MAX_DETAIL_FEATURES);
+
   // Poll roadmap.json while a run is active so the phase list lands live.
   useEffect(() => {
     if (!running) return;
-    const id = setInterval(() => setReloadKey((k) => k + 1), 2000);
+    const id = setInterval(() => {
+      setReloadKey((k) => k + 1);
+      // Re-read the runner's progress file too: after a remount the in-flight
+      // `roadmap-progress` emissions that would otherwise drive this panel may
+      // already have fired, and the terminal 'complete' event clears the file
+      // rather than emitting to a view that did not exist at the time.
+      const disk = readGenerationProgress(project);
+      if (disk) setProgress(disk);
+      else setRunning(false);
+    }, 2000);
     return () => clearInterval(id);
-  }, [running]);
+  }, [running, project]);
 
   // Subscribe to the real manager events for this project.
   useEffect(() => {
@@ -197,7 +300,7 @@ export function RoadmapView({ theme: c, project, isActive }: Props) {
   return (
     <Box flexDirection="column" flexGrow={1} gap={0}>
       {(running || errorMsg || logDisplay.length > 0) && (
-        <Panel title="GENERATION" theme={c} focused={isActive && running}>
+        <Panel title="GENERATION" theme={c} focused={isActive && running} height={GENERATION_PANEL_HEIGHT}>
           <Text color={running ? c.accent : errorMsg ? c.err : c.ok}>{status}</Text>
           {running && progress ? (
             <Box marginLeft={1} gap={1}>
@@ -249,7 +352,9 @@ export function RoadmapView({ theme: c, project, isActive }: Props) {
           {selPhase?.features?.length ? (
             <Box flexDirection="column">
               <Text color={c.text} bold>{selPhase.name ?? selPhase.title}</Text>
-              {selPhase.features.map((f, i) => (
+              {detailFeats.map((f, wi) => {
+                const i = detailStart + wi;
+                return (
                 <Box key={f.id ?? i} flexDirection="column">
                   <Text color={i === featIndex ? c.text : c.dim} wrap="truncate-end">
                     {i === featIndex ? '❯' : ' '}{f.linked_spec_id ? '⇒' : '·'} <Text color={i === featIndex ? c.accent : c.dim}>{f.title ?? f.id}</Text> <Text color={c.faint}>[{f.status ?? 'planned'}{f.priority ? ` · ${f.priority}` : ''}]</Text>
@@ -260,7 +365,13 @@ export function RoadmapView({ theme: c, project, isActive }: Props) {
                     <Text color={i === featIndex ? c.accent : c.faint}>   {i === featIndex ? 'c → convert this feature to a task spec' : 'n/p to select'}</Text>
                   )}
                 </Box>
-              ))}
+                );
+              })}
+              {phaseFeats.length > MAX_DETAIL_FEATURES ? (
+                <Text color={c.faint}>
+                  {`   showing ${detailStart + 1}-${detailStart + detailFeats.length} of ${phaseFeats.length} · n/p scrolls`}
+                </Text>
+              ) : null}
             </Box>
           ) : (
             <Text color={c.faint}>{phases.length ? 'phase has no features yet' : 'generate a roadmap first (g)'}</Text>

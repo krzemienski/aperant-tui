@@ -1,0 +1,50 @@
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ ap-overflow-proj /tmp/ap-overflow-proj │ ⑂ master                                                                                                      ◉ 0 running  ◆ 0 review  ● no profile│
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃ PHASES                                                                   ┃│ DETAIL                                                                                                               │ │
+│ ┃ ❯ ○ PHASE phase-1 Big Phase                                              ┃│ Big Phase                                                                                                            │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/30 features                                       ┃│    c → convert this feature to a task specbly long title [planned · must_have]                                       │ │
+│ ┃                                                                          ┃│    n/p to selecte feature 2 with a reasonably long title [planned · must_have]                                       │ │
+│ ┃   ○ PHASE phase-2 Second                                                 ┃│    n/p to selecte feature 3 with a reasonably long title [planned · must_have]                                       │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/0 features                                        ┃│                                                                                                                      │ │
+│ ┃                                                                          ┃│    n/p to selecte feature 4 with a reasonably long title [planned · must_have]                                       │ │
+│ ┃                                                                          ┃│    n/p to selecte feature 5 with a reasonably long title [planned · must_have]                                       │ │
+│ ┃                                                                          ┃│                                                                                                                      │ │
+│ ┃                                                                          ┃│    n/p to selecte feature 6 with a reasonably long title [planned · must_have]                                       │ │
+│ ┃                                                                          ┃│    n/p to selecte feature 7 with a reasonably long title [planned · must_have]                                       │ │
+│ ┃                                                                          ┃│    n/p to selecte feature 8 with a reasonably long title [planned · must_have]                                       │ │
+│ ┃                                                                          ┃│                                                                                                                      │ │
+│ ┃                                                                          ┃│    n/p to selecte feature 9 with a reasonably long title [planned · must_have]                                       │ │
+│ ┃                                                                          ┃│    n/p to selecte feature 10 with a reasonably long title [planned · must_have]                                      │ │
+│ ┃                                                                          ┃│                                                                                                                      │ │
+│ ┃                                                                          ┃│    n/p to selecte feature 11 with a reasonably long title [planned · must_have]                                      │ │
+│ ┃                                                                          ┃│    n/p to selecte feature 12 with a reasonably long title [planned · must_have]                                      │ │
+│ ┃                                                                          ┃│    n/p to selecte feature 13 with a reasonably long title [planned · must_have]                                      │ │
+│ ┃                                                                          ┃│                                                                                                                      │ │
+│ ┃                                                                          ┃│    n/p to selecte feature 14 with a reasonably long title [planned · must_have]                                      │ │
+│ ┃                                                                          ┃│    n/p to selecte feature 15 with a reasonably long title [planned · must_have]                                      │ │
+│ ┃                                                                          ┃│                                                                                                                      │ │
+│ ┃                                                                          ┃│    n/p to selecte feature 16 with a reasonably long title [planned · must_have]                                      │ │
+│ ┃                                                                          ┃│    n/p to selecte feature 17 with a reasonably long title [planned · must_have]                                      │ │
+│ ┃                                                                          ┃│    n/p to selecte feature 18 with a reasonably long title [planned · must_have]                                      │ │
+│ ┃                                                                          ┃│                                                                                                                      │ │
+│ ┃                                                                          ┃│    n/p to selecte feature 19 with a reasonably long title [planned · must_have]                                      │ │
+│ ┃                                                                          ┃│    n/p to selecte feature 20 with a reasonably long title [planned · must_have]                                      │ │
+│ ┃                                                                          ┃│                                                                                                                      │ │
+│ ┃                                                                          ┃│    n/p to selecte feature 21 with a reasonably long title [planned · must_have]                                      │ │
+│ ┃                                                                          ┃│    n/p to selecte feature 22 with a reasonably long title [planned · must_have]                                      │ │
+│ ┃                                                                          ┃│    n/p to selecte feature 23 with a reasonably long title [planned · must_have]                                      │ │
+│ ┃                                                                          ┃│                                                                                                                      │ │
+│ ┃                                                                          ┃│    n/p to selecte feature 24 with a reasonably long title [planned · must_have]                                      │ │
+│ ┃                                                                          ┃│    n/p to selecte feature 25 with a reasonably long title [planned · must_have]                                      │ │
+│ ┃                                                                          ┃│                                                                                                                      │ │
+│ ┃                                                                          ┃│    n/p to selecte feature 26 with a reasonably long title [planned · must_have]                                      │ │
+│ ┃                                                                          ┃│    n/p to selecte feature 27 with a reasonably long title [planned · must_have]                                      │ │
+│ ┃                                                                          ┃│    n/p to selecte feature 28 with a reasonably long title [planned · must_have]                                      │ │
+│ ┃                                                                          ┃│                                                                                                                      │ │
+│ ┃                                                                          ┃│    n/p to selecte feature 29 with a reasonably long title [planned · must_have]                                      │ │
+│ ┃                                                                          ┃│    n/p to selecte feature 30 with a reasonably long title [planned · must_have]                                      │ │
+│ ┃                                                                          ┃│                                                                                                                      │ │
+│ ┗g generate · G refresh · j/k phase · n/p feature · c convert→spec━━━━━━━━━┛└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ ROAD  g generate (G force regen) · x stop · j/k phase · c convert→spec                                                                                                                  : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

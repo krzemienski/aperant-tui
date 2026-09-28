@@ -1,0 +1,390 @@
+{
+  "feature": "Schema-validated SDK message boundary",
+  "workflow_type": "feature",
+  "workflow_rationale": "This adds a new validation layer (a zod schema module + a new `diagnostic` RunEvent) and then migrates the existing session handlers onto it. It is not a pure refactor because new observable behaviour (diagnostics on disk, explicit-unknown cost) is introduced, and it is not an investigation because the root cause is already known and stated in the spec. Phases follow the natural dependency order: schemas and the event vocabulary must exist before session.ts can be rewired, and tests/fixtures come after the surface they pin down exists.",
+  "phases": [
+    {
+      "id": "phase-0-setup",
+      "name": "Toolchain bootstrap",
+      "type": "setup",
+      "description": "Install dependencies (this worktree has no node_modules) and establish the SDK's real message shapes from the pinned 0.3.261 type definitions so the schemas are written against fact, not guesswork.",
+      "depends_on": [],
+      "parallel_safe": false,
+      "subtasks": [
+        {
+          "id": "subtask-0-1",
+          "title": "Install deps and capture SDK message shapes",
+          "description": "Run `npm install` in the project root so node_modules exists (typecheck and vitest cannot run without it). Then read the Claude Agent SDK type definitions at node_modules/@anthropic-ai/claude-agent-sdk/*.d.ts and extract the exact declared shapes of the message variants Vigil consumes: SDKSystemMessage (subtype 'init' and the status/notification/api_retry/compact_boundary subtypes), SDKPartialAssistantMessage / stream_event, SDKAssistantMessage (message.content text + tool_use blocks), SDKUserMessage (message.content tool_result blocks), the tool_progress message, SDKResultMessage (subtype, total_cost_usd, duration_ms, num_turns, usage, modelUsage, errors, result, is_error) and the rate_limit_event message (rate_limit_info.status / rateLimitType / unifiedWindows). Write the findings as a short markdown note at .auto-claude/specs/006-schema-validated-sdk-message-boundary/SDK_SHAPES.md listing, per message type, which fields Vigil actually reads today (cross-reference src/engine/session.ts handle()) and whether the SDK declares them required or optional. Do NOT modify any source file in this subtask. If the SDK ships no usable .d.ts, record that explicitly in the note and fall back to the field list already documented in context.json.",
+          "service": "vigil",
+          "files_to_modify": [],
+          "files_to_create": [".auto-claude/specs/006-schema-validated-sdk-message-boundary/SDK_SHAPES.md"],
+          "patterns_from": ["src/engine/session.ts"],
+          "expected_output": "SDK_SHAPES.md enumerating each consumed message type, its fields, and required/optional status per the pinned SDK typings.",
+          "verification": {
+            "type": "command",
+            "command": "npm run typecheck && test -s .auto-claude/specs/006-schema-validated-sdk-message-boundary/SDK_SHAPES.md && echo SHAPES_OK",
+            "expected": "SHAPES_OK with no typecheck errors (baseline is green before any change)"
+          },
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": "phase-1-foundations",
+      "name": "Schema module and diagnostic vocabulary",
+      "type": "implementation",
+      "description": "Create the zod schema layer for SDK messages and extend the RunEvent vocabulary with a typed `diagnostic` variant plus an explicit-unknown representation for cost. Nothing in session.ts changes yet; this phase only builds the surfaces phase 2 will consume.",
+      "depends_on": ["phase-0-setup"],
+      "parallel_safe": false,
+      "subtasks": [
+        {
+          "id": "subtask-1-1",
+          "title": "Create SDK message zod schema module",
+          "description": "Create src/engine/sdk-schema.ts following the zod idiom in src/config.ts (module-level const schemas + z.infer type aliases, NodeNext .js imports). Use zod v4 LOOSE objects (z.looseObject({...})) everywhere so unknown extra fields on an SDK message are silently tolerated - never z.strictObject.\n\nAdopt a two-layer design so a malformed message degrades instead of vanishing:\n1. `SdkEnvelopeSchema = z.looseObject({ type: z.string() })` - the outermost gate; parse every incoming message through it first.\n2. One named ENVELOPE schema per consumed message type holding only the fields Vigil strictly requires to act at all, and one named DETAIL schema per type holding the fields Vigil reports but can survive without (numerics, usage, modelUsage, errors, result text). Required export names: SystemInitSchema, SystemStatusSchema, StreamEventSchema, AssistantMessageSchema, ToolProgressSchema, UserMessageSchema, ResultEnvelopeSchema, ResultDetailSchema, RateLimitEventSchema. Base every field on SDK_SHAPES.md from subtask-0-1.\n   - SystemInitSchema: session_id string (required), model string (required), tools array of string (default []), cwd string (required).\n   - StreamEventSchema: event.type string (required), event.delta optional { type string, text optional string }, parent_tool_use_id string|null (default null).\n   - AssistantMessageSchema: message.content array of loose blocks with `type` string required and optional text/id/name/input; parent_tool_use_id string|null (default null).\n   - ToolProgressSchema: tool_use_id string (required), elapsed_time_seconds number (default 0), heartbeat optional boolean.\n   - UserMessageSchema: message.content is z.union([z.string(), z.array(loose block with type string required, tool_use_id/content/is_error optional)]).\n   - ResultEnvelopeSchema: subtype string (required), is_error optional boolean.\n   - ResultDetailSchema: total_cost_usd, duration_ms, num_turns as OPTIONAL numbers; usage as an optional loose object of optional numbers (input_tokens, output_tokens, cache_read_input_tokens, cache_creation_input_tokens); modelUsage optional record of loose { costUSD, inputTokens, outputTokens } optional numbers; errors optional string[]; result optional string.\n   - RateLimitEventSchema: rate_limit_info optional loose object { status optional string, rateLimitType optional string, unifiedWindows optional record of loose { utilization optional number } }.\n\nAlso export:\n- `export interface SchemaIssue { path: string; code: string; message: string }` where `path` is the dotted/bracketed field path (e.g. `message.content[0].type`), derived from a zod issue's `path` array via a small `formatPath(path: PropertyKey[]): string` helper (join with '.', render numeric segments as [n], and render an empty path as '(root)').\n- `export type ParseResult<T> = { ok: true; value: T } | { ok: false; issues: SchemaIssue[] }`.\n- `export function parseWith<T>(schema: z.ZodType<T>, schemaName: string, input: unknown): ParseResult<T>` implemented with schema.safeParse (never throws) mapping error.issues to SchemaIssue[].\n- `export function sampleOf(input: unknown, max = 300): string` returning a truncated, safe JSON.stringify of the offending message for diagnostics (must not throw on circular/BigInt input - wrap in try/catch and fall back to String(input)).\n\nThis module must import nothing from session.ts (no cycles) and must contain zero `as unknown as` casts.",
+          "service": "vigil",
+          "files_to_modify": [],
+          "files_to_create": ["src/engine/sdk-schema.ts"],
+          "patterns_from": ["src/config.ts", "src/engine/events.ts"],
+          "verification": {
+            "type": "command",
+            "command": "npm run typecheck && node --experimental-strip-types -e \"import('./src/engine/sdk-schema.ts').then(m=>{const r=m.parseWith(m.SystemInitSchema,'SystemInitSchema',{type:'system',subtype:'init',session_id:'s',model:'m',cwd:'/',tools:[],brand_new_field:1});if(!r.ok)throw new Error('loose parse failed');const b=m.parseWith(m.SystemInitSchema,'SystemInitSchema',{type:'system',subtype:'init',model:'m',cwd:'/'});if(b.ok)throw new Error('missing session_id should fail');console.log('SCHEMA_OK',b.issues[0].path)})\"",
+            "expected": "SCHEMA_OK session_id — extra fields tolerated, missing required field reported with its path"
+          },
+          "status": "pending"
+        },
+        {
+          "id": "subtask-1-2",
+          "title": "Add diagnostic RunEvent kind end to end",
+          "description": "Add a new variant to the RunEvent union in src/engine/events.ts, placed next to the `log` variant:\n`| { t: number; kind: \"diagnostic\"; planId: string; source: \"sdk-schema\"; messageType: string; schema: string; issues: { path: string; code: string; message: string }[]; sample?: string }`\nKeep the existing field ordering/style of the file (one line per variant).\n\nThen handle it everywhere RunEvent is switched on:\n- src/state/reducer.ts reduce(): add `case \"diagnostic\":` that pushes a diag row via the existing diag() helper with source \"schema\", level \"warn\", and text `${ev.messageType} failed ${ev.schema}: ${ev.issues.map(i => i.path).join(\", \")} — ${ev.issues[0]?.message ?? \"\"}`. Also add a `diagnostics: number` counter to UIState (initialised to 0 in initialState()) and increment it, so the count is observable.\n- src/cli.ts plainLine(): add `case \"diagnostic\": return `${ts} ⚠ schema ${ev.messageType}/${ev.schema}: ${ev.issues.map(i=>i.path).join(\",\")}`;` so `vigil replay --plain` and `vigil tail` surface diagnostics.\nNo change is required in src/engine/store.ts — append() already JSON-stringifies every event into events.jsonl before its per-kind switch; verify this by reading store.ts and do not add a redundant case.\nDo not touch session.ts in this subtask.",
+          "service": "vigil",
+          "files_to_modify": ["src/engine/events.ts", "src/state/reducer.ts", "src/cli.ts"],
+          "files_to_create": [],
+          "patterns_from": ["src/engine/events.ts", "src/state/reducer.ts", "src/cli.ts"],
+          "verification": {
+            "type": "command",
+            "command": "npm run typecheck && npx vitest run tests/reducer.test.ts",
+            "expected": "typecheck clean and existing reducer tests still pass"
+          },
+          "status": "pending"
+        },
+        {
+          "id": "subtask-1-3",
+          "title": "Represent unknown cost explicitly as null",
+          "description": "Make a missing total_cost_usd representable as an explicit unknown rather than 0/NaN. In src/engine/events.ts change the `session.result` variant's `costUsd: number` to `costUsd: number | null`. Then fix every consumer so an unknown cost renders as an em-dash rather than a fabricated number:\n- src/state/reducer.ts: UIState.costUsd becomes `number | null` (initialState returns null); the `session.result` case assigns ev.costUsd directly (no ?? 0), and its diag text uses `ev.costUsd === null ? \"$?\" : \"$\" + ev.costUsd.toFixed(3)`.\n- src/ui/panes.tsx Header (~line 43): render `s.costUsd === null ? \"$—\" : \"$\" + s.costUsd.toFixed(2)` and keep the C.ok colour (use C.dim when null).\n- src/cli.ts plainLine() `session.result` (~line 86): `cost=${ev.costUsd === null ? \"unknown\" : \"$\" + ev.costUsd.toFixed(3)}`.\n- src/cli.ts `runs` command (~line 140): the per-run cost column must print `$?` when the last session.result has a null costUsd, instead of `$0.00`.\n- src/engine/store.ts writes ev.costUsd into cost.json verbatim — confirm null serialises fine and leave it.\nUpdate tests/reducer.test.ts only as far as needed to keep it compiling/passing (the existing fixture supplies costUsd: 0.42 so it should be unaffected); add one assertion that a session.result with costUsd: null leaves s.costUsd null.\nDo not touch session.ts in this subtask — it will be rewired in phase 2 and may temporarily keep passing a number.",
+          "service": "vigil",
+          "files_to_modify": ["src/engine/events.ts", "src/state/reducer.ts", "src/ui/panes.tsx", "src/cli.ts", "tests/reducer.test.ts"],
+          "files_to_create": [],
+          "patterns_from": ["src/state/reducer.ts", "src/ui/panes.tsx"],
+          "verification": {
+            "type": "command",
+            "command": "npm run typecheck && npx vitest run tests/reducer.test.ts",
+            "expected": "typecheck clean; reducer tests pass including the new null-cost assertion"
+          },
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": "phase-2-session-boundary",
+      "name": "Rewire session handlers onto schemas",
+      "type": "implementation",
+      "description": "Replace every unchecked cast in PlanSession with schema parsing that emits a diagnostic RunEvent on failure and never aborts the run. Split across three subtasks by message group to keep each change reviewable; all three touch src/engine/session.ts so they must run sequentially.",
+      "depends_on": ["phase-1-foundations"],
+      "parallel_safe": false,
+      "subtasks": [
+        {
+          "id": "subtask-2-1",
+          "title": "Add diagnostic helper and envelope dispatch",
+          "description": "In src/engine/session.ts import the schema module (`import { ... } from \"./sdk-schema.js\"`).\n\n1. Add a private helper to PlanSession:\n`private diagnose(messageType: string, schema: string, issues: SchemaIssue[], raw: unknown) { this.emitEv({ t: now(), kind: \"diagnostic\", planId: this.opts.planId, source: \"sdk-schema\", messageType, schema, issues, sample: sampleOf(raw) }); }`\n2. Add a private helper `private parseOrDiagnose<T>(schema: z.ZodType<T>, schemaName: string, messageType: string, raw: unknown): T | null` that calls parseWith, and on failure calls this.diagnose(...) and returns null. Callers early-return on null so a malformed message is skipped, never thrown.\n3. Change `handle(msg: SDKMessage & Record<string, unknown>)` to `private async handle(msg: unknown)`. At the top, parse through SdkEnvelopeSchema; if that fails emit a diagnostic with messageType \"(unknown)\" and return. Switch on the validated `type` string from the envelope result instead of a cast.\n4. In run(): change the loop body to `await this.handle(msg)` with no cast, and replace the `(msg as {type:string}).type === \"result\"` turn-end check. To keep the turn-end logic driven by validated data, have handle() record the last parsed result (e.g. set a private field `lastResult: { subtype: string; costUsd: number | null } | null` in the result case) and have run() consult a small flag/return rather than re-casting msg. The `lastResultCost` accumulator must be fed from the validated value (null-safe: keep the previous value when cost is unknown).\n5. Convert the `system` case: for subtype 'init' use SystemInitSchema via parseOrDiagnose and emit session.init from the validated values (tools defaults to []); for the status/notification/api_retry/compact_boundary subtypes use SystemStatusSchema instead of the `(msg as {text?:string})` cast at line 232. The `default:` branch's debug log must read subtype off the validated envelope, not a cast.\nAfter this subtask the assistant/user/tool_progress/result/rate_limit cases may still hold their original casts — they are migrated in 2-2 and 2-3. The file must still typecheck and existing tests must still pass.",
+          "service": "vigil",
+          "files_to_modify": ["src/engine/session.ts"],
+          "files_to_create": [],
+          "patterns_from": ["src/engine/sdk-schema.ts", "src/engine/session.ts"],
+          "verification": {
+            "type": "command",
+            "command": "npm run typecheck && npx vitest run",
+            "expected": "typecheck clean; all existing tests pass"
+          },
+          "status": "pending"
+        },
+        {
+          "id": "subtask-2-2",
+          "title": "Validate stream, assistant, tool_progress and tool_result",
+          "description": "In src/engine/session.ts replace the remaining casts in the streaming/tool path with schema parsing via this.parseOrDiagnose:\n- `stream_event` (lines ~236-243): parse with StreamEventSchema; keep the existing content_block_delta / text_delta gating on the validated fields; emit assistant.delta and feed the line buffer exactly as before.\n- `assistant` (lines ~245-259): parse with AssistantMessageSchema; iterate validated message.content. Keep the existing semantics precisely: text blocks emit assistant.text (final: true), flush the line buffer and re-scan the block text for verdict lines; tool_use blocks with id and name register in this.toolStart and emit tool.start. A block whose shape is wrong must produce ONE diagnostic naming the block path (e.g. `message.content[2].type`) and be skipped, while sibling blocks still process.\n- `tool_progress` (lines ~260-264): parse with ToolProgressSchema; keep the heartbeat suppression and the `.slice(-6)` id-tail debug log.\n- `user` (lines ~265-279): parse with UserMessageSchema; keep the string-vs-array content handling, the tool_result extraction, the nested-content text flattening (the `(c as {text?:string}).text` inner cast must also go — model the inner content as a loose array/union in the schema), and the existing tool.output + tool.end emissions with the toolStart duration lookup.\nNo behaviour change for well-formed messages; zero `as unknown as` may remain in any of these cases.",
+          "service": "vigil",
+          "files_to_modify": ["src/engine/session.ts"],
+          "files_to_create": [],
+          "patterns_from": ["src/engine/sdk-schema.ts", "src/engine/session.ts"],
+          "verification": {
+            "type": "command",
+            "command": "npm run typecheck && npx vitest run",
+            "expected": "typecheck clean; all existing tests pass"
+          },
+          "status": "pending"
+        },
+        {
+          "id": "subtask-2-3",
+          "title": "Validate result and rate_limit cost/token reads",
+          "description": "In src/engine/session.ts migrate the two money/quota-bearing cases so cost, tokens and rate-limit values are read ONLY through validated schemas:\n- `result` (lines ~280-288): parse ResultEnvelopeSchema first (subtype + is_error). If the envelope fails, emit a diagnostic and return without emitting session.result. If it succeeds, parse ResultDetailSchema separately; a detail failure must NOT discard the result — emit a diagnostic and continue with whatever validated fields are available. Then: costUsd = validated total_cost_usd when present, otherwise null AND a diagnostic naming path `total_cost_usd` with a 'missing required field' message (an unknown cost is explicit, never 0 and never NaN). durationMs/turns fall back to 0 as today. usage maps to TokenUsage from the validated usage object (missing numeric members -> 0). modelUsage defaults to {}. Preserve the existing lastResultOk / lastResultSubtype assignment, the errors[] log and the re-scan of `result` text for verdict lines.\n- `rate_limit_event` (lines ~289-294): parse RateLimitEventSchema; build the utilisation summary from the validated unifiedWindows record and keep the warn-vs-debug level rule on status. The `(v.utilization ?? 0)` read must come from validated data.\nFinally, sweep the whole file: `grep -n 'as unknown as' src/engine/session.ts` must return nothing. Prefer validated data over `as` casts generally, but the acceptance criterion is specifically zero `as unknown as`.",
+          "service": "vigil",
+          "files_to_modify": ["src/engine/session.ts"],
+          "files_to_create": [],
+          "patterns_from": ["src/engine/sdk-schema.ts", "src/engine/session.ts"],
+          "verification": {
+            "type": "command",
+            "command": "npm run typecheck && npx vitest run && ! grep -q 'as unknown as' src/engine/session.ts && echo NO_UNSAFE_CASTS",
+            "expected": "typecheck clean, all tests pass, NO_UNSAFE_CASTS printed"
+          },
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": "phase-3-tests-and-corpus",
+      "name": "Tests, malformed fixtures and real-session corpus",
+      "type": "implementation",
+      "description": "Pin down every acceptance criterion with executable tests: per-schema parse-failure fixtures, the end-to-end diagnostic path through events.jsonl, the cast guard, and a recorded real-session corpus that must parse with zero diagnostics.",
+      "depends_on": ["phase-2-session-boundary"],
+      "parallel_safe": false,
+      "subtasks": [
+        {
+          "id": "subtask-3-1",
+          "title": "Unit-test every schema parse-failure path",
+          "description": "Create tests/sdk-schema.test.ts (vitest, imports from ../src/engine/sdk-schema.js). For EVERY exported named schema (SystemInitSchema, SystemStatusSchema, StreamEventSchema, AssistantMessageSchema, ToolProgressSchema, UserMessageSchema, ResultEnvelopeSchema, ResultDetailSchema, RateLimitEventSchema) assert three things:\n1. a well-formed fixture parses ok;\n2. the same fixture with extra unknown top-level AND nested fields (e.g. `future_field: {...}`) still parses ok with NO issues — tolerance of unknown additional fields;\n3. a malformed fixture with a required field deleted or retyped fails, and the returned issues[0].path is exactly the expected dotted/bracketed path (e.g. `session_id`, `message.content[0].type`, `event.type`, `tool_use_id`, `subtype`).\nAlso test formatPath/parseWith directly: a nested array index renders as `a.b[1].c`, and parseWith never throws on null/undefined/a primitive/a circular object. Drive the fixtures from SDK_SHAPES.md so the happy-path shapes are realistic.",
+          "service": "vigil",
+          "files_to_modify": [],
+          "files_to_create": ["tests/sdk-schema.test.ts"],
+          "patterns_from": ["tests/reducer.test.ts", "tests/parser.test.ts"],
+          "verification": {
+            "type": "command",
+            "command": "npx vitest run tests/sdk-schema.test.ts",
+            "expected": "all schema unit tests pass, covering ok / extra-fields / malformed for every named schema"
+          },
+          "status": "pending"
+        },
+        {
+          "id": "subtask-3-2",
+          "title": "Test diagnostics reach events.jsonl without aborting",
+          "description": "Create tests/session-diagnostics.test.ts. Build a PlanSession the same way tests/session-verdict.test.ts does (mk() helper at line 11) and invoke the private handle() through a cast, feeding raw message objects directly — no SDK process is started.\nAssert:\n1. Feeding a malformed message of each consumed type (missing session_id on system/init; non-array message.content on assistant; missing tool_use_id on tool_progress; missing subtype on result; garbage rate_limit_info) emits a `diagnostic` RunEvent whose messageType is the SDK type string and whose issues[0].path is the failing field path — and that the await resolves rather than rejecting (the run does not abort).\n2. A well-formed message carrying extra unknown fields emits NO diagnostic and still produces its normal RunEvent (e.g. session.init / assistant.text / tool.start).\n3. A result message with total_cost_usd absent emits session.result with costUsd === null (never 0, never NaN) plus a diagnostic naming `total_cost_usd`; a result with total_cost_usd present emits the exact number.\n4. Persistence: construct a RunStore against a mkdtempSync temp dir (see tests/session-verdict.test.ts for the tmpdir idiom), append the emitted diagnostic events, then read back runs/<id>/events.jsonl and assert a line with kind === \"diagnostic\" containing the message type and failing path is present.\n5. A malformed block inside an otherwise valid assistant message still lets the sibling well-formed blocks emit their events.",
+          "service": "vigil",
+          "files_to_modify": [],
+          "files_to_create": ["tests/session-diagnostics.test.ts"],
+          "patterns_from": ["tests/session-verdict.test.ts", "src/engine/store.ts"],
+          "verification": {
+            "type": "command",
+            "command": "npx vitest run tests/session-diagnostics.test.ts",
+            "expected": "all diagnostic-boundary tests pass, including the events.jsonl round-trip"
+          },
+          "status": "pending"
+        },
+        {
+          "id": "subtask-3-3",
+          "title": "Add source guard test for unsafe casts",
+          "description": "Create tests/no-unsafe-casts.test.ts which reads src/engine/session.ts from disk (readFileSync, path resolved relative to the test file via fileURLToPath(import.meta.url) so it is cwd-independent) and asserts the source contains zero occurrences of `as unknown as`. Report the offending line numbers in the failure message so a regression is immediately actionable. Also assert src/engine/sdk-schema.ts is free of `as unknown as`. Keep the regex simple and literal — this test is the enforcement mechanism for acceptance criterion 1.",
+          "service": "vigil",
+          "files_to_modify": [],
+          "files_to_create": ["tests/no-unsafe-casts.test.ts"],
+          "patterns_from": ["tests/parser.test.ts"],
+          "verification": {
+            "type": "command",
+            "command": "npx vitest run tests/no-unsafe-casts.test.ts",
+            "expected": "guard test passes (zero unsafe casts in session.ts and sdk-schema.ts)"
+          },
+          "status": "pending"
+        },
+        {
+          "id": "subtask-3-4",
+          "title": "Record and pin a real-session message corpus",
+          "description": "Give Vigil a way to record raw SDK messages and commit a corpus that must parse clean.\n1. In src/engine/session.ts add an opt-in recorder: when process.env.VIGIL_RECORD_SDK is set to a file path, append JSON.stringify(rawMessage) + \"\\n\" to that path for every message entering handle(), before parsing. Wrap the write in try/catch so a recorder failure can never affect a run, and emit one info log naming the path on first write. Document the env var in README.md next to the other run knobs.\n2. Create tests/fixtures/sdk-messages/corpus.jsonl containing at least one realistic recorded message per consumed type (system/init, system/status, stream_event content_block_delta, assistant with both a text and a tool_use block, user with a tool_result block, tool_progress, result/success with full usage + modelUsage, result with an error subtype, rate_limit_event). Derive each line from a real recording produced via VIGIL_RECORD_SDK if a live run is possible; otherwise reconstruct them faithfully from the pinned SDK typings captured in SDK_SHAPES.md. Redact any tokens/paths that are machine-specific. Add a short tests/fixtures/sdk-messages/README.md stating the SDK version the corpus was recorded against (0.3.261) and how to regenerate it with VIGIL_RECORD_SDK.\n3. Create tests/sdk-corpus.test.ts which reads corpus.jsonl line by line, routes each message through the same dispatch the session uses, collects every diagnostic that would be emitted, and asserts the collected list is EMPTY — printing the message type and failing path for any that fail. Also assert the corpus actually covers every consumed message type (guards against an empty/stale corpus silently passing).",
+          "service": "vigil",
+          "files_to_modify": ["src/engine/session.ts", "README.md"],
+          "files_to_create": ["tests/fixtures/sdk-messages/corpus.jsonl", "tests/fixtures/sdk-messages/README.md", "tests/sdk-corpus.test.ts"],
+          "patterns_from": ["src/engine/session.ts", "tests/session-verdict.test.ts"],
+          "verification": {
+            "type": "command",
+            "command": "npx vitest run tests/sdk-corpus.test.ts",
+            "expected": "corpus parses with zero diagnostics and covers every consumed message type"
+          },
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": "phase-4-integration",
+      "name": "Full verification",
+      "type": "integration",
+      "description": "Verify the whole boundary end to end: build, typecheck, full suite, and a real replay/tail render proving the diagnostic surfaces in the TUI and CLI without regressing the existing run pipeline.",
+      "depends_on": ["phase-3-tests-and-corpus"],
+      "parallel_safe": false,
+      "subtasks": [
+        {
+          "id": "subtask-4-1",
+          "title": "Typecheck, build and full suite green",
+          "description": "Run the complete verification set: `npm run typecheck`, `npm run build` and `npm test`. Fix any fallout in files not yet touched (src/ui/App.tsx, src/ui/overlays.tsx, src/replay.ts, src/plan/reports.ts) arising from the costUsd nullability or the new RunEvent variant. Do not weaken any schema or delete a test to make this pass.",
+          "service": "vigil",
+          "files_to_modify": ["src/ui/App.tsx", "src/ui/overlays.tsx", "src/replay.ts"],
+          "files_to_create": [],
+          "patterns_from": [],
+          "verification": {
+            "type": "command",
+            "command": "npm run typecheck && npm run build && npm test",
+            "expected": "tsc clean, dist built, every vitest file passing with no skips"
+          },
+          "status": "pending"
+        },
+        {
+          "id": "subtask-4-2",
+          "title": "End-to-end diagnostic replay verification",
+          "description": "Prove the diagnostic is a first-class, persisted, renderable event. Write a temporary events.jsonl in a scratch run dir containing a run.start, a session.init, a diagnostic event and a session.result with costUsd null, then run `node --experimental-strip-types src/cli.ts replay <dir> --plain` (or the built dist equivalent) and confirm the output contains the schema diagnostic line naming the message type and failing path, and prints the unknown cost as `unknown` rather than $0.000. Then run `node ... src/cli.ts runs <planRoot>` against a scratch runs/ tree and confirm a null-cost run shows `$?`. Delete the scratch dirs afterwards; nothing temporary may be committed.",
+          "all_services": true,
+          "files_to_modify": [],
+          "files_to_create": [],
+          "patterns_from": ["src/cli.ts"],
+          "verification": {
+            "type": "e2e",
+            "steps": [
+              "Write a scratch events.jsonl containing run.start, session.init, a diagnostic event and a session.result with costUsd null",
+              "Run the CLI replay --plain against that dir",
+              "Assert the diagnostic line appears with the message type and failing field path",
+              "Assert the unknown cost renders as 'unknown' and not $0.000",
+              "Run the CLI runs command and assert a null-cost run renders $?",
+              "Remove the scratch directories"
+            ]
+          },
+          "status": "pending"
+        },
+        {
+          "id": "subtask-4-3",
+          "title": "Audit all six acceptance criteria",
+          "description": "Walk the six acceptance criteria in spec.md one by one and record, for each, the exact command or test that proves it: (1) zero `as unknown as` in session.ts enforced by tests/no-unsafe-casts.test.ts; (2) every consumed SDK message has a named schema with a unit-tested parse-failure path in tests/sdk-schema.test.ts; (3) malformed message -> diagnostic RunEvent with type + failing path, appended to events.jsonl, run continues (tests/session-diagnostics.test.ts); (4) unknown extra fields tolerated with no diagnostic, missing required fields always diagnose; (5) cost/token/rate-limit read only through validated schemas and missing total_cost_usd yields explicit unknown, not NaN or 0; (6) the recorded corpus parses with zero diagnostics. Append the evidence table to .auto-claude/specs/006-schema-validated-sdk-message-boundary/build-progress.txt. Flag any criterion that is only partially met rather than declaring done.",
+          "service": "vigil",
+          "files_to_modify": [".auto-claude/specs/006-schema-validated-sdk-message-boundary/build-progress.txt"],
+          "files_to_create": [],
+          "patterns_from": [],
+          "expected_output": "An evidence table mapping each of the six acceptance criteria to the test/command that proves it.",
+          "verification": {
+            "type": "manual",
+            "instructions": "Review the evidence table in build-progress.txt: each of the six acceptance criteria must name a concrete passing test or command. Any criterion without executable evidence must be called out as incomplete."
+          },
+          "status": "pending"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "total_phases": 5,
+    "total_subtasks": 14,
+    "services_involved": ["vigil"],
+    "parallelism": {
+      "max_parallel_phases": 1,
+      "parallel_groups": [],
+      "recommended_workers": 1,
+      "speedup_estimate": "1x — strictly sequential",
+      "reasoning": "Single-package project. Every phase depends on the previous one, and the three phase-2 subtasks all edit src/engine/session.ts, so concurrent work would collide. Phase-3 test subtasks are independent of each other file-wise but all depend on the finished phase-2 boundary; running them in one worker keeps the 'full suite green' signal honest."
+    },
+    "startup_command": "source auto-claude/.venv/bin/activate && python auto-claude/run.py --spec 006 --parallel 1"
+  },
+  "verification_strategy": {
+    "risk_level": "high",
+    "skip_validation": false,
+    "test_creation_phase": "post_implementation",
+    "test_types_required": ["unit", "integration", "e2e"],
+    "security_scanning_required": false,
+    "staging_deployment_required": false,
+    "acceptance_criteria": [
+      "Zero `as unknown as` casts remain in src/engine/session.ts, enforced by a test that greps the source",
+      "Every SDK message consumed by Vigil has a named Zod schema whose parse-failure path is unit-tested with a malformed fixture",
+      "A malformed message produces a `diagnostic` RunEvent containing the message type and the failing field path, is appended to events.jsonl, and does not abort the run",
+      "Unknown additional fields on an SDK message are tolerated without a diagnostic; missing required fields always produce one",
+      "Cost, token and rate-limit values are read only through validated schemas; a missing total_cost_usd yields an explicit unknown rather than NaN or 0",
+      "A recorded real-session message corpus parses with zero diagnostics",
+      "All pre-existing tests continue to pass (no behaviour regression for well-formed messages)"
+    ],
+    "verification_steps": [
+      {
+        "name": "Install",
+        "command": "npm install",
+        "expected_outcome": "node_modules present; zod v4 and the pinned SDK available",
+        "type": "build",
+        "required": true,
+        "blocking": true
+      },
+      {
+        "name": "Typecheck",
+        "command": "npm run typecheck",
+        "expected_outcome": "tsc --noEmit reports no errors under strict mode",
+        "type": "build",
+        "required": true,
+        "blocking": true
+      },
+      {
+        "name": "Build",
+        "command": "npm run build",
+        "expected_outcome": "dist emitted with no errors",
+        "type": "build",
+        "required": true,
+        "blocking": true
+      },
+      {
+        "name": "Unit + Integration Tests",
+        "command": "npm test",
+        "expected_outcome": "All vitest files pass, including sdk-schema, session-diagnostics, no-unsafe-casts and sdk-corpus",
+        "type": "test",
+        "required": true,
+        "blocking": true
+      },
+      {
+        "name": "Unsafe Cast Guard",
+        "command": "! grep -q 'as unknown as' src/engine/session.ts && echo NO_UNSAFE_CASTS",
+        "expected_outcome": "NO_UNSAFE_CASTS",
+        "type": "test",
+        "required": true,
+        "blocking": true
+      },
+      {
+        "name": "Corpus Clean Parse",
+        "command": "npx vitest run tests/sdk-corpus.test.ts",
+        "expected_outcome": "Recorded corpus parses with zero diagnostics and covers every consumed message type",
+        "type": "test",
+        "required": true,
+        "blocking": true
+      }
+    ],
+    "reasoning": "This rewrites the single code path every observability claim in the tool depends on, and changes a persisted event shape (costUsd nullability) consumed by the reducer, the TUI and the CLI. A silent regression here produces wrong dollar figures and missing verdicts with no error. High risk warrants unit tests per schema, an integration test through the session boundary to events.jsonl, and an e2e replay render check. No secrets or network surface is touched, so security scanning is not required."
+  },
+  "qa_acceptance": {
+    "unit_tests": {
+      "required": true,
+      "commands": ["npx vitest run tests/sdk-schema.test.ts", "npx vitest run tests/no-unsafe-casts.test.ts"],
+      "minimum_coverage": null,
+      "notes": "Every named schema needs ok / extra-fields-tolerated / malformed-path assertions."
+    },
+    "integration_tests": {
+      "required": true,
+      "commands": ["npx vitest run tests/session-diagnostics.test.ts", "npx vitest run tests/sdk-corpus.test.ts"],
+      "services_to_test": ["vigil"],
+      "notes": "Diagnostics must round-trip through RunStore into events.jsonl and must not abort handle()."
+    },
+    "e2e_tests": {
+      "required": true,
+      "commands": ["npm test"],
+      "flows": ["replay-plain-renders-diagnostic", "runs-command-shows-unknown-cost"]
+    },
+    "browser_verification": {
+      "required": false,
+      "pages": [],
+      "notes": "Terminal UI only - no browser. The ink Header cost render is covered by typecheck plus the reducer test."
+    },
+    "database_verification": {
+      "required": false,
+      "checks": [],
+      "notes": "No database. The on-disk equivalent is runs/<id>/events.jsonl, asserted in tests/session-diagnostics.test.ts."
+    },
+    "regression_checks": {
+      "required": true,
+      "commands": ["npx vitest run tests/session-verdict.test.ts", "npx vitest run tests/reducer.test.ts", "npx vitest run tests/parser.test.ts", "npx vitest run tests/reports.test.ts", "npx vitest run tests/verdict-rails.test.ts", "npx vitest run tests/anim.test.ts"],
+      "notes": "Well-formed SDK messages must produce byte-identical RunEvents to before, apart from costUsd nullability."
+    }
+  },
+  "qa_signoff": null
+}

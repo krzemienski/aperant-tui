@@ -1,0 +1,642 @@
+[
+  {
+    "id": "VG-030",
+    "title": "Land stranded worktree work and enforce a merge-verification gate",
+    "description": "Merge the completed, QA-passed worktree at .auto-claude/worktrees/tasks/001-neutral-default-rails-with-environment-profiles into the main checkout (src/engine/profiles.ts, the --profile flag, profiles/omniroute.json, the neutralized vigil.config.example.json and tests/profiles.test.ts), re-run the full suite and typecheck against main, and then institutionalize the landing step: a `npm run land:verify` script and a documented worktree-landing checklist that greps for author-specific strings, asserts the test count did not regress, and refuses to declare a task done while its worktree is unmerged. Add a repository status check that lists worktrees under .auto-claude/worktrees containing commits absent from the main branch.",
+    "rationale": "Discovery's single largest finding is that the biggest adoption blocker is already solved but invisible: spec 001 is built, 34/34 tests pass and the author-string grep is clean — in a worktree that was never merged. Value that is delivered but not landed is worth zero to users and decays into a hard merge as main moves. The fix is integration effort, not build effort, which makes it the highest return-per-hour item on the roadmap. The generalized gate matters just as much: agents execute work in per-task worktrees and the manual merge step is a documented process risk that will strand the next four specs the same way.",
+    "priority": "must_have",
+    "complexity": "small",
+    "impact": "critical",
+    "effort_estimate": "1-2 days",
+    "phase_id": "phase-1",
+    "status": "planned",
+    "dependencies": ["VG-001"],
+    "tags": ["process", "integration", "portability", "delivery"],
+    "source_pain_points": [
+      "Completed work (spec 001) is stranded in a worktree — value delivered but not shipped; the longer it sits the harder the merge",
+      "Work is executed by autonomous agents in per-task worktrees; merging completed worktrees back to main is currently a manual, lagging step and is itself a process risk",
+      "Environment-specific defaults make the shipped tool effectively unusable by anyone else"
+    ],
+    "affected_files": [
+      "src/engine/rails.ts",
+      "src/engine/profiles.ts",
+      "src/config.ts",
+      "src/cli.ts",
+      "profiles/omniroute.json",
+      "vigil.config.example.json",
+      "tests/profiles.test.ts",
+      "package.json",
+      "CONTRIBUTING.md"
+    ],
+    "acceptance_criteria": [
+      "The 001 worktree is merged into the main branch with profiles.ts, the --profile flag, profiles/omniroute.json, the neutralized example config and tests/profiles.test.ts all present on main",
+      "On main, `npm run typecheck` is clean and the full vitest suite passes with no fewer test files or cases than the worktree reported (7 files, 34 cases as a floor)",
+      "A grep for '/Users/nick', 'OmniRoute', '.omp', '20128', '20219', '20239' and 'launchctl' over src/ and shipped config on main returns zero matches, asserted by an automated check rather than a manual run",
+      "`npm run land:verify` runs typecheck, the suite and the author-string grep in one command and exits non-zero on any failure",
+      "A status command or script lists every worktree under .auto-claude/worktrees whose branch contains commits not reachable from main, and reports 'clean' when there are none",
+      "CONTRIBUTING (or docs/) documents the landing checklist, including that a task is not complete until `land:verify` passes on main",
+      "The unmerged-worktree check runs in the CI pipeline once VG-007 exists, failing the build on stranded work older than a configurable threshold"
+    ],
+    "user_stories": [
+      {
+        "id": "VG-030-US1",
+        "as_a": "second engineer trying Vigil",
+        "i_want": "the neutral rails and profile support to actually be in the version I install",
+        "so_that": "I benefit from work that is already finished instead of hitting a blocker that was solved weeks ago"
+      },
+      {
+        "id": "VG-030-US2",
+        "as_a": "solo maintainer using agent worktrees",
+        "i_want": "a single verification command and a visible list of unmerged worktrees",
+        "so_that": "completed work cannot quietly accumulate outside the branch users install from"
+      }
+    ],
+    "linked_spec_id": "001-neutral-default-rails-with-environment-profiles"
+  },
+  {
+    "id": "VG-031",
+    "title": "Real mock-violation detection replacing the report's hardcoded claim",
+    "description": "Delete the hardcoded 'Mock Violations: none detected' string in src/plan/reports.ts and back that section with an actual detector. Classify observed tool activity for mock-shaped evidence tampering: edits that introduce stubs, fakes, skipped tests or always-true assertions into files under test; writes directly into an evidence/ path by a tool other than the command whose output it claims to capture; test invocations narrowed by filters or `.only`; and environment overrides that disable real dependencies. Record each detection as a typed RunEvent with the tool call index, file and matched pattern, surface them in the diagnostics pane, and let a configurable policy either annotate the report or downgrade the affected gate to FAIL.",
+    "rationale": "The generated VALIDATION report — the one document whose entire purpose is observed truth rather than agent prose — currently asserts the result of a check the code never performs. That is a false negative by construction in the product's credibility centre: a reader is told mocking was checked when nothing was checked. Discovery names mocking a system to make a check go green as one of the three core failure modes Vigil exists to catch, so this is the last unimplemented leg of the headline trust claim.",
+    "priority": "must_have",
+    "complexity": "large",
+    "impact": "high",
+    "effort_estimate": "1-1.5 weeks",
+    "phase_id": "phase-3",
+    "status": "planned",
+    "dependencies": ["VG-003", "VG-009", "VG-016"],
+    "tags": ["trust", "reporting", "detection", "correctness"],
+    "source_pain_points": [
+      "The report's 'Mock Violations' section is a hardcoded string asserting a rails check the code never performs — a false negative by construction in the one document whose purpose is observed truth",
+      "An agent can mock a system to make a check go green",
+      "Validation reports written by the agent are self-graded",
+      "The VALIDATION report contains a hardcoded claim about a check that does not exist — a credibility bug in the trust product"
+    ],
+    "affected_files": [
+      "src/plan/reports.ts",
+      "src/engine/session.ts",
+      "src/engine/events.ts",
+      "src/engine/store.ts",
+      "tests/reports.test.ts"
+    ],
+    "acceptance_criteria": [
+      "No hardcoded verdict string remains in reports.ts; the Mock Violations section is rendered exclusively from recorded detections, and renders 'not checked' rather than 'none detected' when detection is disabled",
+      "A detector inspects Edit/Write/MultiEdit tool inputs for mock-shaped changes (stub/fake/mock insertion, test skip or .only, assertions replaced with constants, dependency substitution) and records a mock.violation RunEvent with tool index, path and matched rule",
+      "Writes into an evidence/ path by a tool that is not the command producing the captured output are flagged as suspicious evidence provenance",
+      "Test commands narrowed by a filter, `.only`, or a skip flag during a gate are recorded with the exact invocation so a reader can judge scope",
+      "A configurable policy of annotate (default) or enforce is honoured: under enforce, a gate with an unresolved violation is downgraded to FAIL through the existing evidence-downgrade path and the reason is injected into the live session",
+      "A false-positive corpus of legitimate test-double usage in code that is not under validation produces zero violations, and a positive corpus of at least eight tampering patterns is detected, each covered by a test",
+      "Detections appear in the diagnostics pane, in --plain output, in gates.json and in the run summary, with the rule id that fired"
+    ],
+    "user_stories": [
+      {
+        "id": "VG-031-US1",
+        "as_a": "operator reading a VALIDATION report",
+        "i_want": "the mock-violation section to reflect a check that actually ran",
+        "so_that": "the one artifact I trust is not quietly lying to me"
+      },
+      {
+        "id": "VG-031-US2",
+        "as_a": "engineering lead auditing an agent run",
+        "i_want": "detection when an agent stubs or narrows a test to turn a gate green",
+        "so_that": "a PASS means the real system was exercised rather than replaced"
+      }
+    ],
+    "linked_spec_id": null
+  },
+  {
+    "id": "VG-032",
+    "title": "Byte-accurate, self-terminating `vigil tail`",
+    "description": "Rewrite the tail pump to track a byte offset with a positioned read instead of slicing a UTF-16 decoded string, buffer partial trailing lines across polls, and reuse the store's JSONL parsing rather than an inline JSON.parse. Terminate cleanly on the existing `run.end` event with an exit code matching the run outcome, keep watching only under `--follow`, and expose the logic as a reusable `RunStore.tailEvents(dir, onEvent, opts)` helper shared by tail, replay and any future consumer.",
+    "rationale": "This is a real defect, not a refinement: file size is measured in bytes while the slice is applied in UTF-16 code units, so the first non-ASCII character in agent output — and the cockpit itself emits ✓ ✗ ▶ · — permanently desynchronises the tail and corrupts every line after it. The same loop re-reads the entire events.jsonl every 500ms and never exits, even though a terminal run.end event already exists and is used elsewhere. For an audit tool, a log follower that silently corrupts its output is the worst possible failure mode, and the fix is a few dozen lines against primitives that already exist.",
+    "priority": "should_have",
+    "complexity": "small",
+    "impact": "medium",
+    "effort_estimate": "1 day",
+    "phase_id": "phase-2",
+    "status": "planned",
+    "dependencies": [],
+    "tags": ["correctness", "observability", "cli", "quick-win"],
+    "source_pain_points": [
+      "`vigil tail` tracks byte offsets against a UTF-16 decoded string, so any non-ASCII output permanently desynchronises the tail",
+      "Post-hoc auditing requires reconstructing what happened from scrollback that is already gone",
+      "Long autonomous runs are opaque — no live view of tool calls, hook decisions, token burn or dollar cost"
+    ],
+    "affected_files": ["src/cli.ts", "src/engine/store.ts", "tests/store.test.ts"],
+    "acceptance_criteria": [
+      "Tailing is implemented with a positioned byte read from the last known offset; no full re-read of events.jsonl occurs per poll",
+      "A test feeds JSONL containing multibyte characters with a chunk boundary splitting a line mid-character and asserts every event is recovered, in order, with no corruption",
+      "Partial trailing lines are carried across polls and never emitted as malformed events",
+      "`vigil tail` exits on the terminal run.end event with exit code 0 for a successful run and non-zero otherwise; `--follow` keeps watching past run.end",
+      "Tail logic is exposed as a reusable store helper and used by both the tail command and any other live consumer, with no duplicated parsing",
+      "Tailing a run directory that does not yet exist waits for creation rather than crashing",
+      "Memory use is bounded when following a run that writes 10,000 events, asserted by a benchmark test"
+    ],
+    "user_stories": [
+      {
+        "id": "VG-032-US1",
+        "as_a": "operator watching a run from a second terminal",
+        "i_want": "a tail that does not corrupt itself the moment the agent prints a non-ASCII character",
+        "so_that": "the live log I am reading is trustworthy"
+      },
+      {
+        "id": "VG-032-US2",
+        "as_a": "platform engineer scripting around Vigil",
+        "i_want": "tail to exit with the run's outcome when the run ends",
+        "so_that": "I can pipe it in a script without a manual kill or a wrapper timeout"
+      }
+    ],
+    "linked_spec_id": null
+  },
+  {
+    "id": "VG-033",
+    "title": "Run index manifest for fast corpus enumeration",
+    "description": "Extend the store's derived-artifact pipeline with a runs/<id>/summary.json manifest maintained incrementally from run.start, plan.start/plan.end, session.result and run.end events, carrying run id, label, mode, model, base URL, cwd, start and end timestamps, outcome, per-plan verdicts and durations, gate counts by state, cost and token totals, and an event count. Add a static reader and rewrite `vigil runs` to prefer the manifest, falling back to the existing full-events scan for legacy run directories.",
+    "rationale": "`vigil runs` currently parses every line of every events.jsonl in the corpus to find one run.end and the last session.result, making a listing operation O(total events ever recorded) on a long-lived plan root. The store already derives three side-car JSON files from the same stream with an identical pattern, so a fourth is a direct copy. Beyond the listing, every later cross-run capability — retention, aggregate cost, diffing, export — needs exactly this index to enumerate runs cheaply, so building it early removes repeated full-corpus scans from four downstream features.",
+    "priority": "should_have",
+    "complexity": "small",
+    "impact": "medium",
+    "effort_estimate": "2-3 days",
+    "phase_id": "phase-2",
+    "status": "planned",
+    "dependencies": ["VG-011"],
+    "tags": ["performance", "lifecycle", "observability", "artifacts"],
+    "source_pain_points": [
+      "runs/ is written under the plan root and is never pruned",
+      "Post-hoc auditing requires reconstructing what happened from scrollback that is already gone",
+      "Reviewers/auditors who read run artifacts after the fact without the TUI"
+    ],
+    "affected_files": ["src/engine/store.ts", "src/cli.ts", "tests/store.test.ts"],
+    "acceptance_criteria": [
+      "A summary manifest is written and updated incrementally as events are appended, using the same derived-artifact pattern as gates.json and cost.json",
+      "The manifest records run id, label, mode, model, base URL, cwd, started/ended timestamps, outcome and reason, per-plan verdicts and durations, gate counts by state, cost and token totals, and an event count",
+      "A manifest exists and is readable for interrupted runs, reflecting everything observed before termination",
+      "`vigil runs` reads the manifest when present and falls back to the events scan for run directories without one, producing identical output in both paths for a fixture corpus",
+      "Listing a corpus of 500 runs completes in under 500ms via manifests, asserted by a benchmark test",
+      "A store test replays a fixture event sequence and asserts every manifest field, including the per-plan verdict array and the cache-token split",
+      "The manifest carries a schema version so VG-013's public summary can extend it without breaking readers"
+    ],
+    "user_stories": [
+      {
+        "id": "VG-033-US1",
+        "as_a": "operator with hundreds of recorded runs",
+        "i_want": "`vigil runs` to list instantly",
+        "so_that": "finding the run I care about does not require re-parsing every event I have ever recorded"
+      },
+      {
+        "id": "VG-033-US2",
+        "as_a": "auditor",
+        "i_want": "a one-file overview per run directory",
+        "so_that": "I can triage which runs need deep inspection before opening any JSONL"
+      }
+    ],
+    "linked_spec_id": null
+  },
+  {
+    "id": "VG-034",
+    "title": "Rail action `ask` with per-pattern approval routing",
+    "description": "Add a third rail action alongside deny and warn: `ask`. When a matching rail is marked ask, the PreToolUse hook raises the existing ApprovalRequest so the approval overlay prompts for that single tool call regardless of the current approval mode, records the resolution as an approval.resolve event with source `rail`, and on rejection returns the same structured deny payload the rails already produce. Precedence becomes deny > ask > warn, and the two environment warn rails become natural ask candidates.",
+    "rationale": "Every part of this already exists and one piece is literally dead code waiting for it: the approval.resolve event declares a `rail` source that nothing ever emits. Today granularity is all-or-nothing — auto prompts for nothing while all prompts for every Read and Glob, which is unusable across a long run. Per-pattern prompting is the missing middle that makes the default mode safe without making it unusable, and it needs no new UI, no new event and no new hook.",
+    "priority": "should_have",
+    "complexity": "small",
+    "impact": "high",
+    "effort_estimate": "2-3 days",
+    "phase_id": "phase-2",
+    "status": "planned",
+    "dependencies": ["VG-001", "VG-009"],
+    "tags": ["safety", "rails", "approvals", "operator-control"],
+    "source_pain_points": [
+      "approvals auto/gates run with bypassPermissions — rails are the only gate on tool execution in the default mode",
+      "Destructive shell commands in a shared repo/worktree have real blast radius",
+      "Rails are regex over a flattened tool-input string: prone to false positives"
+    ],
+    "affected_files": [
+      "src/engine/rails.ts",
+      "src/engine/session.ts",
+      "src/config.ts",
+      "src/cli.ts",
+      "tests/verdict-rails.test.ts"
+    ],
+    "acceptance_criteria": [
+      "The rail action union and its config schema accept `ask`, and rail hit ordering resolves deny > ask > warn with deny still winning outright",
+      "An ask hit raises an approval request through the existing pipeline and blocks the tool call until resolved, in every approval mode including auto",
+      "Resolution is recorded as approval.resolve with source `rail`, and a hook event carries the rail id and reason so the diagnostics pane shows why the prompt appeared",
+      "Rejecting an ask returns the same structured deny payload as a deny rail, with a reason naming the rail and the operator decision, visible to the agent",
+      "In non-TTY mode an ask hit follows the configured non-TTY approval policy rather than hanging, defaulting to deny with a recorded reason",
+      "The promise-bridge used by canUseTool is factored into a single shared helper used by both tool approvals and rail asks, with no duplicated logic",
+      "Unit tests cover ordering, ask-hit detection, approval and rejection paths, and the non-TTY fallback"
+    ],
+    "user_stories": [
+      {
+        "id": "VG-034-US1",
+        "as_a": "operator running in auto mode",
+        "i_want": "to be prompted only for the specific patterns I marked risky",
+        "so_that": "I get targeted oversight without approving every file read"
+      },
+      {
+        "id": "VG-034-US2",
+        "as_a": "operator with a live database and a real config file",
+        "i_want": "those paths to prompt rather than merely warn",
+        "so_that": "a warning I might miss in a scrolling pane becomes a decision I have to make"
+      }
+    ],
+    "linked_spec_id": null
+  },
+  {
+    "id": "VG-035",
+    "title": "Task-level progress and run position cursor",
+    "description": "Act on the task model the parser already produces and the TASK verdict lines the contract already requests. Add a task.update RunEvent, handle the task branch in the session's verdict handler, track tasks per plan in the reducer alongside gates, render task rows in the plan pane with gates nested under the task they follow, emit a task line in plain output, add a task column to the VALIDATION report, and derive a 'position N of M' cursor for the cockpit header from the parsed plan sequence.",
+    "rationale": "The parser already builds tasks, a sequence and a gate-to-task association, and the verdict module already has a TASK matcher with a passing test, and the runner contract already instructs the agent to print TASK lines — but the session's verdict handler branches only on gate and plan, so every TASK line the agent emits is silently dropped. The result is a cockpit that shows a static gate list with no sense of movement through a long plan, which is exactly when an operator most needs to know whether the run is progressing or stuck. The data, the regex, the contract clause and the tests all exist; only the reducer and render leg is missing.",
+    "priority": "should_have",
+    "complexity": "medium",
+    "impact": "medium",
+    "effort_estimate": "4-5 days",
+    "phase_id": "phase-3",
+    "status": "planned",
+    "dependencies": ["VG-016", "VG-017"],
+    "tags": ["observability", "ui", "reporting"],
+    "source_pain_points": [
+      "Long autonomous runs are opaque — no live view of tool calls, hook decisions, token burn or dollar cost",
+      "Gates authored without an explicit id are parsed but can never have a detectable verdict — silent failure, no warning",
+      "Reports only fire for plans containing a phase gate, so mid-phase runs produce no report"
+    ],
+    "affected_files": [
+      "src/engine/events.ts",
+      "src/engine/session.ts",
+      "src/state/reducer.ts",
+      "src/ui/panes.tsx",
+      "src/cli.ts",
+      "src/plan/reports.ts"
+    ],
+    "acceptance_criteria": [
+      "A task.update RunEvent exists, is emitted when the agent prints a TASK verdict line, and is persisted to events.jsonl",
+      "The reducer tracks task state per plan and the plan pane renders task rows with their gates nested beneath the task they follow",
+      "The cockpit header shows a position cursor derived from the parsed plan sequence, for example 'task 4 of 11'",
+      "Plain and JSON output emit task transitions in a parseable form",
+      "The VALIDATION report lists tasks with their observed completion state, distinguishing completed, not reported and not reached",
+      "A TASK line referencing an id absent from the parsed plan produces a diagnostic rather than being silently dropped",
+      "Reducer and render behaviour for task events is covered by tests, including a plan whose gates have no task association"
+    ],
+    "user_stories": [
+      {
+        "id": "VG-035-US1",
+        "as_a": "operator watching a long plan between gates",
+        "i_want": "to see which task the agent is on and how many remain",
+        "so_that": "I can tell progress from a stall without reading raw tool output"
+      },
+      {
+        "id": "VG-035-US2",
+        "as_a": "reviewer reading a VALIDATION report",
+        "i_want": "task completion recorded alongside gate verdicts",
+        "so_that": "I can see how far the plan actually got when a gate failed"
+      }
+    ],
+    "linked_spec_id": null
+  },
+  {
+    "id": "VG-036",
+    "title": "Silent-failure elimination: exhaustiveness guards and validated inputs",
+    "description": "Close the class of defects where wrong input or new code compiles and runs but does nothing observable. Add an exhaustive default branch to the RunEvent reducer switch with a never-typed assertion and a diagnostic for unhandled variants; validate the CLI enum flags (--approvals, --log, --settings and friends) through the config schema instead of unchecked casts, failing with the accepted values; warn at parse time when a gate is authored without a detectable id; classify report gate sections by parsed gate kind rather than an id prefix; and enable noUncheckedIndexedAccess with the resulting fixes.",
+    "rationale": "Discovery lists five distinct silent-failure paths with outsized value per line: a new RunEvent variant compiles clean and simply never renders, a typo in --approvals propagates as a bad value instead of an error, a gate without an id can never have a detectable verdict and nobody is told, and report sections are classified by string prefix rather than the kind the parser already determined. In a tool whose entire proposition is that nothing important happens invisibly, silent no-ops are the most damaging bug class there is — and each fix is small and independently testable.",
+    "priority": "should_have",
+    "complexity": "small",
+    "impact": "medium",
+    "effort_estimate": "3-4 days",
+    "phase_id": "phase-2",
+    "status": "planned",
+    "dependencies": ["VG-007"],
+    "tags": ["correctness", "durability", "dx", "type-safety"],
+    "source_pain_points": [
+      "The reducer switch has no default/exhaustiveness guard, so new RunEvent variants compile clean and silently never render",
+      "CLI enum flags (--approvals, --log, --settings) are type-cast without validation, so bad values propagate silently",
+      "Gates authored without an explicit id are parsed but can never have a detectable verdict — silent failure, no warning",
+      "noUncheckedIndexedAccess is not enabled"
+    ],
+    "affected_files": [
+      "src/state/reducer.ts",
+      "src/cli.ts",
+      "src/config.ts",
+      "src/plan/parser.ts",
+      "src/plan/reports.ts",
+      "tsconfig.json"
+    ],
+    "acceptance_criteria": [
+      "The reducer has a default branch with a never-typed exhaustiveness assertion; adding an unhandled RunEvent variant fails typecheck, and an unknown variant arriving at runtime emits a diagnostic instead of being ignored",
+      "Every CLI enum flag is parsed through the config schema; an invalid value exits non-zero with a message listing the accepted values, covered by a CLI test",
+      "A gate parsed without a detectable verdict id produces a parse-time warning naming the plan file and gate, and the warning is surfaced in the diagnostics pane and plain output",
+      "Report gate sections are classified by the parsed gate kind, with a fixture test proving a validation gate whose id resembles a phase-gate prefix is classified correctly",
+      "noUncheckedIndexedAccess is enabled in tsconfig and the codebase typechecks clean under it",
+      "The typecheck script covers tests/ as well as src/, so test-only type errors cannot hide",
+      "No unchecked `as` cast on user-supplied CLI input remains, asserted by a source grep test"
+    ],
+    "user_stories": [
+      {
+        "id": "VG-036-US1",
+        "as_a": "operator who mistyped a flag",
+        "i_want": "an immediate error naming the valid values",
+        "so_that": "I do not discover mid-run that my approval mode was never what I asked for"
+      },
+      {
+        "id": "VG-036-US2",
+        "as_a": "plan author",
+        "i_want": "a warning when a gate can never produce a detectable verdict",
+        "so_that": "a malformed gate fails loudly instead of silently never being checked"
+      }
+    ],
+    "linked_spec_id": null
+  },
+  {
+    "id": "VG-037",
+    "title": "Plan lint with authoring diagnostics and configurable discovery",
+    "description": "Add `vigil plan check <planRoot>` that discovers and parses every plan without starting a session and reports authoring problems: gates with no detectable id, Capture targets whose directory cannot exist, Capture globs that match nothing at authoring time, gates with no pass criteria, duplicate gate ids across plans, tasks referenced by a gate that do not exist, and plans that parse to zero gates. Make discovery depth and glob configurable rather than hardcoded at exactly two levels under phases/, and support `--json` for scripted checks.",
+    "rationale": "Plan authoring is the one place the roadmap deliberately keeps expert-level, which makes fast feedback there disproportionately valuable: today the only way to learn a plan is malformed is to spend a full agent run discovering that a gate never produced a verdict. Discovery also notes plan discovery is exactly two levels deep under phases/, so a plausible directory layout yields a silent zero-plan run. A linter turns both classes of failure into a sub-second local check and pairs naturally with the init scaffold.",
+    "priority": "should_have",
+    "complexity": "small",
+    "impact": "medium",
+    "effort_estimate": "3-4 days",
+    "phase_id": "phase-1",
+    "status": "planned",
+    "dependencies": ["VG-002"],
+    "tags": ["dx", "onboarding", "cli", "correctness"],
+    "source_pain_points": [
+      "Gates authored without an explicit id are parsed but can never have a detectable verdict — silent failure, no warning",
+      "Plan discovery is exactly two levels deep under phases/ — more deeply nested plans are not found",
+      "Opinionated on one plan format — arbitrary markdown plans are not understood",
+      "Assumes fluency with authoring gated validation plans"
+    ],
+    "affected_files": [
+      "src/cli.ts",
+      "src/plan/discover.ts",
+      "src/plan/parser.ts",
+      "src/config.ts",
+      "tests/parser.test.ts"
+    ],
+    "acceptance_criteria": [
+      "`vigil plan check <planRoot>` lists every discovered plan with its gate and task counts and exits non-zero when any error-level problem is found",
+      "Detected problems include: gate without a detectable id, duplicate gate id across plans, gate with no pass criteria, gate referencing an unknown task, Capture target in an impossible location, Capture glob matching nothing, and a plan parsing to zero gates",
+      "Problems are classified error or warning, and `--strict` promotes warnings to errors for CI use",
+      "Discovery depth and the plan filename pattern are configurable, with the current two-level phases/ behaviour as the default, covered by a fixture with a deeper layout",
+      "Running against a root with no discoverable plans reports that explicitly and exits non-zero rather than silently succeeding with nothing to do",
+      "`--json` emits the same findings as a structured array suitable for a CI step",
+      "The command runs without a Claude binary, network access or any agent session, in under one second over the fixture plan set"
+    ],
+    "user_stories": [
+      {
+        "id": "VG-037-US1",
+        "as_a": "plan author",
+        "i_want": "to lint my plans before running them",
+        "so_that": "I fix a missing gate id in a second instead of discovering it after a long agent run"
+      },
+      {
+        "id": "VG-037-US2",
+        "as_a": "platform engineer",
+        "i_want": "plan linting in CI alongside rail linting",
+        "so_that": "a malformed validation plan cannot be merged"
+      }
+    ],
+    "linked_spec_id": null
+  },
+  {
+    "id": "VG-038",
+    "title": "`vigil doctor` environment preflight",
+    "description": "Add a `vigil doctor` command that validates everything a run depends on before any tokens are spent: Node version, the resolved Claude Code executable and its resolution source, config discovery order and schema validity, whether settingSources is empty, auth token presence (by source, never by value) and base URL reachability, active rail set compilation, plan discovery results, the runs directory and its writability and current size, and probe target reachability. Report each check as pass, warn or fail with a remediation hint, support `--json`, and exit non-zero on any failure.",
+    "rationale": "Vigil's failure modes on a new machine are mostly environmental — a missing binary, an unreachable local router, a config in the wrong place, an unwritable runs directory — and today each one is discovered by starting a real run and watching it fail partway in. A preflight consolidates the diagnosis that init, rail lint and plan lint each perform partially, and it is the single command a user can be asked to paste when reporting a problem, which matters enormously for a project with a bus factor of one.",
+    "priority": "should_have",
+    "complexity": "small",
+    "impact": "medium",
+    "effort_estimate": "2-3 days",
+    "phase_id": "phase-1",
+    "status": "planned",
+    "dependencies": ["VG-002"],
+    "tags": ["onboarding", "dx", "cli", "operations"],
+    "source_pain_points": [
+      "Requires a Claude Code executable on the machine (PATH, CLAUDE_CODE_EXECPATH or --claude-bin)",
+      "Default model id and a 127.0.0.1 baseUrl assume the author's local router",
+      "Local Claude Code settings leak into runs and make them irreproducible",
+      "A second user cannot run Vigil usefully without rewriting rails and config"
+    ],
+    "affected_files": ["src/cli.ts", "src/config.ts", "src/engine/runner.ts", "src/engine/probes.ts"],
+    "acceptance_criteria": [
+      "`vigil doctor` reports a pass/warn/fail line per check covering Node version, Claude executable and resolution source, config file discovered and schema validity, settingSources emptiness, auth token source, base URL reachability, rail compilation, plan discovery count, runs directory writability and size, and probe reachability",
+      "Every failing or warning check includes a one-line remediation hint naming the flag, env var or config key to change",
+      "Secrets are never printed: the auth token is reported by source and presence only, verified by a test asserting no token value appears in output",
+      "Checks that require network access are clearly marked and skippable with `--offline`",
+      "`--json` emits structured results with stable check ids, and the command exits non-zero if any check fails",
+      "Doctor runs successfully in a directory with no config at all, reporting exactly what is missing rather than erroring out",
+      "Total runtime is under three seconds with network checks enabled and under one second with `--offline`"
+    ],
+    "user_stories": [
+      {
+        "id": "VG-038-US1",
+        "as_a": "new operator",
+        "i_want": "one command that tells me whether my environment is ready",
+        "so_that": "I fix setup problems before spending tokens on a run that cannot succeed"
+      },
+      {
+        "id": "VG-038-US2",
+        "as_a": "maintainer triaging a bug report",
+        "i_want": "a redacted environment report I can ask a user to paste",
+        "so_that": "I diagnose configuration issues without a back-and-forth"
+      }
+    ],
+    "linked_spec_id": null
+  },
+  {
+    "id": "VG-039",
+    "title": "Lint, format and whole-repo type baseline",
+    "description": "Establish the missing code-quality baseline: an ESLint (or equivalent) configuration and a formatter with committed rules matching docs/code-standards.md, npm scripts for lint, lint:fix and format:check, a typecheck that includes tests/ as well as src/, and CI wiring so all three run on every push. Include targeted rules for the conventions this codebase actually depends on — no floating promises, exhaustive switch handling on discriminated unions, no unchecked type assertions on external input, and consistent import ordering.",
+    "rationale": "Discovery records no lint or format script, a dense single-line style optimized for author velocity over readability, and a typecheck configured to include only src/ so test-only type errors are invisible. For a project whose stated Phase 5 goal is external contributors, mechanical consistency is the cheapest way to make review about substance rather than style, and rules against floating promises and unchecked assertions directly target two of the defect classes already found in the source.",
+    "priority": "should_have",
+    "complexity": "small",
+    "impact": "medium",
+    "effort_estimate": "2-3 days",
+    "phase_id": "phase-2",
+    "status": "planned",
+    "dependencies": ["VG-007"],
+    "tags": ["durability", "dx", "process", "ci"],
+    "source_pain_points": [
+      "No issue tracker, no lint or format script, no documented public API in-repo",
+      "~1.7k LOC of dense single-line style optimized for author velocity over readability",
+      "tsconfig include is ['src'] so `npm run typecheck` does not typecheck tests/",
+      "Solo author, 2 commits of history — bus factor of one"
+    ],
+    "affected_files": [
+      "eslint.config.js",
+      ".prettierrc",
+      "package.json",
+      "tsconfig.json",
+      "tsconfig.test.json",
+      ".github/workflows/ci.yml",
+      "docs/code-standards.md"
+    ],
+    "acceptance_criteria": [
+      "`npm run lint` and `npm run format:check` exist, pass on the current tree, and fail on a deliberately introduced violation",
+      "Lint rules include no floating promises, exhaustive discriminated-union switches, no unchecked type assertions on external input, and consistent import ordering",
+      "Typecheck covers src/ and tests/, and a type error introduced in a test file fails the check",
+      "Lint, format check and typecheck all run in the CI pipeline and are required for a green build",
+      "The committed rule set is reconciled with docs/code-standards.md so documentation and enforcement agree",
+      "The full lint and format pass completes in under 30 seconds locally",
+      "An initial formatting pass is committed as a single isolated commit so it never mixes with behavioural changes"
+    ],
+    "user_stories": [
+      {
+        "id": "VG-039-US1",
+        "as_a": "contributor",
+        "i_want": "automated lint and format checks",
+        "so_that": "my pull request is reviewed on substance rather than style"
+      },
+      {
+        "id": "VG-039-US2",
+        "as_a": "maintainer",
+        "i_want": "lint rules that catch floating promises and unchecked assertions",
+        "so_that": "the defect classes already found in this codebase cannot silently return"
+      }
+    ],
+    "linked_spec_id": null
+  },
+  {
+    "id": "VG-040",
+    "title": "Versioned requirements corpus with FR/NFR traceability",
+    "description": "Commit the untracked docs/ corpus (project overview PDR, system architecture, codebase summary, code standards) to version control and make it load-bearing: give every FR and NFR a stable id, map each to the tests and source paths that verify it, and add a CI check that fails when a requirement has no linked test, when a linked path no longer exists, or when a documented line reference has drifted. Publish the map as a generated coverage table in the repository.",
+    "rationale": "Discovery flags docs/ as untracked, meaning the only formal record of FR-1..FR-25 and NFR-1..NFR-9 — a corpus that makes regression testing and CI cheaper to specify — can be lost to a single clean checkout. On a bus-factor-of-one project the requirements baseline is the most valuable non-code asset there is, and once versioned, requirement-to-test traceability converts it from prose into an enforced contract that shows exactly which guarantees are unverified.",
+    "priority": "could_have",
+    "complexity": "small",
+    "impact": "medium",
+    "effort_estimate": "2-3 days",
+    "phase_id": "phase-2",
+    "status": "planned",
+    "dependencies": ["VG-007"],
+    "tags": ["durability", "docs", "process", "testing"],
+    "source_pain_points": [
+      "docs/ is untracked in git — the requirements corpus exists but is not versioned",
+      "docs/ is untracked, so the requirements baseline can be lost",
+      "No issue tracker, no documented public API in-repo",
+      "Solo author, 2 commits of history — bus factor of one"
+    ],
+    "affected_files": [
+      "docs/project-overview-pdr.md",
+      "docs/system-architecture.md",
+      "docs/requirements-traceability.md",
+      "scripts/check-traceability.ts",
+      ".github/workflows/ci.yml"
+    ],
+    "acceptance_criteria": [
+      "All four docs/ documents are committed to version control and referenced from the README",
+      "Every FR and NFR carries a stable id and a traceability entry listing the source paths and test names that verify it, or an explicit 'unverified' marker",
+      "A CI check fails when a requirement has neither a linked test nor an unverified marker, or when a referenced source path no longer exists",
+      "Line-number references are either removed in favour of symbol anchors or validated by the same check so drift cannot go unnoticed",
+      "A generated coverage table reports the count and percentage of requirements with verifying tests, and the number currently unverified",
+      "Adding a new requirement without traceability fails CI, proving the check is load-bearing",
+      "The traceability map is generated rather than hand-maintained wherever the linkage can be derived from test names or annotations"
+    ],
+    "user_stories": [
+      {
+        "id": "VG-040-US1",
+        "as_a": "maintainer",
+        "i_want": "the requirements corpus versioned and linked to tests",
+        "so_that": "the baseline survives a clean checkout and tells me which guarantees are unverified"
+      },
+      {
+        "id": "VG-040-US2",
+        "as_a": "new contributor",
+        "i_want": "to see which requirement a test covers",
+        "so_that": "I understand why a test exists before I change it"
+      }
+    ],
+    "linked_spec_id": null
+  },
+  {
+    "id": "VG-041",
+    "title": "Stall and no-progress watchdog",
+    "description": "Detect runs that have stopped making progress rather than stopped spending. Track time since the last meaningful observation (tool call, verdict line, task update, assistant text) and time spent on the current gate, emit escalating warn events at configurable thresholds, and on a hard stall interrupt the turn and either inject a nudge, halt the plan, or halt the run according to policy. Detect degenerate loops — the same tool call with identical input repeated beyond a threshold — as a distinct stall class, and surface time-on-current-gate live in the cockpit and plain output.",
+    "rationale": "The north star is that an operator hands over a multi-phase plan and walks away, and the budget guard protects the wallet — but nothing protects the clock. An agent stuck retrying the same failing command, waiting on a hung probe, or looping without emitting a verdict burns hours while every artifact looks healthy, and an operator who walked away has no signal at all. Wall-clock stall detection is the missing half of unattended-run safety and rides on observations the event stream already carries.",
+    "priority": "could_have",
+    "complexity": "small",
+    "impact": "medium",
+    "effort_estimate": "3-4 days",
+    "phase_id": "phase-3",
+    "status": "planned",
+    "dependencies": ["VG-004"],
+    "tags": ["safety", "guardrails", "observability", "reliability"],
+    "source_pain_points": [
+      "Long autonomous runs are opaque — no live view of tool calls, hook decisions, token burn or dollar cost",
+      "maxBudgetUsd is forwarded to the SDK but there is no Vigil-side budget guard, warning or hard stop",
+      "Pending gates after a failure are explicitly left pending"
+    ],
+    "affected_files": [
+      "src/engine/session.ts",
+      "src/engine/runner.ts",
+      "src/engine/events.ts",
+      "src/ui/panes.tsx",
+      "src/config.ts"
+    ],
+    "acceptance_criteria": [
+      "Time since the last meaningful observation and time on the current gate are tracked and exposed as live values in the cockpit header and in plain output",
+      "Configurable idle and per-gate thresholds emit escalating warn events exactly once per threshold, visible in the diagnostics pane and persisted to events.jsonl",
+      "On a hard stall the configured policy is applied — nudge, halt plan, or halt run — with the turn interrupted and the reason recorded in the run summary",
+      "Repeating an identical tool call with identical input beyond a configurable count is detected as a loop stall and reported distinctly from an idle stall",
+      "A long-running but legitimately progressing tool call does not trigger a stall, asserted by a test with a slow single call under the idle threshold",
+      "Watchdog behaviour is entirely disabled when no thresholds are configured, with no events emitted and no behaviour change",
+      "Unit tests drive synthetic event timelines through idle, per-gate and loop stall paths and assert the emitted events and applied policy"
+    ],
+    "user_stories": [
+      {
+        "id": "VG-041-US1",
+        "as_a": "operator who walked away from a run",
+        "i_want": "a stalled run to halt or nudge itself",
+        "so_that": "I do not return hours later to an agent that stopped progressing in minute three"
+      },
+      {
+        "id": "VG-041-US2",
+        "as_a": "operator watching the cockpit",
+        "i_want": "to see how long the current gate has been running",
+        "so_that": "I can tell slow progress from no progress and intervene deliberately"
+      }
+    ],
+    "linked_spec_id": null
+  },
+  {
+    "id": "VG-042",
+    "title": "Credential resolution via keychain and secret-manager providers",
+    "description": "Replace plaintext-only credential handling with a pluggable resolver chain: explicit env var, OS keychain (macOS Keychain, libsecret, Windows Credential Manager where available), a shell command provider whose stdout supplies the secret, and finally the existing env or config field with a deprecation warning when a literal token is found in config. Resolve secrets at launch into process memory only, never write them to artifacts or logs, and record which provider supplied each credential so the resolution path is auditable without exposing the value.",
+    "rationale": "The auth token is read from an env var or a plaintext config field with no secret-manager integration, while the same tool writes exhaustive artifacts to disk — meaning the credential most likely to leak lives in the file most likely to be committed. Redaction in Phase 1 stops secrets reaching artifacts; this closes the other end by removing the need to store them in plaintext at all, which is a precondition for the platform and DevOps audiences the roadmap targets.",
+    "priority": "could_have",
+    "complexity": "medium",
+    "impact": "medium",
+    "effort_estimate": "4-5 days",
+    "phase_id": "phase-5",
+    "status": "planned",
+    "dependencies": ["VG-005", "VG-024"],
+    "tags": ["security", "config", "operations", "extensibility"],
+    "source_pain_points": [
+      "Auth token read from an env var (default VIGIL_AUTH_TOKEN) or a plaintext config field — no keychain/secret-manager integration",
+      "Tool artifacts store full inputs and outputs verbatim: runs/ can contain secrets",
+      "Platform/DevOps engineers running gated validation plans in CI or over SSH"
+    ],
+    "affected_files": ["src/config.ts", "src/engine/runner.ts", "src/cli.ts", "docs/configuration.md"],
+    "acceptance_criteria": [
+      "A documented resolver chain supports explicit env var, OS keychain, a command provider whose stdout is the secret, and the legacy env-or-config field, tried in a configurable order",
+      "A literal token present in a config file produces a deprecation warning naming the file and recommending a provider, without failing the run",
+      "The provider that supplied each credential is recorded in the run summary by name only; a test asserts no secret value appears in any artifact, log or diagnostic",
+      "A command provider that fails, times out or returns empty output produces a clear error naming the provider rather than proceeding with an empty token",
+      "Keychain support degrades gracefully with an actionable message on platforms or environments where the backend is unavailable",
+      "`vigil doctor` reports which provider would supply the credential and whether it resolves, without printing the value",
+      "Resolved secrets are held only in process memory and are never persisted, cached to disk or included in the child environment beyond the variables the SDK requires"
+    ],
+    "user_stories": [
+      {
+        "id": "VG-042-US1",
+        "as_a": "security-conscious operator",
+        "i_want": "my agent credential to come from the OS keychain",
+        "so_that": "no plaintext token sits in a config file I might commit"
+      },
+      {
+        "id": "VG-042-US2",
+        "as_a": "platform engineer running Vigil in a pipeline",
+        "i_want": "a command provider that fetches the token from our secret manager",
+        "so_that": "credentials are short-lived and centrally managed rather than injected as static environment variables"
+      }
+    ],
+    "linked_spec_id": null
+  }
+]

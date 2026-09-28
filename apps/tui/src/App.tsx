@@ -1,6 +1,6 @@
 /** App — root layout, view router, global keymap. */
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Box, Text, useApp, useInput } from 'ink';
+import { Box, Text, useApp, useInput, useStdout } from 'ink';
 import type { Project, Task } from '@shared/types';
 import { resolveTheme } from './theme/tokens';
 import { detectColorTier } from './util/truecolor';
@@ -48,6 +48,38 @@ registerSettingsAccessor((key: string) => {
 
 const VIEW_KEYS: Record<string, ViewName> = { '1': 'board', '2': 'term', '3': 'road', '4': 'chat', '5': 'tree', '6': 'set', '7': 'agents' };
 
+// Ink renders whatever height the tree asks for. When the frame's height
+// REACHES the terminal's row count it abandons incremental repaint and issues
+// a full clearTerminal on EVERY frame (node_modules/ink/build/ink.js:121,
+// `if (outputHeight >= this.options.stdout.rows)`), which in a real PTY stacks
+// never-cleared frames until the app is unreadable — measured 2026-09-28 in a
+// 200x50 tmux pane during a live roadmap run that was growing the feature
+// list (34 stacked repaints, evidence/phase-4/run-.../logs/
+// frame-overflow-scrollback-ap6.txt).
+//
+// Nothing in the tree bounded total height: the root Box carried only
+// `minHeight`. Views whose content scales with DATA (the roadmap's phase and
+// feature lists) therefore grew the frame without limit as generation added
+// features. Pin the root BELOW the terminal's height so the frame can never
+// reach the overflow threshold: the comparison is `>=`, so a frame of exactly
+// `rows` still takes the full-clear path. Reserve one row. Every Panel
+// already clips with overflow="hidden", so the excess is trimmed instead of
+// corrupting the display. `stdout.rows` is undefined on a non-TTY — fall back
+// to the 50-row floor the capture harness uses.
+function useTerminalRows(): number {
+  const { stdout } = useStdout();
+  // `- 1` is load-bearing, not cosmetic: see the `>=` above.
+  const [rows, setRows] = useState(Math.max(1, (stdout?.rows ?? 50) - 1));
+  useEffect(() => {
+    if (!stdout) return;
+    const onResize = () => setRows(Math.max(1, (stdout.rows ?? 50) - 1));
+    onResize();
+    stdout.on('resize', onResize);
+    return () => { stdout.off('resize', onResize); };
+  }, [stdout]);
+  return rows;
+}
+
 export function App({ projectPath }: AppProps) {
   const { exit } = useApp();
   const view = useAppStore((s) => s.view);
@@ -67,6 +99,11 @@ export function App({ projectPath }: AppProps) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [logsTask, setLogsTask] = useState<Task | null>(null);
   const ctrlCArmed = useRef(false);
+  // Must be called before ANY early return below (App returns a bare error /
+  // loading frame when `opened` is null) — a hook after a conditional return
+  // renders a different hook count between passes and React aborts the tree
+  // with "Rendered more hooks than during the previous render".
+  const termRows = useTerminalRows();
   // D14: agents/chat were a one-way trap — AgentsView literally tells the
   // user on screen "esc then 1-7 to switch tabs", but escape only called
   // closeOverlays() and never restored digit tab-navigation. `escape` now
@@ -237,7 +274,8 @@ export function App({ projectPath }: AppProps) {
 
   const viewActive = !overlaysOpen;
   return (
-    <Box flexDirection="column" borderStyle="single" borderColor={theme.border}>
+    <Box flexDirection="column" borderStyle="single" borderColor={theme.border}
+      height={termRows} overflow="hidden">
       <TitleBar theme={theme} projectName={opened.project.name} projectPath={opened.project.path}
         branch={opened.branch} counts={counts} profile={profile} />
       <TabBar view={view} theme={theme} />

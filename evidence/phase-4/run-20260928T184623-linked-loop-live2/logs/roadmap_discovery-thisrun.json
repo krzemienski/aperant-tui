@@ -1,0 +1,408 @@
+{
+  "project_name": "vigil",
+  "version": "0.1.0",
+  "one_liner": "Agent-SDK TUI runner for gated validation plans and arbitrary prompts — every tool call, gate verdict, hook decision, token and dollar visible live and persisted to disk for replay and audit.",
+
+  "analysis_metadata": {
+    "analyzed_at": "2026-09-28",
+    "analysis_method": "Direct static review of the repository: README.md, package.json, tsconfig.json, vigil.config.example.json, all 18 src/ files (line counts + key modules), 6 test suites, the tests/fixtures/omp-live-deploy plan corpus, all four docs/ documents, git history and branch topology, all five .auto-claude worktrees diffed against main, the five spec.md documents, and the existing ideation/code_improvements_ideas.json.",
+    "project_index_status": "MISSING — /Users/nick/Desktop/vigil/.auto-claude/roadmap/project_index.json does not exist. Every finding below was derived from first-hand repository inspection rather than a prebuilt index.",
+    "source_loc": 1722,
+    "source_files": 18,
+    "test_files": 6,
+    "test_cases": 26,
+    "largest_source_file": "src/engine/session.ts (301 lines)",
+    "git_head": "eb88694",
+    "git_commits_on_main": 2,
+    "working_tree": "README.md modified; .auto-claude/ and docs/ untracked",
+    "maturity": "early prototype / v0.1.0 — functional end-to-end, single author, unpublished, no CI, no LICENSE, no lint or format tooling",
+    "user_profile_mismatch": "The supplied memory context describes a beginner video developer focused on WebRTC/P2P (simple-peer), live streaming and media transport. Nothing in this repository relates to video, WebRTC, streaming or media. Vigil is an expert-level TypeScript agent-observability CLI. The memory context was judged unrelated to this codebase and did NOT shape any finding, recommendation or priority below.",
+    "verified_claims": [
+      "main is at eb88694 with exactly 2 commits; zero source changes since the previous discovery pass.",
+      "Three feature branches carry completed, tested work that is NOT merged: 001 (223 lines added), 004 (439 lines added), 005 (586 lines added) — roughly 1,250 added lines outside main.",
+      "Branches 002 and 003 have worktrees sitting exactly at eb88694 — specified and scaffolded, zero implementation.",
+      "git grep for 'redact' on branch 005 matches only src/config.ts and src/engine/redact.ts — store.ts, session.ts and cli.ts contain zero matches, so no artifact is actually redacted despite 268 lines of passing tests.",
+      "DEFAULT_RAILS in src/engine/rails.ts still hardcodes 'Desktop/OmniRoute', \"Nick's real omp config\" and '.omniroute/storage.sqlite' on main.",
+      "A stale remote branch origin/auto-claude/001-verdict-parser-fuzz-conformance-suite exists with no commits ahead of main."
+    ]
+  },
+
+  "target_audience": {
+    "primary": "The author/operator — a solo engineer driving high-risk, multi-phase deployment and migration work (the OmniRoute stack) through a Claude Code agent, who needs hard proof that each declared step actually happened rather than the agent's word for it.",
+    "secondary": [
+      "AI-assisted engineering leads who must audit what an autonomous coding agent did on a production-adjacent machine",
+      "Platform/DevOps engineers running gated validation plans in CI or over SSH via --plain mode",
+      "Teams adopting the Claude Agent SDK who need observability, safety rails and cost visibility around long agent runs",
+      "Reviewers and auditors who read run artifacts (events.jsonl, gates.json, cost.json) after the fact without ever opening the TUI"
+    ],
+    "user_sophistication": "Expert. Assumes fluency with Claude Code, the Agent SDK, terminal TUIs, JSONL log analysis, and authoring gated validation plans by hand. There is no onboarding path, no init command and no tutorial.",
+    "inferred_from": [
+      "README install is a personal checkout plus `npm link`, with a required manual `npm run build`",
+      "DEFAULT_RAILS (src/engine/rails.ts:19-27) names 'Desktop/OmniRoute', \"Nick's real omp config\" and the live .omniroute/storage.sqlite database verbatim",
+      "vigil.config.example.json hardcodes the author's absolute paths, ports 20128/20219 and a launchd label",
+      "Test fixtures are a realistic 3-phase 'omp-live-deploy' plan set with BRIEF.md and ROADMAP.md",
+      "Presence of --plain, tail, runs and replay commands aimed at CI/ssh/audit consumers",
+      "Default model id 'cc/claude-fable-5-1' behind a local baseUrl implies a self-hosted router sitting in front of the SDK"
+    ],
+    "adoption_blocker": "A second user cannot run Vigil usefully without rewriting rails and config, because the shipped defaults encode one machine's filesystem, ports and services. The fix (spec 001) is complete and tested — on a branch nobody has merged."
+  },
+
+  "problem_statement": {
+    "core_problem": "Coding agents narrate success they did not achieve. An agent can claim a validation gate PASSed while the evidence file was never written, mock a system to make a check go green, or run a destructive command (git stash, pkill -f, checkout in a shared checkout) that silently breaks unrelated work — and none of this is visible while it happens or provable afterwards.",
+    "pain_points": [
+      "Agent prose is unverifiable: PASS claims are not backed by artifacts on disk",
+      "Long autonomous runs are opaque — no live view of tool calls, hook decisions, token burn or dollar cost",
+      "Destructive shell commands in a shared repo or worktree have real blast radius",
+      "Local Claude Code settings (plugins, hooks, skills, env overrides) leak into runs and make them irreproducible",
+      "Post-hoc auditing requires reconstructing what happened from scrollback that is already gone",
+      "Validation reports written by the agent are self-graded"
+    ],
+    "solution_approach": "Wrap the Claude Agent SDK query loop in a runner that (1) appends a machine-readable runner contract to every plan so verdict lines are parseable, (2) independently verifies Capture: evidence files exist and are non-empty before accepting a PASS, (3) enforces configurable PreToolUse deny/warn rails, (4) streams every observation as a typed RunEvent into both an animated Ink cockpit and runs/<id>/ on disk, and (5) writes VALIDATION reports and ROADMAP status from its own observations rather than agent prose."
+  },
+
+  "product_vision": {
+    "statement": "Vigil is the trust layer for autonomous coding agents: a cockpit that makes an agent run observable while it happens and provable after it ends. It never accepts a claim it has not independently verified — every PASS is backed by bytes on disk, every destructive action passes a rail, and every report is rendered from Vigil's own recorded observations rather than the agent's prose.",
+    "north_star": "A run that is reproducible, auditable and portable: any engineer can re-run the same plan on a clean machine, replay the recorded event stream, and reach the same verdict without trusting either the agent or the operator who ran it.",
+    "design_principles": [
+      "Observer and enforcer, never executor — the agent does the work; Vigil constrains what it may do, what it must print, and what must exist before a claim is accepted",
+      "Evidence is bytes, not existence — presence is `bytes > 0`, never existsSync; an empty file created to satisfy a checklist does not count",
+      "One event spine — everything Vigil sees is a typed RunEvent appended to events.jsonl; the TUI, reports, replay and tail are all pure functions of that one stream",
+      "Reports from observation — VALIDATION.md and the ROADMAP status row are rendered from gates.json, and the contract forbids the agent from writing them",
+      "Clean agent by default — settingSources: [] so operator plugins, hooks, skills and env overrides never leak into a run",
+      "Degrade gracefully — no TTY, --plain or CI automatically drops the animation and emits a line-oriented log with the same information",
+      "Purity islands — reducer.ts and anim.ts have zero runtime imports, which is what makes the 18-case event fold unit-testable without a live SDK session"
+    ],
+    "differentiator": "Every comparable tool logs what an agent said. Vigil is built around disbelieving it: the PASS→FAIL downgrade with a correction injected back into the live session is the product, and everything else is plumbing that makes that loop observable."
+  },
+
+  "key_features": {
+    "implemented_on_main": [
+      {
+        "name": "Evidence-gated verdict enforcement",
+        "detail": "Parses VG-<id>: PASS|FAIL from the streamed text, resolves the gate's Capture: targets (globs with * and {a,b} alternation supported), and downgrades any PASS whose targets are missing or zero-byte, injecting a correction into the live session.",
+        "source": "src/engine/session.ts:118-169, src/plan/verdict.ts",
+        "maturity": "core, tested (tests/session-verdict.test.ts)"
+      },
+      {
+        "name": "Runner contract injection",
+        "detail": "Appends a machine-readable protocol block to every plan prompt demanding per-gate and per-plan verdict lines, asserting hard prohibitions (no mocking, no git stash, no checkout in main, no pattern kills, NODE_ENV unset) and forbidding the agent from authoring VALIDATION.md.",
+        "source": "src/plan/parser.ts:107-122",
+        "maturity": "core, tested (tests/parser.test.ts)"
+      },
+      {
+        "name": "PreToolUse rails",
+        "detail": "Seven configurable regex rails (five deny, two warn) evaluated against a flattened '<tool> <json input>' view, with every decision and its latency recorded as a hook event.",
+        "source": "src/engine/rails.ts",
+        "maturity": "core, tested — but defaults are author-specific"
+      },
+      {
+        "name": "Ink cockpit TUI",
+        "detail": "React 19 + Ink 7 terminal cockpit: header, plan/gate pane, agent stream, tool cards, diagnostics, footer; six modal overlays; a modal keyboard state machine; responsive layout that stacks below 110 columns.",
+        "source": "src/ui/ (App.tsx, panes.tsx, overlays.tsx, anim.ts)",
+        "maturity": "functional, ZERO automated coverage except anim.ts"
+      },
+      {
+        "name": "Run artifact persistence",
+        "detail": "Five artifacts per run under runs/<runId>/: append-only events.jsonl, tools/NNNN-<tool>.txt, gates.json, cost.json, session.json — the single source downstream for TUI, reports, replay and tail.",
+        "source": "src/engine/store.ts",
+        "maturity": "core, tested (tests/reports.test.ts)"
+      },
+      {
+        "name": "Reports generated from observation",
+        "detail": "<NN>-VALIDATION.md and the matching ROADMAP status row are rendered from the recorded gate ledger on plan completion.",
+        "source": "src/plan/reports.ts, src/engine/runner.ts:134-146",
+        "maturity": "core, tested — but the 'Mock Violations' section is hardcoded and asserts a check the code never performs"
+      },
+      {
+        "name": "Three approval modes",
+        "detail": "auto / gates / all — gates presents every claimed PASS to the operator (rejection downgrades to fail), all blocks on every tool call. Switchable live from the TUI.",
+        "source": "src/engine/session.ts:105-152, src/ui/App.tsx:98",
+        "maturity": "functional; only gates-mode has automated coverage"
+      },
+      {
+        "name": "Replay, tail and runs inspection",
+        "detail": "replay re-animates a recorded run through the real App at a speed multiplier; tail follows a live events.jsonl from another terminal; runs lists recorded runs with verdict, cost and event count.",
+        "source": "src/replay.ts, src/cli.ts:110-142",
+        "maturity": "functional, ZERO automated coverage; tail has a known byte/UTF-16 offset defect"
+      },
+      {
+        "name": "Clean-agent isolation",
+        "detail": "settingSources: [] by default so no operator plugins, hooks, skills or env overrides load; deterministic child env built as process.env minus unsetEnv, then cfg.env, then explicit overrides.",
+        "source": "src/config.ts:24-51",
+        "maturity": "shipped in the most recent commit; ZERO automated coverage"
+      },
+      {
+        "name": "Background health probes",
+        "detail": "Interval HTTP and shell probes emitting probe events into the cockpit alongside the agent stream.",
+        "source": "src/engine/probes.ts",
+        "maturity": "functional, ZERO automated coverage; schema permits a probe with neither url nor command"
+      }
+    ],
+    "built_but_unmerged": [
+      {
+        "name": "Neutral default rails with environment profiles",
+        "spec": "001",
+        "branch": "auto-claude/001-neutral-default-rails-with-environment-profiles @ 1b402c0",
+        "scope": "7 commits, +223/-28 across 8 files: portable DEFAULT_RAILS, ${HOME}/${planRoot}/${cwd} token interpolation, src/engine/profiles.ts, profiles/omniroute.json, --profile CLI flag, tests/profiles.test.ts, neutralized example config.",
+        "status": "COMPLETE and tested — unmerged. This is the single blocker on anyone but the author running Vigil."
+      },
+      {
+        "name": "Enforced budget and turn guards",
+        "spec": "004",
+        "branch": "auto-claude/004-enforced-budget-and-turn-guards @ d13df77",
+        "scope": "8 commits, +439/-12 across 9 files: src/engine/budget.ts (131 lines), budget RunEvent variants, Runner enforcement with warn thresholds and hard stop, run-level cost.json totals, Header budget readout, distinct exit code 3, tests/budget.test.ts (213 lines).",
+        "status": "COMPLETE and tested — unmerged. On main, maxBudgetUsd is accepted in config and never enforced locally."
+      },
+      {
+        "name": "Secret redaction in run artifacts",
+        "spec": "005",
+        "branch": "auto-claude/005-secret-redaction-in-run-artifacts @ fd34d1d",
+        "scope": "5 commits, +586/-1 across 3 files: src/engine/redact.ts (257 lines), validated config.redact schema, tests/redact.test.ts (268 lines).",
+        "status": "PARTIAL and DANGEROUS — the engine exists and passes tests, but store.ts, session.ts and cli.ts contain zero references to it. No artifact is actually redacted. The capability looks done and delivers no protection."
+      }
+    ],
+    "specified_not_started": [
+      {
+        "name": "vigil init — config and plan scaffolding",
+        "spec": "002",
+        "branch": "auto-claude/002-vigil-init-config-and-plan-scaffolding @ eb88694 (no commits)",
+        "scope": "Interactive and --yes-scriptable init that detects the Claude Code binary, git root and worktree usage, writes a validated vigil.config.json, optionally scaffolds phases/ with an example PLAN.md and ROADMAP.md, and prints the resolved config including active rails and run output path."
+      },
+      {
+        "name": "Content-aware evidence assertions with hash recording",
+        "spec": "003",
+        "branch": "auto-claude/003-content-aware-evidence-assertions-with-hash-record @ eb88694 (no commits)",
+        "scope": "Extend Capture targets beyond bytes>0 to min size, regex match, JSON-path existence/value and expected line count; record SHA-256 and byte size of every verified artifact into gates.json; reuse the existing downgrade path for assertion failures. This deepens the product's core differentiator."
+      }
+    ]
+  },
+
+  "technical_stack": {
+    "language": "TypeScript 5.8, strict: true, ES2022 target, NodeNext module + resolution",
+    "runtime": "Node >= 20, pure ESM (\"type\": \"module\")",
+    "ui": "React 19 rendering to the terminal via Ink 7 + @inkjs/ui 2.0.0 + ink-spinner 5.0.0 — terminal, not browser",
+    "agent_integration": "@anthropic-ai/claude-agent-sdk 0.3.261 (pinned exactly), driving an external Claude Code executable resolved via --claude-bin, CLAUDE_CODE_EXECPATH, or `claude` on PATH",
+    "cli": "commander ^13.1.0 — 5 commands (run, prompt, replay, tail, runs)",
+    "validation": "zod ^4.0.0 — 16 config keys, defaults on 12, parsed with .parse so a malformed file throws",
+    "testing": "vitest ^3.1.1 — 6 files, 8 describe groups, 26 it blocks, no vi.mock anywhere; tests read the real fixture corpus from disk and use mkdtempSync for real filesystem evidence checks",
+    "build": "tsc -p tsconfig.json, src → dist; bin/vigil.js is a 2-line shim importing ../dist/cli.js",
+    "persistence": "Plain filesystem — append-only JSONL plus JSON sidecars. No database, no network service.",
+    "architecture": {
+      "shape": "Layered, acyclic, no barrel files and no path aliases — every import names a concrete relative file with a .js extension",
+      "flow": "plan/ (leaf, type-only engine imports) → engine/ (owns all I/O: SDK, filesystem, probes) → state/reducer.ts (zero runtime imports) → ui/ → cli.ts (composition root)",
+      "spine": "A single RunEvent discriminated union of 18 variants defined in src/engine/events.ts (40 lines) — the smallest file in the engine and the one every other module depends on",
+      "purity_islands": "src/state/reducer.ts and src/ui/anim.ts have zero runtime imports, which is what makes the full 18-case event fold testable without a live SDK session"
+    },
+    "external_dependencies": [
+      "A Claude Code executable on the machine",
+      "An Anthropic-compatible endpoint — the example config points at a local router on 127.0.0.1:20128 with model id cc/claude-fable-5-1"
+    ]
+  },
+
+  "current_state": {
+    "what_works": "The end-to-end loop is real and proven by tests: parse a plan, inject the contract, stream the SDK session into typed events, catch verdict lines, verify evidence on disk, downgrade unsupported PASS claims with a live correction, enforce rails, persist five artifacts, render reports from observation, and replay the whole thing later.",
+    "test_coverage": {
+      "covered": [
+        "Contract injection (FR-1..FR-3) — tests/parser.test.ts",
+        "Verdict grammar and LineBuffer chunking (FR-4..FR-6) — tests/verdict-rails.test.ts",
+        "Evidence enforcement and PASS→FAIL downgrade (FR-7..FR-12) — tests/session-verdict.test.ts",
+        "Rails deny/warn and ordering (FR-13..FR-14) — tests/verdict-rails.test.ts",
+        "Persistence round-trip and report rendering (FR-17..FR-20) — tests/reports.test.ts",
+        "Event fold to UIState — tests/reducer.test.ts",
+        "UI formatters and animation primitives — tests/anim.test.ts"
+      ],
+      "uncovered": [
+        "src/cli.ts — command wiring, flag precedence, plain-mode log, exit codes",
+        "src/config.ts — schema defaults, discovery order, buildEnv() precedence",
+        "src/replay.ts — replay rendering",
+        "src/engine/probes.ts — background HTTP and command probes",
+        "src/ui/ — 3 of 4 files (App.tsx, panes.tsx, overlays.tsx)"
+      ],
+      "structural_gap": "tsconfig.json sets include: [\"src\"], so `npm run typecheck` does not typecheck tests/. Running `npm test` is mandatory to catch type errors in the suite."
+    },
+    "documentation": "Unusually strong for a v0.1.0: four docs (project-overview-pdr, system-architecture, codebase-summary, code-standards) formalize FR-1..FR-25 and NFR-1..NFR-9 against path:line citations and honestly enumerate known defects. They are UNTRACKED in git — the entire requirements baseline is one `rm -rf` from gone.",
+    "integration_debt": "The dominant fact about this project's state. main has not moved in two commits while three branches accumulated ~1,250 lines of finished, tested source. Every merge conflicts on the same small files (config.ts, cli.ts, store.ts, events.ts), and the conflict cost grows with every day of delay."
+  },
+
+  "known_defects": [
+    {
+      "id": "D1",
+      "severity": "high",
+      "issue": "Secret redaction engine is built and tested but never wired — store.ts, session.ts and cli.ts on branch 005 have zero references to it. runs/ is never gitignored and tool artifacts store inputs and outputs verbatim.",
+      "source": "branch auto-claude/005, verified by git grep"
+    },
+    {
+      "id": "D2",
+      "severity": "high",
+      "issue": "A gate authored without an explicit `id` silently has no detectable verdict. GATE_RE demands a literal VG- prefix while the parser's fallback id is `${tag}-${n}` (e.g. validation_gate-4), which can never match. Silent failure, no warning.",
+      "source": "src/plan/verdict.ts:7, src/plan/parser.ts:86"
+    },
+    {
+      "id": "D3",
+      "severity": "high",
+      "issue": "The 'Mock Violations' section of VALIDATION.md emits a hardcoded string asserting a rails check the code never performs — a false negative by construction, in the one document whose stated purpose is observed truth.",
+      "source": "src/plan/reports.ts:48-49"
+    },
+    {
+      "id": "D4",
+      "severity": "medium",
+      "issue": "maxBudgetUsd is accepted in config and handed to the SDK but never enforced locally. A runaway run is bounded only by maxTurns (default 400).",
+      "source": "src/config.ts; fix complete on branch 004"
+    },
+    {
+      "id": "D5",
+      "severity": "medium",
+      "issue": "DEFAULT_RAILS hardcodes one machine's paths and services ('Desktop/OmniRoute', \"Nick's real omp config\", .omniroute/storage.sqlite), and setting `rails` in config REPLACES the defaults entirely rather than extending them.",
+      "source": "src/engine/rails.ts:19-27; fix complete on branch 001"
+    },
+    {
+      "id": "D6",
+      "severity": "medium",
+      "issue": "`vigil tail` tracks byte offsets against a UTF-16 decoded string. Since plainLine emits ▶ ✓ ✗ and reports write ✓/✗, any non-ASCII content permanently desynchronises the tail and corrupts every subsequent line. It also re-reads the whole file every 500ms and never self-terminates on run.end.",
+      "source": "src/cli.ts:125-126"
+    },
+    {
+      "id": "D7",
+      "severity": "medium",
+      "issue": "New RunEvent variants are silently dropped by the UI — the reducer switch has no default case and no exhaustiveness guard, so an added variant compiles clean and never reaches the screen.",
+      "source": "src/state/reducer.ts:50-100"
+    },
+    {
+      "id": "D8",
+      "severity": "medium",
+      "issue": "No prepare or prepublishOnly script, while bin/vigil.js imports ../dist/cli.js. Installing from git or publishing without a manual `npm run build` produces a binary that fails with ERR_MODULE_NOT_FOUND.",
+      "source": "package.json:9-14, bin/vigil.js"
+    },
+    {
+      "id": "D9",
+      "severity": "low",
+      "issue": "CLI enum flags (--approvals, --log, --settings) are type-cast at the boundary without validation, so `--approvals bogus` propagates silently.",
+      "source": "src/cli.ts:40-42"
+    },
+    {
+      "id": "D10",
+      "severity": "low",
+      "issue": "reducer.ts is documented as 'Pure; testable' but the private diag() helper mutates the array shared by the shallow copy.",
+      "source": "src/state/reducer.ts:46-49"
+    },
+    {
+      "id": "D11",
+      "severity": "low",
+      "issue": "Plan discovery is exactly two levels deep (phases/<dir>/<file>); more deeply nested plans are not found. ProbeSchema permits a probe with neither url nor command. Report gate classification uses id-prefix string matching rather than the parsed kind, and keeps only the first match per phase.",
+      "source": "src/plan/discover.ts:17-21, src/config.ts:8, src/plan/reports.ts:19-20"
+    }
+  ],
+
+  "constraints": {
+    "technical": [
+      "Node >= 20 and pure ESM — no CommonJS consumers",
+      "Requires an external Claude Code executable on the machine; Vigil cannot run standalone",
+      "Coupled to @anthropic-ai/claude-agent-sdk 0.3.261 pinned exactly at a pre-1.0 version; SDK message shapes and hook callbacks are an unstable surface",
+      "Terminal-only UI via Ink — no web dashboard, and animation requires a TTY plus config.animations plus absence of --plain",
+      "Verdict detection depends on the agent obeying the injected text contract; a model that reformats its output breaks enforcement",
+      "Evidence verification is filesystem-local — no remote or containerized evidence resolution",
+      "Config discovery is first-file-wins with NO merging, so a partial file silently gets schema defaults rather than lower-priority values",
+      "Single-run, single-process: no concurrency, no daemon, no multi-run aggregation",
+      "noUncheckedIndexedAccess is not enabled despite strict: true"
+    ],
+    "process_and_project": [
+      "Single author, 2 commits on main, no CI pipeline, no lint or format script, no LICENSE file, unpublished to npm",
+      "Feature work happens in .auto-claude worktrees on long-lived branches that are not being merged — integration debt is the dominant process risk",
+      "docs/ and .auto-claude/ are untracked, so the requirements baseline and all roadmap state live outside version control",
+      "No release process, no CHANGELOG, no versioning discipline beyond 0.1.0",
+      "Test suite is fast and real (no mocks) but covers roughly half the source; the CLI, config, replay, probes and TUI layers are unverified"
+    ],
+    "product": [
+      "Shipped defaults encode one machine's filesystem, ports and services, which blocks any second user",
+      "There is no path from zero to a first run — no init, no quickstart scaffolding, no example plan outside tests/fixtures",
+      "Reports claim a mock-violation check that does not exist, which undermines the product's central trust claim",
+      "Run artifacts capture secrets verbatim and runs/ is not gitignored"
+    ],
+    "non_constraints": [
+      "No performance or scale pressure — 1,722 lines of source, single-user, single-run; correctness and trust dominate over throughput",
+      "No backwards-compatibility obligation — unpublished, no external users, so breaking changes are cheap right now and will not stay cheap"
+    ]
+  },
+
+  "opportunities": [
+    {
+      "priority": 1,
+      "title": "Land the integration debt",
+      "rationale": "Three branches hold ~1,250 lines of finished, tested source that main has never seen. Branch 001 alone unblocks every non-author user. Branch 004 closes an unbounded-spend hole. Nothing else on any roadmap should outrank merging work that is already done and already passing tests, and the merge cost only grows.",
+      "concrete": "Merge 001 (neutral rails + profiles), then 004 (budget guards), then finish wiring 005's redactor into store.ts/session.ts/cli.ts before merging it. Prune the abandoned origin/auto-claude/001-verdict-parser-fuzz-conformance-suite branch."
+    },
+    {
+      "priority": 2,
+      "title": "Close the trust gaps in the product's own claims",
+      "rationale": "Vigil's entire value proposition is that it does not repeat claims it has not verified — yet VALIDATION.md hardcodes a mock-violation clearance it never checks (D3), and a gate missing an id silently becomes unverifiable (D2). These are self-inflicted wounds on the core differentiator.",
+      "concrete": "Derive the Mock Violations section from actual recorded rail denials in events.jsonl or remove the section. Make an id-less gate a hard parse error rather than a silent no-op."
+    },
+    {
+      "priority": 3,
+      "title": "Make the repository survivable",
+      "rationale": "docs/ carries the full FR/NFR baseline with path:line citations and is untracked. There is no CI, no LICENSE, and no prepare script, so a fresh clone plus npm install yields a broken binary.",
+      "concrete": "git add docs/, add a prepare script, add a minimal GitHub Actions workflow running typecheck + test on Node 20/22, add a LICENSE, gitignore runs/."
+    },
+    {
+      "priority": 4,
+      "title": "Build the onboarding path",
+      "rationale": "Spec 002 (vigil init) is written and unstarted. Paired with merged neutral rails, it converts Vigil from a personal tool into something a second engineer can actually adopt.",
+      "concrete": "Implement vigil init with --yes, environment detection, validated config emission and optional phases/ scaffolding; surface the resolved rails and run output path."
+    },
+    {
+      "priority": 5,
+      "title": "Deepen evidence verification",
+      "rationale": "Spec 003 extends the core loop from bytes>0 to real content assertions plus SHA-256 recording. This is the differentiator getting sharper rather than the surface getting wider, and it reuses the existing downgrade path.",
+      "concrete": "Min-size, regex, JSON-path and line-count assertions on Capture targets; hash and size recorded into gates.json for every verified artifact."
+    },
+    {
+      "priority": 6,
+      "title": "Cover the untested half",
+      "rationale": "cli.ts, config.ts, replay.ts, probes.ts and three of four ui/ files have zero automated coverage, and typecheck does not even see tests/. The CLI and config layers are where flag precedence and env construction bugs hide.",
+      "concrete": "Unit-test buildEnv() precedence and config discovery order, add CLI flag-precedence and exit-code tests, add an exhaustiveness guard to the reducer switch, fix the tail byte-offset defect with a positioned read and a run.end self-terminate."
+    }
+  ],
+
+  "risks": [
+    {
+      "risk": "Unmerged branches rot",
+      "impact": "high",
+      "detail": "001, 004 and 005 all touch config.ts and cli.ts. Each additional change to main multiplies the three-way conflict cost, and the QA effort already spent gets revalidated or discarded."
+    },
+    {
+      "risk": "Redaction looks done and protects nothing",
+      "impact": "high",
+      "detail": "A merged-but-unwired redactor would give the operator false confidence that runs/ is safe to share while tool artifacts still contain tokens verbatim. Do not merge 005 until store/session/cli actually call it."
+    },
+    {
+      "risk": "Untracked requirements baseline",
+      "impact": "medium",
+      "detail": "The four docs/ files encode FR-1..FR-25 and NFR-1..NFR-9 with citations and are not in git. Losing them loses the only formal specification of what Vigil guarantees."
+    },
+    {
+      "risk": "Pre-1.0 SDK coupling",
+      "impact": "medium",
+      "detail": "@anthropic-ai/claude-agent-sdk is pinned at 0.3.261. Message shapes and PreToolUse hook semantics can change without notice, and session.ts (301 lines, the largest file) is where that breakage lands."
+    },
+    {
+      "risk": "Contract compliance is a soft dependency",
+      "impact": "medium",
+      "detail": "Enforcement rests on the agent printing VG-<id>: PASS|FAIL in a parseable form. A model change or a verbose formatting habit degrades enforcement silently rather than loudly."
+    },
+    {
+      "risk": "Single-author bus factor",
+      "impact": "medium",
+      "detail": "Two commits, one contributor, no CI, no LICENSE, machine-specific defaults. The project currently cannot be picked up by anyone else without the merge of branch 001 plus an onboarding path."
+    }
+  ],
+
+  "success_metrics": [
+    "Zero unmerged feature branches older than one week; main carries every completed spec",
+    "A clean clone on a foreign machine reaches a first successful `vigil run` without editing source",
+    "Every section of VALIDATION.md is derived from a recorded RunEvent — no hardcoded assertions remain",
+    "An id-less gate fails loudly at parse time instead of silently producing no verdict",
+    "CI runs typecheck and the full suite on Node 20 and 22 for every push",
+    "runs/ artifacts contain no recoverable secrets, verified by a test that plants a token and asserts it is redacted on disk",
+    "Automated coverage extends to config.ts, cli.ts and the reducer exhaustiveness guard"
+  ]
+}

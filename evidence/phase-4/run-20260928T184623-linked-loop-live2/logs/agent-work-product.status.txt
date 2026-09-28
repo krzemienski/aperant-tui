@@ -1,0 +1,2 @@
+?? .auto-claude/
+?? src/engine/sdk-schema.ts

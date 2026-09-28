@@ -211,7 +211,16 @@ export class ObservabilityService extends EventEmitter {
         phase: progress?.phase ?? 'roadmap',
         message: progress?.message,
       }));
-    on('roadmap-log', (projectId, message: string) => this.onLog(String(projectId), String(message)));
+    // A roadmap run is a REAL agent run whose only stream surface is
+    // `roadmap-log` (agent-queue.ts emits `Tool: <name>`, `Running <phase>
+    // phase...`, `Phase <phase> completed` and raw text-deltas there). Routing
+    // it at onLog alone dropped every one of those lines, because onLog returns
+    // unless the message is worker.ts's `Starting agent session:` banner — so
+    // LIVE TOOL TRACE / trace / tokens rendered EMPTY for the whole generation
+    // even though the swarm listed the agent as live. onRoadmapLog keeps the
+    // model-id sniffing (via onLog) and additionally lands the roadmap's own
+    // activity in the same trace ring the task path uses.
+    on('roadmap-log', (projectId, message: string) => this.onRoadmapLog(String(projectId), String(message)));
     on('roadmap-error', (projectId, error: string) => this.onError(String(projectId), String(error)));
     on('roadmap-complete', (projectId) => this.onExit(String(projectId), 0));
     on('roadmap-stopped', (projectId) => this.onExit(String(projectId), null));
@@ -348,6 +357,55 @@ export class ObservabilityService extends EventEmitter {
     // whole session's lifetime.
     a.snap.model = resolvedModelId;
     a.snap.contextWindowLimit = getModelContextWindow(resolvedModelId);
+    this.dirty = true;
+  }
+
+  /** `Tool: <name>` — the roadmap runner's tool-use surface (agent-queue.ts). */
+  private static readonly ROADMAP_TOOL_RE = /^Tool:\s*(\S+)/;
+  /** `Running <phase> phase...` / `Phase <phase> completed|failed`. */
+  private static readonly ROADMAP_PHASE_RE = /^(?:Running (\S+) phase\.\.\.|Phase (\S+) (completed|failed))$/;
+
+  /**
+   * Fold one roadmap-log line into the same agent record + trace ring the task
+   * path uses. Every branch is driven by a line the runner actually emitted —
+   * nothing is synthesized when the roadmap is quiet.
+   */
+  private onRoadmapLog(taskId: string, message: string): void {
+    this.onLog(taskId, message);
+    const line = message.trim();
+    if (!line) return;
+    const a = this.ensureAgent(taskId);
+
+    const tool = ObservabilityService.ROADMAP_TOOL_RE.exec(line);
+    if (tool) {
+      // The runner reports tool USE only (no matching result event), so this is
+      // a completed-call row rather than an open call — recording it as open
+      // would strand the agent in a permanent `blocked` wait state.
+      a.snap.stepsExecuted += 1;
+      this.pushTrace(taskId, 'tool-call', tool[1], undefined, false, 'roadmap');
+      this.dirty = true;
+      return;
+    }
+
+    const phase = ObservabilityService.ROADMAP_PHASE_RE.exec(line);
+    if (phase) {
+      const failed = phase[3] === 'failed';
+      this.pushTrace(taskId, `roadmap:${phase[1] ?? phase[2]}`, undefined, undefined, failed, line);
+      if (failed) a.snap.state = 'error';
+      this.dirty = true;
+      return;
+    }
+
+    if (line.startsWith('Error:')) {
+      this.pushTrace(taskId, 'error', undefined, undefined, true, line.slice(0, 160));
+      a.snap.state = 'error';
+      this.dirty = true;
+      return;
+    }
+
+    // Streamed model prose — the roadmap equivalent of a text-delta.
+    this.pushTrace(taskId, 'text-delta', undefined, undefined, false, summarizeDelta(line));
+    a.snap.lastMessage = line.slice(0, 160);
     this.dirty = true;
   }
 

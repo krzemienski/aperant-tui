@@ -1,0 +1,36 @@
+{
+  "providerAccounts": [
+    {
+      "id": "anthropic-mu6zlcfu",
+      "provider": "anthropic",
+      "name": "Anthropic (operator router)",
+      "authType": "api-key",
+      "billingModel": "pay-per-use",
+      "apiKey": "<REDACTED-from-env-at-runtime>",
+      "baseUrl": "http://127.0.0.1:20219/v1",
+      "createdAt": 1789737659706,
+      "updatedAt": 1789737659706
+    },
+    {
+      "id": "anthropic-mu76gy5z",
+      "provider": "anthropic",
+      "name": "Anthropic (operator router)",
+      "authType": "api-key",
+      "billingModel": "pay-per-use",
+      "apiKey": "<REDACTED-from-env-at-runtime>",
+      "baseUrl": "https://router.hack.ski/v1",
+      "createdAt": 1789749211895,
+      "updatedAt": 1790621490436
+    }
+  ],
+  "globalPriorityOrder": [
+    "anthropic-mu76gy5z",
+    "anthropic-mu6zlcfu"
+  ],
+  "_runtime": {
+    "ANTHROPIC_BASE_URL": "https://router.hack.ski",
+    "APERANT_MODEL": "cc/claude-opus-5",
+    "ANTHROPIC_AUTH_TOKEN": "<REDACTED-from-env-at-runtime>",
+    "note": "token sourced only from the operator env via zsh -lc at tmux session create; never in argv, ps, screenshots or git."
+  }
+}

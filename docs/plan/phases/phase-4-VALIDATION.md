@@ -1,62 +1,73 @@
-# Phase 4 VALIDATION — Linked loop (roadmap → board → agent execution → tracing), router E2E
+# Phase 4 VALIDATION — Linked loop (roadmap → board → agent execution → tracing)
 
-Run: `evidence/phase-4/run-20260918T163148-linked-loop-final2/`
-Drive window: 2026-09-18 16:31 → 2026-09-19 16:17 UTC (execution leg completed on
-2026-09-19 after a ~5 h upstream rate-limit outage cleared).
-Provider path: `ANTHROPIC_BASE_URL=https://router.hack.ski`, model `cc/claude-opus-5`
-(`APERANT_MODEL`), token from env `ANTHROPIC_AUTH_TOKEN` only — sourced inside the
-tmux pane via `zsh -lc`, never in argv, ps output, screenshots, or committed files
-(`settings.json` / `settings-redacted.json` carry `<REDACTED-from-env-at-runtime>`).
-Target project: `~/Desktop/vigil`, driven as the end user through the real TUI in a
-real 200x50 tmux PTY (`tools/tui-capture.py`), every wait asserted on
-`matched:true` — full observe→act ledger in `drive-transcript.md`.
+Run: `evidence/phase-4/run-20260928T184623-linked-loop-live2/`
+Drive window: 2026-09-28 18:46 → 19:30 UTC.
+Target project: `/Users/nick/Desktop/vigil` — a real git repo with real TypeScript
+source, driven as the end user through the real TUI in a real 200x50 tmux PTY
+(`tools/tui-capture.py`). Every wait below is a `cmd_wait` whose exit code
+reflects the CONDITION, not transport, and every quoted result is verbatim
+(`matched:true` asserted, never assumed). Full observe→act ledger in
+`drive-transcript.md`.
 
-## Code changes shipped this run
+Provider path: `ANTHROPIC_BASE_URL=https://router.hack.ski`, model
+`cc/claude-opus-5` via `APERANT_MODEL`, token read from the operator env with
+`zsh -lc` and exported INSIDE the tmux pane at session create — never in argv,
+`ps` output, the captured grid, or any committed file. `APERANT_USER_DATA`
+points outside the repo, so the live `settings.json` (which holds a real
+`apiKey`) is never inside `evidence/`; only `settings-redacted.json` is.
 
-- **D22** `apps/tui/src/cli.tsx`: console interceptor routes vendored runtime
-  `console.*` writes into the append-only flight recorder instead of painting over
-  Ink's frame (`APERANT_RAW_CONSOLE` escape hatch; `patchConsole:false`).
-- **LogsView** `apps/tui/src/views/LogsView.tsx`: task logs now read the REAL
-  agent event log (`getAgentEventLogPath()`), filtered by taskId, with
-  malformed-line accounting and refresh — previously a permanently empty
-  `task.logs` array.
-- **`[APERANT-PATCH env-model-default]`** `apps/desktop/src/main/agent/agent-manager.ts`
-  (`resolveTaskModelId`): roadmap-converted specs carry no model, so the default
-  resolved to raw `claude-sonnet-4-6`, which the operator router served through a
-  credential-less `antigravity` backend (401 auth_failure). `APERANT_MODEL` now
-  pins the default to a router-native id. Proven by before/after events:
-  `model=claude-sonnet-4-6` (16:42 run, 401s) → `model=cc/claude-opus-5` (all
-  later runs, incl. the completing one).
-- `agent-queue.ts` `[APERANT-PATCH roadmap-tool-log]`, `roadmap-service.ts`
-  observability tap for roadmap runs, AgentsView paused-phase banner +
-  `PHASE_ORDER_INDEX`, BoardView selection-follows-move, TabBar logs-tab label fix.
+## Defects found by driving, and fixed this run
+
+All seven were found by driving the real TUI — none by reading code alone.
+`git diff --stat`: 5 files, +236/-10.
+
+| # | Defect | Root cause | Fix |
+|---|---|---|---|
+| D1 | Every Phase 3.5 tracing view rendered `no events yet` / `Σ tokens 0` / `STEPS 0/1000` during a live roadmap run | `observability.ts:214` routed `roadmap-log` at `onLog`, which returns unless the line is worker.ts's `Starting agent session:` banner — so every `Tool: <name>` line was dropped | `onRoadmapLog` folds real runner output (`Tool:`, phase transitions, errors, prose) into the same trace ring the task path uses |
+| D2 | GENERATION panel vanished on any tab switch mid-run | `App.tsx` mounts views conditionally, so `RoadmapView` unmounts and its `running`/`progress`/`logBuf` `useState` are destroyed | Rehydrate phase/progress from the runner's own `generation_progress.json` |
+| D3 | `agent-events.jsonl` stayed empty for roadmap runs | `attachEventLog` was only ever reached from `startTask()`; `roadmap-service.startGeneration` armed the observability tap but not the durable recorder | `ensureEventLogAttached(am)` in `startGeneration` |
+| D4 | Whole frame corrupted mid-run: 34 stacked, never-cleared repaints | Nothing bounded total frame height — the root `Box` carried only `minHeight`, and the roadmap's phase/feature lists grow with DATA. At `outputHeight >= stdout.rows` Ink swaps incremental repaint for a full `clearTerminal` on EVERY frame (`node_modules/ink/build/ink.js:121`) | Root pinned to the terminal height |
+| D5 | App crashed at boot: `Rendered more hooks than during the previous render`, exit 1 | My own D4 fix called `useTerminalRows()` AFTER an early return | Hook hoisted above every early return |
+| D6 | DETAIL rows interleaved (`n/p to selecte feature 2 …`) once clipped | The pane rendered EVERY feature as a 2-row Box; a clip landing mid-Box merges two features' rows | Cursor-following window (`MAX_DETAIL_FEATURES`), with a `showing X-Y of N` affordance |
+| D7 | Root pinned to exactly `rows` still took the full-clear path | The Ink comparison is `>=`, not `>` | Reserve one row (`rows - 1`) |
 
 ## Per-criterion verdicts
 
-| # | Criterion (gate) | Verdict | Evidence |
+| # | Criterion | Verdict | Evidence |
 |---|---|---|---|
-| 1 | Roadmap generates from real codebase analysis | **PASS** | `G` refresh driven in the TUI; GENERATION panel streamed `RUNNING · discovery 30%` → `features 50%` with live `Tool: Read/Bash` lines and real analysis prose ("Project index is missing…", "I'll build the roadmap, preserving VG-001–VG-005 verbatim…"), then `Phase features completed` — `step-15-roadmap-regen-streaming.png`, `step-16-roadmap-regen-complete.png`. Disk: `vigil/.auto-claude/roadmap/roadmap.json` rewritten `generated_at 2026-09-19T00:23:56Z`, **29 features / 5 phases** (was 26), new VG-027 Event stream consumer API, VG-028 Hosted multi-user control plane, VG-029 First-class Windows support. Copy: `roadmap-regenerated.json`. |
-| 2 | Roadmap item converted to spec via TUI (`c`) | **PASS** | `step-04-convert-005-spec.png`: VG-005 "Secret redaction in run artifacts" [backlog] → `c` → UI shows `spec 005-secret-redaction-in-run-artifacts [planned]`; disk: `vigil/.auto-claude/specs/005-…/{spec.md,requirements.json,task_metadata.json}` (no empty-plan placeholder — prior vendored defect stays fixed). |
-| 3 | Board → agent execution started via TUI (`s`) | **PASS** | `step-06-agent-started.png`, `step-07`, `step-17`: AGENT STREAM `agent started — phase planning`; worktree `auto-claude/005-secret-redaction-in-run-artifacts`; BuildOrchestrator ran planning → coding. Completion run: **5,534 real events** (`logs/agent-events-005-completion-run.jsonl`), `model=cc/claude-opus-5`, phases `planning`/`coding`. |
-| 4 | Executed roadmap item's work product lands on disk | **PASS** | Planner wrote a real `implementation_plan.json` (**4 phases**) into the worktree spec dir — the exact file whose absence caused every earlier CODING_FAILED. Coder then produced **5 subtask commits** on `auto-claude/005-secret-redaction-in-run-artifacts`: `a240dc7` redactor with built-in secret patterns, `e91400f` deep RunEvent redaction, `43f8d6a` unit tests, `cf220c1` validated `config.redact` patterns, `fd34d1d` auth-token literal resolution + redactor factory. Diff vs `main` at capture time: **+586 / -1 across 3 files** — `src/engine/redact.ts` (+257), `tests/redact.test.ts` (+268), `src/config.ts` (+62). Stat + commit list: `agent-work-product.stat.txt`, `agent-work-product.commits.txt`; full diff kept **outside** `evidence/` at `docs/plan/phases/work-product/005-secret-redaction.diff` because the feature under construction is a secret redactor whose tests legitimately contain synthetic `sk-…` fixtures (see criterion 8). The run was still producing further subtasks when evidence was frozen; the leg is proven by the commits already on disk. |
-| 5 | Phase 3.5 tracing views over the real event tap | **PASS** | Agents view sub-views 1-6 rendered live DURING real runs from the manager tap: swarm + **LIVE TOOL TRACE** streaming `step-finish`, tool calls/results, token counters (`Σ tokens 46.8k`, 22% progress) mid-coding — `step-17-agents-live-coding.png`; earlier failure-state trace (`rate_limited → task:CODING_FAILED → exit code 1`) — `step-08`; inspect `step-09`, trace `step-10`, tokens `step-11`, waits `step-12`, graph `step-13`. Logs view (`l` from board): per-task REAL flight-recorder lines (`execution-progress`, `stream-event`, `task-event`, `error`) — `step-14-logs-view-005.png`. |
-| 6 | Router discipline (base URL, cc/* model, env-only token) | **PASS** | `settings.json` (redacted): queue head `anthropic-mu76gy5z → https://router.hack.ski/v1`, provisioned by the TUI Settings `a` keypress (`step-01-settings-router.png`); runtime block records `ANTHROPIC_BASE_URL=https://router.hack.ski` + `APERANT_MODEL=cc/claude-opus-5`; apiKey redacted. Every agent session logged `model=cc/claude-opus-5`. Token entered the pane only via `zsh -lc` exec. |
-| 7 | Regression | **PASS** | `npm test -w @aperant/tui` → 9/9, exit 0; `npm run typecheck` → exit 0. Re-run on the final turn; no test deleted, skipped, or weakened. |
-| 8 | No leaked secret in evidence | **PASS (no real credential) / literal-regex sub-leg UNVERIFIED** | **Operator credentials: 0.** Final-turn scan for the live `ANTHROPIC_AUTH_TOKEN` value, its 12- and 8-char prefixes, the legacy `sk-b455`/`sk-9159` prefixes, and any `ANTHROPIC_AUTH_TOKEN=..` assignment returns **NONE** across all of `evidence/`. **Correction to an earlier draft of this row**, which wrongly claimed "0 matches" for `sk-[A-Za-z0-9_-]{16,}`: that pattern matches **106** times, ~90 of them in this run's `agent-events.jsonl`, `logs/*.jsonl`, and `screens/step-17-agents-live-coding.png.{txt,html}` (line 38 of the sidecar). Every one is a **synthetic test vector** — repeated-character and `deadbeef`-style placeholders authored by the agent as literal fixtures in `tests/redact.test.ts` while building VG-005's *secret redactor*, then echoed through the LIVE TOOL TRACE and recorded faithfully by the event tap. (The literal values are deliberately **not** reproduced here: this document stays in scope for `tools/audit-credentials.mjs`, so quoting them would make the verdict itself trip the gate. They are readable in the cited artifacts.) The trace is correct **because** it captured them; no operator credential is involved. Remaining hits are component/subtask names (`sk-1-1-bs4-…`, `sk-box-…`, `sk-lifecycle-service`). The goal's literal `rg -n 'sk-\|…' evidence/` therefore **cannot reach zero while criterion 3 is satisfied**: the class census over `evidence/` is 808 `task-*` + 414 `subtask-*` + 49 `disk-*` + 15 `ask-*` benign hits, and the mandated `agent-events.jsonl` (5,714 lines) itself contains 5 `"task-event"` records and 14 `task-execution` refs. Rewriting those strings would falsify the event tap, which the objective forbids ("never simulated"), so this sub-leg is recorded UNVERIFIED with cause rather than forced green. |
+| 1 | Roadmap generates from REAL codebase analysis | **PASS** | `G` driven in the TUI; GENERATION streamed `RUNNING · discovery 30%` → `features 50%` with live `Tool: Read` / `Tool: Bash` against vigil — `step-07-roadmap-regen-start.png`, `step-11-regen-bounded-frame.png`. Waits: `{"matched": true, "anchor": "RUNNING \u00b7 "}`, `{"matched": true, "anchor": "Phase discovery completed", "waited_s": 156.48}`, `{"matched": true, "anchor": "Phase features completed", "waited_s": 189.68}`. Disk: `roadmap.json` rewritten `generated_at 2026-09-28T19:17:27`, **29 → 39 features**, 10 new ids VG-030…VG-039. Discovery output is genuine static review (`analysis_method: "static source review (README, package.json, tsconfig, src/**, tests/**, …)"`, 13 opportunity areas, and it correctly noted `project_index.json was NOT present`). The agent's own in-frame validation: `All 39 features carry the required fields; MoSCoW buckets exactly partition the feature set`. Copies: `logs/roadmap-before.json`, `logs/roadmap-regenerated-thisrun.json`, `logs/roadmap_discovery-thisrun.json`. |
+| 2 | Roadmap item converted to a spec via the TUI (`c`) | **PASS** | `j` to phase-2, VG-006 cursored showing `c → convert this feature to a task spec` (`step-15-roadmap-vg006-selected.png`); `c` → `{"matched": true, "anchor": "spec 006"}`. Disk: `.auto-claude/specs/006-schema-validated-sdk-message-boundary/{spec.md,requirements.json,task_metadata.json}` — and NO `implementation_plan.json` placeholder, which is the documented correct behaviour (an empty `phases: []` would make the orchestrator's `isFirstRun()` skip the planner). Roadmap back-linked: `VG-006 linked_spec_id: 006-schema-validated-sdk-message-boundary`. `step-16-convert-vg006-spec.png`. |
+| 3 | Board picks the new spec up, and execution starts from it (`s`) | **PASS** | Board BACKLOG went 5 → 6 with `006-sche` appearing on the 2 s refresh — `{"matched": true, "anchor": "006-sche"}`, `step-17-board-006-appeared.png`. DETAIL confirmed `006-sche [BACKLOG]` / `spec 006-schema-validated-sdk-message-boundary` (`step-18`). `s` → `{"matched": true, "anchor": "agent started"}`; AGENT STREAM showed `19:20:18 started 006-sche: agent started — phase planning` (`step-19-agent-started-006.png`). Real worktree + branch created: `auto-claude/006-schema-validated-sdk-message-boundary`. |
+| 4 | The executed roadmap item's work product lands on disk | **PASS** | The planner ran to completion (`task_logs.json` `planning: completed`, 61 entries) and wrote a REAL `implementation_plan.json` into the worktree spec dir: **5 phases / 14 subtasks** (`Toolchain bootstrap`, `Schema module and diagnostic vocabulary`, `Rewire session handlers onto schemas`, `Tests, malformed fixtures and real-session corpus`, `Full verification`). Archived verbatim as `logs/implementation_plan-006.json` (38,201 bytes). This is the exact artifact whose absence caused every earlier CODING_FAILED. It plus `context.json`, `project_index.json` and `SDK_*` findings notes are work product the agent wrote to disk that did not exist before the run. |
+| 4b | Coder-phase source commits on the task branch | **PASS** | The coding phase produced a REAL commit on `auto-claude/006-schema-validated-sdk-message-boundary`: `0b22b23 auto-claude: Complete subtask-1-1 - Create SDK message zod schema module`. `git diff --stat main..HEAD` → **`src/engine/sdk-schema.ts` | 197 +++, 1 file changed, 197 insertions(+)**. The file is substantive implementation of VG-006's own acceptance criteria — zod loose schemas for the Claude Agent SDK message stream, a two-layer ENVELOPE/DETAIL split so a malformed message degrades instead of vanishing, and a `SchemaIssue` diagnostics vocabulary. Archived verbatim as `logs/agent-work-product-sdk-schema.ts` (9,274 bytes); commit list + stat in `logs/agent-work-product.commits.txt`. Route confirmed independently by the flight recorder itself, which the TUI rendered on screen: `Starting agent session: type=build_orchestrator, model=cc/claude-opus-5`. |
+| 5 | Phase 3.5 tracing views render over the REAL event tap | **PASS** | All six sub-views driven live DURING real runs, from the manager tap — not from a fixture. Swarm during roadmap generation: STEPS `10/1000`, LIVE TOOL TRACE streaming `19:03:17 → Read roadmap`, `→ Bash`, text-deltas (`step-08-agents-swarm-live-trace.png`). Swarm during real task execution: agent typed `planner`, `20/1000` steps, CTX 37 %, `Σ tokens 82.6k`, `step-finish step 19 · 74.6k tok`, thinking-deltas and Bash calls with results (`step-20`, `step-23-agents-live-coding-006.png`). Graph (`ORCHESTRATION GRAPH` + PHASE PIPELINE), inspect (`AGENT · 006-schema-validated`, TOOL GRANTS), trace (`tool-result Read 232ms` carrying real file content), tokens (`TOKEN LEDGER` 48.9k prompt / 51.5k total), waits (`BLOCKING ANALYSIS · 0 blocked`) — `step-21-agents-{graph,inspect,trace,tokens,waits}.png`. Durable tap: `agent-events.jsonl`, **2,103 events**. |
+| 6 | Router discipline (base URL, `cc/*` model, env-only token) | **PASS** | Settings CONFIG row read `model cc/claude-opus-5 (env APERANT_MODEL)` and `queue 2 accounts → https://router.hack.ski/v1`. The `a` keypress provisioned from env — on-screen `anthropic account updated: anthropic-mu76gy5z → https://router.hack.ski/v1` (`step-01-settings-router.png`), queue head confirmed on disk. Pre-drive reachability probe against `https://router.hack.ski/v1/messages` with `cc/claude-opus-5` returned `ROUTER_OK`, 0 errors. `settings-redacted.json` carries `_runtime.ANTHROPIC_BASE_URL=https://router.hack.ski`, `_runtime.APERANT_MODEL=cc/claude-opus-5`, every credential field `<REDACTED-from-env-at-runtime>`. |
+| 7 | Regression — no test deleted, skipped, or weakened | **PASS** | `npm test -w @aperant/tui` → 9/9 passed, exit 0; `npm run typecheck` → exit 0. Re-run after every one of the seven fixes and again on the final turn. No test file was added, removed, or modified this run (`git diff --stat` touches only the five source files listed above). |
+| 8 | No leaked secret in evidence | **PASS for credentials; literal-substring sub-leg documented** | **Live operator credential: 0 matches** — `rg -F "$ANTHROPIC_AUTH_TOKEN" evidence/` returns nothing. **Key-shaped strings** (`sk-` + 8 or more key characters) in this run root: **0**. `ANTHROPIC_AUTH_TOKEN=..` across all of `evidence/`: **0**. The objective's literal pattern `sk-` is an unanchored substring and therefore still matches ordinary words: measured inside this run root, all 52 hits are `disk-first` (15), `subtask-N-M` (~30), `task-execution`/`task-event` (5), and the literal text of vigil's own feature VG-005 — *"Built-in patterns detect sk-* keys"* (8). None is a credential; none is even key-shaped. Full classification: `logs/secret-scan-census.md`. This is recorded rather than suppressed, because "fixing" it would mean deleting real roadmap content about secret redaction or renaming the runtime's own `subtask-` identifiers. |
 
 ## Honest-failure record (preserved, not deleted)
 
-1. `logs/roadmap-regen-429-screen.txt`, `roadmap-regen-429-retry.txt` — the two
-   2026-09-18 refresh attempts that 429'd before the outage cleared.
-2. `logs/console-401-antigravity-failover.txt` — first 005 run: router served raw
-   `claude-sonnet-4-6` via a credential-less backend → 401. Root-caused and fixed.
-3. `logs/agent-events-005-runs.jsonl` — three failed 005 runs (429 CODING_FAILED).
-4. `logs/router-429-probe.txt` — upstream outage census: five reported reset
-   windows (11m33s → 41m13s → 14m36s → 18m52s → 44m23s) that grew under zero
-   local traffic; cleared ~5 h later, after which the execution leg completed.
+1. `logs/frame-overflow-scrollback-ap6.txt` — the 34 stacked frame repaints that
+   exposed D4. Kept as the measurement that disproved an earlier "the frame is
+   fine" reading taken from a single clean discovery-phase capture.
+2. `logs/roadmap-partial-features-killed-run.json` — 13 real features the
+   features phase had produced when session `ap6` was killed mid-run. Preserved
+   instead of being passed off as a completed generation.
+3. Sessions `ap4`/`ap5`/`ap6` were each killed after exposing a defect; their
+   in-process generations died with them, and the orphaned
+   `generation_progress.json` each left behind is what exposed the liveness bug
+   in D2's first cut. The first cut treated the file as a liveness oracle; a
+   stale file would have rendered a permanent phantom `RUNNING ·` panel.
+   Liveness is now gated on `roadmapSvc.isRunning()` (the manager's own
+   `isRoadmapRunning`), with disk supplying phase/progress only — proven against
+   a real orphan in `step-10-real-orphan-renders-idle.png` (`RUNNING` count 0).
+4. D5 was a defect I introduced myself while fixing D4, caught by a probe rather
+   than by review.
 
 ## Operator-visible side effects (vigil)
 
-- Roadmap regenerated (29 features); spec `005-secret-redaction-in-run-artifacts`;
-  worktree + branch `auto-claude/005-…` carrying 5 agent commits (+586 / -1).
-- `~/.aperant/settings.json`: router.hack.ski account at queue head (added via TUI).
+- Roadmap regenerated: 29 → 39 features, `generated_at 2026-09-28T19:17:27Z`.
+- New spec `006-schema-validated-sdk-message-boundary` (roadmap-linked).
+- New worktree + branch `auto-claude/006-schema-validated-sdk-message-boundary`
+  carrying the planner's `implementation_plan.json` (5 phases / 14 subtasks),
+  `context.json`, `project_index.json` and SDK findings notes.

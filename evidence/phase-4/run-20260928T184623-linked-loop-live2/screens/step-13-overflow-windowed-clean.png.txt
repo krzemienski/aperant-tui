@@ -1,0 +1,50 @@
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ ap-overflow-proj /tmp/ap-overflow-proj │ ⑂ master                                                                                                      ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃ PHASES                                                                   ┃│ DETAIL                                                                                                               │ │
+│ ┃ ❯ ○ PHASE phase-1 Big Phase                                              ┃│ Big Phase                                                                                                            │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/30 features                                       ┃│ ❯· Overflow probe feature 1 with a reasonably long title [planned · must_have]                                       │ │
+│ ┃                                                                          ┃│    c → convert this feature to a task spec                                                                           │ │
+│ ┃   ○ PHASE phase-2 Second                                                 ┃│  · Overflow probe feature 2 with a reasonably long title [planned · must_have]                                       │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/0 features                                        ┃│    n/p to select                                                                                                     │ │
+│ ┃                                                                          ┃│  · Overflow probe feature 3 with a reasonably long title [planned · must_have]                                       │ │
+│ ┃                                                                          ┃│    n/p to select                                                                                                     │ │
+│ ┃                                                                          ┃│  · Overflow probe feature 4 with a reasonably long title [planned · must_have]                                       │ │
+│ ┃                                                                          ┃│    n/p to select                                                                                                     │ │
+│ ┃                                                                          ┃│  · Overflow probe feature 5 with a reasonably long title [planned · must_have]                                       │ │
+│ ┃                                                                          ┃│    n/p to select                                                                                                     │ │
+│ ┃                                                                          ┃│  · Overflow probe feature 6 with a reasonably long title [planned · must_have]                                       │ │
+│ ┃                                                                          ┃│    n/p to select                                                                                                     │ │
+│ ┃                                                                          ┃│  · Overflow probe feature 7 with a reasonably long title [planned · must_have]                                       │ │
+│ ┃                                                                          ┃│    n/p to select                                                                                                     │ │
+│ ┃                                                                          ┃│  · Overflow probe feature 8 with a reasonably long title [planned · must_have]                                       │ │
+│ ┃                                                                          ┃│    n/p to select                                                                                                     │ │
+│ ┃                                                                          ┃│  · Overflow probe feature 9 with a reasonably long title [planned · must_have]                                       │ │
+│ ┃                                                                          ┃│    n/p to select                                                                                                     │ │
+│ ┃                                                                          ┃│  · Overflow probe feature 10 with a reasonably long title [planned · must_have]                                      │ │
+│ ┃                                                                          ┃│    n/p to select                                                                                                     │ │
+│ ┃                                                                          ┃│  · Overflow probe feature 11 with a reasonably long title [planned · must_have]                                      │ │
+│ ┃                                                                          ┃│    n/p to select                                                                                                     │ │
+│ ┃                                                                          ┃│  · Overflow probe feature 12 with a reasonably long title [planned · must_have]                                      │ │
+│ ┃                                                                          ┃│    n/p to select                                                                                                     │ │
+│ ┃                                                                          ┃│    showing 1-12 of 30 · n/p scrolls                                                                                  │ │
+│ ┃                                                                          ┃│                                                                                                                      │ │
+│ ┃                                                                          ┃│                                                                                                                      │ │
+│ ┃                                                                          ┃│                                                                                                                      │ │
+│ ┃                                                                          ┃│                                                                                                                      │ │
+│ ┃                                                                          ┃│                                                                                                                      │ │
+│ ┃                                                                          ┃│                                                                                                                      │ │
+│ ┃                                                                          ┃│                                                                                                                      │ │
+│ ┃                                                                          ┃│                                                                                                                      │ │
+│ ┃                                                                          ┃│                                                                                                                      │ │
+│ ┃                                                                          ┃│                                                                                                                      │ │
+│ ┃                                                                          ┃│                                                                                                                      │ │
+│ ┃                                                                          ┃│                                                                                                                      │ │
+│ ┃                                                                          ┃│                                                                                                                      │ │
+│ ┃                                                                          ┃│                                                                                                                      │ │
+│ ┃                                                                          ┃│                                                                                                                      │ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│  g generate · G refresh · j/k phase · n/p feature · c convert→spec                                                                                                                                   │
+│ ROAD  g generate (G force regen) · x stop · j/k phase · c convert→spec                                                                                                                  : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘

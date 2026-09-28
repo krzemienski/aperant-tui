@@ -106,6 +106,19 @@ function attachEventLog(am: AgentManagerLike): void {
   }
 }
 
+/**
+ * Arm the durable JSONL flight recorder for a NON-task run (roadmap /
+ * ideation). `roadmap-progress`, `roadmap-log`, `roadmap-complete` and
+ * `roadmap-error` are already in OBSERVED_EVENTS, but attachEventLog itself
+ * was only ever reached from startTask() — so a roadmap generation started
+ * from the TUI produced a live observability tap and an EMPTY
+ * agent-events.jsonl, leaving the run with no durable record and LogsView
+ * with nothing to read. Idempotent via the same `eventLogAttached` latch.
+ */
+export function ensureEventLogAttached(am: AgentManagerLike): void {
+  attachEventLog(am);
+}
+
 // ---------------------------------------------------------------------------
 // F-17: plan sync on exit (TUI port of the desktop exit handler)
 //

@@ -1,0 +1,50 @@
+┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│APERANT │ vigil /Users/nick/Desktop/vigil │ ⑂ main                                                                                                               ◉ 0 running  ◆ 0 review  ● no profile│
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents                                                                                                                                │
+│ ┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ │ GENERATION                                                                                                                                                                                       │ │
+│ │ idle                                                                                                                                                                                             │ │
+│ │ **I ignored the memory context.** It describes a beginner WebRTC/video developer; Vigil is an expert                                                                                             │ │
+│ │ ## Validation run                                                                                                                                                                                │ │
+│ │ All 39 features carry the required fields; MoSCoW buckets exactly partition the feature set and agre                                                                                             │ │
+│ │ Phase features completed                                                                                                                                                                         │ │
+│ │                                                                                                                                                                                                  │ │
+│ │                                                                                                                                                                                                  │ │
+│ │                                                                                                                                                                                                  │ │
+│ │                                                                                                                                                                                                  │ │
+│ │                                                                                                                                                                                                  │ │
+│ └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓┌──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+│ ┃ PHASES                                                           ┃│ DETAIL                                                                                                                       │ │
+│ ┃ ❯ ○ PHASE phase-1 Escape Velocity                                ┃│ Escape Velocity                                                                                                              │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/9 features                                ┃│ ❯⇒ Neutral default rails with environment profiles [planned · must_have]                                                     │ │
+│ ┃                                                                  ┃│    spec 001-neutral-default-rails-with-environment-profiles                                                                  │ │
+│ ┃   ○ PHASE phase-2 Hardened Boundary                              ┃│  ⇒ `vigil init` config and plan scaffolding [planned · must_have]                                                            │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/11 features                               ┃│    spec 002-vigil-init-config-and-plan-scaffolding                                                                           │ │
+│ ┃                                                                  ┃│  ⇒ Content-aware evidence assertions with hash recording [planned · must_have]                                               │ │
+│ ┃   ○ PHASE phase-3 CI Native                                      ┃│    spec 003-content-aware-evidence-assertions-with-hash-record                                                               │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/8 features                                ┃│  ⇒ Enforced budget and turn guards [planned · must_have]                                                                     │ │
+│ ┃                                                                  ┃│    spec 004-enforced-budget-and-turn-guards                                                                                  │ │
+│ ┃   ○ PHASE phase-4 Resume & Compare                               ┃│  ⇒ Secret redaction in run artifacts [planned · must_have]                                                                   │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/5 features                                ┃│    spec 005-secret-redaction-in-run-artifacts                                                                                │ │
+│ ┃                                                                  ┃│  · Land the integration debt: merge train and trunk policy [planned · must_have]                                             │ │
+│ ┃   ○ PHASE phase-5 Open Platform                                  ┃│    n/p to select                                                                                                             │ │
+│ ┃   ░░░░░░░░░░░░░░░░░░ 0/6 features                                ┃│  · Strict gate identity with loud parse-time failure [planned · must_have]                                                   │ │
+│ ┃                                                                  ┃│    n/p to select                                                                                                             │ │
+│ ┃                                                                  ┃│  · Reports derived wholly from recorded observations [planned · must_have]                                                   │ │
+│ ┃                                                                  ┃│    n/p to select                                                                                                             │ │
+│ ┃                                                                  ┃│  · Repository survivability: tracked baseline, build lifecycle and hygiene [planned · must_have]                             │ │
+│ ┃                                                                  ┃│    n/p to select                                                                                                             │ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+│  g generate · G refresh · j/k phase · n/p feature · c convert→spec                                                                                                                                   │
+│ ROAD  g generate (G force regen) · x stop · j/k phase · c convert→spec                                                                                                                  : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+
+
+
+
+
+
+
+
