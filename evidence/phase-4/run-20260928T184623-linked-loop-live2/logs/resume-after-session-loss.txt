@@ -1,0 +1,24 @@
+Resume after host-session loss — driven as the end user
+
+The 006 worker was in-process to the TUI session that started it. Killing
+that session (ap8, for an unrelated 80x24 test) killed the worker: the tap
+stops dead at 19:36:55.367Z and the board correctly returned 006 to BACKLOG
+with 'no recorded runs for this task' — no false 'running' state.
+
+Restarted from the board with 's' at 19:58:20 and verified the resume is
+NON-DESTRUCTIVE against the already-committed work product:
+
+  agent stream      : '19:58:20 started 006-sche: agent started - phase planning'
+  wait result       : {"matched": true, "anchor": "agent started"}
+  prior commit      : 0b22b23 still on auto-claude/006-... (not rewound)
+  planner plan      : implementation_plan.json still 5 phases (not regenerated away)
+  tap               : 4,964 -> 5,312 events, still appending
+  live tracing       : planner, step 9/1000, CTX 29%, Sigma tokens 61.6k,
+                      LIVE TOOL TRACE '19:59:08 <- 3ms Successfully edited ...'
+
+Screens: step-28-agent-resumed-006.png, step-29-agents-live-after-resume.png
+
+Known gap, recorded not hidden: the board DETAIL pane shows 'subtasks 0/0'
+and 'location main' for a task whose worktree carries a 14-subtask plan.
+That is a board-projection defect, out of scope for the Phase 4 loop proof
+and NOT fixed here.
