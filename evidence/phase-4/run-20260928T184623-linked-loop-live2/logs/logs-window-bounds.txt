@@ -1,0 +1,13 @@
+LogsView window bound — derived from stdout.rows, not a fixed constant
+
+A fixed 30-row window disagreed with App's `stdout.rows - 1` frame clip.
+On a short terminal the renderer drew fewer rows than the scroll bound
+assumed, so the newest events could never be scrolled into view.
+
+terminal 50 rows -> window 41 | maxOffset 4175 | last of 4216 lines reachable: True
+terminal 24 rows -> window 15 | maxOffset 4201 | last of 4216 lines reachable: True
+terminal 12 rows -> window  3 | maxOffset 4213 | last of 4216 lines reachable: True
+
+OLD fixed-30 bound on an 80x24 terminal:
+  scroll stopped at offset 4186, but only 15 rows render
+  -> last visible line 4201 of 4216: tail UNREACHABLE by 15 lines

@@ -1,6 +1,6 @@
 /** LogsView — the selected task's REAL recorded log lines (full list, scrollable). */
 import React, { useEffect, useState } from 'react';
-import { Box, Text } from 'ink';
+import { Box, Text, useStdout } from 'ink';
 import { closeSync, openSync, readSync, statSync } from 'node:fs';
 import type { Task } from '@shared/types';
 import type { Theme } from '../theme/themes';
@@ -18,19 +18,35 @@ type EventLogState = {
 };
 
 /**
- * How many log rows the panel draws at once.
+ * Rows the app consumes around this panel: the root border (2), TitleBar,
+ * TabBar, StatusLine, this Panel's own border (2) and its title row, plus the
+ * optional malformed-line notice. Subtracting them from the terminal height
+ * gives the rows actually available for log lines.
+ */
+const CHROME_ROWS = 9;
+/** Always draw at least a few rows, even on an absurdly short terminal. */
+const MIN_LOG_ROWS = 3;
+
+/**
+ * How many log rows the panel may draw.
  *
- * It used to slice 200. A task's flight recorder holds thousands of events, so
- * the panel asked for ~200 rows inside a pane that has roughly 45 — the frame
- * then exceeded the terminal's row count and Ink switched from incremental
- * repaint to a full clearTerminal on every frame
+ * It used to slice a FIXED 200. A task's flight recorder holds thousands of
+ * events, so the panel asked for ~200 rows inside a pane that has roughly 45:
+ * the frame exceeded the terminal's row count and Ink switched from
+ * incremental repaint to a full clearTerminal on every frame
  * (node_modules/ink/build/ink.js:121, `outputHeight >= stdout.rows`), which in
  * a real PTY renders as rows overwriting each other mid-line. Measured
- * 2026-09-28 driving task 006: `TASK LOGS` never became matchable because the
- * frame was corrupt. 30 rows leaves room for the panel border, the title, the
- * malformed-line notice and the surrounding app chrome.
+ * 2026-09-28 driving task 006: `TASK LOGS` never became matchable.
+ *
+ * A fixed 30 was the first fix and was still wrong — App clips the frame to
+ * `stdout.rows - 1`, so on a 24-row terminal a 30-row slice both re-overflows
+ * AND strands the tail, because the scroll bound stopped at
+ * `lines.length - 30`, a row the user could never reach. Derive the window
+ * from the real terminal height so the slice and the scroll limit always agree.
  */
-const MAX_LOG_ROWS = 30;
+function logRowsFor(terminalRows: number): number {
+  return Math.max(MIN_LOG_ROWS, terminalRows - CHROME_ROWS);
+}
 
 /**
  * The flight recorder is append-only and unbounded — it was measured at 146 MB
@@ -112,6 +128,16 @@ export function LogsView({ theme: c, task, isActive, onBack }: { theme: Theme; t
   const [offset, setOffset] = useState(0);
   const taskId = task?.id ?? null;
   const [eventLog, setEventLog] = useState(() => readTaskEventLog(taskId));
+  const { stdout } = useStdout();
+  const [maxRows, setMaxRows] = useState(() => logRowsFor(stdout?.rows ?? 50));
+
+  useEffect(() => {
+    if (!stdout) return;
+    const onResize = () => setMaxRows(logRowsFor(stdout.rows ?? 50));
+    onResize();
+    stdout.on('resize', onResize);
+    return () => { stdout.off('resize', onResize); };
+  }, [stdout]);
 
   useEffect(() => {
     const refresh = () => setEventLog(readTaskEventLog(taskId));
@@ -123,11 +149,13 @@ export function LogsView({ theme: c, task, isActive, onBack }: { theme: Theme; t
 
   // Keep the historical task.logs source in the display if a producer ever populates it.
   const lines = task?.logs.length ? [...eventLog.lines, ...task.logs] : eventLog.lines;
+  // One bound for both the slice and the scroll limit: if they disagree, the
+  // tail becomes unreachable (the `- 30` vs `stdout.rows - 1` mismatch above).
+  const maxOffset = Math.max(0, lines.length - maxRows);
   useKeymap({
-    // Stop scrolling once the last row is on screen. The old `- 10` bound was
-    // unrelated to how many rows actually render, so the tail could be scrolled
-    // past into a blank panel.
-    j: () => setOffset((o) => Math.min(o + 1, Math.max(0, lines.length - MAX_LOG_ROWS))),
+    // Stop scrolling once the last row is on screen — derived from the SAME
+    // window the renderer uses, so the final event is always reachable.
+    j: () => setOffset((o) => Math.min(o + 1, maxOffset)),
     k: () => setOffset((o) => Math.max(o - 1, 0)),
     escape: onBack,
   }, { isActive });
@@ -158,7 +186,7 @@ export function LogsView({ theme: c, task, isActive, onBack }: { theme: Theme; t
           {eventLog.malformedLines > 0 && (
             <Text color={c.faint}>{eventLog.malformedLines} malformed event log line{eventLog.malformedLines === 1 ? '' : 's'} skipped</Text>
           )}
-          {lines.slice(offset, offset + MAX_LOG_ROWS).map((l, i) => (
+          {lines.slice(offset, offset + maxRows).map((l, i) => (
             <Text key={offset + i} color={c.dim} wrap="truncate-end">{l}</Text>
           ))}
         </Box>

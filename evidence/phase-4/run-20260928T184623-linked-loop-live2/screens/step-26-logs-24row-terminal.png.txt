@@ -1,0 +1,24 @@
+┌──────────────────────────────────────────────────────────────────────────────┐
+│APERANT│ vigil/Users/nick/Desktop/vig│ ⑂ main◉ 0 running◆ 0 review ● no       │
+│              il                                                   profile    │
+│  1 board    2 term    3 road    4 chat    5 tree    6 set    7 agents        │
+│ ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ │
+│ ┃ TASK LOGS · 006-sche · 4216 lines                                        ┃ │
+│ ┃ 2026-09-28T19:20:30.520Z stream-event {"type":"usage-update","usage":{"… ┃ │
+│ ┃ 2026-09-28T19:20:32.190Z execution-progress {"phase":"idle","phaseProgr… ┃ │
+│ ┃ 2026-09-28T19:20:32.191Z stream-event {"type":"tool-call","toolName":"R… ┃ │
+│ ┃ 2026-09-28T19:20:32.848Z execution-progress {"phase":"idle","phaseProgr… ┃ │
+│ ┃ 2026-09-28T19:20:32.849Z stream-event {"type":"tool-call","toolName":"R… ┃ │
+│ ┃ 2026-09-28T19:20:32.873Z execution-progress {"phase":"idle","phaseProgr… ┃ │
+│ ┃ 2026-09-28T19:20:32.873Z stream-event {"type":"tool-result","toolName":… ┃ │
+│ ┃ 2026-09-28T19:20:32.874Z execution-progress {"phase":"idle","phaseProgr… ┃ │
+│ ┃ 2026-09-28T19:20:32.874Z stream-event {"type":"tool-result","toolName":… ┃ │
+│ ┃ 2026-09-28T19:20:32.881Z execution-progress {"phase":"idle","phaseProgr… ┃ │
+│ ┃ 2026-09-28T19:20:32.881Z stream-event {"type":"step-finish","stepNumber… ┃ │
+│ ┃ 2026-09-28T19:20:32.881Z execution-progress {"phase":"idle","phaseProgr… ┃ │
+│ ┃ 2026-09-28T19:20:32.881Z stream-event {"type":"usage-update","usage":{"… ┃ │
+│ ┃ 2026-09-28T19:20:34.633Z execution-progress {"phase":"idle","phaseProgr… ┃ │
+│ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ │
+│ LOGS  j/k scroll · esc back                                     : cmd  ? help│
+└──────────────────────────────────────────────────────────────────────────────┘
+
